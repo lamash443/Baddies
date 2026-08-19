@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - Baddies Club</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
+    
+    /* DASHBOARD LAYOUT */
+    .dashboard-header { padding:3rem 0 2rem; border-bottom:1px solid rgba(255,140,0,0.12); margin-bottom:2.5rem; }
+    .dashboard-title { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:900; letter-spacing:-0.02em; line-height:1.1; margin-bottom:0.5rem; }
+    .dashboard-title span { background:linear-gradient(135deg,#ff8c00,#ffb347); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dashboard-sub { font-size:0.9rem; color:rgba(255,255,255,0.5); font-weight:400; }
+    
+    .dash-card {
+      background:rgba(17,17,17,0.85); backdrop-filter:blur(15px);
+      border:1px solid rgba(255,140,0,0.2); border-radius:18px; padding:2rem;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); margin-bottom: 2rem;
+    }
+    .dash-card-title { font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:0.5rem; }
+    .dash-card-text { font-size:0.9rem; color:rgba(255,255,255,0.6); margin-bottom:1.5rem; line-height:1.5; }
+
+    /* FORMS */
+    .form-label { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 0.4rem; }
+    .form-control, .form-select {
+      background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,140,0,0.2);
+      color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem;
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: rgba(0,0,0,0.5); border-color: orange; box-shadow: 0 0 0 3px rgba(255,165,0,0.15); color: #fff;
+    }
+    .form-control option, .form-select option {
+      background-color: #111;
+      color: #fff;
+    }
+    .text-danger { color: #ff4d4d !important; font-size: 0.85rem; margin-top: 0.4rem; }
+
+    /* â”€â”€ UNIFIED BUTTON STYLE (matches "View Statistics") â”€â”€ */
+    /* Base style: outlined orange, transparent bg */
+    .btn-profile-action,
+    .btn-orange,
+    .btn-verify-now,
+    .btn-settings-fund,
+    .btn-save-settings,
+    .btn-outline-warning,
+    .btn.btn-orange,
+    .btn.btn-outline-warning,
+    .btn.btn-outline-secondary {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.45rem !important;
+      background: transparent !important;
+      border: 2px solid orange !important;
+      color: orange !important;
+      padding: 0.6rem 1.4rem !important;
+      border-radius: 8px !important;
+      font-size: 0.88rem !important;
+      font-weight: 700 !important;
+      font-family: "Outfit", sans-serif !important;
+      text-decoration: none !important;
+      transition: all 0.3s ease !important;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: none !important;
+      white-space: nowrap;
+    }
+
+    /* Hover: fill + glow */
+    .btn-profile-action:hover,
+    .btn-orange:hover,
+    .btn-verify-now:hover,
+    .btn-settings-fund:hover,
+    .btn-save-settings:hover,
+    .btn-outline-warning:hover,
+    .btn.btn-orange:hover,
+    .btn.btn-outline-warning:hover,
+    .btn.btn-outline-secondary:hover {
+      background: orange !important;
+      color: #000 !important;
+      border-color: orange !important;
+      box-shadow: 0 0 18px 4px rgba(255, 165, 0, 0.55), 0 0 35px rgba(255, 165, 0, 0.25) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Active / pressed */
+    .btn-profile-action:active,
+    .btn-orange:active,
+    .btn-verify-now:active,
+    .btn-settings-fund:active,
+    .btn-save-settings:active,
+    .btn.btn-orange:active,
+    .btn.btn-outline-warning:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 0 10px 2px rgba(255,165,0,0.4) !important;
+    }
+
+    /* Danger button keeps its own colour but same shape */
+    .btn-danger-custom {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      background: transparent; border: 2px solid #dc3545; color: #dc3545;
+      padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700;
+      font-family: "Outfit", sans-serif; text-decoration: none; transition: all 0.3s ease;
+    }
+    .btn-danger-custom:hover {
+      background: #dc3545; color: #fff;
+      box-shadow: 0 0 18px 4px rgba(220,53,69,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* LIGHT THEME */
+    [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }
+    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.1); }
+    [data-bs-theme="light"] .dashboard-sub { color:rgba(0,0,0,0.6); }
+    [data-bs-theme="light"] .dash-card { background:#fff; border-color:rgba(255,140,0,0.3); box-shadow:0 5px 20px rgba(0,0,0,0.05); }
+    [data-bs-theme="light"] .dash-card-title { color:#000; }
+    [data-bs-theme="light"] .dash-card-text { color:rgba(0,0,0,0.6); }
+    /* â”€â”€ PROFILE AVATAR CARD â”€â”€ */
+    .profile-avatar-wrap {
+      position: relative;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 2.5px solid rgba(255,140,0,0.5);
+      background: rgba(255,140,0,0.07);
+      transition: border-color 0.3s ease;
+    }
+    .profile-avatar-wrap:hover { border-color: orange; }
+    .profile-avatar-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+    .profile-avatar-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .profile-avatar-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      border-radius: 50%;
+    }
+    .profile-avatar-wrap:hover .profile-avatar-overlay { opacity: 1; }
+    .alert-photo-success {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(40,167,69,0.12);
+      border: 1px solid rgba(40,167,69,0.35);
+      color: #28a745;
+      border-radius: 8px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem; font-weight: 600;
+    }
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    function previewAndSubmit(input) {
+      if (!input.files || !input.files[0]) return;
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var preview = document.getElementById('avatarPreview');
+        var placeholder = document.getElementById('avatarPlaceholder');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+      // Show uploading spinner then auto-submit
+      document.getElementById('photoUploadStatus').style.display = 'flex';
+      setTimeout(function() {
+        document.getElementById('photoUploadForm').submit();
+      }, 300);
+    }
+  </script>
+</head>
+<body>
+  <x-navbar :hideSearch="true" />
+
+
+
+  <div class="container pb-5 mb-5 mt-5">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-12 col-lg-4 mb-4">
+        
+        <!-- Photo & Stats Card -->
+        <div class="dash-card p-4">
+          <div class="mb-4 text-center">
+
+            {{-- â”€â”€ Avatar with click-to-change overlay â”€â”€ --}}
+            <form id="photoUploadForm" action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data">
+              @csrf
+              <div class="profile-avatar-wrap mx-auto mb-3" onclick="document.getElementById('profilePhotoInput').click()" title="Click to change photo">
+                @if(auth()->user()->profile_photo)
+                  <img id="avatarPreview"
+                       src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                       alt="Profile Photo"
+                       class="profile-avatar-img" />
+                @else
+                  <img id="avatarPreview"
+                       src=""
+                       alt="Profile Photo"
+                       class="profile-avatar-img"
+                       style="display:none;" />
+                  <div id="avatarPlaceholder" class="profile-avatar-placeholder">
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.6)" stroke-width="1.5">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                @endif
+
+                {{-- Camera overlay --}}
+                <div class="profile-avatar-overlay">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                  <span style="font-size:0.72rem;font-weight:700;margin-top:3px;">Change</span>
+                </div>
+              </div>
+
+              {{-- Hidden file input --}}
+              <input type="file"
+                     id="profilePhotoInput"
+                     name="profile_photo"
+                     accept="image/jpeg,image/png,image/webp,image/gif"
+                     style="display:none;"
+                     onchange="previewAndSubmit(this)" />
+
+              {{-- Error message --}}
+              @error('profile_photo')
+                <div class="text-danger small mb-2">{{ $message }}</div>
+              @enderror
+
+              {{-- Upload status --}}
+              <div id="photoUploadStatus" style="display:none;" class="mb-2">
+                <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+                <span class="text-secondary small ms-1">Uploadingâ€¦</span>
+              </div>
+
+              {{-- Success flash --}}
+              @if(session('status') === 'photo-updated')
+                <div class="alert-photo-success mb-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Photo updated successfully!
+                </div>
+              @endif
+
+            </form>
+
+            {{-- User name below avatar --}}
+            <div class="fw-bold text-white d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.3rem; letter-spacing:0.01em;">
+              {{ auth()->user()->name }}
+              @if(auth()->user()->is_verified)
+                <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:24px; height:24px; box-shadow:0 0 10px rgba(29,161,242,0.4);" title="Verified">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              @endif
+            </div>
+            <div class="text-secondary" style="font-size:0.85rem;">{{ auth()->user()->email }}</div>
+          </div>
+          
+          <div class="d-flex justify-content-around mb-4 border-top border-bottom border-secondary py-3" style="border-color: rgba(255,255,255,0.1) !important;">
+            <div class="text-center">
+              <div class="fs-4 fw-bold text-light">{{ number_format(auth()->user()->profile_views ?? 0) }}</div>
+              <div class="text-secondary small d-flex align-items-center justify-content-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Views
+              </div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
+            <div class="text-center">
+              <div class="fs-4 fw-bold text-light">{{ number_format(auth()->user()->phone_calls ?? 0) }}</div>
+              <div class="text-secondary small d-flex align-items-center justify-content-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Calls
+              </div>
+            </div>
+          </div>
+          
+          <a href="{{ route('profile.statistics') }}" class="btn btn-outline-warning w-100 fw-bold" style="border-radius:8px;">{{ __('View Statistics') }}</a>
+        </div>
+
+        <div class="dash-card p-3">
+          <ul class="nav flex-column list-unstyled mb-0 m-sidebar-menu" role="tablist">
+            <li role="presentation"><button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">My Profile</button></li>
+            <li role="presentation"><button class="nav-link" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">My Wallet</button></li>
+            <li role="presentation"><button class="nav-link" id="membership-tab" data-bs-toggle="tab" data-bs-target="#tab-membership" type="button" role="tab" aria-controls="tab-membership" aria-selected="false">My Membership</button></li>
+            <li role="presentation"><button class="nav-link" id="classifieds-tab" data-bs-toggle="tab" data-bs-target="#tab-classifieds" type="button" role="tab" aria-controls="tab-classifieds" aria-selected="false">My Classifieds</button></li>
+            <li role="presentation"><button class="nav-link" id="publish-media-tab" data-bs-toggle="tab" data-bs-target="#tab-publish-media" type="button" role="tab" aria-controls="tab-publish-media" aria-selected="false">Publish Photos &amp; Videos</button></li>
+
+            <li role="presentation"><button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab" aria-controls="tab-settings" aria-selected="false">My Settings</button></li>
+            <li role="presentation"><button class="nav-link" id="verification-tab" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button" role="tab" aria-controls="tab-verification" aria-selected="false">Photo Verification</button></li>
+          </ul>
+        </div>
+        
+        <style>
+          .m-sidebar-menu li button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.8rem 1rem;
+            color: rgba(255,255,255,0.7);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.2rem;
+          }
+          .m-sidebar-menu li button:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+          }
+          .m-sidebar-menu li button.active {
+            background: rgba(255,140,0,0.1) !important;
+            color: orange !important;
+            border-left: 3px solid orange;
+          }
+        </style>
+
+        {{-- â”€â”€ PHOTOS CARD â”€â”€ --}}
+        @php
+          $isVerified = auth()->user()->is_verified ?? false;
+          $hasSub = $hasSubscription ?? false;
+        @endphp
+        @if(!$isVerified)
+        <div class="dash-card p-4 photos-sidebar-card" style="margin-top:0;">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="photos-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+            <span class="fw-bold text-white" style="font-size:1rem;">Photos</span>
+            @if($isVerified)
+              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;">{{ $photos->count() }} uploaded</span>
+            @endif
+          </div>
+
+          @if(!$isVerified)
+            {{-- LOCKED STATE --}}
+            <div class="photos-locked-state text-center py-2">
+              <div class="lock-icon-wrap mx-auto mb-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <p class="photos-locked-title mb-1">Only Verified Accounts</p>
+              <p class="photos-locked-title mb-1">can Upload Photos.</p>
+              <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
+              <a href="{{ route('profile.edit') }}#tab-verification"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 class="btn-verify-now w-100">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Verify Now
+              </a>
+            </div>
+
+          @elseif(!$hasSub)
+            {{-- PLAN GATE STATE --}}
+            <div class="text-center py-2">
+              <div class="mx-auto mb-3" style="width:60px;height:60px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <p class="photos-locked-title mb-1" style="color:rgba(255,200,0,0.9);">Unlock Photo Uploads</p>
+              <p class="photos-locked-sub mb-1">You're verified! Now choose a</p>
+              <p class="photos-locked-sub mb-4">membership plan to start uploading.</p>
+              <a href="{{ route('profile.edit') }}#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 class="btn-verify-now w-100" style="margin-bottom:0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Subscribe Now
+              </a>
+              <a href="{{ route('profile.edit') }}#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 style="font-size:0.75rem;color:rgba(255,140,0,0.6);text-decoration:none;">View all plans</a>
+            </div>
+
+          @else
+            {{-- UPLOAD STATE --}}
+            @if(session('photo_upload_success'))
+              <div class="alert-photo-success mb-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ session('photo_upload_success') }}
+              </div>
+            @endif
+
+            {{-- Upload form --}}
+            @if(auth()->user()->photos()->count() < auth()->user()->photo_limit)
+              <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                @csrf
+                <label for="photoUploadInput" class="media-upload-drop w-100" id="photoDropLabel">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.8" stroke-linecap="round">
+                    <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span style="font-size:0.82rem;color:rgba(255,255,255,0.6);">Click to upload photos</span>
+                  <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);">JPG, PNG, WEBP â€” max 5MB</span>
+                </label>
+                <input type="file" id="photoUploadInput" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="this.closest('form').submit()">
+                @error('photo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+              </form>
+            @else
+              <div class="alert alert-warning py-2 small mb-3" style="background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3); color: orange;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                You've reached your limit of {{ auth()->user()->photo_limit }} photos for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+              </div>
+            @endif
+
+            {{-- Photo grid --}}
+            @if($photos->count())
+              <div class="media-grid">
+                @foreach($photos as $photo)
+                  <div class="media-thumb-wrap">
+                    <img src="{{ asset('storage/' . $photo->path) }}" alt="Photo" class="media-thumb">
+                    <form action="{{ route('user.photos.destroy', $photo->id) }}" method="POST" class="media-delete-form">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="media-delete-btn" title="Delete" onclick="return confirm('Delete this photo?')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                @endforeach
+              </div>
+            @else
+              <p class="text-secondary small text-center mb-0">No photos yet. Upload your first one!</p>
+            @endif
+          @endif
+        </div>
+        @endif
+
+        <style>
+          .photos-sidebar-card, .videos-sidebar-card {
+            background: rgba(17,17,17,0.9);
+            border: 1px solid rgba(255,140,0,0.18);
+            border-radius: 18px;
+          }
+          .photos-icon-wrap, .videos-icon-wrap {
+            width: 34px; height: 34px;
+            background: rgba(255,140,0,0.1);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .lock-icon-wrap {
+            width: 60px; height: 60px;
+            background: rgba(255,140,0,0.07);
+            border: 1.5px solid rgba(255,140,0,0.22);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .photos-locked-title { font-size:0.88rem; font-weight:600; color:rgba(255,255,255,0.85); line-height:1.5; margin:0; }
+          .photos-locked-sub { font-size:0.82rem; color:rgba(255,255,255,0.45); font-weight:400; }
+          /* btn-verify-now styles handled by global button CSS */
+
+          /* Upload drop zone */
+          .media-upload-drop {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.4rem; padding: 1rem 0.5rem;
+            border: 1.5px dashed rgba(255,140,0,0.35);
+            border-radius: 10px; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+          }
+          .media-upload-drop:hover { border-color: orange; background: rgba(255,140,0,0.05); }
+
+          /* Thumbnail grid */
+          .media-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+            margin-top: 0.5rem;
+          }
+          .media-thumb-wrap { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+          .media-thumb { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px; }
+          .media-delete-form { position: absolute; top: 3px; right: 3px; }
+          .media-delete-btn {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(220,53,69,0.85); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s;
+          }
+          .media-thumb-wrap:hover .media-delete-btn { opacity: 1; }
+
+          /* Video thumb */
+          .video-thumb { width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover; display:block; }
+          .media-video-wrap { position: relative; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
+          .media-video-wrap .media-delete-form { top: 4px; right: 4px; }
+          .media-video-wrap .media-delete-btn { opacity: 1; }
+        </style>
+
+        {{-- â”€â”€ VIDEOS CARD â”€â”€ --}}
+        @if(!$isVerified)
+        <div class="dash-card p-4 videos-sidebar-card" style="margin-top:0;">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="videos-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            </div>
+            <span style="font-size:1rem;font-weight:700;color:#fff;">Videos</span>
+            @if($isVerified && $hasSub)
+              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;">{{ $videos->count() }} uploaded</span>
+            @endif
+          </div>
+
+          @if(!$isVerified)
+            {{-- LOCKED STATE --}}
+            <div class="text-center py-2">
+              <div class="lock-icon-wrap mx-auto mb-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <p class="photos-locked-title mb-1">Only Verified Accounts</p>
+              <p class="photos-locked-title mb-1">can Upload Videos.</p>
+              <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
+              <a href="{{ route('profile.edit') }}#tab-verification"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 class="btn-verify-now w-100">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Verify Now
+              </a>
+            </div>
+
+          @elseif(!$hasSub)
+            {{-- PLAN GATE STATE --}}
+            <div class="text-center py-2">
+              <div class="mx-auto mb-3" style="width:60px;height:60px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <p class="photos-locked-title mb-1" style="color:rgba(255,200,0,0.9);">Unlock Video Uploads</p>
+              <p class="photos-locked-sub mb-1">You're verified! Now choose a</p>
+              <p class="photos-locked-sub mb-4">membership plan to start uploading.</p>
+              <a href="{{ route('profile.edit') }}#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 class="btn-verify-now w-100" style="margin-bottom:0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Subscribe Now
+              </a>
+              <a href="{{ route('profile.edit') }}#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 style="font-size:0.75rem;color:rgba(255,140,0,0.6);text-decoration:none;">View all plans</a>
+            </div>
+
+          @else
+            {{-- VIDEO UPLOAD STATE --}}
+            @if(session('video_upload_success'))
+              <div class="alert-photo-success mb-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ session('video_upload_success') }}
+              </div>
+            @endif
+
+            {{-- Upload form --}}
+            @if(auth()->user()->videos()->count() < auth()->user()->video_limit)
+              <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                @csrf
+                <label for="videoUploadInput" class="media-upload-drop w-100">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.8" stroke-linecap="round">
+                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                  <span style="font-size:0.82rem;color:rgba(255,255,255,0.6);">Click to upload videos</span>
+                  <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);">MP4, MOV, WEBM â€” max 100MB</span>
+                </label>
+                <input type="file" id="videoUploadInput" name="video" accept="video/mp4,video/mov,video/avi,video/webm,video/x-matroska" style="display:none;" onchange="this.closest('form').submit()">
+                @error('video')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+              </form>
+            @else
+              <div class="alert alert-warning py-2 small mb-3" style="background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3); color: orange;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                You've reached your limit of {{ auth()->user()->video_limit }} videos for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+              </div>
+            @endif
+
+            {{-- Video list --}}
+            @if($videos->count())
+              @foreach($videos as $vid)
+                <div class="media-video-wrap mb-2">
+                  <video class="video-thumb" controls preload="none">
+                    <source src="{{ asset('storage/' . $vid->path) }}">
+                  </video>
+                  <form action="{{ route('user.videos.destroy', $vid->id) }}" method="POST" class="media-delete-form">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="media-delete-btn" title="Delete" onclick="return confirm('Delete this video?')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </form>
+                </div>
+              @endforeach
+            @else
+              <p class="text-secondary small text-center mb-0">No videos yet. Upload your first one!</p>
+            @endif
+          @endif
+        </div>
+        @endif
+
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-8">
+        <div class="tab-content">
+          <!-- Profile Tab -->
+          <div class="tab-pane fade show active" id="tab-profile" role="tabpanel" aria-labelledby="profile-tab">
+            @include('profile.partials.update-profile-information-form')
+
+            {{-- My Photos & Videos has been moved to the Publish Photos & Videos tab --}}
+            @include('profile.partials.delete-user-form')
+          </div>
+
+          {{-- â”€â”€ PUBLISH PHOTOS & VIDEOS TAB â”€â”€ --}}
+          <div class="tab-pane fade" id="tab-publish-media" role="tabpanel" aria-labelledby="publish-media-tab">
+            <div class="dash-card">
+              <header class="mb-4">
+                <h2 class="dash-card-title d-flex align-items-center gap-2">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  Publish Photos &amp; Videos
+                </h2>
+                <p class="dash-card-text">Upload and manage the photos and videos displayed on your public profile.</p>
+              </header>
+
+              @if(!$isVerified)
+                {{-- STEP 1: Account not verified --}}
+                <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
+                  <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,140,0,0.07);border:1.5px solid rgba(255,140,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                  </div>
+                  <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
+                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
+                  <a href="{{ route('profile.edit') }}#tab-verification"
+                     onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                     class="btn-verify-now">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Verify My Account
+                  </a>
+                </div>
+
+              @elseif(!$hasSub)
+                {{-- STEP 2: Verified but no subscription --}}
+                <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
+                  <div class="mx-auto mb-4" style="width:72px;height:72px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  </div>
+                  <h4 class="fw-bold mb-2" style="color:rgba(255,210,0,0.95);">Choose a Subscription to Unlock</h4>
+                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:420px;margin:0 auto 0.5rem;">Great â€” your account is verified! Select a membership plan to start publishing photos and videos to your public profile.</p>
+                  <p style="font-size:0.8rem;color:rgba(255,140,0,0.6);margin-bottom:1.5rem;">Each plan includes different photo and video upload limits.</p>
+                  <button onclick="document.getElementById('membership-tab').click(); document.getElementById('membership-tab').scrollIntoView({behavior:'smooth'});" class="btn-orange">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="me-1">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    View Subscription Plans
+                  </button>
+                </div>
+
+              @else
+                {{-- STEP 3: Verified + subscribed â€” show upload zones and galleries --}}
+
+                {{-- Plan badge --}}
+                <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.15);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span style="font-size:0.85rem;color:rgba(255,255,255,0.75);">Active Plan: <strong style="color:orange;">{{ ucfirst(auth()->user()->subscription_plan) }}</strong></span>
+                  <span class="ms-auto" style="font-size:0.78rem;color:rgba(255,255,255,0.4);">
+                    Photos: {{ $photos->count() }}/{{ auth()->user()->photo_limit }} &nbsp;·&nbsp;
+                    Videos: {{ $videos->count() }}/{{ auth()->user()->video_limit }}
+                  </span>
+                </div>
+
+                <div class="row g-4">
+
+                  {{-- ── PHOTOS COLUMN ── --}}
+                  <div class="col-12 col-lg-6">
+                    <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
+                      <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Publish Photo
+                      </h3>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ $photos->count() }} of {{ auth()->user()->photo_limit }} used</p>
+
+                      @if(auth()->user()->photos()->count() < auth()->user()->photo_limit)
+                        <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishPhotoForm">
+                          @csrf
+                          <label for="publishPhotoInput" id="publishPhotoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
+                                 onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
+                                 onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.7" stroke-linecap="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.75);">Click to Select a Photo</span>
+                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">JPG, PNG, WEBP — Max 5MB (1 photo per upload)</span>
+                          </label>
+                          <input type="file" id="publishPhotoInput" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="previewPhoto(this)">
+                          <div id="photoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
+                            <img id="photoPreviewImg" src="#" style="max-width:100%; max-height:200px; border-radius:8px; margin-bottom:1rem; border:1px solid rgba(255,140,0,0.3);">
+                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelPhotoUpload()" style="border-radius:8px;">Remove Selection</button>
+                          </div>
+                          
+                          <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Photo</button>
+                          @error('photo')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
+                        </form>
+                      @else
+                        <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
+                          You've reached the photo limit ({{ auth()->user()->photo_limit }}) for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+                          <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+
+                  {{-- ── VIDEOS COLUMN ── --}}
+                  <div class="col-12 col-lg-6">
+                    <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
+                      <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                        Publish Video
+                      </h3>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ $videos->count() }} of {{ auth()->user()->video_limit }} used</p>
+
+                      @if(auth()->user()->videos()->count() < auth()->user()->video_limit)
+                        <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishVideoForm">
+                          @csrf
+                          <label for="publishVideoInput" id="publishVideoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
+                                 onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
+                                 onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.7" stroke-linecap="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.75);">Click to Select a Video</span>
+                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">MP4, MOV, WEBM — Max 100MB</span>
+                          </label>
+                          <input type="file" id="publishVideoInput" name="video" accept="video/mp4,video/mov,video/avi,video/webm" style="display:none;" onchange="previewVideo(this)">
+                          <div id="videoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
+                            <p id="videoFileName" class="text-light mb-2 fw-bold" style="font-size:0.9rem; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"></p>
+                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelVideoUpload()" style="border-radius:8px;">Remove Selection</button>
+                          </div>
+                          
+                          <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Video</button>
+                          @error('video')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
+                        </form>
+                      @else
+                        <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
+                          You've reached the video limit ({{ auth()->user()->video_limit }}) for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+                          <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+
+                </div>{{-- /row --}}
+
+                {{-- ── NEW CARD: PUBLISHED MEDIA (Current Active Subscription Period) ── --}}
+                <div class="mt-4 p-4 rounded" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;">
+                  <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3" style="border-color:rgba(255,255,255,0.08) !important;">
+                    <div>
+                      <h3 class="fs-5 fw-bold mb-1 text-light d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Published Media (Current Subscription Period)
+                      </h3>
+                      <p class="small mb-0 text-secondary">Active until {{ auth()->user()->subscription_expires_at ? auth()->user()->subscription_expires_at->format('M d, Y') : 'N/A' }}. Click any image to view in full screen.</p>
+                    </div>
+                    <span class="badge bg-outline-warning border border-warning text-warning px-3 py-2" style="border-radius:20px;">
+                      {{ $photos->count() + $videos->count() }} Items Live
+                    </span>
+                  </div>
+
+                  <div class="row g-3">
+                    {{-- Published Photos --}}
+                    @if($photos->count())
+                      @foreach($photos as $photo)
+                        <div class="col-6 col-sm-4 col-md-3">
+                          <div class="published-photo-card" data-img-url="{{ asset('storage/' . $photo->path) }}" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.15);cursor:pointer;" onclick="openMediaModal('{{ asset('storage/' . $photo->path) }}', 'image')">
+                            <img src="{{ asset('storage/' . $photo->path) }}" alt="Published Photo" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" class="d-flex align-items-center justify-content-center">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                            </div>
+                            <form action="{{ route('user.photos.destroy', $photo->id) }}" method="POST" style="position:absolute;top:6px;right:6px;z-index:2;" onclick="event.stopPropagation();">
+                              @csrf @method('DELETE')
+                              <button type="submit" onclick="return confirm('Delete this photo?')" style="width:26px;height:26px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      @endforeach
+                    @endif
+
+                    {{-- Published Videos --}}
+                    @if($videos->count())
+                      @foreach($videos as $vid)
+                        <div class="col-12 col-md-6">
+                          <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,0.15);">
+                            <video style="width:100%;display:block;border-radius:10px;aspect-ratio:16/9;object-fit:contain;" controls preload="none">
+                              <source src="{{ asset('storage/' . $vid->path) }}">
+                            </video>
+                            <form action="{{ route('user.videos.destroy', $vid->id) }}" method="POST" style="position:absolute;top:8px;right:8px;z-index:2;">
+                              @csrf @method('DELETE')
+                              <button type="submit" onclick="return confirm('Delete this video?')" style="width:28px;height:28px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      @endforeach
+                    @endif
+
+                    @if(!$photos->count() && !$videos->count())
+                      <div class="col-12 text-center py-4">
+                        <p style="color:rgba(255,255,255,0.3);font-size:0.9rem;" class="mb-0">No photos or videos published for this period yet. Use the upload boxes above to publish.</p>
+                      </div>
+                    @endif
+                  </div>
+                </div>
+              @endif
+            </div>
+          </div>
+
+
+          <!-- Wallet Tab -->
+          <div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="wallet-tab">
+            
+            <div class="dash-card">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text">{{ __('Check your current balance and add funds.') }}</p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                </div>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Wallet History') }}</h2>
+                  <p class="dash-card-text">{{ __('Review your recent wallet transactions.') }}</p>
+              </header>
+              <div class="table-responsive">
+                @if($deposits->isEmpty())
+                  <div class="text-center py-5 rounded" style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1);">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-secondary mb-3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <h5 class="text-secondary fw-normal">{{ __('No transaction history found.') }}</h5>
+                    <p class="small text-secondary mb-0">{{ __('When you add funds or an admin updates your balance, it will appear here.') }}</p>
+                  </div>
+                @else
+                  <table class="table table-borderless table-hover align-middle mb-0" style="color: #fff;">
+                    <thead>
+                      <tr style="border-bottom: 2px solid rgba(255,140,0,0.3);">
+                        <th class="text-uppercase text-secondary small fw-bold" style="letter-spacing:1px;">Date</th>
+                        <th class="text-uppercase text-secondary small fw-bold" style="letter-spacing:1px;">Ref / Method</th>
+                        <th class="text-uppercase text-secondary small fw-bold text-end" style="letter-spacing:1px;">Amount</th>
+                        <th class="text-uppercase text-secondary small fw-bold text-center" style="letter-spacing:1px;">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @foreach($deposits as $deposit)
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                          <td class="py-3 text-nowrap">
+                            <div class="fw-bold">{{ $deposit->created_at->format('M d, Y') }}</div>
+                            <div class="small text-secondary">{{ $deposit->created_at->format('h:i A') }}</div>
+                          </td>
+                          <td class="py-3">
+                            <div class="fw-bold text-light">{{ $deposit->reference ?? 'N/A' }}</div>
+                            <div class="small text-uppercase text-warning">{{ $deposit->payment_method }}</div>
+                          </td>
+                          <td class="py-3 text-end fw-bold fs-5">
+                            KSh {{ number_format($deposit->amount, 2) }}
+                          </td>
+                          <td class="py-3 text-center">
+                            @if($deposit->status === 'completed')
+                              <span class="text-success fw-bold">{{ ucfirst($deposit->status) }}</span>
+                            @elseif($deposit->status === 'failed')
+                              <span class="text-danger fw-bold">{{ ucfirst($deposit->status) }}</span>
+                            @else
+                              <span class="text-warning fw-bold">{{ ucfirst($deposit->status) }}</span>
+                            @endif
+                          </td>
+                        </tr>
+                      @endforeach
+                    </tbody>
+                  </table>
+                @endif
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Membership Tab -->
+          <div class="tab-pane fade" id="tab-membership" role="tabpanel" aria-labelledby="membership-tab">
+            
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text">{{ __('Your available funds for membership upgrades and premium features.') }}</p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                </div>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+              </div>
+            </div>
+
+            <!-- Current Subscription -->
+            @if(auth()->user()->hasActiveSubscription())
+              <div class="dash-card mb-4" style="border-color: orange; background: rgba(255,140,0,0.05);">
+                <header>
+                    <h2 class="dash-card-title text-warning d-flex align-items-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                      {{ __('Current Subscription') }}
+                    </h2>
+                </header>
+                <div class="d-flex flex-column gap-2 mt-3">
+                  <div class="fs-5 fw-bold text-light">
+                    Plan: <span class="text-uppercase text-warning">{{ auth()->user()->subscription_plan }}</span>
+                  </div>
+                  @if(auth()->user()->subscription_expires_at)
+                    <div class="text-secondary">Expires: {{ auth()->user()->subscription_expires_at->format('M d, Y h:i A') }}</div>
+                  @else
+                    <div class="text-secondary">Expires: Never</div>
+                  @endif
+                  
+                  <div class="mt-3 text-light p-3 rounded" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);">
+                    <div class="mb-2 text-warning fw-bold small text-uppercase" style="letter-spacing: 1px;">Upload Limits</div>
+                    <div class="d-flex gap-4">
+                      <div>
+                        <span class="text-secondary small">Photos:</span>
+                        <span class="fw-bold">{{ auth()->user()->photos()->count() }} / {{ auth()->user()->photo_limit }}</span>
+                      </div>
+                      <div>
+                        <span class="text-secondary small">Videos:</span>
+                        <span class="fw-bold">{{ auth()->user()->videos()->count() }} / {{ auth()->user()->video_limit }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            @endif
+
+            <!-- Available Plans -->
+            <div class="dash-card">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Available Plans') }}</h2>
+                  <p class="dash-card-text">{{ __('Upgrade your membership to unlock more features.') }}</p>
+              </header>
+              
+              <div class="row">
+              @foreach($membershipPlans as $plan)
+                @php
+                  $checkoutRoutes = [
+                    'regular'   => 'membership.regular.checkout',
+                    'prime'     => 'membership.prime.checkout',
+                    'prime-vip' => 'membership.prime-vip.checkout',
+                    'vip'       => 'membership.vip.checkout',
+                  ];
+                  $checkoutRoute = $checkoutRoutes[$plan->slug] ?? null;
+                  $isPrimeVip = $plan->slug === 'prime-vip';
+                  $minPrice = $plan->pricing ? min(array_values($plan->pricing)) : 0;
+                @endphp
+                <div class="col-12 col-md-6 mb-3">
+                  <div class="p-4 rounded h-100 d-flex flex-column" style="{{ $isPrimeVip ? 'background:linear-gradient(135deg, rgba(255,165,0,0.1), rgba(255,140,0,0.05)); border:1px solid rgba(255,165,0,0.4); box-shadow:0 5px 15px rgba(255,165,0,0.15);' : 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);' }} position:relative; overflow:hidden;">
+                    
+                    @if($isPrimeVip)
+                      <div class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 fw-bold small" style="border-bottom-left-radius:8px;">{{ __('BEST VALUE') }}</div>
+                    @endif
+
+                    <div class="mb-4">
+                      <div class="fs-2 fw-bold text-light mt-1 mb-1">{{ strtoupper($plan->name) }}</div>
+                      <div class="fs-5 text-warning fw-bold">From KSh {{ number_format($minPrice, 2) }}</div>
+                    </div>
+
+                    <ul class="list-unstyled text-secondary small mb-4 flex-grow-1" style="line-height:1.8;">
+                      @if($plan->pricing)
+                        @foreach($plan->pricing as $days => $price)
+                          <li class="d-flex align-items-start gap-2 mb-2">
+                            <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span class="fw-medium text-light">{{ $days }} {{ (int)$days === 1 ? 'Day' : 'Days' }} Listing</span> = {{ number_format($price) }} Ksh
+                          </li>
+                        @endforeach
+                      @endif
+                      @if($plan->features)
+                        @foreach($plan->features as $feature)
+                          <li class="d-flex align-items-start gap-2 mb-2">
+                            <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            {{ $feature }}
+                          </li>
+                        @endforeach
+                      @endif
+                    </ul>
+
+                    @if($checkoutRoute)
+                      <a href="{{ route($checkoutRoute) }}" class="btn {{ $isPrimeVip ? 'btn-orange' : 'btn-outline-warning' }} w-100 fw-bold mt-auto" style="border-radius:8px;">{{ __('Sign Up Now') }}</a>
+                    @endif
+                  </div>
+                </div>
+              @endforeach
+              </div>
+
+            </div>
+            
+          </div>
+
+          <!-- Classifieds Tab -->
+          <div class="tab-pane fade" id="tab-classifieds" role="tabpanel" aria-labelledby="classifieds-tab" x-data="{ showCreate: false }">
+            
+            <div x-show="!showCreate">
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text">{{ __('Your available funds for classified listings and features.') }}</p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                </div>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+              </div>
+            </div>
+
+            <!-- Classifieds Stats -->
+            <div class="dash-card">
+              <header>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h2 class="dash-card-title mb-0">{{ __('Classifieds') }}</h2>
+                    <button @click="showCreate = true" class="btn btn-orange btn-sm" style="font-size:0.8rem; padding:0.4rem 1rem;">{{ __('Post New') }}</button>
+                  </div>
+                  <p class="dash-card-text">{{ __('Manage and track the status of your classified listings.') }}</p>
+              </header>
+              
+              <div class="row g-3">
+                <div class="col-6 col-md-3">
+                  <div class="p-4 rounded text-center h-100" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
+                    <div class="fs-2 fw-bold text-light mb-1">{{ $classifieds->where('payment_status', 'pending')->count() }}</div>
+                    <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:0.5px;">Unpublished</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-4 rounded text-center h-100" style="background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2);">
+                    <div class="fs-2 fw-bold text-warning mb-1">{{ $classifieds->where('status', 'pending')->count() }}</div>
+                    <div class="text-warning small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">In Moderation</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-4 rounded text-center h-100" style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.2);">
+                    <div class="fs-2 fw-bold text-success mb-1">{{ $classifieds->where('status', 'approved')->where('payment_status', 'paid')->count() }}</div>
+                    <div class="text-success small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">Approved</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-4 rounded text-center h-100" style="background:rgba(220,53,69,0.05); border:1px solid rgba(220,53,69,0.2);">
+                    <div class="fs-2 fw-bold text-danger mb-1">{{ $classifieds->where('status', 'rejected')->count() }}</div>
+                    <div class="text-danger small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">Rejected</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Classifieds History Table -->
+            <div class="dash-card mt-4">
+              <header>
+                  <h2 class="dash-card-title">{{ __('Classifieds History') }}</h2>
+                  <p class="dash-card-text">{{ __('Review your recent classified listings and their statuses.') }}</p>
+              </header>
+              <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle mb-0" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.05);">
+                  <thead>
+                    <tr>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Date</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Title</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Amount</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Post Status</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Payment Gateway</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Payment Status</th>
+                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @forelse($classifieds as $c)
+                    <tr>
+                      <td class="text-secondary" style="font-size:0.85rem;">{{ $c->created_at->format('M d, Y') }}</td>
+                      <td class="text-light fw-medium">{{ $c->title }}</td>
+                      <td class="text-light">KSh {{ number_format($c->amount, 2) }}</td>
+                      <td>
+                        @if($c->status === 'approved')
+                          <span class="badge" style="background:rgba(40,167,69,0.2); color:#28a745; border:1px solid rgba(40,167,69,0.4);">Approved</span>
+                        @elseif($c->status === 'rejected')
+                          <span class="badge" style="background:rgba(220,53,69,0.2); color:#dc3545; border:1px solid rgba(220,53,69,0.4);">Rejected</span>
+                        @else
+                          <span class="badge" style="background:rgba(255,193,7,0.2); color:#ffc107; border:1px solid rgba(255,193,7,0.4);">Pending</span>
+                        @endif
+                      </td>
+                      <td class="text-secondary" style="font-size:0.85rem;">{{ $c->payment_status === 'paid' ? 'Wallet/M-Pesa' : 'N/A' }}</td>
+                      <td>
+                        @if($c->payment_status === 'paid')
+                          <span class="badge" style="background:rgba(40,167,69,0.2); color:#28a745; border:1px solid rgba(40,167,69,0.4);">Paid</span>
+                        @else
+                          <span class="badge" style="background:rgba(255,140,0,0.2); color:orange; border:1px solid rgba(255,140,0,0.4);">Pending</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($c->payment_status === 'paid')
+                          <a href="{{ route('classifieds.show', $c->id) }}" class="btn btn-sm btn-outline-warning" style="font-size:0.75rem;">View</a>
+                        @else
+                          <span class="text-secondary" style="font-size:0.8rem;">Awaiting payment</span>
+                        @endif
+                      </td>
+                    </tr>
+                    @empty
+                    <tr>
+                      <td colspan="7" class="text-center text-secondary py-4" style="font-size:0.9rem;">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-3">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-secondary" style="opacity:0.5;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                          No classifieds found.
+                        </div>
+                      </td>
+                    </tr>
+                    @endforelse
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            </div>
+
+            <!-- Create View -->
+            <div x-show="showCreate" style="display: none;" x-cloak>
+              <div class="dash-card mb-4">
+                <header class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="dash-card-title mb-0">{{ __('Create Classified Post') }}</h2>
+                    <button @click="showCreate = false" class="btn btn-outline-secondary btn-sm">{{ __('Back') }}</button>
+                </header>
+                
+                <form action="{{ route('membership.process') }}" method="POST" enctype="multipart/form-data" id="classified-form">
+                  @csrf
+                  <input type="hidden" name="plan_type" value="classified">
+                  <input type="hidden" name="plan" value="0">
+                  <div class="row g-3">
+                    
+                    <div class="col-md-6">
+                      <label class="form-label">{{ __('Post Title') }}</label>
+                      <input type="text" name="title" class="form-control" placeholder="Post Title" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <label class="form-label">{{ __('Category') }}</label>
+                      <select name="category" class="form-select text-secondary" required>
+                        <option value="">Select Category</option>
+                        <option value="personals">Personals</option>
+                        <option value="jobs">Job</option>
+                        <option value="massage">Massage</option>
+                        <option value="events">Events</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label">{{ __('City or Neighbourhood') }}</label>
+                      <input type="text" name="city" class="form-control" placeholder="City Or Neighbourhood">
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label">{{ __('Featured Image') }}</label>
+                      <input type="file" name="image" class="form-control text-secondary" accept="image/*" required>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label">{{ __('Description') }}</label>
+                      <textarea name="description" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label">{{ __('Gallery (Add Images)') }}</label>
+                      <input type="file" name="gallery[]" class="form-control text-secondary" multiple>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-check mb-2 mt-3">
+                        <input class="form-check-input" type="checkbox" id="showPhone" checked>
+                        <label class="form-check-label text-light" for="showPhone">{{ __('Show my Phone Number') }}</label>
+                      </div>
+                      <label class="form-label">{{ __('Phone Number') }}</label>
+                      <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-check mb-2 mt-3">
+                        <input class="form-check-input" type="checkbox" id="showName" checked>
+                        <label class="form-check-label text-light" for="showName">{{ __('Show my Name') }}</label>
+                      </div>
+                      <label class="form-label">{{ __('Contact Name') }}</label>
+                      <input type="text" name="contact_name" class="form-control" placeholder="Contact Name">
+                    </div>
+                  </div>
+
+                  <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+                  
+                  <h5 class="text-light fw-bold mb-3">{{ __('Payment Method') }}</h5>
+                  
+                  <div class="p-4 rounded mb-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
+                    <div class="mb-4">
+                      <select name="payment_method" class="form-select text-secondary" required>
+                        <option value="mpesa">MPESA [Transaction Fee: 0% + 0]</option>
+                        <option value="wallet">Available Wallet Balance (KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }})</option>
+                      </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                      <span>{{ __('Post Price:') }}</span>
+                      <span class="text-light fw-medium">KSh1,000.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                      <span>{{ __('Transaction Fee:') }}</span>
+                      <span class="text-light fw-medium">KSh0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-3 mt-3 border-top" style="border-color:rgba(255,255,255,0.1) !important;">
+                      <span class="text-light fw-bold">{{ __('Total:') }}</span>
+                      <span class="text-warning fw-bold fs-5">KSh1,000.00</span>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-orange w-100 fw-bold py-2" style="border-radius:8px;">{{ __('Pay & Publish') }}</button>
+
+                </form>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hookups Tab -->
+          <div class="tab-pane fade" id="tab-hookups" role="tabpanel" aria-labelledby="hookups-tab">
+            @include('profile.partials.hookup-listing-form')
+          </div>
+
+
+          <!-- Settings Tab -->
+          <div class="tab-pane fade" id="tab-settings" role="tabpanel" aria-labelledby="settings-tab">
+
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4 settings-wallet-card">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="settings-section-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                </div>
+                <span class="settings-section-label">Available Wallet Balance</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded settings-balance-inner">
+                <div>
+                  <div class="text-uppercase fw-bold mb-1" style="font-size:0.72rem;letter-spacing:1.5px;color:rgba(255,140,0,0.7);">Current Balance</div>
+                  <div class="fw-bold text-light" style="font-size:1.5rem;line-height:1;">
+                    KSh <span style="color:#fff;">{{ auth()->user()->wallet_balance ?? '0.00' }}</span>
+                  </div>
+                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);margin-top:0.3rem;">Available for premium features & upgrades</div>
+                </div>
+                <a href="{{ route('wallet.add') }}" class="btn-settings-fund btn-sm">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Add Funds
+                </a>
+              </div>
+            </div>
+
+            <!-- My Settings Form -->
+            <div class="dash-card settings-form-card">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="settings-section-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                  </svg>
+                </div>
+                <span class="settings-section-label">My Settings</span>
+              </div>
+              <p class="dash-card-text mb-4">Manage your privacy preferences, notifications, and account security.</p>
+
+              <form class="mt-2" method="POST" action="{{ route('profile.update') }}">
+                @csrf
+                @method('patch')
+
+                {{-- â”€â”€â”€ Privacy Settings â”€â”€â”€ --}}
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Privacy
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">
+                      Favorites are Visible to
+                    </label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="favorites_visibility">
+                        <option value="everybody" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'everybody' ? 'selected' : '' }}>Everybody</option>
+                        <option value="favourites" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'favourites' ? 'selected' : '' }}>Favourites Only</option>
+                        <option value="nobody" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'nobody' ? 'selected' : '' }}>Nobody</option>
+                      </select>
+                      <div class="settings-select-current">{{ ucfirst(old('favorites_visibility', auth()->user()->favorites_visibility ?? 'everybody')) }}</div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">
+                      Photos are Visible to
+                    </label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="photos_visibility">
+                        <option value="everybody" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'everybody' ? 'selected' : '' }}>Everybody</option>
+                        <option value="favourites" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'favourites' ? 'selected' : '' }}>Favourites Only</option>
+                        <option value="nobody" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'nobody' ? 'selected' : '' }}>Nobody</option>
+                      </select>
+                      <div class="settings-select-current">{{ ucfirst(old('photos_visibility', auth()->user()->photos_visibility ?? 'everybody')) }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- ——— Notifications ——— --}}
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  Notifications
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Email Notifications</label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="email_notifications">
+                        <option value="messages" {{ old('email_notifications', auth()->user()->email_notifications) == 'messages' ? 'selected' : '' }}>Messages</option>
+                        <option value="none" {{ old('email_notifications', auth()->user()->email_notifications) == 'none' ? 'selected' : '' }}>None</option>
+                      </select>
+                      <div class="settings-select-current">{{ ucfirst(old('email_notifications', auth()->user()->email_notifications ?? 'messages')) }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- â”€â”€â”€ Account â”€â”€â”€ --}}
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  Account
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Email Address</label>
+                    <div class="settings-input-wrap">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                      </svg>
+                      <input type="email" class="form-control settings-input" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="your@email.com" />
+                    </div>
+                  </div>
+                </div>
+
+                {{-- â”€â”€â”€ Security â”€â”€â”€ --}}
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Change Password
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">New Password</label>
+                    <div class="settings-input-wrap">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="password" placeholder="Enter new password" />
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Confirm Password</label>
+                    <div class="settings-input-wrap">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="password_confirmation" placeholder="Repeat new password" />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label class="settings-field-label">Current Password <span style="color:rgba(255,140,0,0.8);">*</span></label>
+                    <div class="settings-input-wrap" style="max-width:400px;">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="current_password" placeholder="Required to save any changes" />
+                    </div>
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.4rem;">You must enter your current password to apply any changes.</div>
+                  </div>
+                </div>
+
+                {{-- â”€â”€â”€ Save â”€â”€â”€ --}}
+                <div class="d-flex align-items-center justify-content-between pt-3 mt-2" style="border-top:1px solid rgba(255,255,255,0.07);">
+                  <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">All changes are saved securely.</span>
+                  <button type="submit" class="btn-save-settings">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Save Changes
+                  </button>
+                </div>
+
+              </form>
+            </div>
+
+          </div>
+
+          <style>
+            /* Settings Tab Styles */
+            .settings-wallet-card, .settings-form-card {
+              background: rgba(17,17,17,0.9);
+              border: 1px solid rgba(255,140,0,0.18);
+              border-radius: 18px;
+              padding: 1.8rem;
+            }
+            .settings-section-icon {
+              width: 32px; height: 32px;
+              background: rgba(255,140,0,0.1);
+              border-radius: 8px;
+              display: flex; align-items: center; justify-content: center;
+              flex-shrink: 0;
+            }
+            .settings-section-label {
+              font-size: 1.05rem;
+              font-weight: 700;
+              color: #fff;
+            }
+            .settings-balance-inner {
+              background: rgba(255,140,0,0.04);
+              border: 1px solid rgba(255,140,0,0.15);
+              flex-wrap: wrap;
+              gap: 1rem;
+            }
+            /* btn-settings-fund & btn-save-settings handled by global button CSS */
+            .settings-group-label {
+              display: flex; align-items: center; gap: 0.5rem;
+              font-size: 0.75rem; font-weight: 700;
+              text-transform: uppercase; letter-spacing: 1.2px;
+              color: rgba(255,140,0,0.85);
+              margin-bottom: 1rem; margin-top: 0.5rem;
+              padding-bottom: 0.5rem;
+              border-bottom: 1px solid rgba(255,140,0,0.1);
+            }
+            .settings-field-label {
+              display: block;
+              font-size: 0.82rem; font-weight: 600;
+              color: rgba(255,255,255,0.75);
+              margin-bottom: 0.45rem;
+            }
+            .settings-select-wrap { position: relative; }
+            .settings-select {
+              background: rgba(0,0,0,0.35) !important;
+              border: 1px solid rgba(255,140,0,0.18) !important;
+              color: #fff !important;
+              border-radius: 9px !important;
+              padding: 0.7rem 1rem !important;
+              font-size: 0.9rem;
+              transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .settings-select:focus {
+              border-color: orange !important;
+              box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
+            }
+            .settings-select option { background: #111; color: #fff; }
+            .settings-input-wrap { position: relative; }
+            .settings-input-icon {
+              position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+              color: rgba(255,140,0,0.6); pointer-events: none; z-index: 2;
+            }
+            .settings-input {
+              background: rgba(0,0,0,0.35) !important;
+              border: 1px solid rgba(255,140,0,0.18) !important;
+              color: #fff !important;
+              border-radius: 9px !important;
+              padding: 0.7rem 1rem 0.7rem 2.5rem !important;
+              font-size: 0.9rem;
+              transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .settings-input:focus {
+              border-color: orange !important;
+              box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
+            }
+            .settings-input::placeholder { color: rgba(255,255,255,0.25); }
+          </style>
+
+
+
+          <!-- Photo Verification Tab -->
+          <div class="tab-pane fade" id="tab-verification" role="tabpanel" aria-labelledby="verification-tab">
+            
+            <div class="mb-4">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">{{ __('Home') }}</a></li>
+                  <li class="breadcrumb-item active text-secondary" aria-current="page">{{ __('Photo Verification') }}</li>
+                </ol>
+              </nav>
+            </div>
+
+            <!-- Get Verified Hero -->
+            <div class="dash-card mb-4" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
+              <header class="d-flex align-items-center gap-3 mb-3">
+                  <div class="bg-orange text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: orange;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  </div>
+                  <div>
+                    <h2 class="dash-card-title mb-1 text-warning" style="font-size: 1.5rem;">{{ __('Get Verified') }}</h2>
+                    <div class="badge bg-success text-dark fw-bold px-2 py-1">{{ __('"REAL PHOTOS" BADGE') }}</div>
+                  </div>
+              </header>
+              <p class="dash-card-text text-light" style="font-size: 1.05rem;">
+                {{ __('If you want to get the "REAL PHOTOS" badge use our totally free photo verification service, you can build trust in your visitors and have much more clients as well.') }}
+              </p>
+            </div>
+
+            <div class="row">
+              <div class="col-12 col-xl-7 mb-4">
+                <!-- Upload Section -->
+                <div class="dash-card h-100">
+                  <header class="mb-4">
+                      <h3 class="dash-card-title">{{ __('Real Photo') }}</h3>
+                      <p class="dash-card-text mb-0">{{ __('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.') }}</p>
+                  </header>
+                  
+                  <div class="d-flex flex-column align-items-center justify-content-center p-4 mb-4 rounded text-center" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,140,0,0.4);">
+                    <div class="fs-1 mb-2">✋</div>
+                    <h4 class="text-light fw-bold mb-1">{{ __('Show this sign') }}</h4>
+                    <span class="text-secondary small">{{ __('(Palm)') }}</span>
+                  </div>
+
+                  @if(session('verification_upload_success'))
+                    <div class="alert alert-success text-white border-0 mb-4" style="background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                        {{ session('verification_upload_success') }}
+                    </div>
+                  @endif
+
+                  @if(auth()->user()->is_verified)
+                      <div class="alert alert-success text-white border-0 mb-4 text-center" style="background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                          <strong>Verified!</strong><br>Your account has been verified. You can now upload photos and videos.
+                      </div>
+                  @elseif(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+                      <div class="alert alert-warning text-center border-0 mb-4" style="background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.3) !important;">
+                          <strong>Pending Review</strong><br>Your photo is currently being reviewed by our team. Please check back later.
+                      </div>
+                  @else
+                      @if(isset($verificationSubmission) && $verificationSubmission->status === 'rejected')
+                          <div class="alert alert-danger border-0 mb-4 text-center" style="background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.3) !important;">
+                              <strong>Rejected</strong><br>Your previous submission was rejected. Please carefully review the requirements and try again.
+                          </div>
+                      @endif
+
+                      <form method="POST" action="{{ route('verification.submit') }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-4">
+                          <label class="form-label fw-bold">{{ __('Upload Photo') }}</label>
+                          <input type="file" name="photo" class="form-control py-2" accept="image/jpeg,image/png,image/webp" required />
+                          @error('photo')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                          @enderror
+                        </div>
+                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px;">{{ __('Submit for Verification') }}</button>
+                      </form>
+                  @endif
+                </div>
+              </div>
+
+              <div class="col-12 col-xl-5 mb-4">
+                <!-- Requirements Section -->
+                <div class="dash-card h-100" style="background: rgba(255,255,255,0.03);">
+                  <header class="mb-4">
+                      <h3 class="dash-card-title text-success d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        {{ __('Accepted Photos') }}
+                      </h3>
+                  </header>
+                  <ul class="list-unstyled text-secondary mb-4" style="line-height: 1.8;">
+                    <li class="d-flex gap-2 mb-3">
+                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div>{{ __('Showing this requested sign with hand.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-3">
+                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div>{{ __('We must see your FULL BODY without covering clothes (Lingerie Accepted).') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-3">
+                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div>{{ __('Tattoo must be seen on the photo, if you have.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-3">
+                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div>{{ __('Please use makeup that helps us to compare the photos.') }}</div>
+                    </li>
+                  </ul>
+                  
+                  <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+
+                  <header class="mb-3">
+                      <h3 class="dash-card-title text-danger d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        {{ __('Rejected Photos') }}
+                      </h3>
+                  </header>
+                  <ul class="list-unstyled text-secondary" style="line-height: 1.8;">
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div>{{ __('Face not visible or covered.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div>{{ __('Not showing the requested hand sign.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div>{{ __('Heavily filtered or edited photos.') }}</div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <x-footer />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Restore tab from hash on load
+      if (window.location.hash) {
+        var tabTarget = window.location.hash;
+        var tabButton = document.querySelector('button[data-bs-target="' + tabTarget + '"]');
+        if (tabButton) {
+          // Add a tiny delay to ensure Bootstrap is fully initialized before showing
+          setTimeout(function() {
+            var tab = new bootstrap.Tab(tabButton);
+            tab.show();
+          }, 50);
+        }
+      }
+
+      // 2. Update hash when a new tab is clicked
+      var tabList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'));
+      tabList.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          var target = event.target.getAttribute('data-bs-target');
+          if (target) {
+            // Using window.location.hash ensures the browser explicitly tracks it for reloads
+            if(history.replaceState) {
+                history.replaceState(null, null, target);
+            } else {
+                window.location.hash = target;
+            }
+          }
+        });
+      });
+      
+      // 3. Auto-open Publish Media tab if there are media-related errors or success messages
+      @if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success'))
+        var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
+        if (mediaTabBtn) {
+            setTimeout(function() {
+                var tab = new bootstrap.Tab(mediaTabBtn);
+                tab.show();
+                window.location.hash = '#tab-publish-media';
+            }, 60);
+        }
+      @endif
+    });
+
+    // Preview functions for manual upload
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photoPreviewImg').src = e.target.result;
+          document.getElementById('publishPhotoLabel').style.display = 'none';
+          document.getElementById('photoPreviewContainer').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function cancelPhotoUpload() {
+      document.getElementById('publishPhotoInput').value = '';
+      document.getElementById('photoPreviewContainer').style.display = 'none';
+      document.getElementById('photoPreviewImg').src = '#';
+      document.getElementById('publishPhotoLabel').style.display = 'flex';
+    }
+
+    function previewVideo(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('videoFileName').innerText = input.files[0].name;
+        document.getElementById('publishVideoLabel').style.display = 'none';
+        document.getElementById('videoPreviewContainer').style.display = 'block';
+      }
+    }
+    
+    function cancelVideoUpload() {
+      document.getElementById('publishVideoInput').value = '';
+      document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoFileName').innerText = '';
+      document.getElementById('publishVideoLabel').style.display = 'flex';
+    }
+  </script>
+
+  {{-- ── LIGHTBOX POPUP OVERLAY (global, outside all tab panes) ── --}}
+  <style>
+    .lb-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lb-overlay.active { display: flex; opacity: 1; }
+    .lb-img {
+      max-width: 90vw; max-height: 82vh;
+      width: auto; height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+      display: block;
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 25px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-close:hover { background: rgba(220,53,69,0.9); border-color: #dc3545; transform: scale(1.08); }
+    .lb-arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(20,20,25,0.88);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-arrow:hover { background: orange; border-color: orange; color: #000; }
+    .lb-arrow.prev { left: 20px; }
+    .lb-arrow.next { right: 20px; }
+    .lb-meta {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 18px;
+      background: rgba(15,15,20,0.9);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 20px; color: #fff; font-size: 0.87rem;
+      z-index: 1000001; white-space: nowrap;
+    }
+  </style>
+
+  <div id="lbOverlay" class="lb-overlay" onclick="lbClose(event)">
+    <button class="lb-close" onclick="lbForceClose()" title="Close (Esc)">&times;</button>
+    <button class="lb-arrow prev" onclick="lbNav(-1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lbImg" class="lb-img" src="" alt="Photo">
+    <button class="lb-arrow next" onclick="lbNav(1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lb-meta">
+      <span id="lbCounter">1 / 1</span>
+      <span style="opacity:0.35">|</span>
+      <span class="fw-bold" style="color:orange;">Published Photo</span>
+    </div>
+  </div>
+
+  <script>
+    var lbPhotos = [], lbIdx = 0;
+
+    function openMediaModal(url, type) {
+      if (type !== 'image') return;
+      var cards = document.querySelectorAll('.published-photo-card');
+      lbPhotos = Array.from(cards).map(function(c){ return c.getAttribute('data-img-url'); }).filter(Boolean);
+      if (!lbPhotos.length) lbPhotos = [url];
+      lbIdx = lbPhotos.indexOf(url);
+      if (lbIdx < 0) lbIdx = 0;
+      lbShow();
+      var ov = document.getElementById('lbOverlay');
+      ov.style.display = 'flex';
+      setTimeout(function(){ ov.classList.add('active'); }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function lbShow() {
+      document.getElementById('lbImg').src = lbPhotos[lbIdx] || '';
+      document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
+      var prev = document.querySelector('.lb-arrow.prev');
+      var next = document.querySelector('.lb-arrow.next');
+                      <div>{{ __('Face not visible or covered.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div>{{ __('Not showing the requested hand sign.') }}</div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div>{{ __('Heavily filtered or edited photos.') }}</div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <x-footer />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Restore tab from hash on load
+      if (window.location.hash) {
+        var tabTarget = window.location.hash;
+        var tabButton = document.querySelector('button[data-bs-target="' + tabTarget + '"]');
+        if (tabButton) {
+          // Add a tiny delay to ensure Bootstrap is fully initialized before showing
+          setTimeout(function() {
+            var tab = new bootstrap.Tab(tabButton);
+            tab.show();
+          }, 50);
+        }
+      }
+
+      // 2. Update hash when a new tab is clicked
+      var tabList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'));
+      tabList.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          var target = event.target.getAttribute('data-bs-target');
+          if (target) {
+            // Using window.location.hash ensures the browser explicitly tracks it for reloads
+            if(history.replaceState) {
+                history.replaceState(null, null, target);
+            } else {
+                window.location.hash = target;
+            }
+          }
+        });
+      });
+      
+      // 3. Auto-open Publish Media tab if there are media-related errors or success messages
+      @if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success'))
+        var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
+        if (mediaTabBtn) {
+            setTimeout(function() {
+                var tab = new bootstrap.Tab(mediaTabBtn);
+                tab.show();
+                window.location.hash = '#tab-publish-media';
+            }, 60);
+        }
+      @endif
+    });
+
+    // Preview functions for manual upload
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photoPreviewImg').src = e.target.result;
+          document.getElementById('publishPhotoLabel').style.display = 'none';
+          document.getElementById('photoPreviewContainer').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function cancelPhotoUpload() {
+      document.getElementById('publishPhotoInput').value = '';
+      document.getElementById('photoPreviewContainer').style.display = 'none';
+      document.getElementById('photoPreviewImg').src = '#';
+      document.getElementById('publishPhotoLabel').style.display = 'flex';
+    }
+
+    function previewVideo(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('videoFileName').innerText = input.files[0].name;
+        document.getElementById('publishVideoLabel').style.display = 'none';
+        document.getElementById('videoPreviewContainer').style.display = 'block';
+      }
+    }
+    
+    function cancelVideoUpload() {
+      document.getElementById('publishVideoInput').value = '';
+      document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoFileName').innerText = '';
+      document.getElementById('publishVideoLabel').style.display = 'flex';
+    }
+  </script>
+
+  {{-- ── LIGHTBOX POPUP OVERLAY (global, outside all tab panes) ── --}}
+  <style>
+    .lb-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lb-overlay.active { display: flex; opacity: 1; }
+    .lb-img {
+      max-width: 90vw; max-height: 82vh;
+      width: auto; height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+      display: block;
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 25px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-close:hover { background: rgba(220,53,69,0.9); border-color: #dc3545; transform: scale(1.08); }
+    .lb-arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(20,20,25,0.88);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-arrow:hover { background: orange; border-color: orange; color: #000; }
+    .lb-arrow.prev { left: 20px; }
+    .lb-arrow.next { right: 20px; }
+    .lb-meta {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 18px;
+      background: rgba(15,15,20,0.9);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 20px; color: #fff; font-size: 0.87rem;
+      z-index: 1000001; white-space: nowrap;
+    }
+  </style>
+
+  <div id="lbOverlay" class="lb-overlay" onclick="lbClose(event)">
+    <button class="lb-close" onclick="lbForceClose()" title="Close (Esc)">&times;</button>
+    <button class="lb-arrow prev" onclick="lbNav(-1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lbImg" class="lb-img" src="" alt="Photo">
+    <button class="lb-arrow next" onclick="lbNav(1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lb-meta">
+      <span id="lbCounter">1 / 1</span>
+      <span style="opacity:0.35">|</span>
+      <span class="fw-bold" style="color:orange;">Published Photo</span>
+    </div>
+  </div>
+
+  <script>
+    var lbPhotos = [], lbIdx = 0;
+
+    function openMediaModal(url, type) {
+      if (type !== 'image') return;
+      var cards = document.querySelectorAll('.published-photo-card');
+      lbPhotos = Array.from(cards).map(function(c){ return c.getAttribute('data-img-url'); }).filter(Boolean);
+      if (!lbPhotos.length) lbPhotos = [url];
+      lbIdx = lbPhotos.indexOf(url);
+      if (lbIdx < 0) lbIdx = 0;
+      lbShow();
+      var ov = document.getElementById('lbOverlay');
+      ov.style.display = 'flex';
+      setTimeout(function(){ ov.classList.add('active'); }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function lbShow() {
+      document.getElementById('lbImg').src = lbPhotos[lbIdx] || '';
+      document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
+      var prev = document.querySelector('.lb-arrow.prev');
+      var next = document.querySelector('.lb-arrow.next');
+      var show = lbPhotos.length > 1 ? 'flex' : 'none';
+      if (prev) prev.style.display = show;
+      if (next) next.style.display = show;
+    }
+
+    function lbNav(dir, e) {
+      if (e) e.stopPropagation();
+      if (lbPhotos.length <= 1) return;
+      lbIdx = (lbIdx + dir + lbPhotos.length) % lbPhotos.length;
+      lbShow();
+    }
+
+    function lbForceClose() {
+      var ov = document.getElementById('lbOverlay');
+      ov.classList.remove('active');
+      setTimeout(function(){ ov.style.display = 'none'; document.body.style.overflow = ''; }, 200);
+    }
+
+    function lbClose(e) {
+      if (e.target.id === 'lbOverlay') lbForceClose();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      var ov = document.getElementById('lbOverlay');
+      if (!ov || !ov.classList.contains('active')) return;
+      if (e.key === 'Escape') lbForceClose();
+      else if (e.key === 'ArrowLeft') lbNav(-1, e);
+      else if (e.key === 'ArrowRight') lbNav(1, e);
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var tabEls = document.querySelectorAll('.m-sidebar-menu button[data-bs-toggle="tab"]');
+      var tabContentContainer = document.querySelector('.tab-content');
+      
+      tabEls.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          if (window.innerWidth < 992 && tabContentContainer) {
+            // Scroll to the top of the tab content container with an offset for the navbar
+            var offset = 80;
+            var topPos = tabContentContainer.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: topPos, behavior: 'smooth' });
+          }
+        });
+      });
+
+      @if(session('success'))
+      // Show a toast notification
+      var toastEl = document.createElement('div');
+      toastEl.innerHTML = `
+        <div id="classifiedToast" style="
+          position:fixed; top:80px; right:2rem; z-index:9999;
+          background:linear-gradient(135deg,rgba(40,167,69,0.95),rgba(25,110,45,0.95));
+          border:1px solid rgba(40,167,69,0.5);
+          border-radius:12px; padding:1.25rem 1.5rem;
+          color:#fff; font-family:'Outfit',sans-serif;
+          font-size:0.95rem; font-weight:500;
+          box-shadow:0 8px 24px rgba(0,0,0,0.4);
+          display:flex; align-items:center; gap:0.75rem;
+          max-width:360px;
+          animation: slideInToast 0.4s ease;
+        ">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ session('success') }}</span>
+        </div>
+      `;
+      document.body.appendChild(toastEl);
+      setTimeout(function() {
+        var t = document.getElementById('classifiedToast');
+        if (t) { t.style.opacity = '0'; t.style.transition = 'opacity 0.5s'; setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t.parentNode); }, 500); }
+      }, 4000);
+
+      // Auto-activate classifieds tab if success from classified payment
+      var classifiedsTabBtn = document.getElementById('classifieds-tab');
+      if (classifiedsTabBtn) {
+        var bsTab = new bootstrap.Tab(classifiedsTabBtn);
+        bsTab.show();
+      }
+      @endif
+
+    });
+  </script>
+
+  <style>
+    @keyframes slideInToast {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
