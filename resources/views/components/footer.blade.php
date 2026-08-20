@@ -48,7 +48,8 @@
       <div class="col-6 col-lg-2">
         <h3 class="nr-footer__title h6">Explore</h3>
         <ul class="list-unstyled mb-0">
-          <li class="mb-2"><a href="/#vip-escorts">Escort Girls</a></li>
+          <li class="mb-2"><a href="/">Home</a></li>
+          <li class="mb-2"><a href="{{ route('escort-girls') }}">Escort Girls</a></li>
           <li class="mb-2"><a href="/category/call-boys">Call Boys</a></li>
           <li class="mb-2"><a href="/videos">Videos</a></li>
           <li class="mb-2"><a href="/classifieds">Adult Classifieds</a></li>

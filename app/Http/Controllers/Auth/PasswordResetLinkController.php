@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\RateLimiter;
 
 class PasswordResetLinkController extends Controller
 {
@@ -26,6 +27,12 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $key = 'forgot-password:'.$request->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            return back()->with('throttle_error', 'You have requested too many password resets. Please try again tomorrow.');
+        }
+
         $request->validate([
             'email' => ['required', 'email'],
         ]);
@@ -37,9 +44,12 @@ class PasswordResetLinkController extends Controller
             $request->only('email')
         );
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        if ($status == Password::RESET_LINK_SENT) {
+            RateLimiter::hit($key, 1440 * 60); // 1440 minutes = 24 hours
+            return back()->with('status', __($status));
+        }
+
+        return back()->withInput($request->only('email'))
+            ->withErrors(['email' => __($status)]);
     }
 }

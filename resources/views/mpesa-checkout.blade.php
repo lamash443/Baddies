@@ -125,15 +125,8 @@
             <p class="text-secondary">{{ __('Enter Your M-Pesa Number Below') }}</p>
           </div>
 
-          <form action="#" method="POST">
+          <form id="mpesa-payment-form" action="#" method="POST">
             @csrf
-            
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                <strong>Success!</strong> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            @endif
 
             <div class="mb-4">
               <input type="text" class="form-control form-control-lg" name="phone" placeholder="254722xxxxxx" required autofocus autocomplete="tel">
@@ -145,10 +138,12 @@
             </button>
           </form>
 
+          <div id="payment-status-message" class="alert alert-info mt-3 text-center" style="display:none; font-family:'Outfit',sans-serif;"></div>
+
           <div class="instructions">
             <p>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              <span>Check your phone number for the M-PESA PIN prompt.</span>
+              <span>Check your phone screen for the M-PESA PIN prompt.</span>
             </p>
             <p>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -156,7 +151,7 @@
             </p>
             <p>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-              <span>Wait for this page to refresh to move you to the next page.</span>
+              <span>Wait for the page to redirect automatically once the payment succeeds.</span>
             </p>
           </div>
 
@@ -168,5 +163,114 @@
 
   <x-footer />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById('mpesa-payment-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const phoneInput = this.querySelector('input[name="phone"]');
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const statusDiv = document.getElementById('payment-status-message');
+      
+      const phone = phoneInput.value;
+      const checkoutPlanType = "{{ session('checkout_plan_type') }}";
+      const checkoutPlan = "{{ session('checkout_plan') }}";
+      const classifiedId = "{{ session('classified_id') }}";
+      const checkoutAmount = "{{ session('checkout_amount') }}";
+      
+      let purpose = 'membership';
+      if (checkoutPlanType === 'classified') {
+        purpose = 'classified';
+      } else if (checkoutPlanType === 'wallet') {
+        purpose = 'wallet';
+      }
+
+      // Disable inputs
+      phoneInput.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Sending Request... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+      
+      statusDiv.style.display = 'block';
+      statusDiv.className = 'alert alert-info mt-3 text-center';
+      statusDiv.innerHTML = 'Initiating PayHero transaction...';
+
+      fetch("{{ route('payment.initiate') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+          phone: phone,
+          purpose: purpose,
+          amount: checkoutAmount,
+          plan_type: checkoutPlanType,
+          plan_days: checkoutPlan,
+          classified_id: classifiedId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          statusDiv.className = 'alert alert-warning mt-3 text-center';
+          statusDiv.innerHTML = '<strong>' + data.message + '</strong><br>Waiting for PIN input on your phone...';
+          
+          // Start Polling
+          const pollInterval = setInterval(() => {
+            fetch('/payment/status/' + data.reference)
+            .then(res => res.json())
+            .then(statusData => {
+              if (statusData.status === 'completed') {
+                clearInterval(pollInterval);
+                statusDiv.className = 'alert alert-success mt-3 text-center';
+                statusDiv.innerHTML = 'Payment received successfully! Redirecting...';
+                
+                // Redirect based on purpose
+                setTimeout(() => {
+                  if (purpose === 'classified') {
+                    window.location.href = "{{ route('profile.edit') }}#tab-classifieds";
+                  } else if (purpose === 'wallet') {
+                    window.location.href = "{{ route('wallet.add') }}";
+                  } else {
+                    window.location.href = "{{ route('profile.edit') }}#tab-membership";
+                  }
+                }, 2000);
+              } else if (statusData.status === 'failed') {
+                clearInterval(pollInterval);
+                statusDiv.className = 'alert alert-danger mt-3 text-center';
+                statusDiv.innerHTML = 'Payment failed. Please try again.';
+                
+                // Enable inputs
+                phoneInput.disabled = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Send Payment Request to Phone';
+              }
+            })
+            .catch(err => {
+              console.error('Polling status error:', err);
+            });
+          }, 3000);
+        } else {
+          statusDiv.className = 'alert alert-danger mt-3 text-center';
+          statusDiv.innerHTML = 'Error: ' + data.message;
+          
+          // Enable inputs
+          phoneInput.disabled = false;
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Send Payment Request to Phone';
+        }
+      })
+      .catch(error => {
+        console.error('Payment initiation error:', error);
+        statusDiv.className = 'alert alert-danger mt-3 text-center';
+        statusDiv.innerHTML = 'An unexpected error occurred. Please try again.';
+        
+        // Enable inputs
+        phoneInput.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send Payment Request to Phone';
+      });
+    });
+  </script>
 </body>
 </html>
+

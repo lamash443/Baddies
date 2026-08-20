@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserPhotoController;
 use App\Http\Controllers\UserVideoController;
 use App\Http\Controllers\VerificationSubmissionController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -457,40 +458,29 @@ Route::middleware('auth')->group(function () {
         return view('mpesa-checkout');
     })->name('checkout.mpesa');
 
-    Route::post('/checkout-mpesa', function (\Illuminate\Http\Request $request) {
-        $request->validate([
-            'phone' => 'required|string',
-        ]);
-        
-        // TODO: Implement actual MPESA STK Push logic here
-        
-        $type = session('checkout_plan_type');
-        if ($type === 'classified') {
-            $classifiedId = session('classified_id');
-            if ($classifiedId) {
-                \App\Models\Classified::where('id', $classifiedId)->update(['payment_status' => 'paid']);
-            }
-        }
-        
-        return back()->with('success', 'Payment request sent to ' . $request->phone . '. Please check your phone.');
-    });
-
     Route::get('/wallet/add-funds', function () {
         $deposits = auth()->user()->deposits()->latest()->get();
         return view('wallet-add-funds', compact('deposits'));
     })->name('wallet.add');
-    
+
     Route::post('/wallet/add-funds', function (\Illuminate\Http\Request $request) {
         $request->validate([
             'amount' => 'required|numeric|min:50',
-            'payment_method' => 'required|string',
         ]);
-        
-        session(['checkout_plan_type' => 'wallet', 'checkout_amount' => $request->amount]);
-        
+        session([
+            'checkout_plan_type' => 'wallet',
+            'checkout_amount' => $request->amount,
+        ]);
         return redirect()->route('checkout.mpesa');
-    });
+    })->name('wallet.add.post');
+
+    Route::post('/payment/initiate', [PaymentController::class, 'initiate'])->name('payment.initiate');
+    Route::get('/payment/status/{reference}', [PaymentController::class, 'status'])->name('payment.status');
 });
+
+
+Route::post('/webhook/payhero', [PaymentController::class, 'webhook'])->name('webhook.payhero');
+
 
 Route::get('/contact', function () {
     $sitePage = \App\Models\Page::where('slug', 'contact')->first();
@@ -498,14 +488,20 @@ Route::get('/contact', function () {
 })->name('contact');
 
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
+    $key = 'contact-support:' . $request->ip();
+
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+        return back()->with('throttle_error', 'You have reached the 3 message limit for today. Please try again in 24 hours.');
+    }
+
     $rules = [
-        'subject' => 'required|string|max:255',
-        'message' => 'required|string|min:5',
+        'subject' => 'required|string|max:80',
+        'message' => 'required|string|min:5|max:1000',
     ];
 
     if (!auth()->check()) {
-        $rules['name'] = 'required|string|max:255';
-        $rules['email'] = 'required|email|max:255';
+        $rules['name']  = 'required|string|max:50';
+        $rules['email'] = 'required|email|max:100';
     }
 
     $data = $request->validate($rules);
@@ -518,6 +514,8 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => $data['message'],
         'status' => 'pending',
     ]);
+
+    \Illuminate\Support\Facades\RateLimiter::hit($key, 1440 * 60); // 24 hours
 
     return back()->with('success', 'Your support ticket has been submitted. Our team will review it soon.');
 })->name('contact.submit');

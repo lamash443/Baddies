@@ -15,10 +15,18 @@ class Deposit extends Model
         'status',
         'reference',
         'payment_method',
+        'checkout_request_id',
+        'payhero_reference',
+        'meta',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
     ];
 
     public function user()
     {
+
         return $this->belongsTo(User::class);
     }
 

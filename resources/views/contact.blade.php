@@ -70,6 +70,19 @@
     [data-bs-theme="light"] .form-control::placeholder { color: rgba(0,0,0,0.4); }
     [data-bs-theme="light"] .user-info-badge { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
 
+    /* CHAR COUNTER */
+    .char-counter {
+      font-size: 0.75rem; font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      text-align: right; margin-top: 4px;
+      transition: color 0.2s ease;
+    }
+    .char-counter.warn  { color: #ffc107; }
+    .char-counter.limit { color: #dc3545; }
+    [data-bs-theme="light"] .char-counter { color: rgba(0,0,0,0.35); }
+    [data-bs-theme="light"] .char-counter.warn  { color: #e07a00; }
+    [data-bs-theme="light"] .char-counter.limit { color: #dc3545; }
+
     /* PHONE BADGE */
     .contact-phone-badge {
       display: inline-flex; align-items: center; gap: 0.55rem;
@@ -130,14 +143,16 @@
               <div class="row g-3 mb-3">
                 <div class="col-12 col-md-6">
                   <label class="form-label" for="name">Your Name</label>
-                  <input type="text" name="name" id="name" class="form-control" placeholder="e.g. John Doe" required value="{{ old('name') }}">
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required maxlength="50" value="{{ old('name') }}">
+                  <div class="char-counter" id="name-counter">0 / 50</div>
                   @error('name')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                   @enderror
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label" for="email">Your Email Address</label>
-                  <input type="email" name="email" id="email" class="form-control" placeholder="e.g. john@example.com" required value="{{ old('email') }}">
+                  <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required maxlength="100" value="{{ old('email') }}">
+                  <div class="char-counter" id="email-counter">0 / 100</div>
                   @error('email')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                   @enderror
@@ -147,7 +162,8 @@
 
             <div class="mb-3">
               <label class="form-label" for="subject">Subject / Purpose</label>
-              <input type="text" name="subject" id="subject" class="form-control" placeholder="How can we help you?" required value="{{ old('subject') }}">
+              <input type="text" name="subject" id="subject" class="form-control" placeholder="How can we help you?" required maxlength="80" value="{{ old('subject') }}">
+              <div class="char-counter" id="subject-counter">0 / 80</div>
               @error('subject')
                 <div class="text-danger small mt-1">{{ $message }}</div>
               @enderror
@@ -155,7 +171,8 @@
 
             <div class="mb-4">
               <label class="form-label" for="message">Detailed Message</label>
-              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Please describe your issue or query in detail..." required>{{ old('message') }}</textarea>
+              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Please describe your issue or query in detail..." required maxlength="1000">{{ old('message') }}</textarea>
+              <div class="char-counter" id="message-counter">0 / 1000</div>
               @error('message')
                 <div class="text-danger small mt-1">{{ $message }}</div>
               @enderror
@@ -176,6 +193,28 @@
   <x-footer />
   <x-auth-modal />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function initCounter(inputId, counterId, max) {
+      var el = document.getElementById(inputId);
+      var ct = document.getElementById(counterId);
+      if (!el || !ct) return;
+      function update() {
+        var len = el.value.length;
+        ct.textContent = len + ' / ' + max;
+        ct.classList.remove('warn', 'limit');
+        if (len >= max) ct.classList.add('limit');
+        else if (len >= max * 0.85) ct.classList.add('warn');
+      }
+      el.addEventListener('input', update);
+      update();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      initCounter('name',    'name-counter',    50);
+      initCounter('email',   'email-counter',   100);
+      initCounter('subject', 'subject-counter', 80);
+      initCounter('message', 'message-counter', 1000);
+    });
+  </script>
 
   @if(session('success'))
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080; margin-top: 60px;">
@@ -198,6 +237,32 @@
       document.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('successToast');
         var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+        toast.show();
+      });
+    </script>
+  @endif
+
+  @if(session('throttle_error'))
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080; margin-top: 60px;">
+      <div id="throttleToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(220,53,69,0.4) !important;">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-3 text-white">
+            <div style="background: rgba(220,53,69,0.2); padding: 8px; border-radius: 50%; color: #dc3545; display: flex;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <div>
+              <div class="fw-bold" style="font-size: 1rem; color: #dc3545;">Limit Reached</div>
+              <div class="small" style="opacity: 0.9;">{{ session('throttle_error') }}</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var toastEl = document.getElementById('throttleToast');
+        var toast = new bootstrap.Toast(toastEl, { delay: 6000 });
         toast.show();
       });
     </script>

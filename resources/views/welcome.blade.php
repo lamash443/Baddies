@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <x-site-favicon />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    if (window.location.hash === '#vip-escorts') {
+      window.location.replace("{{ route('escort-girls') }}");
+    }
+  </script>
   <title>Kenyan Baddies Club – VIP Escorts & Call Girls in Nairobi</title>
   <meta name="description" content="Browse VIP escorts, call girls and hookups in Nairobi and across Kenya. Join Kenyan Baddies Club – discreet, trusted and always online.">
   <meta name="robots" content="index,follow">
@@ -283,7 +288,10 @@
     [data-bs-theme="light"] .del-toast__msg { color: rgba(0,0,0,0.7); }
     [data-bs-theme="light"] .del-toast__close { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.5); }
     [data-bs-theme="light"] .del-toast__close:hover { background: rgba(220,53,69,0.1); color: #dc3545; border-color: rgba(220,53,69,0.2); }
-    [data-bs-theme="light"] .text-white-50 { color: rgba(0,0,0,0.5) !important; }
+    [data-bs-theme="light"] .home-hero__bg-img,
+    [data-bs-theme="light"] .home-hero__overlay {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -304,18 +312,21 @@
 
 <!-- ══ HERO ══ -->
 <section class="home-hero">
-  <div class="home-hero__bg"></div>
+  <div class="home-hero__bg">
+    <img src="{{ !empty($siteSettings['hero_background']) ? asset('storage/' . $siteSettings['hero_background']) : asset('images/header-image.jpg') }}" alt="" aria-hidden="true" class="home-hero__bg-img"
+         style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:0; pointer-events:none; display:block;">
+    <div class="home-hero__overlay" style="position:absolute; inset:0; background:linear-gradient(160deg, rgba(0,0,0,0.5) 0%, rgba(26,15,0,0.6) 40%, rgba(0,0,0,0.5) 100%); z-index:1;"></div>
+  </div>
   <div class="home-hero__inner">
 
     <h1 class="home-hero__title">
-      Meet Beautiful <span>Kenyan Baddies</span><br>Near You Tonight
+      {!! $siteSettings['hero_title'] ?? 'Meet Beautiful <span>Kenyan Baddies</span><br>Near You Tonight' !!}
     </h1>
     <p class="home-hero__sub">
-      Browse verified VIP escorts, call girls, and adult classifieds across Nairobi and all of Kenya.
-      Discreet, safe, and always online.
+      {{ $siteSettings['hero_subtitle'] ?? 'Browse verified VIP escorts, call girls, and adult classifieds across Nairobi and all of Kenya. Discreet, safe, and always online.' }}
     </p>
     <div class="home-hero__cta-group">
-      <a href="#vip-escorts" class="btn-orange">Browse VIP Escorts</a>
+      <a href="{{ route('escort-girls') }}" class="btn-orange">Browse VIP Escorts</a>
       @guest
       <a href="#" class="btn-outline-orange" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register">Join Free</a>
       @endguest
@@ -337,7 +348,7 @@
       </div>
     </div>
     <div class="cat-grid">
-      <a href="/#vip-escorts" class="cat-card">
+      <a href="{{ route('escort-girls') }}" class="cat-card">
         <div class="cat-card__name">Escort Girls</div>
         <div class="cat-card__count">VIP & Featured</div>
       </a>
@@ -464,11 +475,11 @@
           <div class="accordion-body">
 
             @php
-              $predefinedRoads = ['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road'];
+              $predefinedRoads = \App\Models\Location::where('is_active', true)->where('type', 'road')->pluck('name')->toArray();
               
-              $predefinedAreas = ['Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'];
+              $predefinedAreas = \App\Models\Location::where('is_active', true)->where('type', 'area')->pluck('name')->toArray();
               
-              $predefinedCounties = ['Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua','Murang\'a','Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'];
+              $predefinedCounties = \App\Models\Location::where('is_active', true)->where('type', 'county')->pluck('name')->toArray();
 
               // Retrieve distinct custom locations and counties from database
               $dbCounties = \App\Models\User::where('is_verified', true)
@@ -634,7 +645,7 @@
         <h2 class="home-section-title">
           <span>Call</span> Girls
         </h2>
-        <p class="home-section-sub">Verified escorts and call girls across Kenya</p>
+        <p class="home-section-sub">{{ \App\Models\SiteSetting::get('call_girls_subtitle', 'Verified escorts and call girls across Kenya') }}</p>
         <div class="home-section-line"></div>
       </div>
     </div>
@@ -656,7 +667,7 @@
     <div class="home-section-header">
       <div>
         <h2 class="home-section-title"><span>Adult</span> Classifieds</h2>
-        <p class="home-section-sub">Personals, jobs, and adult services</p>
+        <p class="home-section-sub">{{ \App\Models\SiteSetting::get('classifieds_subtitle', 'Personals, jobs, and adult services') }}</p>
         <div class="home-section-line"></div>
       </div>
       <a href="/classifieds" class="btn-outline-orange" style="font-size:.85rem; padding:.5rem 1.25rem;">View All</a>
@@ -688,7 +699,7 @@
     <div class="home-section-header">
       <div>
         <h2 class="home-section-title">How It <span>Works</span></h2>
-        <p class="home-section-sub">Find your perfect match in 3 simple steps</p>
+        <p class="home-section-sub">{{ \App\Models\SiteSetting::get('hiw_subtitle', 'Find your perfect match in 3 simple steps') }}</p>
         <div class="home-section-line"></div>
       </div>
     </div>
@@ -698,32 +709,32 @@
         <div class="hiw-card__icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
-        <div class="hiw-card__title">Browse Profiles</div>
-        <div class="hiw-card__body">Browse hundreds of verified escorts and call girls near you. Filter by location, price, or category.</div>
+        <div class="hiw-card__title">{{ \App\Models\SiteSetting::get('hiw_step1_title', 'Browse Profiles') }}</div>
+        <div class="hiw-card__body">{{ \App\Models\SiteSetting::get('hiw_step1_body', 'Browse hundreds of verified escorts and call girls near you. Filter by location, price, or category.') }}</div>
       </div>
       <div class="hiw-card">
         <div class="hiw-card__num">2</div>
         <div class="hiw-card__icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <div class="hiw-card__title">View Profile</div>
-        <div class="hiw-card__body">See full details — photos, rates, services, and location. Everything you need to make the right choice.</div>
+        <div class="hiw-card__title">{{ \App\Models\SiteSetting::get('hiw_step2_title', 'View Profile') }}</div>
+        <div class="hiw-card__body">{{ \App\Models\SiteSetting::get('hiw_step2_body', 'See full details — photos, rates, services, and location. Everything you need to make the right choice.') }}</div>
       </div>
       <div class="hiw-card">
         <div class="hiw-card__num">3</div>
         <div class="hiw-card__icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.37a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
         </div>
-        <div class="hiw-card__title">Connect Directly</div>
-        <div class="hiw-card__body">Reach out directly via the profile contact details. No middlemen, no delays — just direct connection.</div>
+        <div class="hiw-card__title">{{ \App\Models\SiteSetting::get('hiw_step3_title', 'Connect Directly') }}</div>
+        <div class="hiw-card__body">{{ \App\Models\SiteSetting::get('hiw_step3_body', 'Reach out directly via the profile contact details. No middlemen, no delays — just direct connection.') }}</div>
       </div>
       <div class="hiw-card">
         <div class="hiw-card__num">4</div>
         <div class="hiw-card__icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </div>
-        <div class="hiw-card__title">Enjoy VIP Perks</div>
-        <div class="hiw-card__body">Upgrade to VIP to unlock priority visibility, more photos, videos, and exclusive features.</div>
+        <div class="hiw-card__title">{{ \App\Models\SiteSetting::get('hiw_step4_title', 'Enjoy VIP Perks') }}</div>
+        <div class="hiw-card__body">{{ \App\Models\SiteSetting::get('hiw_step4_body', 'Upgrade to VIP to unlock priority visibility, more photos, videos, and exclusive features.') }}</div>
       </div>
     </div>
   </div>
@@ -803,42 +814,84 @@
         }
       </style>
 
-      <h2 class="ed-heading">If you are in Kenya and looking for a way to <span>spice up your day or night</span>, you are lucky to have landed in Baddies‑Club.</h2>
+      @php
+        /**
+         * Helper: parse a body string into paragraphs and bullet lists.
+         * Lines starting with "- " become <li> items (grouped into <ul class="ed-list">).
+         * Blank lines separate paragraphs.
+         */
+        function renderEditorialBody(string $text): string {
+          $lines = explode("\n", str_replace("\r\n", "\n", $text));
+          $html  = '';
+          $bullets = [];
+          $paragraphLines = [];
 
-      <p class="ed-body">We are a Kenyan escort agency that crafts pleasurable moments for men and women across the country. What pleasure means is totally up to you. Committed to creating authentic <em>Raha</em> vibes, our escort girls are up to anything you can envision in companionship, relaxation, and sexual terms. It's time to spend a day you'll never forget!</p>
+          $flushParagraph = function() use (&$paragraphLines, &$html) {
+            if ($paragraphLines) {
+              $html .= '<p class="ed-body" style="margin-top:.75rem;">' . e(implode(' ', $paragraphLines)) . '</p>';
+              $paragraphLines = [];
+            }
+          };
+          $flushBullets = function() use (&$bullets, &$html) {
+            if ($bullets) {
+              $html .= '<ul class="ed-list" style="margin-top:.75rem;">';
+              foreach ($bullets as $b) { $html .= '<li>' . e($b) . '</li>'; }
+              $html .= '</ul>';
+              $bullets = [];
+            }
+          };
+
+          foreach ($lines as $line) {
+            $trimmed = rtrim($line);
+            if ($trimmed === '') {
+              $flushParagraph();
+              $flushBullets();
+            } elseif (str_starts_with($trimmed, '- ')) {
+              $flushParagraph();
+              $bullets[] = ltrim(substr($trimmed, 2));
+            } else {
+              $flushBullets();
+              $paragraphLines[] = $trimmed;
+            }
+          }
+          $flushParagraph();
+          $flushBullets();
+          return $html;
+        }
+
+        $edHeading       = \App\Models\SiteSetting::get('editorial_heading',
+          'If you are in Kenya and looking for a way to <span>spice up your day or night</span>, you are lucky to have landed in Baddies‑Club.');
+        $edIntro         = \App\Models\SiteSetting::get('editorial_intro',
+          "We are a Kenyan escort agency that crafts pleasurable moments for men and women across the country. What pleasure means is totally up to you. Committed to creating authentic Raha vibes, our escort girls are up to anything you can envision in companionship, relaxation, and sexual terms. It's time to spend a day you'll never forget!");
+        $edLocalTitle    = \App\Models\SiteSetting::get('editorial_local_title', 'Local Escorts and Call Girls in Kenya');
+        $edLocalBody     = \App\Models\SiteSetting::get('editorial_local_body',
+          "You may be enjoying Kenyan national parks and African flavors a lot, but it is the local female beauties that make the country one to remember. Most of our girls are Kenyans who are well aware of the real meaning behind Raha and who can do it all for your contentment and sexual delight.\n\nSpend your time while accompanied by passionate Kenya sex escorts and indulge in their pristine beauty. Let them arrange a VIP experience just for you at any place of your choice, as long as they cover the selected area.\n\nBesides Kenyan girls, you are in good company with Eritrean, Egyptian, Ethiopian, Ugandan, and Tanzanian escorts. You can meet them all directly on this website.");
+        $edServicesTitle = \App\Models\SiteSetting::get('editorial_services_title', 'A Wide Range of Escort Services in Kenya');
+        $edServicesBody  = \App\Models\SiteSetting::get('editorial_services_body',
+          "Your wish is our escort girls' command. Whether you are bored, want to blow off some steam, or are thirsty for extraordinary sexual experiences, you only need to find the right lady to accompany you.\n\nHere's a glimpse at the Kenya escort services you can receive with Baddies‑Club:\n- Massage services that get as erotic as you can imagine\n- Luxury and VIP companionship (events or private)\n- Erotic dancing that will leave you speechless\n- Video calls and remote ways of satisfying your desires\n- Incall and outcall sex services\n\nEnjoy time with your escort in a way you're comfortable with. Whether you want her to come over to your place or get away from the usual surroundings, we are at your service.");
+        $edMeetTitle     = \App\Models\SiteSetting::get('editorial_meet_title', "Know Whom You're Going to Meet");
+        $edMeetBody      = \App\Models\SiteSetting::get('editorial_meet_body',
+          "Our escorts in Kenya are hot, but you don't have to take our word for it. The portfolio of every service provider on Baddies‑Club is complete with appearance details and photos, so you can let your eyes choose. These are verified to minimize the risk of unexpected encounters and unwanted surprises on the meeting day.\n\nAs you get familiar with a call girl's portfolio, you'll also discover:\n- Everything she is ready (and isn't ready) to do for you\n- The list of areas covered\n- The fees she would charge for her escort services\n- Contact information");
+      @endphp
+
+      <h2 class="ed-heading">{!! $edHeading !!}</h2>
+
+      <p class="ed-body">{{ $edIntro }}</p>
 
       <div class="ed-divider"></div>
 
-      <h3 class="ed-subheading">Local Escorts and Call Girls in Kenya</h3>
-      <p class="ed-body">You may be enjoying Kenyan national parks and African flavors a lot, but it is the local female beauties that make the country one to remember. Most of our girls are Kenyans who are well aware of the real meaning behind <em>Raha</em> and who can do it all for your contentment and sexual delight.</p>
-      <p class="ed-body" style="margin-top:.75rem;">Spend your time while accompanied by passionate Kenya sex escorts and indulge in their pristine beauty. Let them arrange a VIP experience just for you at any place of your choice, as long as they cover the selected area.</p>
-      <p class="ed-body" style="margin-top:.75rem;">Besides Kenyan girls, you are in good company with Eritrean, Egyptian, Ethiopian, Ugandan, and Tanzanian escorts. You can meet them all directly on this website.</p>
+      <h3 class="ed-subheading">{{ $edLocalTitle }}</h3>
+      {!! renderEditorialBody($edLocalBody) !!}
 
       <div class="ed-divider"></div>
 
-      <h3 class="ed-subheading">A Wide Range of Escort Services in Kenya</h3>
-      <p class="ed-body">Your wish is our escort girls' command. Whether you are bored, want to blow off some steam, or are thirsty for extraordinary sexual experiences, you only need to find the right lady to accompany you.</p>
-      <p class="ed-body" style="margin-top:.75rem;">Here's a glimpse at the Kenya escort services you can receive with Baddies‑Club:</p>
-      <ul class="ed-list" style="margin-top:.75rem;">
-        <li>Massage services that get as erotic as you can imagine</li>
-        <li>Luxury and VIP companionship (events or private)</li>
-        <li>Erotic dancing that will leave you speechless</li>
-        <li>Video calls and remote ways of satisfying your desires</li>
-        <li>Incall and outcall sex services</li>
-      </ul>
-      <p class="ed-body" style="margin-top:.75rem;">Enjoy time with your escort in a way you're comfortable with. Whether you want her to come over to your place or get away from the usual surroundings, we are at your service.</p>
+      <h3 class="ed-subheading">{{ $edServicesTitle }}</h3>
+      {!! renderEditorialBody($edServicesBody) !!}
 
       <div class="ed-divider"></div>
 
-      <h3 class="ed-subheading">Know Whom You're Going to Meet</h3>
-      <p class="ed-body">Our escorts in Kenya are hot, but you don't have to take our word for it. The portfolio of every service provider on Baddies‑Club is complete with appearance details and photos, so you can let your eyes choose. These are verified to minimize the risk of unexpected encounters and unwanted surprises on the meeting day.</p>
-      <p class="ed-body" style="margin-top:.75rem;">As you get familiar with a call girl's portfolio, you'll also discover:</p>
-      <ul class="ed-list" style="margin-top:.75rem;">
-        <li>Everything she is ready (and isn't ready) to do for you</li>
-        <li>The list of areas covered</li>
-        <li>The fees she would charge for her escort services</li>
-        <li>Contact information</li>
-      </ul>
+      <h3 class="ed-subheading">{{ $edMeetTitle }}</h3>
+      {!! renderEditorialBody($edMeetBody) !!}
 
       @guest
       <div class="home-hero__cta-group" style="margin-top:2rem;">

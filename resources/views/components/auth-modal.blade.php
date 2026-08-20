@@ -191,6 +191,24 @@
           [data-bs-theme="light"] .auth-modal-content span[style*="background:#000000;"] {
             background: #ffffff !important;
           }
+          .pwd-req {
+            color: rgba(255,255,255,0.4);
+            transition: color 0.3s ease;
+          }
+          .pwd-req svg {
+            opacity: 0.3;
+            transition: opacity 0.3s ease, color 0.3s ease;
+          }
+          .pwd-req.valid {
+            color: #198754 !important;
+          }
+          .pwd-req.valid svg {
+            opacity: 1;
+            color: #198754;
+          }
+          [data-bs-theme="light"] .pwd-req {
+            color: rgba(0,0,0,0.5);
+          }
         </style>
 
         <div class="tab-content">
@@ -286,7 +304,7 @@
                 @csrf
                 <div class="mb-3">
                   <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Full Name</label>
-                  <input id="reg-name" type="text" name="name" class="form-control auth-custom-input" value="{{ old('name') }}" required placeholder="e.g. Jane Doe">
+                  <input id="reg-name" type="text" name="name" class="form-control auth-custom-input" value="{{ old('name') }}" required placeholder="Enter your name">
                   @error('name')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
@@ -297,13 +315,29 @@
                 <div class="mb-3">
                   <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Password</label>
                   <input id="reg-password" type="password" name="password" class="form-control auth-custom-input" required placeholder="Min 8 characters">
+                  <div class="mt-2 d-none" id="password-strength-container">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="small fw-bold" id="password-strength-text" style="font-size: 0.75rem; letter-spacing: 0.02em;">Password Strength</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 4px; background-color: rgba(255,255,255,0.1); border-radius: 2px;">
+                      <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%; transition: width 0.3s ease, background-color 0.3s ease;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="small" style="font-size: 0.75rem;">
+                      <ul class="list-unstyled mb-0" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                        <li id="req-length" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>8+ characters</li>
+                        <li id="req-upper" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>Uppercase</li>
+                        <li id="req-lower" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>Lowercase</li>
+                        <li id="req-number" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"></polyline></svg>Number/Symbol</li>
+                      </ul>
+                    </div>
+                  </div>
                   @error('password')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-4">
                   <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Confirm Password</label>
                   <input id="reg-password-confirm" type="password" name="password_confirmation" class="form-control auth-custom-input" required placeholder="Repeat password">
                 </div>
-                <button type="submit" class="btn btn-orange-lg w-100 shadow-sm">Sign Up</button>
+                <button type="submit" id="reg-submit-btn" class="btn btn-orange-lg w-100 shadow-sm" disabled style="opacity: 0.6; cursor: not-allowed;">Sign Up</button>
               </form>
             </div>
           </div>
@@ -362,8 +396,24 @@
         }
       });
 
-      // Handle server-side validation errors
-      @if($errors->any())
+      // Handle opening modal via URL parameter
+      var urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('auth')) {
+        var authTab = urlParams.get('auth');
+        var modal = new bootstrap.Modal(authModalEl);
+        modal.show();
+        if (authTab === 'register') {
+          switchAuthTab('register');
+          showEmailForm('register');
+        } else {
+          switchAuthTab('login');
+          showEmailForm('login');
+        }
+        var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: newUrl}, '', newUrl);
+      }
+
+      @if($errors->any() && !in_array(request()->route()->getName(), ['password.request', 'password.reset']))
         var modal = new bootstrap.Modal(authModalEl);
         modal.show();
         @if(old('name') || $errors->has('name'))
@@ -374,6 +424,96 @@
           showEmailForm('login');
         @endif
       @endif
+    }
+  });
+
+  // Password strength logic
+  document.addEventListener("DOMContentLoaded", function() {
+    const passwordInput = document.getElementById('reg-password');
+    const strengthContainer = document.getElementById('password-strength-container');
+    const strengthText = document.getElementById('password-strength-text');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const submitBtn = document.getElementById('reg-submit-btn');
+    
+    const reqLength = document.getElementById('req-length');
+    const reqUpper = document.getElementById('req-upper');
+    const reqLower = document.getElementById('req-lower');
+    const reqNumber = document.getElementById('req-number');
+
+    function updateRequirement(el, isValid) {
+      if (!el) return;
+      if (isValid) {
+        el.classList.add('valid');
+      } else {
+        el.classList.remove('valid');
+      }
+    }
+
+    if (passwordInput && strengthContainer && strengthText && strengthBar && submitBtn) {
+      passwordInput.addEventListener('input', function() {
+        const val = passwordInput.value;
+        if (val.length > 0) {
+          strengthContainer.classList.remove('d-none');
+        } else {
+          strengthContainer.classList.add('d-none');
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = '0.6';
+          submitBtn.style.cursor = 'not-allowed';
+          return;
+        }
+
+        let strength = 0;
+        
+        const hasLength = val.length >= 8;
+        const hasLower = /[a-z]/.test(val);
+        const hasUpper = /[A-Z]/.test(val);
+        const hasNumberOrSymbol = /[0-9]/.test(val) || /[$@#&!%*?]/.test(val);
+
+        updateRequirement(reqLength, hasLength);
+        updateRequirement(reqLower, hasLower);
+        updateRequirement(reqUpper, hasUpper);
+        updateRequirement(reqNumber, hasNumberOrSymbol);
+
+        const allValid = hasLength && hasLower && hasUpper && hasNumberOrSymbol;
+        
+        if (allValid) {
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = '1';
+          submitBtn.style.cursor = 'pointer';
+        } else {
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = '0.6';
+          submitBtn.style.cursor = 'not-allowed';
+        }
+
+        if (hasLength) strength += 25;
+        if (hasLower) strength += 25;
+        if (hasUpper) strength += 25;
+        if (hasNumberOrSymbol) strength += 25;
+
+        strengthBar.style.width = strength + '%';
+        strengthBar.setAttribute('aria-valuenow', strength);
+        
+        strengthBar.classList.remove('bg-danger', 'bg-warning', 'bg-info', 'bg-success');
+
+        if (strength <= 25) {
+          strengthBar.classList.add('bg-danger');
+          strengthText.textContent = 'Weak';
+          strengthText.style.color = '#dc3545';
+        } else if (strength <= 50) {
+          strengthBar.classList.add('bg-warning');
+          strengthText.textContent = 'Fair';
+          strengthText.style.color = '#ffc107';
+        } else if (strength <= 75) {
+          strengthBar.classList.add('bg-info');
+          strengthText.textContent = 'Good';
+          strengthText.style.color = '#0dcaf0';
+        } else {
+          strengthBar.classList.add('bg-success');
+          strengthText.textContent = 'Strong';
+          strengthText.style.color = '#198754';
+        }
+      });
     }
   });
 </script>
