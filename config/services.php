@@ -38,6 +38,7 @@ return [
     'payhero' => [
         'username' => env('PAYHERO_USERNAME'),
         'password' => env('PAYHERO_PASSWORD'),
+        'auth_token' => env('PAYHERO_AUTH_TOKEN'),
         'channel_id' => env('PAYHERO_CHANNEL_ID'),
         'account_id' => env('PAYHERO_ACCOUNT_ID'),
         'callback_url' => env('PAYHERO_CALLBACK_URL'),

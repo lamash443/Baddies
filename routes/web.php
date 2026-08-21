@@ -296,6 +296,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update']); // fallback for browsers missing _method field
     Route::post('/profile/photo', [ProfileController::class, 'uploadPhoto'])->name('profile.photo');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/sessions/{id}/terminate', [ProfileController::class, 'terminateSession'])->name('profile.sessions.terminate');
+    Route::post('/profile/sessions/terminate-others', [ProfileController::class, 'terminateAllOtherSessions'])->name('profile.sessions.terminate-others');
     // User Photos
     Route::post('/profile/photos', [UserPhotoController::class, 'store'])->name('user.photos.store');
     Route::delete('/profile/photos/{photo}', [UserPhotoController::class, 'destroy'])->name('user.photos.destroy');
@@ -438,6 +440,13 @@ Route::middleware('auth')->group(function () {
             }
 
             $planLabel = strtoupper($planType) . ' (' . $planDays . ' days)';
+
+            // Log the subscription activity
+            activity()
+                ->causedBy($user)
+                ->withProperties(['plan' => $planType, 'days' => $planDays, 'cost' => $cost, 'method' => 'wallet'])
+                ->log("Subscribed to {$planLabel} plan via wallet");
+
             // Redirect back to same checkout page with success toast
             return back()->with('success', "You're now subscribed to the {$planLabel} plan!");
         }
@@ -471,6 +480,13 @@ Route::middleware('auth')->group(function () {
             'checkout_plan_type' => 'wallet',
             'checkout_amount' => $request->amount,
         ]);
+
+        // Log wallet top-up initiation
+        activity()
+            ->causedBy(auth()->user())
+            ->withProperties(['amount' => $request->amount])
+            ->log('Initiated wallet top-up of KSh ' . number_format($request->amount, 2));
+
         return redirect()->route('checkout.mpesa');
     })->name('wallet.add.post');
 

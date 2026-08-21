@@ -1422,6 +1422,92 @@
               </form>
             </div>
 
+            <!-- Active Sessions Card -->
+            <div class="dash-card mt-4 settings-sessions-card">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="settings-section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span class="settings-section-label d-block">Active Sessions</span>
+                    <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);">Manage and sign out of your active sessions on other browsers and devices.</span>
+                  </div>
+                </div>
+                
+                @if(isset($sessions) && count($sessions) > 1)
+                  <form method="POST" action="{{ route('profile.sessions.terminate-others') }}">
+                    @csrf
+                    <button type="submit" class="btn-danger-custom btn-sm py-2" onclick="return confirm('Are you sure you want to sign out of all other devices?')">
+                      Sign Out Other Devices
+                    </button>
+                  </form>
+                @endif
+              </div>
+
+              @if(session('status') === 'session-terminated')
+                <div class="alert alert-success bg-success-subtle text-success border-success-subtle mb-4" role="alert">
+                  Session terminated successfully.
+                </div>
+              @endif
+              @if(session('status') === 'other-sessions-terminated')
+                <div class="alert alert-success bg-success-subtle text-success border-success-subtle mb-4" role="alert">
+                  All other sessions terminated successfully.
+                </div>
+              @endif
+              @if($errors->has('session'))
+                <div class="alert alert-danger bg-danger-subtle text-danger border-danger-subtle mb-4" role="alert">
+                  {{ $errors->first('session') }}
+                </div>
+              @endif
+
+              <div class="list-group list-group-flush rounded border border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
+                @if(isset($sessions) && count($sessions) > 0)
+                  @foreach($sessions as $session)
+                    <div class="list-group-item d-flex align-items-center justify-content-between p-3 flex-wrap gap-2" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); color: #fff;">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="session-device-icon" style="color: orange; background: rgba(255,140,0,0.1); padding: 0.6rem; border-radius: 8px;">
+                          @if($session->device === 'Mobile')
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                          @elseif($session->device === 'Tablet')
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                          @else
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                          @endif
+                        </div>
+                        <div>
+                          <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="fw-bold text-white">{{ $session->platform }} - {{ $session->browser }}</span>
+                            @if($session->is_current_device)
+                              <span class="badge bg-success text-white border-0 px-2 py-1" style="font-size: 0.7rem; font-weight: 600; background-color: #28a745 !important;">This device</span>
+                            @endif
+                          </div>
+                          <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">
+                            {{ $session->ip_address }} &bull; Last active {{ $session->last_active }}
+                          </div>
+                        </div>
+                      </div>
+
+                      @if(!$session->is_current_device)
+                        <form method="POST" action="{{ route('profile.sessions.terminate', $session->id) }}">
+                          @csrf
+                          <button type="submit" class="btn btn-outline-danger btn-sm px-3 py-1.5" style="font-weight: 600; border-radius: 6px; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to terminate this session?')">
+                            Sign Out
+                          </button>
+                        </form>
+                      @endif
+                    </div>
+                  @endforeach
+                @else
+                  <div class="p-4 text-center text-secondary" style="background: rgba(0,0,0,0.2);">
+                    No active sessions found.
+                  </div>
+                @endif
+              </div>
+            </div>
+
           </div>
 
           <style>
@@ -1500,6 +1586,37 @@
               box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
             }
             .settings-input::placeholder { color: rgba(255,255,255,0.25); }
+
+            /* Active Sessions Styles */
+            .settings-sessions-card {
+              background: rgba(17,17,17,0.9);
+              border: 1px solid rgba(255,140,0,0.18);
+              border-radius: 18px;
+              padding: 1.8rem;
+            }
+            .session-device-icon {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 42px;
+              height: 42px;
+              background: rgba(255,140,0,0.08);
+              border: 1px solid rgba(255,140,0,0.2);
+              border-radius: 10px;
+              color: orange;
+            }
+            .btn-outline-danger {
+              color: #ff4d4d !important;
+              border-color: rgba(255, 77, 77, 0.3) !important;
+              background: transparent !important;
+              transition: all 0.3s ease !important;
+            }
+            .btn-outline-danger:hover {
+              color: #fff !important;
+              background: #ff4d4d !important;
+              border-color: #ff4d4d !important;
+              box-shadow: 0 0 15px rgba(255, 77, 77, 0.4) !important;
+            }
           </style>
 
 

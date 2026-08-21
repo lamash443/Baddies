@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Http\View\Composers\SiteSettingsComposer;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +24,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Inject site settings (logo, favicon, preloader) into every view
-        View::composer('*', SiteSettingsComposer::class);
+        // Inject site settings into front-end views only (exclude admin/Filament views)
+        if (!request()->is('admin') && !request()->is('admin/*')) {
+            View::composer('*', SiteSettingsComposer::class);
+        }
+
+        // Log user logins
+        Event::listen(Login::class, function (Login $event) {
+            activity()
+                ->causedBy($event->user)
+                ->withProperties(['ip' => request()->ip(), 'user_agent' => request()->userAgent()])
+                ->log('User logged in');
+        });
+
+        // Log user logouts
+        Event::listen(Logout::class, function (Logout $event) {
+            if ($event->user) {
+                activity()
+                    ->causedBy($event->user)
+                    ->withProperties(['ip' => request()->ip()])
+                    ->log('User logged out');
+            }
+        });
     }
 }

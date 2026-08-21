@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Log;
 
 class PayHeroService
 {
-    protected string $username;
-    protected string $password;
+    protected ?string $username;
+    protected ?string $password;
+    protected ?string $authToken;
     protected int $channelId;
     protected int $accountId;
     protected string $callbackUrl;
@@ -17,6 +18,7 @@ class PayHeroService
     {
         $this->username = config('services.payhero.username');
         $this->password = config('services.payhero.password');
+        $this->authToken = config('services.payhero.auth_token');
         $this->channelId = (int) config('services.payhero.channel_id');
         $this->accountId = (int) config('services.payhero.account_id');
         $this->callbackUrl = config('services.payhero.callback_url');
@@ -35,7 +37,7 @@ class PayHeroService
     public function initiatePayment(float $amount, string $phoneNumber, string $reference, string $provider = 'm-pesa', string $networkCode = '63902'): array
     {
         $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-        $credentials = base64_encode($this->username . ':' . $this->password);
+        $credentials = $this->authToken ?: base64_encode($this->username . ':' . $this->password);
 
         $payload = [
             'amount' => (float) $amount,

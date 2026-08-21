@@ -8,9 +8,12 @@ use Illuminate\Support\Facades\Cache;
 
 class SiteSettingsComposer
 {
-    public function compose(View $view): void
+    protected array $settings;
+
+    public function __construct()
     {
-        $view->with('siteSettings', Cache::remember('site_settings', 3600, function () {
+        // Load once per request; cache avoids DB hits across requests
+        $this->settings = Cache::remember('site_settings', 3600, function () {
             return [
                 'logo'            => SiteSetting::get('logo'),
                 'favicon'         => SiteSetting::get('favicon'),
@@ -19,6 +22,11 @@ class SiteSettingsComposer
                 'hero_subtitle'   => SiteSetting::get('hero_subtitle'),
                 'hero_background' => SiteSetting::get('hero_background'),
             ];
-        }));
+        });
+    }
+
+    public function compose(View $view): void
+    {
+        $view->with('siteSettings', $this->settings);
     }
 }

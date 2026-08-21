@@ -23,6 +23,28 @@ class ProfileController extends Controller
         $user = $request->user();
         $classifieds = \App\Models\Classified::where('user_id', $user->id)->latest()->get();
         $membershipPlans = MembershipPlan::whereNotIn('slug', ['chat'])->get();
+
+        $sessions = [];
+        if (config('session.driver') === 'database') {
+            $rawSessions = \Illuminate\Support\Facades\DB::table('sessions')
+                ->where('user_id', $user->id)
+                ->orderBy('last_activity', 'desc')
+                ->get();
+
+            foreach ($rawSessions as $session) {
+                $ua = $this->parseUserAgent($session->user_agent);
+                $sessions[] = (object) [
+                    'id'                => $session->id,
+                    'ip_address'        => $session->ip_address,
+                    'is_current_device' => $session->id === $request->session()->getId(),
+                    'platform'          => $ua->platform,
+                    'browser'           => $ua->browser,
+                    'device'            => $ua->device,
+                    'last_active'       => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                ];
+            }
+        }
+
         return view('profile.edit', [
             'user'                   => $user,
             'photos'                 => UserPhoto::where('user_id', $user->id)->latest()->get(),
@@ -32,6 +54,7 @@ class ProfileController extends Controller
             'deposits'               => $user->deposits()->latest()->get(),
             'classifieds'            => $classifieds,
             'membershipPlans'        => $membershipPlans,
+            'sessions'               => $sessions,
         ]);
     }
 
@@ -95,5 +118,116 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::route('login')->with('status', 'Your account deletion request has been submitted and is pending admin approval.');
+    }
+
+    /**
+     * Terminate a specific user session.
+     */
+    public function terminateSession(Request $request, string $id): RedirectResponse
+    {
+        if ($id === $request->session()->getId()) {
+            return back()->withErrors(['session' => 'You cannot terminate your current session. Please log out instead.']);
+        }
+
+        \Illuminate\Support\Facades\DB::table('sessions')
+            ->where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->delete();
+
+        return Redirect::route('profile.edit', ['#tab-settings'])->with('status', 'session-terminated');
+    }
+
+    /**
+     * Terminate all other active user sessions.
+     */
+    public function terminateAllOtherSessions(Request $request): RedirectResponse
+    {
+        $currentSessionId = $request->session()->getId();
+
+        \Illuminate\Support\Facades\DB::table('sessions')
+            ->where('user_id', $request->user()->id)
+            ->where('id', '!=', $currentSessionId)
+            ->delete();
+
+        return Redirect::route('profile.edit', ['#tab-settings'])->with('status', 'other-sessions-terminated');
+    }
+
+    /**
+     * Helper to parse user agent string and return OS, Browser, Device types.
+     */
+    private function parseUserAgent(?string $userAgent): object
+    {
+        if (!$userAgent) {
+            return (object) [
+                'platform' => 'Unknown OS',
+                'browser' => 'Unknown Browser',
+                'device' => 'Desktop',
+            ];
+        }
+
+        // Detect OS / Platform
+        $os = 'Unknown OS';
+        $osArray = [
+            '/windows nt 10/i'      =>  'Windows 10/11',
+            '/windows nt 6.3/i'     =>  'Windows 8.1',
+            '/windows nt 6.2/i'     =>  'Windows 8',
+            '/windows nt 6.1/i'     =>  'Windows 7',
+            '/windows nt 6.0/i'     =>  'Windows Vista',
+            '/windows nt 5.2/i'     =>  'Windows Server 2003/XP x64',
+            '/windows nt 5.1/i'     =>  'Windows XP',
+            '/windows xp/i'         =>  'Windows XP',
+            '/macintosh|mac os x/i' =>  'macOS',
+            '/linux/i'              =>  'Linux',
+            '/ubuntu/i'             =>  'Ubuntu',
+            '/iphone/i'             =>  'iPhone',
+            '/ipod/i'               =>  'iPod',
+            '/ipad/i'               =>  'iPad',
+            '/android/i'            =>  'Android',
+            '/blackberry/i'         =>  'BlackBerry',
+            '/webos/i'              =>  'Mobile'
+        ];
+
+        foreach ($osArray as $regex => $value) {
+            if (preg_match($regex, $userAgent)) {
+                $os = $value;
+                break;
+            }
+        }
+
+        // Detect Browser
+        $browser = 'Unknown Browser';
+        $browserArray = [
+            '/msie/i'      => 'Internet Explorer',
+            '/firefox/i'   => 'Firefox',
+            '/safari/i'    => 'Safari',
+            '/chrome/i'    => 'Chrome',
+            '/edge/i'      => 'Edge',
+            '/opera/i'     => 'Opera',
+            '/netscape/i'  => 'Netscape',
+            '/maxthon/i'   => 'Maxthon',
+            '/konqueror/i' => 'Konqueror',
+            '/mobile/i'    => 'Handheld Browser'
+        ];
+
+        foreach ($browserArray as $regex => $value) {
+            if (preg_match($regex, $userAgent)) {
+                $browser = $value;
+                break;
+            }
+        }
+
+        // Handheld vs Desktop
+        $device = 'Desktop';
+        if (preg_match('/(tablet|ipad|playbook)|(android(?!.*mobi))/i', $userAgent)) {
+            $device = 'Tablet';
+        } elseif (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', $userAgent)) {
+            $device = 'Mobile';
+        }
+
+        return (object) [
+            'platform' => $os,
+            'browser' => $browser,
+            'device' => $device,
+        ];
     }
 }
