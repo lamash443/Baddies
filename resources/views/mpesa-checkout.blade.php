@@ -212,19 +212,39 @@
       .then(data => {
         if (data.success) {
           statusDiv.className = 'alert alert-warning mt-3 text-center';
-          statusDiv.innerHTML = '<strong>' + data.message + '</strong><br>Waiting for PIN input on your phone...';
-          
-          // Start Polling
+          statusDiv.innerHTML = `
+            <strong>${data.message}</strong><br>
+            <span class="text-white-50">Waiting for PIN input on your phone...</span><br><br>
+            <button id="stop-waiting-btn" class="btn btn-sm btn-outline-light mt-1" style="border-radius:8px; font-size:0.85rem;">
+              ✕ Stop Waiting
+            </button>
+          `;
+
+          let pollCount = 0;
+          const maxPolls = 40; // 40 × 3s = 2 minutes timeout
+
           const pollInterval = setInterval(() => {
+            pollCount++;
+
+            // Timeout after 2 minutes
+            if (pollCount > maxPolls) {
+              clearInterval(pollInterval);
+              statusDiv.className = 'alert alert-secondary mt-3 text-center';
+              statusDiv.innerHTML = '⏱ Payment timed out. No response received. Please try again.';
+              phoneInput.disabled = false;
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = 'Send Payment Request to Phone';
+              return;
+            }
+
             fetch('/payment/status/' + data.reference)
             .then(res => res.json())
             .then(statusData => {
               if (statusData.status === 'completed') {
                 clearInterval(pollInterval);
                 statusDiv.className = 'alert alert-success mt-3 text-center';
-                statusDiv.innerHTML = 'Payment received successfully! Redirecting...';
+                statusDiv.innerHTML = '✅ Payment received successfully! Redirecting...';
                 
-                // Redirect based on purpose
                 setTimeout(() => {
                   if (purpose === 'classified') {
                     window.location.href = "{{ route('profile.edit') }}#tab-classifieds";
@@ -234,12 +254,22 @@
                     window.location.href = "{{ route('profile.edit') }}#tab-membership";
                   }
                 }, 2000);
+
               } else if (statusData.status === 'failed') {
                 clearInterval(pollInterval);
-                statusDiv.className = 'alert alert-danger mt-3 text-center';
-                statusDiv.innerHTML = 'Payment failed. Please try again.';
-                
-                // Enable inputs
+
+                // Distinguish cancellation from other failures
+                if (statusData.is_cancelled) {
+                  statusDiv.className = 'alert alert-warning mt-3 text-center';
+                  statusDiv.innerHTML = '❌ Transaction cancelled.<br><span class="text-white-50">You cancelled the M-Pesa request. You can try again below.</span>';
+                } else if (statusData.failure_reason) {
+                  statusDiv.className = 'alert alert-danger mt-3 text-center';
+                  statusDiv.innerHTML = `❌ Payment failed.<br><span class="text-white-50">${statusData.failure_reason}</span>`;
+                } else {
+                  statusDiv.className = 'alert alert-danger mt-3 text-center';
+                  statusDiv.innerHTML = '❌ Payment failed. Please try again.';
+                }
+
                 phoneInput.disabled = false;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Send Payment Request to Phone';
@@ -249,11 +279,23 @@
               console.error('Polling status error:', err);
             });
           }, 3000);
+
+          // Stop-waiting button handler
+          statusDiv.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'stop-waiting-btn') {
+              clearInterval(pollInterval);
+              statusDiv.className = 'alert alert-secondary mt-3 text-center';
+              statusDiv.innerHTML = 'Stopped waiting. You can try again below.';
+              phoneInput.disabled = false;
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = 'Send Payment Request to Phone';
+            }
+          });
+
         } else {
           statusDiv.className = 'alert alert-danger mt-3 text-center';
           statusDiv.innerHTML = 'Error: ' + data.message;
           
-          // Enable inputs
           phoneInput.disabled = false;
           submitBtn.disabled = false;
           submitBtn.innerHTML = 'Send Payment Request to Phone';
@@ -264,7 +306,6 @@
         statusDiv.className = 'alert alert-danger mt-3 text-center';
         statusDiv.innerHTML = 'An unexpected error occurred. Please try again.';
         
-        // Enable inputs
         phoneInput.disabled = false;
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Send Payment Request to Phone';

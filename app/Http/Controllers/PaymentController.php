@@ -207,9 +207,17 @@ class PaymentController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
         } else {
-            // Payment failed
-            $deposit->update(['status' => 'failed']);
-            Log::info('PayHero Webhook: Deposit marked failed: ' . $externalRef);
+            // Payment failed or cancelled by user
+            $networkMessage = $request->input('network_message') ?? $request->input('NetworkMessage') ?? null;
+
+            $deposit->update([
+                'status' => 'failed',
+                'meta' => array_merge($deposit->meta ?? [], [
+                    'failure_reason' => $networkMessage,
+                ]),
+            ]);
+
+            Log::info('PayHero Webhook: Deposit marked failed: ' . $externalRef . ' Reason: ' . ($networkMessage ?? 'unknown'));
 
             return response()->json(['success' => true, 'message' => 'Payment failed status recorded']);
         }
@@ -222,10 +230,15 @@ class PaymentController extends Controller
     {
         $deposit = Deposit::where('reference', $reference)->firstOrFail();
 
+        $failureReason = $deposit->meta['failure_reason'] ?? null;
+        $isCancelled = $failureReason && str_contains(strtolower($failureReason), 'cancel');
+
         return response()->json([
-            'status' => $deposit->status, // pending, completed, failed
-            'amount' => $deposit->amount,
-            'purpose' => $deposit->meta['purpose'] ?? 'wallet',
+            'status'         => $deposit->status, // pending, completed, failed
+            'amount'         => $deposit->amount,
+            'purpose'        => $deposit->meta['purpose'] ?? 'wallet',
+            'failure_reason' => $failureReason,
+            'is_cancelled'   => $isCancelled,
         ]);
     }
 }

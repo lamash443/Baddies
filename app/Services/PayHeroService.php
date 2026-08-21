@@ -11,7 +11,6 @@ class PayHeroService
     protected ?string $password;
     protected ?string $authToken;
     protected int $channelId;
-    protected int $accountId;
     protected string $callbackUrl;
 
     public function __construct()
@@ -20,7 +19,6 @@ class PayHeroService
         $this->password = config('services.payhero.password');
         $this->authToken = config('services.payhero.auth_token');
         $this->channelId = (int) config('services.payhero.channel_id');
-        $this->accountId = (int) config('services.payhero.account_id');
         $this->callbackUrl = config('services.payhero.callback_url');
     }
 
@@ -45,7 +43,6 @@ class PayHeroService
             'provider' => $provider,
             'network_code' => $networkCode,
             'channel_id' => $this->channelId,
-            'account_id' => $this->accountId,
             'external_reference' => $reference,
             'callback_url' => $this->callbackUrl,
         ];
@@ -56,7 +53,7 @@ class PayHeroService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $credentials,
-            ])->post('https://api.payhero.africa/api/v2/payments', $payload);
+            ])->post('https://backend.payhero.co.ke/api/v2/payments', $payload);
 
             if ($response->successful()) {
                 Log::info('PayHero Payment Response Success:', $response->json());
@@ -73,7 +70,7 @@ class PayHeroService
 
             return [
                 'success' => false,
-                'message' => 'PayHero request failed with status ' . $response->status() . ': ' . ($response->json('message') ?? $response->body())
+                'message' => 'PayHero request failed with status ' . $response->status() . ': ' . ($response->json('error_message') ?? $response->json('message') ?? $response->body())
             ];
         } catch (\Exception $e) {
             Log::error('PayHero Payment Exception: ' . $e->getMessage());
