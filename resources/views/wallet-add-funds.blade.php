@@ -93,6 +93,38 @@
     .summary-total-label { font-size:1.1rem; font-weight:700; color:#fff; }
     .summary-total-value { font-size:1.4rem; font-weight:800; color:orange; }
 
+    /* SIDEBAR NAV CARD */
+    .side-nav-card {
+      background: rgba(17,17,17,0.85); backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,140,0,0.2); border-radius: 18px;
+      padding: 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      position: sticky; top: 1.5rem;
+    }
+    .side-nav-title {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+      padding: 0 0.5rem 0.75rem; margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,140,0,0.12);
+    }
+    .side-nav-link {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.7rem 0.85rem; border-radius: 10px;
+      color: rgba(255,255,255,0.72); text-decoration: none;
+      font-size: 0.92rem; font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      margin-bottom: 2px;
+    }
+    .side-nav-link:hover {
+      background: rgba(255,140,0,0.1); color: orange;
+    }
+    .side-nav-link svg { flex-shrink: 0; opacity: 0.8; }
+    .side-nav-link:hover svg { opacity: 1; }
+    .side-nav-link.active {
+      background: rgba(255,140,0,0.15); color: orange;
+      font-weight: 700;
+    }
+    .side-nav-link.active svg { opacity: 1; }
+
     /* LIGHT THEME */
     [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }
     [data-bs-theme="light"] .dash-card { background:#fff; border-color:rgba(255,140,0,0.3); box-shadow:0 5px 20px rgba(0,0,0,0.05); }
@@ -102,6 +134,9 @@
     [data-bs-theme="light"] .summary-label { color:rgba(0,0,0,0.6); }
     [data-bs-theme="light"] .summary-value { color:#000; }
     [data-bs-theme="light"] .summary-total-label { color:#000; }
+    [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
+    [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.65); }
+    [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08); color:orange; }
   </style>
 </head>
 <body>
@@ -124,8 +159,57 @@
   </div>
 
   <div class="container pb-5 mb-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-8 col-xl-7">
+    <div class="row g-4 align-items-start">
+
+      <!-- SIDEBAR NAV -->
+      <div class="col-12 col-lg-3 mb-4 mb-lg-0">
+        <div class="side-nav-card">
+          <div class="side-nav-title">My Account</div>
+
+          <a href="{{ route('dashboard') }}" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+
+          <a href="{{ route('profile.edit') }}" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            My Profile
+          </a>
+
+          <a href="{{ route('wallet.add') }}" class="side-nav-link active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            My Wallet
+          </a>
+
+          <a href="{{ route('profile.edit') }}#tab-membership" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2Z"/></svg>
+            My Membership
+          </a>
+
+          <a href="{{ url('/classifieds') }}" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            My Classifieds
+          </a>
+
+          <a href="{{ route('profile.edit') }}#tab-photos" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Publish Photos &amp; Videos
+          </a>
+
+          <a href="{{ route('profile.edit') }}#tab-settings" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            My Settings
+          </a>
+
+          <a href="{{ route('profile.edit') }}#tab-verification" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            Photo Verification
+          </a>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="col-12 col-lg-9">
 
         <!-- Available Balance Card -->
         <div class="dash-card mb-4">

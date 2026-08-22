@@ -118,14 +118,24 @@ class PaymentController extends Controller
     {
         Log::info('PayHero Webhook Received:', $request->all());
 
-        // Read payload parameters
-        $externalRef = $request->input('external_reference');
-        $success = $request->input('success');
-        $status = Str::lower($request->input('status', ''));
-        $payheroRef = $request->input('reference');
+        // PayHero wraps the result inside a 'response' key.
+        // Try nested first, then fall back to flat payload for forward-compatibility.
+        $nested      = $request->input('response');
+        $externalRef = $nested['ExternalReference']
+            ?? $nested['external_reference']
+            ?? $request->input('ExternalReference')
+            ?? $request->input('external_reference');
+
+        // Determine success/status from nested or flat fields
+        $rawStatus  = $nested['Status'] ?? $request->input('status', '');
+        $resultCode = $nested['ResultCode'] ?? $request->input('ResultCode');
+        $success    = $request->input('success');             // top-level boolean
+        $status     = Str::lower((string) $rawStatus);
+        $payheroRef = $nested['MerchantRequestID'] ?? $request->input('reference');
+        $networkMsg = $nested['ResultDesc'] ?? $request->input('network_message') ?? $request->input('NetworkMessage');
 
         if (!$externalRef) {
-            Log::warning('PayHero Webhook: external_reference is missing.');
+            Log::warning('PayHero Webhook: external_reference is missing.', $request->all());
             return response()->json(['success' => false, 'message' => 'external_reference missing'], 400);
         }
 
@@ -143,8 +153,11 @@ class PaymentController extends Controller
             return response()->json(['success' => true, 'message' => 'Already processed']);
         }
 
-        // Determine if payment is successful
-        $isSuccessful = ($success === true || $success === 'true' || $status === 'success');
+        // Determine if payment is successful.
+        // ResultCode 0 = success on M-Pesa; status field may be 'Success'/'QUEUED'/'Failed'.
+        $isSuccessful = ($success === true || $success === 'true'
+            || $status === 'success'
+            || (isset($resultCode) && (int) $resultCode === 0));
 
         if ($isSuccessful) {
             // Update deposit status to completed
@@ -208,16 +221,14 @@ class PaymentController extends Controller
             return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
         } else {
             // Payment failed or cancelled by user
-            $networkMessage = $request->input('network_message') ?? $request->input('NetworkMessage') ?? null;
-
             $deposit->update([
                 'status' => 'failed',
                 'meta' => array_merge($deposit->meta ?? [], [
-                    'failure_reason' => $networkMessage,
+                    'failure_reason' => $networkMsg,
                 ]),
             ]);
 
-            Log::info('PayHero Webhook: Deposit marked failed: ' . $externalRef . ' Reason: ' . ($networkMessage ?? 'unknown'));
+            Log::info('PayHero Webhook: Deposit marked failed: ' . $externalRef . ' Reason: ' . ($networkMsg ?? 'unknown'));
 
             return response()->json(['success' => true, 'message' => 'Payment failed status recorded']);
         }
@@ -225,16 +236,44 @@ class PaymentController extends Controller
 
     /**
      * Poll Payment Status
+     * When the deposit is still pending we also query PayHero's API directly
+     * so that cancellations / failures are surfaced on the next poll cycle
+     * without having to wait for the webhook to arrive.
      */
     public function status(string $reference)
     {
         $deposit = Deposit::where('reference', $reference)->firstOrFail();
 
+        // If still pending, hit PayHero's status endpoint directly.
+        // Use CheckoutRequestID (ws_CO_...) — that's what PayHero's status API expects.
+        if ($deposit->status === 'pending') {
+            $checkoutRequestId = $deposit->checkout_request_id;
+            $live = $checkoutRequestId
+                ? $this->payHeroService->checkStatus($checkoutRequestId)
+                : ['status' => 'QUEUED', 'network_message' => null];
+
+            if ($live['status'] === 'SUCCESS') {
+                // Shouldn't normally happen (webhook should have fired), but handle it
+                $deposit->update(['status' => 'completed']);
+
+            } elseif ($live['status'] === 'FAILED') {
+                $networkMessage = $live['network_message'];
+                $deposit->update([
+                    'status' => 'failed',
+                    'meta'   => array_merge($deposit->meta ?? [], [
+                        'failure_reason' => $networkMessage,
+                    ]),
+                ]);
+            }
+            // If QUEUED, leave as pending — keep polling
+            $deposit->refresh();
+        }
+
         $failureReason = $deposit->meta['failure_reason'] ?? null;
-        $isCancelled = $failureReason && str_contains(strtolower($failureReason), 'cancel');
+        $isCancelled   = $failureReason && str_contains(strtolower($failureReason), 'cancel');
 
         return response()->json([
-            'status'         => $deposit->status, // pending, completed, failed
+            'status'         => $deposit->status,
             'amount'         => $deposit->amount,
             'purpose'        => $deposit->meta['purpose'] ?? 'wallet',
             'failure_reason' => $failureReason,

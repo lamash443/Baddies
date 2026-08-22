@@ -296,42 +296,114 @@
           <a href="{{ route('profile.statistics') }}" class="btn btn-outline-warning w-100 fw-bold" style="border-radius:8px;">{{ __('View Statistics') }}</a>
         </div>
 
-        <div class="dash-card p-3">
-          <ul class="nav flex-column list-unstyled mb-0 m-sidebar-menu" role="tablist">
-            <li role="presentation"><button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">My Profile</button></li>
-            <li role="presentation"><button class="nav-link" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">My Wallet</button></li>
-            <li role="presentation"><button class="nav-link" id="membership-tab" data-bs-toggle="tab" data-bs-target="#tab-membership" type="button" role="tab" aria-controls="tab-membership" aria-selected="false">My Membership</button></li>
-            <li role="presentation"><button class="nav-link" id="classifieds-tab" data-bs-toggle="tab" data-bs-target="#tab-classifieds" type="button" role="tab" aria-controls="tab-classifieds" aria-selected="false">My Classifieds</button></li>
-            <li role="presentation"><button class="nav-link" id="publish-media-tab" data-bs-toggle="tab" data-bs-target="#tab-publish-media" type="button" role="tab" aria-controls="tab-publish-media" aria-selected="false">Publish Photos &amp; Videos</button></li>
+        <div class="side-nav-card">
+          <div class="side-nav-title">My Account</div>
 
-            <li role="presentation"><button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab" aria-controls="tab-settings" aria-selected="false">My Settings</button></li>
-            <li role="presentation"><button class="nav-link" id="verification-tab" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button" role="tab" aria-controls="tab-verification" aria-selected="false">Photo Verification</button></li>
+          <ul class="nav flex-column list-unstyled mb-0" role="tablist">
+
+            {{-- Dashboard --}}
+            <li role="presentation">
+              <a href="{{ route('dashboard') }}" class="side-nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+              </a>
+            </li>
+
+            {{-- My Profile --}}
+            <li role="presentation">
+              <button class="side-nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                My Profile
+              </button>
+            </li>
+
+            {{-- My Wallet --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                My Wallet
+              </button>
+            </li>
+
+            {{-- My Membership --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="membership-tab" data-bs-toggle="tab" data-bs-target="#tab-membership" type="button" role="tab" aria-controls="tab-membership" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2Z"/></svg>
+                My Membership
+              </button>
+            </li>
+
+            {{-- My Classifieds --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="classifieds-tab" data-bs-toggle="tab" data-bs-target="#tab-classifieds" type="button" role="tab" aria-controls="tab-classifieds" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                My Classifieds
+              </button>
+            </li>
+
+            {{-- Publish Photos & Videos --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="publish-media-tab" data-bs-toggle="tab" data-bs-target="#tab-publish-media" type="button" role="tab" aria-controls="tab-publish-media" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Publish Photos &amp; Videos
+              </button>
+            </li>
+
+            {{-- My Settings --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab" aria-controls="tab-settings" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                My Settings
+              </button>
+            </li>
+
+            {{-- Photo Verification --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="verification-tab" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button" role="tab" aria-controls="tab-verification" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                Photo Verification
+              </button>
+            </li>
+
           </ul>
         </div>
         
         <style>
-          .m-sidebar-menu li button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 0.8rem 1rem;
-            color: rgba(255,255,255,0.7);
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-bottom: 0.2rem;
+          /* ── SIDEBAR NAV (matches wallet page) ── */
+          .side-nav-card {
+            background: rgba(17,17,17,0.85); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,140,0,0.2); border-radius: 18px;
+            padding: 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
           }
-          .m-sidebar-menu li button:hover {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
+          .side-nav-title {
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.35);
+            padding: 0 0.5rem 0.75rem; margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,140,0,0.12);
           }
-          .m-sidebar-menu li button.active {
-            background: rgba(255,140,0,0.1) !important;
-            color: orange !important;
-            border-left: 3px solid orange;
+          .side-nav-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            width: 100%; padding: 0.7rem 0.85rem; border-radius: 10px;
+            color: rgba(255,255,255,0.72); text-decoration: none;
+            font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
+            background: transparent; border: none; text-align: left;
+            transition: background 0.2s, color 0.2s;
+            margin-bottom: 2px; cursor: pointer;
           }
+          .side-nav-link:hover {
+            background: rgba(255,140,0,0.1); color: orange;
+          }
+          .side-nav-link svg { flex-shrink: 0; opacity: 0.8; }
+          .side-nav-link:hover svg { opacity: 1; }
+          .side-nav-link.active {
+            background: rgba(255,140,0,0.15) !important; color: orange !important;
+            font-weight: 700;
+          }
+          .side-nav-link.active svg { opacity: 1; }
+          [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
+          [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.65); }
+          [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08); color:orange; }
         </style>
 
         {{-- â”€â”€ PHOTOS CARD â”€â”€ --}}
