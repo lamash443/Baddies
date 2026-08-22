@@ -87,7 +87,7 @@ class PaymentController extends Controller
         $result = $this->payHeroService->initiatePayment($amount, $request->phone, $reference);
 
         if ($result['success']) {
-            $checkoutRequestId = $result['data']['CheckoutRequestID'] ?? null;
+            $checkoutRequestId = $result['data']['CheckoutRequestID'] ?? $result['data']['checkout_request_id'] ?? null;
             $payheroRef = $result['data']['reference'] ?? null;
 
             $deposit->update([
@@ -160,63 +160,7 @@ class PaymentController extends Controller
             || (isset($resultCode) && (int) $resultCode === 0));
 
         if ($isSuccessful) {
-            // Update deposit status to completed
-            // (Note: Deposit model observer will increment user's wallet_balance automatically)
-            $deposit->update([
-                'status' => 'completed',
-                'payhero_reference' => $payheroRef ?? $deposit->payhero_reference,
-            ]);
-
-            // Retrieve associated user
-            $user = $deposit->user;
-            $meta = $deposit->meta;
-
-            $purpose = $meta['purpose'] ?? 'wallet';
-
-            if ($purpose === 'membership') {
-                $planType = $meta['plan_type'] ?? null;
-                $planDays = $meta['plan_days'] ?? null;
-
-                if ($planType && $planDays) {
-                    $plan = MembershipPlan::where('slug', $planType)->first();
-                    if ($plan) {
-                        // Deduct from wallet balance that was just incremented
-                        $user->decrement('wallet_balance', $deposit->amount);
-
-                        if ($planType === 'chat') {
-                            $user->update([
-                                'chat_plan' => 'active',
-                                'chat_expires_at' => now()->addDays($planDays),
-                            ]);
-                            Log::info("PayHero Webhook: Chat subscription activated for user {$user->id}");
-                        } else {
-                            $updateData = [
-                                'subscription_plan' => $planType,
-                                'subscription_expires_at' => now()->addDays($planDays),
-                                'photo_limit' => $plan->photo_limit,
-                                'video_limit' => $plan->video_limit,
-                            ];
-                            $user->update($updateData);
-                            Log::info("PayHero Webhook: Membership {$planType} activated for user {$user->id}");
-                        }
-                    }
-                }
-            } elseif ($purpose === 'classified') {
-                $classifiedId = $meta['classified_id'] ?? null;
-                if ($classifiedId) {
-                    $classified = Classified::find($classifiedId);
-                    if ($classified) {
-                        // Deduct from wallet balance that was just incremented
-                        $user->decrement('wallet_balance', $deposit->amount);
-
-                        $classified->update([
-                            'payment_status' => 'paid',
-                            'status' => 'approved',
-                        ]);
-                        Log::info("PayHero Webhook: Classified ad {$classifiedId} marked as paid.");
-                    }
-                }
-            }
+            $this->processSuccessfulDeposit($deposit, $payheroRef ?? null);
 
             return response()->json(['success' => true, 'message' => 'Payment processed successfully']);
         } else {
@@ -244,17 +188,16 @@ class PaymentController extends Controller
     {
         $deposit = Deposit::where('reference', $reference)->firstOrFail();
 
-        // If still pending, hit PayHero's status endpoint directly.
-        // Use CheckoutRequestID (ws_CO_...) — that's what PayHero's status API expects.
+        // Use payhero_reference (the UUID) — that's what PayHero's status API expects in v2.
         if ($deposit->status === 'pending') {
-            $checkoutRequestId = $deposit->checkout_request_id;
-            $live = $checkoutRequestId
-                ? $this->payHeroService->checkStatus($checkoutRequestId)
+            $ref = $deposit->payhero_reference ?? $deposit->checkout_request_id;
+            $live = $ref
+                ? $this->payHeroService->checkStatus($ref)
                 : ['status' => 'QUEUED', 'network_message' => null];
 
             if ($live['status'] === 'SUCCESS') {
                 // Shouldn't normally happen (webhook should have fired), but handle it
-                $deposit->update(['status' => 'completed']);
+                $this->processSuccessfulDeposit($deposit);
 
             } elseif ($live['status'] === 'FAILED') {
                 $networkMessage = $live['network_message'];
@@ -279,5 +222,71 @@ class PaymentController extends Controller
             'failure_reason' => $failureReason,
             'is_cancelled'   => $isCancelled,
         ]);
+    }
+
+    protected function processSuccessfulDeposit(Deposit $deposit, ?string $payheroRef = null)
+    {
+        // Check if already completed
+        if ($deposit->status === 'completed') {
+            return;
+        }
+
+        // Update deposit status to completed
+        // (Note: Deposit model observer will increment user's wallet_balance automatically)
+        $deposit->update([
+            'status' => 'completed',
+            'payhero_reference' => $payheroRef ?? $deposit->payhero_reference,
+        ]);
+
+        // Retrieve associated user
+        $user = $deposit->user;
+        $meta = $deposit->meta;
+
+        $purpose = $meta['purpose'] ?? 'wallet';
+
+        if ($purpose === 'membership') {
+            $planType = $meta['plan_type'] ?? null;
+            $planDays = $meta['plan_days'] ?? null;
+
+            if ($planType && $planDays) {
+                $plan = MembershipPlan::where('slug', $planType)->first();
+                if ($plan) {
+                    // Deduct from wallet balance that was just incremented
+                    $user->decrement('wallet_balance', $deposit->amount);
+
+                    if ($planType === 'chat') {
+                        $user->update([
+                            'chat_plan' => 'active',
+                            'chat_expires_at' => now()->addDays($planDays),
+                        ]);
+                        Log::info("PayHero Deposit: Chat subscription activated for user {$user->id}");
+                    } else {
+                        $updateData = [
+                            'subscription_plan' => $planType,
+                            'subscription_expires_at' => now()->addDays($planDays),
+                            'photo_limit' => $plan->photo_limit,
+                            'video_limit' => $plan->video_limit,
+                        ];
+                        $user->update($updateData);
+                        Log::info("PayHero Deposit: Membership {$planType} activated for user {$user->id}");
+                    }
+                }
+            }
+        } elseif ($purpose === 'classified') {
+            $classifiedId = $meta['classified_id'] ?? null;
+            if ($classifiedId) {
+                $classified = Classified::find($classifiedId);
+                if ($classified) {
+                    // Deduct from wallet balance that was just incremented
+                    $user->decrement('wallet_balance', $deposit->amount);
+
+                    $classified->update([
+                        'payment_status' => 'paid',
+                        'status' => 'approved',
+                    ]);
+                    Log::info("PayHero Deposit: Classified ad {$classifiedId} marked as paid.");
+                }
+            }
+        }
     }
 }

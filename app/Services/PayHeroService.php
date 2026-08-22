@@ -122,7 +122,7 @@ class PayHeroService
                 }
 
                 if ($statusRaw === 'FAILED' || $statusRaw === 'FAIL'
-                    || (isset($resultCode) && (int) $resultCode !== 0 && $statusRaw !== 'QUEUED')) {
+                    || (isset($resultCode) && (int) $resultCode !== 0)) {
                     return ['status' => 'FAILED', 'network_message' => $networkMsg];
                 }
 
