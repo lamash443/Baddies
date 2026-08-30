@@ -28,7 +28,7 @@ class PaymentController extends Controller
         $request->validate([
             'phone' => 'required|string',
             'purpose' => 'required|string|in:wallet,membership,classified',
-            'amount' => 'required_if:purpose,wallet|nullable|numeric|min:50',
+            'amount' => 'required_if:purpose,wallet|nullable|numeric|min:10',
             'plan_type' => 'required_if:purpose,membership|nullable|string',
             'plan_days' => 'required_if:purpose,membership|nullable|integer',
             'classified_id' => 'required_if:purpose,classified|nullable|integer',

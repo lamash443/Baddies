@@ -199,14 +199,11 @@
               </div>
             </div>
 
-              <div class="d-flex flex-row gap-2 gap-sm-3 mt-4">
-                <button type="button" class="btn text-light py-2 py-sm-3 px-1 px-sm-3 fs-6 fs-sm-5 fw-medium w-50 d-flex align-items-center justify-content-center" style="border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="history.back()">
-                  {{ __('Back') }}
-                </button>
-                <button type="submit" class="btn btn-orange py-2 py-sm-3 px-1 px-sm-3 fs-6 fs-sm-5 w-50 d-flex align-items-center justify-content-center text-center" style="border-radius:12px; line-height:1.2;">
-                  <span>{{ __('Pay & Subscribe') }}</span>
-                </button>
-              </div>
+            <div class="d-flex flex-row gap-2 gap-sm-3 mt-4">
+              <button type="submit" class="btn btn-orange py-2 py-sm-3 px-1 px-sm-3 fs-6 fs-sm-5 w-100 d-flex align-items-center justify-content-center text-center" style="border-radius:12px; line-height:1.2;">
+                <span>{{ __('Pay & Subscribe') }}</span>
+              </button>
+            </div>
 
           </form>
         </div>

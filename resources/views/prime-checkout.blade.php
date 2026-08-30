@@ -175,13 +175,14 @@
       <!-- Right Column: Checkout Form -->
       <div class="col-12 col-lg-7 col-xl-8" x-data="{ 
         step: 1, 
-        planPrice: {{ $plan?->pricing ? max(array_values($plan->pricing)) : 3000 }}, 
+        planPrice: {{ $plan?->pricing ? max(array_values($plan->pricing)) : 2000 }}, 
+        planDays: {{ $plan?->pricing ? array_key_last($plan->pricing) : 30 }},
+        paymentMethod: 'mpesa',
         mpesaPhone: '', 
-        loading: false,
-        paymentMethod: 'mpesa'
+        loading: false
       }">
         <div class="dash-card h-100" style="border-top: 4px solid orange;">
-          <form action="{{ route('membership.process') }}" method="POST" id="primeCheckoutForm">
+          <form action="{{ route('membership.process') }}" method="POST" id="primeCheckoutForm" @submit.prevent>
             @csrf
 
 
@@ -193,7 +194,7 @@
               <div class="row g-4 mb-4">
                 <div class="col-12 col-md-6">
                   <label class="form-label">{{ __('Select Plan') }}</label>
-                  <select class="form-select" name="plan" @change="planPrice = parseInt($event.target.options[$event.target.selectedIndex].getAttribute('data-price'))">
+                  <select class="form-select" name="plan" @change="planDays = parseInt($event.target.value); planPrice = parseInt($event.target.options[$event.target.selectedIndex].getAttribute('data-price'))">
                   @php
                     $pricing = $plan?->pricing ?? [];
                     $lastKey = array_key_last($pricing);
@@ -234,22 +235,20 @@
                   <span>{{ __('Pay & Subscribe') }}</span>
                 </button>
               </div>
-            </div>
-
-            <!-- STEP 2: M-PESA Phone Input -->
+                <!-- STEP 2: M-PESA Phone Input (AJAX) -->
             <div x-show="step === 2" style="display:none;" x-cloak x-transition>
               <!-- Stepper -->
               <div class="d-flex justify-content-between align-items-center mb-5 position-relative px-4">
                 <div class="position-absolute top-50 start-0 end-0 translate-middle-y" style="height:2px; background:rgba(255,255,255,0.1); z-index:1;"></div>
                 <div class="text-center position-relative" style="z-index:2;">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:44px; height:44px; font-weight:800; background:#28a745; border:4px solid #111; color:#fff;">
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:44px; height:44px; font-weight:800; background:orange; border:4px solid #111; color:#000;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>
-                  <div class="text-success fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:1px;">Details</div>
+                  <div class="fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:1px; color:orange;">Details</div>
                 </div>
                 <div class="text-center position-relative" style="z-index:2;">
-                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:44px; height:44px; font-weight:800; font-size:1.1rem; background:#28a745; border:4px solid #0d0d0d; color:#fff; box-shadow:0 0 24px rgba(40,167,69,0.5);">2</div>
-                  <div class="text-success fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:1px;">M-PESA</div>
+                  <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:44px; height:44px; font-weight:800; font-size:1.1rem; background:orange; border:4px solid #0d0d0d; color:#000; box-shadow:0 0 24px rgba(255,165,0,0.5);">2</div>
+                  <div class="fw-bold text-uppercase" style="font-size:0.68rem; letter-spacing:1px; color:orange;">M-PESA</div>
                 </div>
                 <div class="text-center position-relative" style="z-index:2;">
                   <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width:44px; height:44px; font-weight:700; background:#1c1c1c; border:2px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.35);">3</div>
@@ -257,7 +256,7 @@
                 </div>
               </div>
 
-              <div class="text-center mb-5">
+              <div class="text-center mb-4">
                 <h3 class="text-light mb-1" style="font-weight:900; font-size:1.65rem; letter-spacing:1.5px;">PAY WITH M-PESA</h3>
                 <p class="text-secondary mb-0" style="font-size:0.95rem;">Enter Your M-Pesa Number Below</p>
               </div>
@@ -265,32 +264,45 @@
               <div class="mb-4">
                 <label class="form-label fw-bold" style="font-size:1rem;">M-PESA Phone Number</label>
                 <div class="input-group input-group-lg">
-                  <span class="input-group-text" style="background:rgba(40,167,69,0.08); border-color:rgba(40,167,69,0.3); color:#28a745;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  </span>
-                  <input type="tel" class="form-control form-control-lg" name="mpesaPhone" placeholder="254722xxxxxx" x-model="mpesaPhone" pattern="^254[0-9]{9}$" maxlength="12" autocomplete="tel" style="background:rgba(0,0,0,0.3); border-color:rgba(40,167,69,0.3); color:#fff; font-size:1.15rem; letter-spacing:3px; text-align:center;">
+                  <span class="input-group-text" style="background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.3); border-right:none; color:orange; font-weight:800; font-size:1rem; border-radius:8px 0 0 8px; user-select:none; pointer-events:none;">+254</span>
+                  <input id="rc-phone-suffix" type="tel" class="form-control form-control-lg" placeholder="7XXXXXXXX" x-model="mpesaPhone" maxlength="9" autocomplete="tel" @keydown.enter.prevent="if (mpesaPhone.length >= 9) document.getElementById('rc-submit-btn').click()" style="background:rgba(0,0,0,0.3); border-color:rgba(255,140,0,0.3); color:#fff; font-size:1.1rem; letter-spacing:3px; text-align:left; border-left:none; border-radius:0 8px 8px 0;">
                 </div>
-                <div class="text-center text-secondary mt-2" style="font-size:0.8rem;">Format: 254XXXXXXXXX &nbsp;·&nbsp; e.g. 254722123456</div>
+                <div class="text-secondary mt-2" style="font-size:0.8rem;">e.g. 722 123 456 &mdash; enter digits after +254</div>
               </div>
 
-              <div class="rounded p-4 mb-5" style="background:rgba(40,167,69,0.04); border:1px solid rgba(40,167,69,0.18);">
-                <div class="d-flex align-items-start gap-3 mb-4">
-                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(40,167,69,0.12); border:1px solid rgba(40,167,69,0.4);"><span class="text-success fw-bold" style="font-size:0.78rem;">1</span></div></div>
-                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Check your phone for the M-PESA PIN prompt</div><div class="text-secondary" style="font-size:0.82rem;">A payment request will be sent to your Safaricom number.</div></div>
-                </div>
-                <div class="d-flex align-items-start gap-3 mb-4">
-                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(40,167,69,0.12); border:1px solid rgba(40,167,69,0.4);"><span class="text-success fw-bold" style="font-size:0.78rem;">2</span></div></div>
-                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Key in your M-PESA PIN and confirm</div><div class="text-secondary" style="font-size:0.82rem;">Enter your PIN on the Safaricom STK push popup to authorise.</div></div>
-                </div>
-                <div class="d-flex align-items-start gap-3">
-                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(40,167,69,0.12); border:1px solid rgba(40,167,69,0.4);"><span class="text-success fw-bold" style="font-size:0.78rem;">3</span></div></div>
-                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Wait for this page to refresh</div><div class="text-secondary" style="font-size:0.82rem;">Once payment is confirmed you will be moved to the next step automatically.</div></div>
-                </div>
+              <!-- Payment Result Panels -->
+              <div id="rc-panel-waiting" class="pay-result waiting text-center" style="display:none;">
+                <div class="pay-result-icon"><span class="spinner-border" style="width:24px;height:24px;border-width:3px;color:orange;" role="status"></span></div>
+                <div class="pay-result-title">Waiting for Payment…</div>
+                <div class="pay-result-sub">Check your phone — an M-Pesa PIN prompt has been sent. Enter your PIN to complete the payment.</div>
+              </div>
+              <div id="rc-panel-success" class="pay-result success text-center" style="display:none;">
+                <div class="pay-result-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="pay-result-title">Payment Successful!</div>
+                <div class="pay-result-sub">Your subscription has been activated. Redirecting…</div>
+              </div>
+              <div id="rc-panel-cancelled" class="pay-result cancelled text-center" style="display:none;">
+                <div class="pay-result-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fd7e14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+                <div class="pay-result-title">Transaction Cancelled</div>
+                <div class="pay-result-sub">You cancelled the M-Pesa PIN prompt. No money was deducted.</div>
+                <button class="btn-retry" id="rc-retry-cancelled"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg> Try Again</button>
+              </div>
+              <div id="rc-panel-failed" class="pay-result failed text-center" style="display:none;">
+                <div class="pay-result-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                <div class="pay-result-title">Payment Failed</div>
+                <div id="rc-panel-failed-reason" class="pay-result-sub">The payment could not be completed. Please try again.</div>
+                <button class="btn-retry" id="rc-retry-failed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg> Try Again</button>
+              </div>
+              <div id="rc-panel-timeout" class="pay-result timeout text-center" style="display:none;">
+                <div class="pay-result-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#adb5bd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="pay-result-title">Payment Timed Out</div>
+                <div class="pay-result-sub">No confirmation received within 2 minutes. No money was deducted.</div>
+                <button class="btn-retry" id="rc-retry-timeout"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg> Try Again</button>
               </div>
 
               <div class="d-flex justify-content-between mt-4">
-                <button type="button" class="btn btn-outline-secondary px-4 py-3" @click="step = 1; window.scrollTo({top: 0, behavior: 'smooth'});">{{ __('Back') }}</button>
-                <button type="submit" class="btn py-3 fw-bold rounded-2 d-flex align-items-center justify-content-center gap-2 flex-grow-1 ms-3" style="background:#28a745; border:2px solid #28a745; color:#fff; font-size:1.05rem; letter-spacing:0.5px; transition:all 0.3s ease; cursor:pointer;" :disabled="loading || mpesaPhone.length < 12" :class="{ 'opacity-75': loading || mpesaPhone.length < 12 }" @click="if(mpesaPhone.length >= 12) loading = true">
+                <button type="button" id="rc-back-btn" class="btn btn-outline-secondary px-4 py-3" @click="step = 1; window.scrollTo({top: 0, behavior: 'smooth'});">{{ __('Back') }}</button>
+                <button type="button" id="rc-submit-btn" class="btn py-3 fw-bold rounded-2 d-flex align-items-center justify-content-center gap-2 flex-grow-1 ms-3 btn-orange" style="font-size:1.05rem; letter-spacing:0.5px;" :disabled="mpesaPhone.length < 9" :class="{ 'opacity-75': mpesaPhone.length < 9 }">
                   <template x-if="!loading">
                     <span class="d-flex align-items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
@@ -300,11 +312,28 @@
                   <template x-if="loading">
                     <span class="d-flex align-items-center gap-2">
                       <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      Sending Payment Request…
+                      Sending Request…
                     </span>
                   </template>
                 </button>
               </div>
+
+              <!-- Instructions (moved to bottom) -->
+              <div class="rounded p-4 mt-4" style="background:rgba(255,140,0,0.04); border:1px solid rgba(255,140,0,0.18);">
+                <div class="d-flex align-items-start gap-3 mb-4">
+                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.4);"><span style="color:orange; font-weight:800; font-size:0.78rem;">1</span></div></div>
+                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Check your phone for the M-PESA PIN prompt</div><div class="text-secondary" style="font-size:0.82rem;">A payment request will be sent to your Safaricom number.</div></div>
+                </div>
+                <div class="d-flex align-items-start gap-3 mb-4">
+                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.4);"><span style="color:orange; font-weight:800; font-size:0.78rem;">2</span></div></div>
+                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Key in your M-PESA PIN and confirm</div><div class="text-secondary" style="font-size:0.82rem;">Enter your PIN on the Safaricom STK push popup to authorise.</div></div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                  <div class="flex-shrink-0 mt-1"><div class="rounded-circle d-flex align-items-center justify-content-center" style="width:30px; height:30px; background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.4);"><span style="color:orange; font-weight:800; font-size:0.78rem;">3</span></div></div>
+                  <div><div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">Wait for this page to refresh</div><div class="text-secondary" style="font-size:0.82rem;">Once payment is confirmed you will be subscribed automatically.</div></div>
+                </div>
+              </div>
+
             </div>
 
           </form>
@@ -317,5 +346,140 @@
   <x-footer />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  {{-- Pay-result panel styles --}}
+  <style>
+    .pay-result { border-radius:14px; padding:1.5rem 1.75rem; margin-top:1rem; animation:fadeSlideIn 0.35s ease; }
+    @keyframes fadeSlideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .pay-result-icon { width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem; }
+    .pay-result-title { font-size:1.1rem;font-weight:800;margin-bottom:0.3rem; }
+    .pay-result-sub { font-size:0.88rem;opacity:0.75;line-height:1.5; }
+    .pay-result.waiting { background:rgba(255,140,0,0.08); border:1px solid rgba(255,140,0,0.25); }
+    .pay-result.waiting .pay-result-icon { background:rgba(255,140,0,0.12); }
+    .pay-result.waiting .pay-result-title { color:orange; }
+    .pay-result.success { background:rgba(40,167,69,0.08); border:1px solid rgba(40,167,69,0.3); }
+    .pay-result.success .pay-result-icon { background:rgba(40,167,69,0.15); }
+    .pay-result.success .pay-result-title { color:#28a745; }
+    .pay-result.cancelled { background:rgba(255,165,0,0.07); border:1px solid rgba(255,165,0,0.3); }
+    .pay-result.cancelled .pay-result-icon { background:rgba(255,165,0,0.12); }
+    .pay-result.cancelled .pay-result-title { color:#fd7e14; }
+    .pay-result.failed { background:rgba(220,53,69,0.08); border:1px solid rgba(220,53,69,0.3); }
+    .pay-result.failed .pay-result-icon { background:rgba(220,53,69,0.12); }
+    .pay-result.failed .pay-result-title { color:#dc3545; }
+    .pay-result.timeout { background:rgba(108,117,125,0.1); border:1px solid rgba(108,117,125,0.25); }
+    .pay-result.timeout .pay-result-icon { background:rgba(108,117,125,0.15); }
+    .pay-result.timeout .pay-result-title { color:#adb5bd; }
+    .btn-retry { display:inline-flex;align-items:center;gap:0.4rem;margin-top:1rem;padding:0.55rem 1.25rem;border-radius:8px;font-size:0.88rem;font-weight:700;font-family:"Outfit",sans-serif;cursor:pointer;transition:all 0.25s;background:transparent;border:2px solid currentColor; }
+    .pay-result.failed .btn-retry { color:#dc3545; }
+    .pay-result.failed .btn-retry:hover { background:#dc3545;color:#fff; }
+    .pay-result.cancelled .btn-retry { color:#fd7e14; }
+    .pay-result.cancelled .btn-retry:hover { background:#fd7e14;color:#fff; }
+    .pay-result.timeout .btn-retry { color:#adb5bd; }
+    .pay-result.timeout .btn-retry:hover { background:#adb5bd;color:#000; }
+  </style>
+
+  <script>
+    // MPESA fetch-based payment
+    (function() {
+      const RC_PANELS = ['waiting','success','cancelled','failed','timeout'];
+      function rcShowPanel(name) {
+        RC_PANELS.forEach(p => {
+          const el = document.getElementById('rc-panel-' + p);
+          if (el) el.style.display = (p === name) ? 'block' : 'none';
+        });
+      }
+      function rcHidePanels() {
+        RC_PANELS.forEach(p => { const el = document.getElementById('rc-panel-' + p); if (el) el.style.display = 'none'; });
+      }
+
+      const submitBtn = document.getElementById('rc-submit-btn');
+      const backBtn  = document.getElementById('rc-back-btn');
+
+      function rcReset() {
+        rcHidePanels();
+        submitBtn.disabled = false;
+        const alpine = submitBtn.closest('[x-data]').__x;
+        if (alpine) alpine.$data.loading = false;
+      }
+
+      ['rc-retry-cancelled','rc-retry-failed','rc-retry-timeout'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', rcReset);
+      });
+
+      submitBtn.addEventListener('click', function() {
+        const alpineEl = submitBtn.closest('[x-data]');
+        const alpineData = alpineEl.__x ? alpineEl.__x.$data : (alpineEl._x_dataStack ? alpineEl._x_dataStack[0] : null);
+        if (!alpineData) return;
+
+        const phoneSuffix = (alpineData.mpesaPhone || '').trim();
+        if (phoneSuffix.length < 9) return;
+
+        const phone    = '254' + phoneSuffix;
+        const planDays = alpineData.planDays || document.querySelector('[name="plan"]')?.value;
+
+        alpineData.loading = true;
+        submitBtn.disabled = true;
+        rcHidePanels();
+
+        fetch("{{ route('payment.initiate') }}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+          body: JSON.stringify({ phone, purpose: 'membership', plan_type: 'prime', plan_days: planDays })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('rc-panel-failed-reason').textContent = data.message || 'Could not initiate payment.';
+            rcShowPanel('failed');
+            alpineData.loading = false;
+            submitBtn.disabled = false;
+            return;
+          }
+          rcShowPanel('waiting');
+          alpineData.loading = false;
+          let pollCount = 0;
+          const maxPolls = 40;
+          window._rcPoll = setInterval(() => {
+            pollCount++;
+            if (pollCount > maxPolls) {
+              clearInterval(window._rcPoll);
+              rcShowPanel('timeout');
+              submitBtn.disabled = false;
+              return;
+            }
+            fetch('/payment/status/' + data.reference)
+            .then(r => r.json())
+            .then(s => {
+              if (s.status === 'completed') {
+                clearInterval(window._rcPoll);
+                rcShowPanel('success');
+                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-membership", 2000);
+              } else if (s.status === 'failed') {
+                clearInterval(window._rcPoll);
+                if (s.is_cancelled) {
+                  rcShowPanel('cancelled');
+                } else {
+                  const raw = s.failure_reason || '';
+                  document.getElementById('rc-panel-failed-reason').textContent = /insufficient|balance|funds/i.test(raw)
+                    ? 'Your M-Pesa account has insufficient balance. Top up and try again.'
+                    : (raw || 'The payment could not be completed.');
+                  rcShowPanel('failed');
+                }
+                submitBtn.disabled = false;
+              }
+            })
+            .catch(err => console.error('Poll error:', err));
+          }, 3000);
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('rc-panel-failed-reason').textContent = 'An unexpected error occurred.';
+          rcShowPanel('failed');
+          alpineData.loading = false;
+          submitBtn.disabled = false;
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

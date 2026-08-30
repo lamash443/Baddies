@@ -628,3 +628,174 @@
   }
 })();
 </script>
+
+{{-- ══ CHAT GUEST TOAST + openChatGuestFlow() ══ --}}
+<style>
+  /* ── Premium Chat Lock Toast ── */
+  .chat-lock-toast {
+    position: fixed;
+    top: 5.5rem; right: 1.5rem;
+    z-index: 2000;
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    background: #0a0a0a;
+    border: 1px solid rgba(255,140,0,0.35);
+    border-left: 4px solid #ff8c00;
+    border-radius: 16px;
+    padding: 1rem 1.15rem 1rem 1rem;
+    max-width: 370px; width: calc(100vw - 3rem);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04), 0 0 30px rgba(255,140,0,0.08);
+    font-family: "Outfit", ui-sans-serif, sans-serif;
+    animation: chatLockToastIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+  @keyframes chatLockToastIn {
+    from { opacity: 0; transform: translateX(60px) scale(0.92); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .chat-lock-toast.removing {
+    animation: chatLockToastOut 0.35s ease-in both;
+  }
+  @keyframes chatLockToastOut {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to   { opacity: 0; transform: translateX(60px) scale(0.9); }
+  }
+  .chat-lock-toast__icon {
+    flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 12px;
+    background: rgba(255,140,0,0.1);
+    border: 1px solid rgba(255,140,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: #ff8c00;
+  }
+  .chat-lock-toast__body { flex: 1; min-width: 0; }
+  .chat-lock-toast__badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #ff8c00;
+    background: rgba(255,140,0,0.12);
+    border: 1px solid rgba(255,140,0,0.25);
+    border-radius: 20px; padding: 0.15rem 0.55rem;
+    margin-bottom: 0.35rem;
+  }
+  .chat-lock-toast__title {
+    font-size: 0.93rem; font-weight: 800; color: #fff;
+    margin: 0 0 0.2rem; line-height: 1.25;
+  }
+  .chat-lock-toast__msg {
+    font-size: 0.8rem; color: rgba(255,255,255,0.6);
+    margin: 0 0 0.6rem; line-height: 1.5;
+  }
+  .chat-lock-toast__action {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.78rem; font-weight: 700; color: #ff8c00;
+    text-decoration: none; cursor: pointer; background: none; border: none;
+    padding: 0; transition: color 0.2s;
+  }
+  .chat-lock-toast__action:hover { color: #fff; }
+  .chat-lock-toast__close {
+    flex-shrink: 0; align-self: flex-start;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); cursor: pointer; padding: 0;
+    transition: all 0.2s;
+  }
+  .chat-lock-toast__close:hover { background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.35); color: #ff8c00; }
+  .chat-lock-toast__bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, #ff8c00, rgba(255,140,0,0.15));
+    border-radius: 0 0 0 16px;
+    animation: chatLockToastBar 5s linear both;
+  }
+  @keyframes chatLockToastBar { from { width: 100%; } to { width: 0%; } }
+
+  /* Light theme */
+  [data-bs-theme="light"] .chat-lock-toast {
+    background: #ffffff;
+    border-color: rgba(255,140,0,0.3);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  }
+  [data-bs-theme="light"] .chat-lock-toast__title { color: #111; }
+  [data-bs-theme="light"] .chat-lock-toast__msg   { color: rgba(0,0,0,0.6); }
+  [data-bs-theme="light"] .chat-lock-toast__close { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.4); }
+  [data-bs-theme="light"] .chat-lock-toast__close:hover { background: rgba(255,140,0,0.1); color: #ff8c00; border-color: rgba(255,140,0,0.25); }
+</style>
+
+<script>
+(function() {
+  var _toastTimer = null;
+  var _toastEl    = null;
+
+  function removeChatToast() {
+    if (!_toastEl) return;
+    _toastEl.classList.add('removing');
+    setTimeout(function() {
+      if (_toastEl && _toastEl.parentNode) _toastEl.parentNode.removeChild(_toastEl);
+      _toastEl = null;
+    }, 380);
+    if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+  }
+
+  function showChatGuestToast() {
+    // Remove any existing toast first
+    if (_toastEl) removeChatToast();
+
+    var toast = document.createElement('div');
+    toast.className = 'chat-lock-toast';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.innerHTML = [
+      '<div class="chat-lock-toast__icon">',
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">',
+          '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>',
+          '<path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+        '</svg>',
+      '</div>',
+      '<div class="chat-lock-toast__body">',
+        '<div class="chat-lock-toast__badge">',
+          '<svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 0 1 5 5v2H7V7a5 5 0 0 1 5-5zm7 9H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2z"/></svg>',
+          'Members Only',
+        '</div>',
+        '<p class="chat-lock-toast__title">Login Required to Chat</p>',
+        '<p class="chat-lock-toast__msg">You need to be logged in with an active chat plan to message members. Join now to unlock private messaging.</p>',
+        '<button class="chat-lock-toast__action" onclick="openAuthModalNow(); removeChatToastPublic();">',
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>',
+          'Sign In Now &rarr;',
+        '</button>',
+      '</div>',
+      '<button class="chat-lock-toast__close" onclick="removeChatToastPublic();" aria-label="Dismiss">',
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">',
+          '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+        '</svg>',
+      '</button>',
+      '<div class="chat-lock-toast__bar"></div>',
+    ].join('');
+
+    document.body.appendChild(toast);
+    _toastEl = toast;
+
+    // Auto-dismiss after 5s (matches bar animation)
+    _toastTimer = setTimeout(removeChatToast, 5200);
+  }
+
+  function openAuthModalNow() {
+    var modalEl = document.getElementById('authModal');
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+      if (typeof switchAuthTab === 'function') switchAuthTab('login');
+    }
+  }
+
+  // Global entry-point: show toast, then open auth modal after a short delay
+  window.openChatGuestFlow = function() {
+    showChatGuestToast();
+    setTimeout(openAuthModalNow, 650);
+  };
+
+  // Exposed so inline onclick inside toast can call it
+  window.removeChatToastPublic = function() { removeChatToast(); };
+  window.openAuthModalNow      = openAuthModalNow;
+})();
+</script>

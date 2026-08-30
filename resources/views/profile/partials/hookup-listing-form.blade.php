@@ -417,28 +417,6 @@ x-cloak>
           </div>
         </div>
 
-        {{-- ── Numbered instructions ── --}}
-        <div class="rounded p-4 mb-5" style="background:rgba(40,167,69,0.04); border:1px solid rgba(40,167,69,0.18);">
-          @foreach([
-            ['Check your phone for the M-PESA PIN prompt', 'A payment request will be sent to your Safaricom number.'],
-            ['Key in your M-PESA PIN and confirm',         'Enter your PIN on the Safaricom STK push popup to authorise.'],
-            ['Wait for this page to refresh',              'Once payment is confirmed you will be moved to the next step automatically.']
-          ] as $i => $item)
-          <div class="d-flex align-items-start gap-3 {{ $i < 2 ? 'mb-4' : '' }}">
-            <div class="flex-shrink-0 mt-1">
-              <div class="rounded-circle d-flex align-items-center justify-content-center"
-                style="width:30px; height:30px; background:rgba(40,167,69,0.12); border:1px solid rgba(40,167,69,0.4);">
-                <span class="text-success fw-bold" style="font-size:0.78rem;">{{ $i + 1 }}</span>
-              </div>
-            </div>
-            <div>
-              <div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">{{ $item[0] }}</div>
-              <div class="text-secondary" style="font-size:0.82rem;">{{ $item[1] }}</div>
-            </div>
-          </div>
-          @endforeach
-        </div>
-
         {{-- ── Submit button ── --}}
         <button type="submit" id="mpesaSubmitBtn"
           class="w-100 py-3 fw-bold rounded-2 d-flex align-items-center justify-content-center gap-2"
@@ -473,6 +451,28 @@ x-cloak>
             @click="step=2; loading=false; window.scrollTo({top:0,behavior:'smooth'});">
             ← Change Plan
           </button>
+        </div>
+
+        {{-- ── Numbered instructions ── --}}
+        <div class="rounded p-4 mt-5" style="background:rgba(40,167,69,0.04); border:1px solid rgba(40,167,69,0.18);">
+          @foreach([
+            ['Check your phone for the M-PESA PIN prompt', 'A payment request will be sent to your Safaricom number.'],
+            ['Key in your M-PESA PIN and confirm',         'Enter your PIN on the Safaricom STK push popup to authorise.'],
+            ['Wait for this page to refresh',              'Once payment is confirmed you will be moved to the next step automatically.']
+          ] as $i => $item)
+          <div class="d-flex align-items-start gap-3 {{ $i < 2 ? 'mb-4' : '' }}">
+            <div class="flex-shrink-0 mt-1">
+              <div class="rounded-circle d-flex align-items-center justify-content-center"
+                style="width:30px; height:30px; background:rgba(40,167,69,0.12); border:1px solid rgba(40,167,69,0.4);">
+                <span class="text-success fw-bold" style="font-size:0.78rem;">{{ $i + 1 }}</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-light fw-semibold mb-1" style="font-size:0.92rem;">{{ $item[0] }}</div>
+              <div class="text-secondary" style="font-size:0.82rem;">{{ $item[1] }}</div>
+            </div>
+          </div>
+          @endforeach
         </div>
 
       </div>{{-- /step 3 --}}

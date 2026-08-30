@@ -309,6 +309,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/verify-account', function () {
         return view('verify-account');
     })->name('account.verify');
+
+    // Chat System
+    Route::get('/chat', function () {
+        if (!auth()->user()->hasActiveChatSubscription()) {
+            return redirect()->route('chat.memberships')->with('error', 'You need an active chat subscription to message members.');
+        }
+        return view('chat.index');
+    })->name('chat.index');
+
+    Route::get('/chat/{user_id}', function ($user_id) {
+        if (!auth()->user()->hasActiveChatSubscription()) {
+            return redirect()->route('chat.memberships')->with('error', 'You need an active chat subscription to message members.');
+        }
+        if (auth()->id() == $user_id) {
+            return redirect()->route('chat.index');
+        }
+        return view('chat.index', ['activeUserId' => $user_id]);
+    })->name('chat.show');
+
     Route::get('/chat-memberships', function () {
         $chatPlan = \App\Models\MembershipPlan::where('slug', 'chat')->first();
         return view('chat-memberships', compact('chatPlan'));
@@ -454,12 +473,16 @@ Route::middleware('auth')->group(function () {
         // Save to session or database to process later for MPESA
         session(['checkout_plan_type' => $planType, 'checkout_plan' => $planDays]);
         
-        // If phone is provided directly in the form, simulate STK push and return to same page
-        if ($request->has('mpesaPhone')) {
-             return back()->with('success', 'Payment request sent to ' . $request->mpesaPhone . '. Please check your phone.');
+        // If phone is provided directly in the form, store in session and redirect to mpesa checkout
+        if ($request->has('mpesaPhone') && $request->mpesaPhone) {
+            $suffix = preg_replace('/\D/', '', $request->mpesaPhone);
+            // Strip leading 254 if user accidentally entered it, keep just 9 digits
+            $suffix = ltrim($suffix, '254');
+            $suffix = substr($suffix, -9);
+            session(['checkout_prefilled_phone' => $suffix]);
         }
 
-        // Fallback for older forms that don't have inline MPESA
+        // Redirect to dedicated MPESA checkout page
         return redirect()->route('checkout.mpesa');
     })->name('membership.process');
 
@@ -474,7 +497,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/wallet/add-funds', function (\Illuminate\Http\Request $request) {
         $request->validate([
-            'amount' => 'required|numeric|min:50',
+            'amount' => 'required|numeric|min:10',
         ]);
         session([
             'checkout_plan_type' => 'wallet',

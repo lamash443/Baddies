@@ -154,10 +154,14 @@
         </style>
         <div class="dropdown d-xl-none" style="flex-shrink:0; z-index:2;">
           <button class="btn p-0 mobile-icon-hover dropdown-toggle mobile-profile-dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width:42px;height:42px;border-radius:50%;border:2px solid orange;background-color:{{ Auth::check() ? 'orange' : 'transparent' }};display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
-            @if(Auth::check() && Auth::user()->profile_photo)
-              <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+            @if(Auth::check())
+              @if(Auth::user()->profile_photo)
+                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+              @else
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+              @endif
             @else
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ Auth::check() ? 'black' : 'orange' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
@@ -351,10 +355,14 @@
               <!-- Desktop Profile Dropdown -->
               <div class="dropdown d-none d-xl-block">
                 <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px; border-radius: 50%; border: 2px solid orange; background-color: {{ Auth::check() ? 'orange' : 'transparent' }}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; padding: 0;">
-                  @if(Auth::check() && Auth::user()->profile_photo)
-                    <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                  @if(Auth::check())
+                    @if(Auth::user()->profile_photo)
+                      <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                    @else
+                      <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                    @endif
                   @else
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{ Auth::check() ? 'black' : 'orange' }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>

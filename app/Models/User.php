@@ -98,6 +98,15 @@ class User extends Authenticatable implements FilamentUser
         'favorites_visibility',
         'photos_visibility',
         'email_notifications',
+        'last_seen_at',
+        'online_toast_enabled',
+        'show_online_status_in_chat',
+        'force_online',
+        'online_toast_message',
+        'online_toast_position',
+        'online_toast_duration',
+        'online_toast_sound',
+        'online_threshold_minutes',
     ];
 
     /**
@@ -128,7 +137,24 @@ class User extends Authenticatable implements FilamentUser
             'chat_expires_at'          => 'datetime',
             'wallet_balance'           => 'decimal:2',
             'deletion_requested_at'    => 'datetime',
+            'last_seen_at'             => 'datetime',
+            'online_toast_enabled'       => 'boolean',
+            'show_online_status_in_chat' => 'boolean',
+            'force_online'               => 'boolean',
+            'online_toast_duration'      => 'integer',
+            'online_threshold_minutes'   => 'integer',
         ];
+    }
+
+    /**
+     * Returns true if the user was active within the admin-configured threshold, or forced online.
+     */
+    public function isOnline(): bool
+    {
+        if ($this->force_online) return true;
+        if (!$this->last_seen_at) return false;
+        $minutes = \App\Models\Setting::getSettings()->online_threshold_minutes ?? 5;
+        return $this->last_seen_at->gt(now()->subMinutes($minutes));
     }
 
     /**
@@ -221,5 +247,15 @@ class User extends Authenticatable implements FilamentUser
     public function classifieds(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(\App\Models\Classified::class);
+    }
+
+    public function messagesSent(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Message::class, 'sender_id');
+    }
+
+    public function messagesReceived(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Message::class, 'receiver_id');
     }
 }

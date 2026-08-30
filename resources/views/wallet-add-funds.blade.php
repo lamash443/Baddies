@@ -149,7 +149,7 @@
     <div class="container text-center">
       <h1 class="dashboard-title">My <span>Wallet</span></h1>
       <nav aria-label="breadcrumb" class="d-flex justify-content-center mt-3">
-        <ol class="breadcrumb mb-0">
+        <ol class="breadcrumb mb-0 justify-content-center flex-wrap text-center">
           <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-warning text-decoration-none fw-bold">{{ __('Home') }}</a></li>
           <li class="breadcrumb-item"><a href="{{ route('profile.edit') }}#tab-membership" class="text-warning text-decoration-none fw-bold">{{ __('My Membership') }}</a></li>
           <li class="breadcrumb-item active text-secondary" aria-current="page">{{ __('Add Fund/Checkout - MPESA') }}</li>
@@ -169,6 +169,19 @@
           <a href="{{ route('dashboard') }}" class="side-nav-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             Dashboard
+          </a>
+
+          <a href="{{ route('chat.index') }}" class="side-nav-link d-flex justify-content-between align-items-center">
+            <span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              Messages
+            </span>
+            @php
+              $unreadCount = auth()->user()->messagesReceived()->where('is_read', false)->count();
+            @endphp
+            @if($unreadCount > 0)
+              <span class="badge bg-danger rounded-pill">{{ $unreadCount }}</span>
+            @endif
           </a>
 
           <a href="{{ route('profile.edit') }}" class="side-nav-link">
@@ -209,7 +222,7 @@
       </div>
 
       <!-- MAIN CONTENT -->
-      <div class="col-12 col-lg-9">
+      <div class="col-12 col-lg-9" id="main-content-area">
 
         <!-- Available Balance Card -->
         <div class="dash-card mb-4">
@@ -259,14 +272,14 @@
             @csrf
 
             <div class="mb-4">
-              <label class="form-label">{{ __('Amount') }} <span class="text-secondary fw-normal" style="font-size:0.85rem;">({{ __('Minimum: KSh 50') }})</span></label>
+              <label class="form-label">{{ __('Amount') }} <span class="text-secondary fw-normal" style="font-size:0.85rem;">({{ __('Minimum: KSh 10') }})</span></label>
               <div class="input-group">
                 <span class="input-group-text">KSh</span>
-                <input type="number" id="amount-input" name="amount" class="form-control" min="50" step="1" placeholder="e.g. 500" required />
+                <input type="number" id="amount-input" name="amount" class="form-control" min="10" step="1" placeholder="e.g. 500" required />
               </div>
               <div id="amount-error" class="mt-2 text-danger small" style="display:none;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-1"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                {{ __('Minimum deposit amount is KSh 50.') }}
+                {{ __('Minimum deposit amount is KSh 10.') }}
               </div>
             </div>
 
@@ -314,12 +327,24 @@
   <x-footer />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // On mobile (less than 992px), scroll down to the main content area on load
+      if (window.innerWidth < 992) {
+        const mainContent = document.getElementById('main-content-area');
+        if (mainContent) {
+          setTimeout(() => {
+            mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 200);
+        }
+      }
+    });
+
     const amountInput  = document.getElementById('amount-input');
     const feeDisplay   = document.getElementById('fee-display');
     const totalDisplay = document.getElementById('total-display');
     const amountError  = document.getElementById('amount-error');
     const addFundsForm = document.getElementById('add-funds-form');
-    const MIN_AMOUNT   = 50;
+    const MIN_AMOUNT   = 10;
 
     function formatKsh(amount) {
       return 'KSh ' + parseFloat(amount).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

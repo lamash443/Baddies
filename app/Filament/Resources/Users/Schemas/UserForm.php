@@ -243,6 +243,11 @@ class UserForm
                             ->label('Chat Plan Expires At')
                             ->placeholder('Never (no expiry)')
                             ->nullable(),
+                        DateTimePicker::make('last_seen_at')
+                            ->label('Last Seen At (Online Status)')
+                            ->placeholder('Offline')
+                            ->helperText('Set a future date to force this user to appear online.')
+                            ->nullable(),
                     ]),
             ]);
     }

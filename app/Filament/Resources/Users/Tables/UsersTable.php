@@ -91,6 +91,13 @@ class UsersTable
                     ->sortable()
                     ->placeholder('Never')
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('last_seen_at')
+                    ->label('Online Status')
+                    ->badge()
+                    ->color(fn ($record) => $record->isOnline() ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($record) => $record->isOnline() ? 'Online' : ($record->last_seen_at ? 'Seen ' . $record->last_seen_at->diffForHumans() : 'Offline'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('photos_count')
                     ->label('Photos')
                     ->counts('photos')

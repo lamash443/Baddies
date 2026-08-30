@@ -199,7 +199,7 @@
         <div class="dash-card p-4">
           <div class="mb-4 text-center">
 
-            {{-- â”€â”€ Avatar with click-to-change overlay â”€â”€ --}}
+            {{-- ── Avatar with click-to-change overlay ── --}}
             <form id="photoUploadForm" action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data">
               @csrf
               <div class="profile-avatar-wrap mx-auto mb-3" onclick="document.getElementById('profilePhotoInput').click()" title="Click to change photo">
@@ -210,11 +210,10 @@
                        class="profile-avatar-img" />
                 @else
                   <img id="avatarPreview"
-                       src=""
+                       src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=ff8c00&color=000&size=200&bold=true"
                        alt="Profile Photo"
-                       class="profile-avatar-img"
-                       style="display:none;" />
-                  <div id="avatarPlaceholder" class="profile-avatar-placeholder">
+                       class="profile-avatar-img" />
+                  <div id="avatarPlaceholder" class="profile-avatar-placeholder" style="display:none;">
                     <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.6)" stroke-width="1.5">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                       <circle cx="12" cy="7" r="4"/>
@@ -272,7 +271,20 @@
                 </div>
               @endif
             </div>
-            <div class="text-secondary" style="font-size:0.85rem;">{{ auth()->user()->email }}</div>
+            <div class="text-secondary mb-2" style="font-size:0.85rem;">{{ auth()->user()->email }}</div>
+            <div>
+              @if(auth()->user()->is_verified)
+                <span class="badge" style="background-color:transparent; color:orange; border:1px solid orange; box-shadow:0 0 10px rgba(255,165,0,0.5); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
+                  <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  Verified User
+                </span>
+              @else
+                <span class="badge" style="background-color:rgba(255,140,0,0.15); color:orange; border:1px solid rgba(255,140,0,0.3); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
+                  <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  Not Verified
+                </span>
+              @endif
+            </div>
           </div>
           
           <div class="d-flex justify-content-around mb-4 border-top border-bottom border-secondary py-3" style="border-color: rgba(255,255,255,0.1) !important;">
@@ -306,6 +318,22 @@
               <a href="{{ route('dashboard') }}" class="side-nav-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Dashboard
+              </a>
+            </li>
+
+            {{-- Messages --}}
+            <li role="presentation">
+              <a href="{{ route('chat.index') }}" class="side-nav-link d-flex justify-content-between align-items-center">
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  Messages
+                </span>
+                @php
+                  $unreadCount = auth()->user()->messagesReceived()->where('is_read', false)->count();
+                @endphp
+                @if($unreadCount > 0)
+                  <span class="badge bg-danger rounded-pill">{{ $unreadCount }}</span>
+                @endif
               </a>
             </li>
 
@@ -2234,7 +2262,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var tabEls = document.querySelectorAll('.m-sidebar-menu button[data-bs-toggle="tab"]');
+      var tabEls = document.querySelectorAll('button[data-bs-toggle="tab"].side-nav-link');
       var tabContentContainer = document.querySelector('.tab-content');
       
       tabEls.forEach(function(tabEl) {

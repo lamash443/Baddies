@@ -32,7 +32,7 @@ class SettingResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Unlock Exclusive Account Banner (Verification)')
+                Section::make('Email Verification Banner (Dashboard)')
                     ->columns(2)
                     ->schema([
                         Toggle::make('unlock_banner_enabled')
@@ -50,6 +50,12 @@ class SettingResource extends Resource
                             ->label('Banner Description')
                             ->columnSpanFull()
                             ->rows(3),
+                        TextInput::make('verification_toast_message')
+                            ->label('Verification Sent Toast Message')
+                            ->helperText('Text shown in the toast when the user requests a new verification link.')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Complete Your Profile Banner')
@@ -71,6 +77,55 @@ class SettingResource extends Resource
                             ->columnSpanFull()
                             ->rows(3),
                     ]),
+
+                Section::make('🟢 Online Status & Toast Notifications')
+                    ->description('Control how and when the "User is Online" notification appears in the chat.')
+                    ->columns(2)
+                    ->schema([
+                        Toggle::make('online_toast_enabled')
+                            ->label('Enable Online Toast Notification')
+                            ->helperText('When ON, a toast pops up in the chat when a user comes online.')
+                            ->columnSpanFull(),
+                        Toggle::make('show_online_status_in_chat')
+                            ->label('Show Online/Offline Status in Chat Header')
+                            ->helperText('When OFF, the chat header will not show "Online" or "Last seen" text.')
+                            ->columnSpanFull(),
+                        TextInput::make('online_toast_message')
+                            ->label('Toast Message Template')
+                            ->helperText('Use {name} as a placeholder for the user\'s name.')
+                            ->placeholder('💚 {name} is now online!')
+                            ->columnSpanFull(),
+                        \Filament\Forms\Components\Select::make('online_toast_position')
+                            ->label('Toast Position')
+                            ->options([
+                                'top-left'      => 'Top Left',
+                                'top-right'     => 'Top Right',
+                                'top-center'    => 'Top Center',
+                                'bottom-left'   => 'Bottom Left',
+                                'bottom-right'  => 'Bottom Right (Default)',
+                                'bottom-center' => 'Bottom Center',
+                            ])
+                            ->default('bottom-right'),
+                        TextInput::make('online_toast_duration')
+                            ->label('Toast Duration (ms)')
+                            ->numeric()
+                            ->helperText('How long the toast shows in milliseconds. e.g. 4000 = 4 seconds.')
+                            ->default(4000),
+                        \Filament\Forms\Components\Select::make('online_toast_sound')
+                            ->label('Notification Sound')
+                            ->options([
+                                'none'  => 'No Sound',
+                                'ping'  => 'Ping',
+                                'chime' => 'Chime',
+                                'pop'   => 'Pop',
+                            ])
+                            ->default('none'),
+                        TextInput::make('online_threshold_minutes')
+                            ->label('Online Threshold (minutes)')
+                            ->numeric()
+                            ->helperText('A user is considered "Online" if they were active within this many minutes.')
+                            ->default(5),
+                    ]),
             ]);
     }
 
@@ -88,6 +143,12 @@ class SettingResource extends Resource
                     ->boolean(),
                 TextColumn::make('profile_banner_title')
                     ->label('Profile Banner Title'),
+                IconColumn::make('online_toast_enabled')
+                    ->label('Online Toast')
+                    ->boolean(),
+                IconColumn::make('show_online_status_in_chat')
+                    ->label('Status in Chat')
+                    ->boolean(),
             ])
             ->filters([])
             ->actions([

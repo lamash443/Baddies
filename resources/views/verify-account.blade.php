@@ -83,68 +83,29 @@
         
         <div class="dash-card mb-4" style="border-top: 4px solid orange;">
           
-          <div class="d-flex align-items-start mb-4">
-            <div class="step-number">1</div>
-            <div class="step-content pt-1">
-              {{ __('To add profile, your account must be verified with following steps:') }}
-            </div>
-          </div>
-
-          <div class="d-flex align-items-start mb-4">
-            <div class="step-number">2</div>
-            <div class="step-content pt-1">
-              {!! __('Write <strong class="text-warning fs-4">857</strong> on a piece of paper and take a new photo of yourself holding that piece of paper.') !!}
-            </div>
-          </div>
-
-          <div class="d-flex align-items-start mb-4">
-            <div class="step-number">3</div>
-            <div class="step-content pt-1">
-              {{ __('Verification code must be hand written') }}
-            </div>
-          </div>
-
-        </div>
-
-        <div class="dash-card mb-4" style="background: rgba(220,53,69,0.05); border-color: rgba(220,53,69,0.3);">
-          <div class="d-flex gap-3">
-            <div class="text-danger mt-1">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            </div>
-            <div>
-              <h4 class="text-danger fw-bold fs-5 mb-2">{{ __('Important Rules') }}</h4>
-              <ul class="text-secondary list-unstyled mb-0" style="line-height: 1.6;">
-                <li class="mb-1">• {{ __('We do not accept passport or ID scans, photos with no face visible.') }}</li>
-                <li>• {{ __('Any attempt to use different person’s photo.') }}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="dash-card">
-          <div class="text-center mb-4">
-            <div class="d-inline-block bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill fw-bold small mb-3">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              {{ __('100% Secure & Private') }}
-            </div>
-            <p class="text-secondary small">
-              {{ __('The image you upload will never be published or shared.') }}
+          <div class="mb-4 text-center">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            <h3 class="text-white mb-3 fw-bold">{{ __('Verify Your Email Address') }}</h3>
+            <p class="text-secondary mx-auto" style="font-size: 1.05rem; max-width: 500px; line-height: 1.6;">
+              {{ __('Thanks for signing up! Before getting started, you must verify your email address. Please click on the link we just emailed to you. If you didn\'t receive the email, we will gladly send you another.') }}
             </p>
           </div>
 
-          <form action="#" method="POST" enctype="multipart/form-data">
+          <form method="POST" action="{{ route('verification.send') }}" class="mt-2">
             @csrf
-            <div class="mb-4">
-              <label class="form-label fw-bold">{{ __('Upload File') }}</label>
-              <input type="file" name="verification_photo" class="form-control py-3" accept=".jpg,.jpeg" required />
-              <div class="mt-2 text-secondary small">{{ __('Allowed file types are JPEG, JPG.') }}</div>
-            </div>
-            
-            <button type="submit" class="btn btn-orange w-100 fw-bold py-3 mt-2 shadow-lg">
-              {{ __('Submit Verification') }}
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <button type="submit" class="btn btn-orange w-100 fw-bold py-3 shadow-lg">
+              {{ __('Resend Verification Email') }}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             </button>
           </form>
+
+          <form method="POST" action="{{ route('logout') }}" class="mt-4 text-center">
+            @csrf
+            <button type="submit" class="btn btn-link text-secondary text-decoration-none p-0" style="font-size: 0.9rem;">
+              {{ __('Log Out') }}
+            </button>
+          </form>
+
         </div>
 
       </div>
@@ -153,5 +114,52 @@
 
   <x-footer />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  @if (session('status') == 'verification-link-sent')
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const isMobile = window.innerWidth <= 768;
+        const toast = document.createElement('div');
+        
+        toast.style.cssText = `
+            position: fixed;
+            top: 85px;
+            ${isMobile ? 'left: 50%; transform: translate(-50%, -20px); width: 90%; max-width: 400px; justify-content: center;' : 'right: 25px; transform: translateY(-20px);'}
+            background: #111;
+            color: #4ade80;
+            border: 1px solid #4ade80;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 30px rgba(74,222,128,0.2);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        toast.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            {{ \App\Models\Setting::getSettings()->verification_toast_message ?? __('A new verification link has been sent to your email address.') }}
+        `;
+        document.body.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = isMobile ? 'translate(-50%, 0)' : 'translateY(0)';
+        }, 100);
+
+        // Animate out
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = isMobile ? 'translate(-50%, -20px)' : 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 400);
+        }, 4500);
+    });
+  </script>
+  @endif
 </body>
 </html>
