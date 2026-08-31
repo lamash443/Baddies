@@ -14,9 +14,9 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect('/');
+        return view('auth.login');
     }
 
     /**
