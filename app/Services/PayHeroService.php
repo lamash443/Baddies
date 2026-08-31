@@ -11,7 +11,7 @@ class PayHeroService
     protected ?string $password;
     protected ?string $authToken;
     protected int $channelId;
-    protected string $callbackUrl;
+    protected ?string $callbackUrl;
 
     public function __construct()
     {

@@ -206,10 +206,26 @@ Route::get('/profile/{id}', function ($id) {
 
     // Increment profile views (not tracking unique per IP for simplicity yet)
     $user->increment('profile_views');
-    \Illuminate\Support\Facades\DB::table('profile_statistics')->updateOrInsert(
-        ['user_id' => $user->id, 'date' => now()->toDateString()],
-        ['views' => \Illuminate\Support\Facades\DB::raw('views + 1'), 'updated_at' => now()]
-    );
+
+    $stat = \Illuminate\Support\Facades\DB::table('profile_statistics')
+        ->where('user_id', $user->id)
+        ->where('date', now()->toDateString())
+        ->first();
+
+    if ($stat) {
+        \Illuminate\Support\Facades\DB::table('profile_statistics')
+            ->where('id', $stat->id)
+            ->increment('views');
+    } else {
+        \Illuminate\Support\Facades\DB::table('profile_statistics')->insert([
+            'user_id' => $user->id,
+            'date' => now()->toDateString(),
+            'views' => 1,
+            'phone_calls' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 
     // Similar profiles: same gender, verified, exclude current
     $similarProfiles = \App\Models\User::with('photos')
@@ -227,10 +243,28 @@ Route::get('/profile/{id}', function ($id) {
 Route::post('/profile/{id}/track-call', function ($id) {
     $user = \App\Models\User::where('is_verified', true)->findOrFail($id);
     $user->increment('phone_calls');
-    \Illuminate\Support\Facades\DB::table('profile_statistics')->updateOrInsert(
-        ['user_id' => $user->id, 'date' => now()->toDateString()],
-        ['phone_calls' => \Illuminate\Support\Facades\DB::raw('phone_calls + 1'), 'updated_at' => now()]
-    );
+
+    $stat = \Illuminate\Support\Facades\DB::table('profile_statistics')
+        ->where('user_id', $user->id)
+        ->where('date', now()->toDateString())
+        ->first();
+
+    if ($stat) {
+        \Illuminate\Support\Facades\DB::table('profile_statistics')
+            ->where('id', $stat->id)
+            ->increment('phone_calls');
+    } else {
+        \Illuminate\Support\Facades\DB::table('profile_statistics')->insert([
+            'user_id' => $user->id,
+            'date' => now()->toDateString(),
+            'views' => 0,
+            'phone_calls' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    return response()->json(['success' => true]);
     return response()->json(['success' => true]);
 })->where('id', '[0-9]+')->name('profile.track-call');
 

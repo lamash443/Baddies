@@ -25,38 +25,6 @@ class User extends Authenticatable implements FilamentUser
             ->dontSubmitEmptyLogs();
     }
 
-    protected static function booted()
-    {
-        static::updating(function ($user) {
-            if ($user->isDirty('profile_views') || $user->isDirty('phone_calls')) {
-                
-                $stat = \Illuminate\Support\Facades\DB::table('profile_statistics')
-                    ->where('user_id', $user->id)
-                    ->where('date', now()->toDateString())
-                    ->first();
-
-                if ($stat) {
-                    \Illuminate\Support\Facades\DB::table('profile_statistics')
-                        ->where('id', $stat->id)
-                        ->update([
-                            'views' => $user->profile_views,
-                            'phone_calls' => $user->phone_calls,
-                            'updated_at' => now(),
-                        ]);
-                } else {
-                    \Illuminate\Support\Facades\DB::table('profile_statistics')->insert([
-                        'user_id' => $user->id,
-                        'date' => now()->toDateString(),
-                        'views' => $user->profile_views,
-                        'phone_calls' => $user->phone_calls,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-        });
-    }
-
     /**
      * The attributes that are mass assignable.
      *

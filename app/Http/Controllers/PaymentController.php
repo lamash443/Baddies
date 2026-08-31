@@ -186,7 +186,9 @@ class PaymentController extends Controller
      */
     public function status(string $reference)
     {
-        $deposit = Deposit::where('reference', $reference)->firstOrFail();
+        $deposit = Deposit::where('reference', $reference)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         // Use payhero_reference (the UUID) — that's what PayHero's status API expects in v2.
         if ($deposit->status === 'pending') {

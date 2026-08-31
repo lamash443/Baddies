@@ -820,7 +820,8 @@
          * Lines starting with "- " become <li> items (grouped into <ul class="ed-list">).
          * Blank lines separate paragraphs.
          */
-        function renderEditorialBody(string $text): string {
+        if (!function_exists('renderEditorialBody')) {
+            function renderEditorialBody(string $text): string {
           $lines = explode("\n", str_replace("\r\n", "\n", $text));
           $html  = '';
           $bullets = [];
@@ -858,6 +859,8 @@
           $flushBullets();
           return $html;
         }
+        }
+
 
         $edHeading       = \App\Models\SiteSetting::get('editorial_heading',
           'If you are in Kenya and looking for a way to <span>spice up your day or night</span>, you are lucky to have landed in Baddies‑Club.');
