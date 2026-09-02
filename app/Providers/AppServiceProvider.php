@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Http\View\Composers\SiteSettingsComposer;
+use App\Http\Responses\Filament\LogoutResponse as FilamentLogoutResponse;
+use Filament\Auth\Http\Responses\Contracts\LogoutResponse as LogoutResponseContract;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
@@ -16,7 +18,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            LogoutResponseContract::class,
+            FilamentLogoutResponse::class
+        );
     }
 
     /**
@@ -33,7 +38,10 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, function (Login $event) {
             activity()
                 ->causedBy($event->user)
-                ->withProperties(['ip' => request()->ip(), 'user_agent' => request()->userAgent()])
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ])
                 ->log('User logged in');
         });
 
@@ -42,7 +50,9 @@ class AppServiceProvider extends ServiceProvider
             if ($event->user) {
                 activity()
                     ->causedBy($event->user)
-                    ->withProperties(['ip' => request()->ip()])
+                    ->withProperties([
+                        'ip' => request()->ip(),
+                    ])
                     ->log('User logged out');
             }
         });
