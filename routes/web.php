@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     // Only verified female (call girl) users
     $users = \App\Models\User::where('is_verified', true)
+        ->activeSubscription()
         ->where(function($q) {
             $q->where('gender', 'female')
               ->orWhereNull('gender')
@@ -44,6 +45,7 @@ Route::get('/', function () {
 
 Route::get('/escort-girls', function () {
     $users = \App\Models\User::where('is_verified', true)
+        ->activeSubscription()
         ->where(function($q) {
             $q->where('gender', 'female')
               ->orWhereNull('gender')
@@ -125,6 +127,7 @@ Route::get('/search', function (\Illuminate\Http\Request $request) {
 
     if ($q !== '') {
         $users = \App\Models\User::where('is_verified', true)
+            ->activeSubscription()
             ->where(function ($query) use ($q) {
                 $query->where('name', 'LIKE', '%' . $q . '%')
                       ->orWhere('county', 'LIKE', '%' . $q . '%')
@@ -159,6 +162,7 @@ Route::get('/search', function (\Illuminate\Http\Request $request) {
 Route::get('/category/call-boys', function () {
     $users = \App\Models\User::where('gender', 'male')
         ->where('is_verified', true)
+        ->activeSubscription()
         ->with('photos')
         ->get();
         
@@ -178,6 +182,7 @@ Route::get('/location/{name}', function ($name) {
     $searchLocation = urldecode($name);
     
     $users = \App\Models\User::where('is_verified', true)
+        ->activeSubscription()
         ->where(function ($query) use ($searchLocation) {
             $query->where('county', 'LIKE', '%' . $searchLocation . '%')
                   ->orWhere('city_town', 'LIKE', '%' . $searchLocation . '%')
@@ -230,6 +235,7 @@ Route::get('/profile/{id}', function ($id) {
     // Similar profiles: same gender, verified, exclude current
     $similarProfiles = \App\Models\User::with('photos')
         ->where('is_verified', true)
+        ->activeSubscription()
         ->where('id', '!=', $user->id)
         ->when($user->gender, fn($q) => $q->where('gender', $user->gender))
         ->inRandomOrder()
@@ -329,11 +335,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile', [ProfileController::class, 'update']); // fallback for browsers missing _method field
     Route::post('/profile/photo', [ProfileController::class, 'uploadPhoto'])->name('profile.photo');
+    Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/sessions/{id}/terminate', [ProfileController::class, 'terminateSession'])->name('profile.sessions.terminate');
     Route::post('/profile/sessions/terminate-others', [ProfileController::class, 'terminateAllOtherSessions'])->name('profile.sessions.terminate-others');
     // User Photos
     Route::post('/profile/photos', [UserPhotoController::class, 'store'])->name('user.photos.store');
+    Route::post('/profile/photos/{photo}/set-main', [UserPhotoController::class, 'setMain'])->name('user.photos.set-main');
     Route::delete('/profile/photos/{photo}', [UserPhotoController::class, 'destroy'])->name('user.photos.destroy');
     // User Videos
     Route::post('/profile/videos', [UserVideoController::class, 'store'])->name('user.videos.store');

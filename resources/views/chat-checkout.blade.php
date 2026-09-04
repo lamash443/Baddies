@@ -61,63 +61,14 @@
     [data-bs-theme="light"] .form-select { background: #fff; color: #000; border-color: rgba(0,0,0,0.1); }
     [data-bs-theme="light"] .plan-list li { color: rgba(0,0,0,0.7); }
     [data-bs-theme="light"] .plan-list li span { color: #000; }
+    [data-bs-theme="light"] hr, [data-bs-theme="light"] .border-top, [data-bs-theme="light"] .border-bottom { border-color: rgba(0,0,0,0.1) !important; }
+    [data-bs-theme="light"] div[style*="background:rgba(255,255,255,0.03)"] { background: #f8f9fa !important; border-color: rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .text-light, [data-bs-theme="light"] .text-white { color: #111 !important; }
   </style>
 </head>
 <body>
 
-  {{-- ── TOAST NOTIFICATIONS ── --}}
-  <style>
-    .checkout-toast { position:fixed; top:5.5rem; right:2rem; z-index:99999; border-radius:14px; min-width:340px; max-width:500px; padding:0; backdrop-filter:blur(12px); box-shadow:0 12px 48px rgba(0,0,0,0.4); animation:toastSlide 0.45s cubic-bezier(0.175,0.885,0.32,1.275); transition:opacity 0.35s ease,top 0.35s ease; }
-    @keyframes toastSlide { from { transform:translateY(-20px) scale(0.93); opacity:0; } to { transform:translateY(0) scale(1); opacity:1; } }
-    .checkout-toast .toast-inner { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; }
-    .checkout-toast .toast-icon { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .checkout-toast .toast-msg { flex: 1; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.01em; line-height: 1.4; }
-    .checkout-toast .toast-close { flex-shrink: 0; background: none; border: none; color: inherit; opacity: 0.7; cursor: pointer; padding: 4px; border-radius: 50%; transition: opacity 0.2s; }
-    .checkout-toast .toast-close:hover { opacity: 1; }
-    .toast-success { background: rgba(25, 135, 84, 0.95); color: #fff; border: 1px solid rgba(40,167,69,0.5); }
-    .toast-success .toast-icon { background: rgba(255,255,255,0.15); }
-    .toast-error { background: rgba(220, 53, 69, 0.95); color: #fff; border: 1px solid rgba(220,53,69,0.5); }
-    .toast-error .toast-icon { background: rgba(255,255,255,0.15); }
-  </style>
-
-  @if(session('success'))
-    <div id="successToast" class="checkout-toast toast-success" role="alert">
-      <div class="toast-inner">
-        <div class="toast-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="toast-msg">
-          <div style="font-size:0.78rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Success</div>
-          {{ session('success') }}
-        </div>
-        <button class="toast-close" onclick="dismissToast('successToast')" aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-  @endif
-
-  @if($errors->has('wallet') || $errors->any())
-    <div id="errorToast" class="checkout-toast toast-error" role="alert">
-      <div class="toast-inner">
-        <div class="toast-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <div class="toast-msg">
-          <div style="font-size:0.78rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;">Payment Failed</div>
-          {{ $errors->first('wallet') ?: $errors->first() }}
-        </div>
-        <button class="toast-close" onclick="dismissToast('errorToast')" aria-label="Close">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-  @endif
-
-  <script>
-    function dismissToast(id) { const t=document.getElementById(id); if(t){t.style.opacity='0';t.style.transform='translateY(-20px) scale(0.93)';setTimeout(()=>t.style.display='none',350);} }
-    ['successToast','errorToast'].forEach(id => setTimeout(()=>dismissToast(id),6000));
-  </script>
+  <x-checkout-toast />
 
 
 
@@ -237,3 +188,4 @@
   </script>
 </body>
 </html>
+

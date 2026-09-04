@@ -94,6 +94,77 @@
 
     /* Divider */
     .orange-divider { height: 3px; width: 48px; background: linear-gradient(90deg,#ff8c00,#ffb347); border-radius: 2px; margin-bottom: 2rem; }
+
+    /* LIGHT THEME OVERRIDES */
+    [data-bs-theme="light"] body {
+      background: #f4f5f8 !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .page-header {
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .page-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .page-sub {
+      color: rgba(0,0,0,0.6) !important;
+    }
+    [data-bs-theme="light"] .info-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .info-card-label {
+      color: rgba(0,0,0,0.5) !important;
+    }
+    [data-bs-theme="light"] .info-card-value {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .active-plan-card {
+      background: linear-gradient(135deg, rgba(40,167,69,0.08), rgba(40,167,69,0.02)) !important;
+      border-color: rgba(40,167,69,0.3) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .plan-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .plan-card:hover {
+      border-color: rgba(255,140,0,0.5) !important;
+      box-shadow: 0 12px 40px rgba(255,140,0,0.12) !important;
+    }
+    [data-bs-theme="light"] .plan-card.featured {
+      background: linear-gradient(145deg, rgba(255,140,0,0.06), #ffffff) !important;
+      border-color: rgba(255,140,0,0.5) !important;
+    }
+    [data-bs-theme="light"] .plan-price {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .plan-per {
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .plan-feature {
+      color: rgba(0,0,0,0.75) !important;
+    }
+    [data-bs-theme="light"] .section-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .section-sub {
+      color: rgba(0,0,0,0.6) !important;
+    }
+    [data-bs-theme="light"] .text-secondary {
+      color: #666666 !important;
+    }
+    [data-bs-theme="light"] div[style*="background:rgba(255,255,255,0.03)"] {
+      background: rgba(0,0,0,0.03) !important;
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] svg[stroke="rgba(255,255,255,0.3)"] {
+      stroke: rgba(0,0,0,0.3) !important;
+    }
   </style>
 </head>
 <body>

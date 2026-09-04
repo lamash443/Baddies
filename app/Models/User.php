@@ -140,6 +140,18 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Scope a query to only include users with an active subscription.
+     */
+    public function scopeActiveSubscription($query)
+    {
+        return $query->whereNotNull('subscription_plan')
+                     ->where(function ($q) {
+                         $q->whereNull('subscription_expires_at')
+                           ->orWhere('subscription_expires_at', '>', now());
+                     });
+    }
+
+    /**
      * Returns true if the user has an active chat subscription (plan set and not expired).
      */
     public function hasActiveChatSubscription(): bool

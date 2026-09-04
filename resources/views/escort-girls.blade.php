@@ -9,7 +9,12 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
-  <style>
+@php
+  $escortGirlsBg = !empty($siteSettings['escort_girls_header_background']) 
+    ? asset('storage/' . $siteSettings['escort_girls_header_background']) 
+    : asset('images/coup2.jpg');
+@endphp
+<style>
     *, *::before, *::after { box-sizing:border-box; }
     html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
 
@@ -21,7 +26,7 @@
     .nr-navbar .nav-link.active::after, .nr-navbar .nav-link:hover::after, .nr-navbar .nav-link:focus::after { transform:scaleX(1) !important; }
 
     /* PAGE HEADER */
-    .cb-page-header { position:relative; overflow:hidden; padding:4rem 0 3rem; background:linear-gradient(180deg,rgba(26,15,0,0.6) 0%,transparent 100%); border-bottom:1px solid rgba(255,140,0,0.12); margin-bottom:0; }
+    .cb-page-header { position:relative; overflow:hidden; padding:4.5rem 0 3.5rem; background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,rgba(13,13,13,0.92) 100%), url('{{ $escortGirlsBg }}') center/cover no-repeat; border-bottom:1px solid rgba(255,140,0,0.25); margin-bottom:0; }
     .cb-page-header::before { content:""; position:absolute; top:-80px; right:-80px; width:400px; height:400px; background:radial-gradient(circle,rgba(255,140,0,0.07) 0%,transparent 65%); pointer-events:none; }
     .cb-header-label { font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,140,0,0.75); font-weight:600; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem; }
     .cb-header-label::before { content:""; display:block; width:28px; height:1.5px; background:rgba(255,140,0,0.5); border-radius:2px; }
@@ -96,11 +101,9 @@
     }
     .home-listing-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
     }
-    @media (min-width: 576px) { .home-listing-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
-    @media (min-width: 992px) { .home-listing-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
     
     /* LOCATION SECTION CSS */
     .loc-tag {
@@ -140,7 +143,7 @@
 
     /* ── LIGHT THEME OVERRIDES ── */
     [data-bs-theme="light"] body { background: #f4f6f9; color: #111; }
-    [data-bs-theme="light"] .cb-page-header { background: linear-gradient(180deg, rgba(255,140,0,0.08) 0%, transparent 100%); border-bottom-color: rgba(0,0,0,0.08); }
+    [data-bs-theme="light"] .cb-page-header { background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(244,246,249,0.95) 100%), url('{{ $escortGirlsBg }}') center/cover no-repeat !important; border-bottom-color: rgba(0,0,0,0.1) !important; }
     [data-bs-theme="light"] .cb-page-title { color: #111; }
     [data-bs-theme="light"] .cb-page-desc { color: rgba(0,0,0,0.65); }
     
@@ -150,10 +153,15 @@
     [data-bs-theme="light"] #locAccordion .accordion-item { background: #ffffff; border-color: rgba(255,140,0,0.25); }
     [data-bs-theme="light"] #locAccordion .accordion-body { background: #fafafa; }
     
-    [data-bs-theme="light"] .home-section-title { color: #111; }
-    [data-bs-theme="light"] .home-section-sub { color: rgba(0,0,0,0.6); }
+    [data-bs-theme="light"] .home-section-title { color: #111 !important; }
+    [data-bs-theme="light"] .home-section-sub { color: rgba(0,0,0,0.65) !important; }
     
-    [data-bs-theme="light"] div[style*="color:rgba(255,255,255,0.35)"] { color: rgba(0,0,0,0.5) !important; }
+    [data-bs-theme="light"] .empty-listing-notice,
+    [data-bs-theme="light"] div[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] p[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] span[style*="color:rgba(255,255,255"] {
+      color: rgba(0,0,0,0.65) !important;
+    }
   </style>
 </head>
 <body>

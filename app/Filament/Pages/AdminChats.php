@@ -26,6 +26,9 @@ class AdminChats extends Page
     public ?int $editingUserId = null;
     public ?User $editingUser = null;
 
+    // Admin reply
+    public ?string $newMessage = null;
+
     // Online settings bound to form
     public bool $force_online               = false;
     public bool $online_toast_enabled       = true;
@@ -145,6 +148,29 @@ class AdminChats extends Page
             ->orWhere(fn($q) => $q->where('sender_id', $this->activeUserB)->where('receiver_id', $this->activeUserA))
             ->orderBy('created_at', 'asc')
             ->get();
+    }
+
+    public function sendMessageAs(int $senderId): void
+    {
+        if (!$this->newMessage || trim($this->newMessage) === '') return;
+        if (!$this->activeUserA || !$this->activeUserB) return;
+
+        $receiverId = ($senderId === $this->activeUserA) ? $this->activeUserB : $this->activeUserA;
+
+        // Mark previous messages from the receiver as read (since the sender is replying)
+        Message::where('sender_id', $receiverId)
+               ->where('receiver_id', $senderId)
+               ->where('is_read', false)
+               ->update(['is_read' => true]);
+
+        Message::create([
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'body' => trim($this->newMessage),
+            'is_read' => false,
+        ]);
+
+        $this->newMessage = null;
     }
 
     public function getViewData(): array

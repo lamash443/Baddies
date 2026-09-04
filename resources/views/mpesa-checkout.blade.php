@@ -27,8 +27,8 @@
     .form-label { font-size: 1rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem; }
     .form-control {
       background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,140,0,0.3);
-      color: #fff; padding: 1rem 1.25rem; border-radius: 8px; font-size: 1.1rem;
-      text-align: center; letter-spacing: 2px;
+      color: #fff; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.95rem;
+      text-align: center; letter-spacing: 1.5px;
     }
     .form-control:focus {
       background-color: rgba(0,0,0,0.5); border-color: orange; box-shadow: 0 0 0 4px rgba(255,165,0,0.15); color: #fff;
@@ -134,13 +134,24 @@
     .btn-stop:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
 
     /* LIGHT THEME */
-    [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }
-    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.1); }
-    [data-bs-theme="light"] .dash-card { background:#fff; border-color:rgba(255,140,0,0.3); box-shadow:0 5px 20px rgba(0,0,0,0.05); }
-    [data-bs-theme="light"] .dash-card-title { color:#000; }
-    [data-bs-theme="light"] .form-control { background: #fff; color: #000; border-color: rgba(0,0,0,0.2); }
-    [data-bs-theme="light"] .instructions { background: #f8f9fa; border-color: rgba(0,0,0,0.1); }
-    [data-bs-theme="light"] .instructions p { color: rgba(0,0,0,0.8); }
+    [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .dashboard-title { color:#111 !important; }
+    [data-bs-theme="light"] .dash-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 4px 20px rgba(0,0,0,0.04) !important; color:#111 !important; }
+    [data-bs-theme="light"] .dash-card-title { color:#111 !important; }
+    [data-bs-theme="light"] .form-control { background: #f9f9fb !important; color: #111 !important; border-color: rgba(0,0,0,0.15) !important; }
+    [data-bs-theme="light"] .form-control:focus { background-color: #ffffff !important; border-color: orange !important; color: #111 !important; }
+    [data-bs-theme="light"] .instructions { background: #f8f9fa !important; border-color: rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .instructions p { color: rgba(0,0,0,0.75) !important; }
+    
+    [data-bs-theme="light"] .stepper-line { background: rgba(0,0,0,0.12) !important; }
+    [data-bs-theme="light"] .step-circle.bg-dark { background: #e9ecef !important; border-color: rgba(0,0,0,0.15) !important; color: #555 !important; }
+    [data-bs-theme="light"] .step-label.text-secondary { color: #666 !important; }
+    [data-bs-theme="light"] .text-secondary { color: #666 !important; }
+    [data-bs-theme="light"] .text-light, [data-bs-theme="light"] .text-white { color: #111 !important; }
+    [data-bs-theme="light"] .input-group-text { background: rgba(255,140,0,0.1) !important; border-color: rgba(0,0,0,0.15) !important; color: #e67e00 !important; }
+    [data-bs-theme="light"] .btn-stop { border-color: rgba(0,0,0,0.2) !important; color: #555 !important; }
+    [data-bs-theme="light"] hr, [data-bs-theme="light"] .border-top, [data-bs-theme="light"] .border-bottom { border-color: rgba(0,0,0,0.1) !important; }
   </style>
 </head>
 <body>
@@ -201,10 +212,10 @@
 
             <div class="mb-4">
               <div class="input-group">
-                <span class="input-group-text" style="background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.3); border-right:none; color:orange; font-weight:800; font-size:1rem; border-radius:8px 0 0 8px; user-select:none; pointer-events:none;">+254</span>
-                <input id="phone-suffix" type="tel" class="form-control form-control-lg" placeholder="7XXXXXXXX" maxlength="9" required autofocus autocomplete="tel" value="{{ session('checkout_prefilled_phone', '') }}" style="border-left:none; border-radius:0 8px 8px 0; text-align:left; letter-spacing:2px;">
+                <span class="input-group-text" style="background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.3); border-right:none; color:orange; font-weight:800; font-size:0.9rem; padding:0.65rem 0.9rem; border-radius:8px 0 0 8px; user-select:none; pointer-events:none;">+254</span>
+                <input id="phone-suffix" type="tel" class="form-control" placeholder="7XXXXXXXX" maxlength="9" required autofocus autocomplete="tel" value="{{ session('checkout_prefilled_phone', '') }}" style="border-left:none; border-radius:0 8px 8px 0; text-align:left; letter-spacing:1.5px; font-size:0.95rem; padding:0.65rem 0.9rem;">
               </div>
-              <div class="mt-1 small text-secondary">e.g. 722 123 456 &mdash; enter digits after +254</div>
+              <div class="mt-1 small text-secondary" style="font-size:0.8rem;">e.g. 722 123 456 &mdash; enter digits after +254</div>
             </div>
 
             <button type="submit" class="btn btn-mpesa">

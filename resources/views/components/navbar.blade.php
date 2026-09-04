@@ -158,7 +158,7 @@
               @if(Auth::user()->profile_photo)
                 <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
               @else
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(substr(Auth::user()->name, 0, 2)) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
               @endif
             @else
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -359,7 +359,7 @@
                     @if(Auth::user()->profile_photo)
                       <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
                     @else
-                      <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                      <img src="https://ui-avatars.com/api/?name={{ urlencode(substr(Auth::user()->name, 0, 2)) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
                     @endif
                   @else
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -466,22 +466,30 @@ document.addEventListener('DOMContentLoaded', function() {
   if (session('login_success')) {
     $toastTitle = 'Login Successful';
     $toastMsg = session('login_success');
-  } elseif (session('photo_upload_success')) {
+  } elseif (session('photo_upload_success') || session('status') === 'photo-updated') {
     $toastTitle = 'Photo Published';
-    $toastMsg = session('photo_upload_success');
-  } elseif (session('photo_delete_success')) {
+    $toastMsg = session('photo_upload_success') ?? 'Your profile photo has been successfully updated.';
+  } elseif (session('photo_delete_success') || session('status') === 'photo-deleted') {
     $toastTitle = 'Photo Removed';
-    $toastMsg = session('photo_delete_success');
+    $toastMsg = session('photo_delete_success') ?? 'Your profile photo has been successfully removed.';
   } elseif (session('video_upload_success')) {
     $toastTitle = 'Video Published';
     $toastMsg = session('video_upload_success');
   } elseif (session('video_delete_success')) {
     $toastTitle = 'Video Removed';
     $toastMsg = session('video_delete_success');
+  } elseif (session('status') === 'session-terminated') {
+    $toastTitle = 'Session Terminated';
+    $toastMsg = 'The selected session has been signed out successfully.';
+  } elseif (session('status') === 'other-sessions-terminated') {
+    $toastTitle = 'Other Sessions Signed Out';
+    $toastMsg = 'All other active sessions have been terminated.';
+  } elseif (session('status') === 'profile-updated') {
+    $toastTitle = 'Profile Updated';
+    $toastMsg = 'Your profile information has been saved successfully.';
   }
 @endphp
 
-@if($toastMsg)
 <style>
   .success-toast {
     position: fixed; top: 5.5rem; right: 2rem; z-index: 99999;
@@ -526,6 +534,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   @keyframes successToastBar { from{width:100%} to{width:0%} }
 </style>
+
+@if($toastMsg)
 <div class="success-toast" id="successToast" role="alert" aria-live="assertive">
   <div class="success-toast__icon">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

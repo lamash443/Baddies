@@ -12,6 +12,8 @@ class ChatBox extends Component
     public $activeUser;
     public $body = '';
 
+    public $replyToId = null;
+
     public function mount($activeUserId = null)
     {
         $this->activeUserId = $activeUserId;
@@ -31,6 +33,16 @@ class ChatBox extends Component
         }
     }
 
+    public function setReply($messageId)
+    {
+        $this->replyToId = $messageId;
+    }
+
+    public function cancelReply()
+    {
+        $this->replyToId = null;
+    }
+
     public function sendMessage()
     {
         if (!trim($this->body) || !$this->activeUserId) return;
@@ -39,9 +51,18 @@ class ChatBox extends Component
             'sender_id'   => auth()->id(),
             'receiver_id' => $this->activeUserId,
             'body'        => $this->body,
+            'reply_to_id' => $this->replyToId,
         ]);
 
+        // Unarchive chat for both users when a new message is sent
+        \App\Models\ChatArchive::where(function($q) {
+            $q->where('user_id', auth()->id())->where('archived_user_id', $this->activeUserId);
+        })->orWhere(function($q) {
+            $q->where('user_id', $this->activeUserId)->where('archived_user_id', auth()->id());
+        })->delete();
+
         $this->body = '';
+        $this->replyToId = null;
         $this->dispatch('messageSent');
     }
 
@@ -59,12 +80,15 @@ class ChatBox extends Component
 
         $messages = [];
         if ($this->activeUserId) {
-            $messages = Message::where(function ($query) {
-                $query->where('sender_id', auth()->id())
-                      ->where('receiver_id', $this->activeUserId);
-            })->orWhere(function ($query) {
+            $myId = auth()->id();
+            $messages = Message::with('replyTo')->where(function ($query) use ($myId) {
+                $query->where('sender_id', $myId)
+                      ->where('receiver_id', $this->activeUserId)
+                      ->where('deleted_by_sender', false);
+            })->orWhere(function ($query) use ($myId) {
                 $query->where('sender_id', $this->activeUserId)
-                      ->where('receiver_id', auth()->id());
+                      ->where('receiver_id', $myId)
+                      ->where('deleted_by_receiver', false);
             })->orderBy('created_at', 'asc')->get();
 
             $this->markMessagesAsRead();

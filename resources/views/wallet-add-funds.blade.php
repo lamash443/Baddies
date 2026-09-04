@@ -125,18 +125,58 @@
     }
     .side-nav-link.active svg { opacity: 1; }
 
-    /* LIGHT THEME */
-    [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }
-    [data-bs-theme="light"] .dash-card { background:#fff; border-color:rgba(255,140,0,0.3); box-shadow:0 5px 20px rgba(0,0,0,0.05); }
-    [data-bs-theme="light"] .dash-card-title { color:#000; }
-    [data-bs-theme="light"] .dash-card-text { color:rgba(0,0,0,0.6); }
-    [data-bs-theme="light"] .form-control, [data-bs-theme="light"] .form-select { background:#fff; color:#000; }
-    [data-bs-theme="light"] .summary-label { color:rgba(0,0,0,0.6); }
-    [data-bs-theme="light"] .summary-value { color:#000; }
-    [data-bs-theme="light"] .summary-total-label { color:#000; }
-    [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
-    [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.65); }
-    [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08); color:orange; }
+    /* LIGHT THEME OVERRIDES */
+    [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header { border-color: rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .dashboard-title { color: #111 !important; }
+    [data-bs-theme="light"] .dash-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 4px 20px rgba(0,0,0,0.04) !important; color:#111 !important; }
+    [data-bs-theme="light"] .dash-card-title { color:#111 !important; }
+    [data-bs-theme="light"] .dash-card-text { color:rgba(0,0,0,0.65) !important; }
+    
+    [data-bs-theme="light"] .text-light,
+    [data-bs-theme="light"] .text-white { color: #111 !important; }
+    [data-bs-theme="light"] .text-secondary { color: #666 !important; }
+
+    [data-bs-theme="light"] .form-label { color:#222 !important; }
+    [data-bs-theme="light"] .form-control,
+    [data-bs-theme="light"] .form-select {
+      background-color:#f9f9fb !important; border:1px solid rgba(0,0,0,0.15) !important; color:#111 !important;
+    }
+    [data-bs-theme="light"] .form-control:focus,
+    [data-bs-theme="light"] .form-select:focus {
+      background-color:#ffffff !important; border-color:orange !important; color:#111 !important;
+      box-shadow:0 0 0 3px rgba(255,165,0,0.18) !important;
+    }
+    [data-bs-theme="light"] .form-control::placeholder { color:#888 !important; }
+    [data-bs-theme="light"] .form-control option,
+    [data-bs-theme="light"] .form-select option { background-color:#ffffff !important; color:#111 !important; }
+
+    [data-bs-theme="light"] .input-group-text {
+      background: rgba(255,140,0,0.1) !important; border-color: rgba(0,0,0,0.15) !important; color: #e67e00 !important;
+    }
+
+    [data-bs-theme="light"] .fee-note {
+      background: rgba(255,140,0,0.08) !important; border-color: rgba(255,140,0,0.25) !important; color: #444 !important;
+    }
+    [data-bs-theme="light"] .fee-note strong { color: #e67e00 !important; }
+
+    [data-bs-theme="light"] .summary-label { color:rgba(0,0,0,0.65) !important; }
+    [data-bs-theme="light"] .summary-value { color:#111 !important; }
+    [data-bs-theme="light"] .summary-total-label { color:#111 !important; }
+    [data-bs-theme="light"] .summary-row:not(:last-child) { border-bottom-color: rgba(0,0,0,0.1) !important; }
+    [data-bs-theme="light"] div[style*="background:rgba(255,255,255,0.03)"] {
+      background: #f8f9fa !important; border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] hr { border-color: rgba(0,0,0,0.08) !important; }
+
+    [data-bs-theme="light"] .side-nav-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 4px 20px rgba(0,0,0,0.04) !important; }
+    [data-bs-theme="light"] .side-nav-title { color:rgba(0,0,0,0.45) !important; border-bottom-color:rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7) !important; }
+    [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08) !important; color:#ff8c00 !important; }
+    [data-bs-theme="light"] .side-nav-link.active { background:rgba(255,140,0,0.12) !important; color:#ff8c00 !important; }
+
+    [data-bs-theme="light"] .stepper-line { background: rgba(0,0,0,0.1) !important; }
+    [data-bs-theme="light"] .step-circle.bg-dark { background: #f0f0f4 !important; border-color: rgba(0,0,0,0.15) !important; color: #666 !important; }
   </style>
 </head>
 <body>
@@ -226,17 +266,18 @@
 
         <!-- Available Balance Card -->
         <div class="dash-card mb-4">
-          <header>
-            <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
-            <p class="dash-card-text mb-0">{{ __('Your current funds available for memberships and features.') }}</p>
+          <header class="mb-3">
+            <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
+            <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Your current funds available for memberships and features. Available for premium features & upgrades.') }}</p>
           </header>
-          <div class="d-flex align-items-center justify-content-between p-4 mt-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+          <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
             <div>
-              <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
-              <div class="fs-1 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+              <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
+              <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+              <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
             </div>
-            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:64px;height:64px;background:rgba(255,140,0,0.1);border:2px solid rgba(255,140,0,0.3);">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:44px;height:44px;background:rgba(255,140,0,0.1);border:1.5px solid rgba(255,140,0,0.3);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             </div>
           </div>
         </div>
@@ -311,8 +352,8 @@
             </div>
 
             <div class="d-flex justify-content-end">
-              <button type="submit" class="btn-orange px-5 py-3 fs-5 w-100" style="border-radius:12px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <button type="submit" class="btn-orange w-100 py-2.5 px-4" style="border-radius:8px; font-size:0.95rem;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 {{ __('Add Funds') }}
               </button>
             </div>

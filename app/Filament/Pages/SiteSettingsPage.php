@@ -32,18 +32,32 @@ class SiteSettingsPage extends Page implements HasForms
 
     public ?array $data = [];
 
+    protected function getValidFileSetting(?string $key): ?string
+    {
+        $val = SiteSetting::get($key);
+        if (! $val || trim($val) === '') {
+            return null;
+        }
+        if (! Storage::disk('public')->exists($val)) {
+            return null;
+        }
+        return $val;
+    }
+
     public function mount(): void
     {
         $this->form->fill([
             // ── Branding ──────────────────────────────────────────────────────
-            'logo'            => SiteSetting::get('logo'),
-            'preloader'       => SiteSetting::get('preloader'),
-            'favicon'         => SiteSetting::get('favicon'),
+            'logo'            => $this->getValidFileSetting('logo'),
+            'preloader'       => $this->getValidFileSetting('preloader'),
+            'favicon'         => $this->getValidFileSetting('favicon'),
 
-            // ── Hero Section ──────────────────────────────────────────────────
-            'hero_title'      => SiteSetting::get('hero_title'),
-            'hero_subtitle'   => SiteSetting::get('hero_subtitle'),
-            'hero_background' => SiteSetting::get('hero_background'),
+            // ── Hero Section & Header Images ─────────────────────────────────
+            'hero_title'                     => SiteSetting::get('hero_title'),
+            'hero_subtitle'                  => SiteSetting::get('hero_subtitle'),
+            'hero_background'                => $this->getValidFileSetting('hero_background'),
+            'escort_girls_header_background' => $this->getValidFileSetting('escort_girls_header_background'),
+            'call_boys_header_background'    => $this->getValidFileSetting('call_boys_header_background'),
 
             // ── Call Girls Section ────────────────────────────────────────────
             'call_girls_subtitle' => SiteSetting::get('call_girls_subtitle', 'Verified escorts and call girls across Kenya'),
@@ -86,13 +100,9 @@ class SiteSettingsPage extends Page implements HasForms
                     ->schema([
                         FileUpload::make('logo')
                             ->label('Site Logo')
-                            ->image()
                             ->disk('public')
                             ->directory('site')
-                            ->imagePreviewHeight('80')
-                            ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg', 'image/svg+xml', 'image/webp'])
-                            ->helperText('Recommended: PNG or SVG with transparent background.')
-                            ->default(SiteSetting::get('logo')),
+                            ->image(),
                     ]),
 
                 Section::make('Favicon')
@@ -100,13 +110,9 @@ class SiteSettingsPage extends Page implements HasForms
                     ->schema([
                         FileUpload::make('favicon')
                             ->label('Favicon')
-                            ->image()
                             ->disk('public')
                             ->directory('site')
-                            ->imagePreviewHeight('48')
-                            ->acceptedFileTypes(['image/png', 'image/x-icon', 'image/ico', 'image/jpeg'])
-                            ->helperText('Recommended: 32×32 or 64×64 PNG/ICO.')
-                            ->default(SiteSetting::get('favicon')),
+                            ->image(),
                     ]),
 
                 Section::make('Preloader')
@@ -114,13 +120,9 @@ class SiteSettingsPage extends Page implements HasForms
                     ->schema([
                         FileUpload::make('preloader')
                             ->label('Preloader Image')
-                            ->image()
                             ->disk('public')
                             ->directory('site')
-                            ->imagePreviewHeight('80')
-                            ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/svg+xml', 'image/webp'])
-                            ->helperText('GIF or animated WebP recommended.')
-                            ->default(SiteSetting::get('preloader')),
+                            ->image(),
                     ]),
 
                 // ── HERO SECTION ──────────────────────────────────────────────────
@@ -138,14 +140,20 @@ class SiteSettingsPage extends Page implements HasForms
                             ->rows(3)
                             ->maxLength(1000),
                         FileUpload::make('hero_background')
-                            ->label('Hero Background Image')
-                            ->image()
+                            ->label('Homepage Hero Background Image (http://127.0.0.1:8000/)')
                             ->disk('public')
                             ->directory('site')
-                            ->imagePreviewHeight('150')
-                            ->acceptedFileTypes(['image/png', 'image/jpg', 'image/jpeg', 'image/webp'])
-                            ->helperText('Best if a dark, high-resolution photo is used (e.g. 1920x1080). Leave empty to use the default image.')
-                            ->default(SiteSetting::get('hero_background')),
+                            ->image(),
+                        FileUpload::make('escort_girls_header_background')
+                            ->label('Escort Girls Header Image (http://127.0.0.1:8000/escort-girls)')
+                            ->disk('public')
+                            ->directory('site')
+                            ->image(),
+                        FileUpload::make('call_boys_header_background')
+                            ->label('Call Boys Header Image (http://127.0.0.1:8000/category/call-boys)')
+                            ->disk('public')
+                            ->directory('site')
+                            ->image(),
                     ]),
 
                 // ── CALL GIRLS SECTION ────────────────────────────────────────────
@@ -170,72 +178,43 @@ class SiteSettingsPage extends Page implements HasForms
 
                 // ── HOW IT WORKS ──────────────────────────────────────────────────
                 Section::make('How It Works Section')
-                    ->description('Edit the section subtitle and each of the 4 step cards shown on the homepage.')
+                    ->description('Manage the 4-step process content shown on the homepage.')
                     ->schema([
                         TextInput::make('hiw_subtitle')
                             ->label('Section Subtitle')
-                            ->maxLength(255)
-                            ->helperText('e.g. "Find your perfect match in 3 simple steps"'),
-
-                        TextInput::make('hiw_step1_title')
-                            ->label('Step 1 — Title')
-                            ->maxLength(100),
-                        Textarea::make('hiw_step1_body')
-                            ->label('Step 1 — Description')
-                            ->rows(2),
-
-                        TextInput::make('hiw_step2_title')
-                            ->label('Step 2 — Title')
-                            ->maxLength(100),
-                        Textarea::make('hiw_step2_body')
-                            ->label('Step 2 — Description')
-                            ->rows(2),
-
-                        TextInput::make('hiw_step3_title')
-                            ->label('Step 3 — Title')
-                            ->maxLength(100),
-                        Textarea::make('hiw_step3_body')
-                            ->label('Step 3 — Description')
-                            ->rows(2),
-
-                        TextInput::make('hiw_step4_title')
-                            ->label('Step 4 — Title')
-                            ->maxLength(100),
-                        Textarea::make('hiw_step4_body')
-                            ->label('Step 4 — Description')
-                            ->rows(2),
+                            ->maxLength(255),
+                        TextInput::make('hiw_step1_title')->label('Step 1 Title'),
+                        Textarea::make('hiw_step1_body')->label('Step 1 Description')->rows(2),
+                        TextInput::make('hiw_step2_title')->label('Step 2 Title'),
+                        Textarea::make('hiw_step2_body')->label('Step 2 Description')->rows(2),
+                        TextInput::make('hiw_step3_title')->label('Step 3 Title'),
+                        Textarea::make('hiw_step3_body')->label('Step 3 Description')->rows(2),
+                        TextInput::make('hiw_step4_title')->label('Step 4 Title'),
+                        Textarea::make('hiw_step4_body')->label('Step 4 Description')->rows(2),
                     ]),
 
                 // ── EDITORIAL / ABOUT SECTION ─────────────────────────────────────
-                Section::make('Editorial / About Section')
-                    ->description('Edit all text blocks in the editorial "About" section at the bottom of the homepage. Wrap text in <span>…</span> for the orange accent colour.')
+                Section::make('Homepage Editorial / About Text')
+                    ->description('Manage the SEO text blocks at the bottom of the homepage.')
                     ->schema([
                         Textarea::make('editorial_heading')
-                            ->label('Main Heading (HTML allowed)')
-                            ->rows(2)
-                            ->helperText('Use <span>…</span> for orange accent. Example: "…looking for a way to <span>spice up your day</span>…"'),
-
+                            ->label('Main Banner Heading (HTML allowed)')
+                            ->rows(2),
                         Textarea::make('editorial_intro')
-                            ->label('Intro Paragraph')
-                            ->rows(4),
-
+                            ->label('Main Banner Intro Text')
+                            ->rows(3),
                         TextInput::make('editorial_local_title')
-                            ->label('Sub-heading: Local Escorts')
-                            ->maxLength(150),
+                            ->label('Local Escorts Section Title'),
                         Textarea::make('editorial_local_body')
-                            ->label('Local Escorts — Body (separate paragraphs with a blank line)')
-                            ->rows(6),
-
+                            ->label('Local Escorts Section Body')
+                            ->rows(5),
                         TextInput::make('editorial_services_title')
-                            ->label('Sub-heading: Escort Services')
-                            ->maxLength(150),
+                            ->label('Services Section Title'),
                         Textarea::make('editorial_services_body')
-                            ->label('Services — Body (use "- item" on its own line for bullet points)')
-                            ->rows(8),
-
+                            ->label('Services Section Body (use "- item" on its own line for bullet points)')
+                            ->rows(6),
                         TextInput::make('editorial_meet_title')
-                            ->label('Sub-heading: Know Whom You Meet')
-                            ->maxLength(150),
+                            ->label('Know Whom — Section Title'),
                         Textarea::make('editorial_meet_body')
                             ->label('Know Whom — Body (use "- item" on its own line for bullet points)')
                             ->rows(6),
@@ -247,13 +226,14 @@ class SiteSettingsPage extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background'];
+        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background'];
 
         $allKeys = [
             // Branding
             'logo', 'preloader', 'favicon',
-            // Hero
+            // Hero & Headers
             'hero_title', 'hero_subtitle', 'hero_background',
+            'escort_girls_header_background', 'call_boys_header_background',
             // Call Girls
             'call_girls_subtitle',
             // Classifieds
@@ -273,6 +253,11 @@ class SiteSettingsPage extends Page implements HasForms
 
         foreach ($allKeys as $key) {
             $newValue = $data[$key] ?? null;
+
+            if (in_array($key, $fileKeys) && is_array($newValue)) {
+                $newValue = reset($newValue) ?: null;
+            }
+
             $oldValue = SiteSetting::get($key);
 
             // Delete old file only for file-upload fields

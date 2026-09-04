@@ -1,44 +1,59 @@
 <div class="chat-box d-flex flex-column bg-dark" style="height: 75vh;">
     @if($activeUser)
         <!-- Header -->
-        <div class="p-3 border-bottom border-secondary d-flex align-items-center">
-            <a href="{{ route('chat.index') }}" class="text-white text-opacity-75 text-decoration-none me-3 d-md-none" title="Back to conversations">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <div class="d-flex align-items-center px-3 py-2" style="background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%); border-bottom: 1px solid rgba(255,140,0,0.25); min-height: 62px;">
+            {{-- Back button (mobile) --}}
+            <a href="{{ route('chat.index') }}" class="text-decoration-none me-2 d-md-none d-flex align-items-center justify-content-center flex-shrink-0" title="Back"
+               style="width: 34px; height: 34px; border-radius: 50%; color: #ff8c00;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             </a>
+
             @php
                 $hasPhoto = $activeUser->profile_photo || $activeUser->photos->first();
                 $cover = $activeUser->profile_photo ? asset('storage/'.$activeUser->profile_photo) : ($hasPhoto ? asset('storage/'.$activeUser->photos->first()->path) : null);
                 $initials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $activeUser->name), 0, 2));
             @endphp
-            @if($hasPhoto)
-                <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle flex-shrink-0" style="width: 45px; height: 45px; object-fit: cover;">
-            @else
-                <div class="rounded-circle flex-shrink-0 bg-secondary bg-opacity-50 d-flex justify-content-center align-items-center text-white fw-bold" style="width: 45px; height: 45px; font-size: 1.1rem;">
-                    {{ $initials ?: 'U' }}
-                </div>
-            @endif
-            <div class="ms-3 flex-grow-1">
-                <h6 class="mb-0 fw-bold text-white"><a href="{{ route('profile.view', $activeUser->id) }}" class="text-white text-decoration-none">{{ $activeUser->name }}</a></h6>
+
+            {{-- Avatar --}}
+            <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none d-block flex-shrink-0">
+                @if($hasPhoto)
+                    <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                        <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                    </div>
+                @else
+                    <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                        <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
+                            {{ $initials ?: 'U' }}
+                        </div>
+                    </div>
+                @endif
+            </a>
+
+            {{-- Name + Status --}}
+            <div class="ms-3 flex-grow-1" style="min-width: 0;">
+                <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
+                    <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
+                </a>
                 @php
                     $chatSettings = \App\Models\Setting::getSettings();
                     $showStatusInChat = $activeUser->show_online_status_in_chat ?? $chatSettings->show_online_status_in_chat;
                 @endphp
                 @if($showStatusInChat)
                     @if($activeUser->isOnline())
-                        <small style="color:#4ade80; font-size:0.72rem; font-weight:600;">Online</small>
+                        <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">Online</small>
                     @elseif($activeUser->last_seen_at)
-                        <small class="text-muted" style="font-size:0.72rem;">Last seen {{ $activeUser->last_seen_at->diffForHumans() }}</small>
+                        <small style="color: rgba(255,255,255,0.4); font-size: 0.7rem;">Last seen {{ $activeUser->last_seen_at->diffForHumans() }}</small>
                     @else
-                        <small class="text-muted" style="font-size:0.72rem;">Offline</small>
+                        <small style="color: rgba(255,255,255,0.35); font-size: 0.7rem;">Offline</small>
                     @endif
                 @endif
             </div>
 
             {{-- Phone Call Icon --}}
             @if($activeUser->phone_number)
-                <a href="tel:{{ $activeUser->phone_number }}" class="ms-auto flex-shrink-0 d-flex align-items-center justify-content-center text-decoration-none" title="Call {{ $activeUser->name }}"
-                   style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.4); color: #ff8c00; transition: all 0.2s; box-shadow: 0 0 12px rgba(255,140,0,0.25), 0 0 4px rgba(255,140,0,0.15);">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(270deg);">
+                <a href="tel:{{ $activeUser->phone_number }}" class="flex-shrink-0 d-flex align-items-center justify-content-center text-decoration-none ms-2" title="Call {{ $activeUser->name }}"
+                   style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.4); color: #ff8c00; transition: all 0.2s; box-shadow: 0 0 10px rgba(255,140,0,0.2);">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(270deg);">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                     </svg>
                 </a>
@@ -46,12 +61,78 @@
         </div>
 
         <!-- Messages Body -->
-        <div class="flex-grow-1 p-3 overflow-auto" id="chat-messages" wire:poll.3s>
+        <div class="flex-grow-1 p-3 overflow-auto position-relative" id="chat-messages" wire:poll.3s style="background-color: #efeae2;">
+            <!-- End-to-End Encryption Notice -->
+            <div class="d-flex justify-content-center mb-4 mt-2">
+                <div class="text-center px-3 py-2" style="background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.25); border-radius: 8px; max-width: 90%;">
+                    <div class="d-flex align-items-center justify-content-center gap-2 mb-1" style="color: rgba(0,0,0,0.7); font-size: 0.75rem; font-weight: 700;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #d97700;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        Messages and calls are end-to-end encrypted.
+                    </div>
+                    <div style="color: rgba(0,0,0,0.6); font-size: 0.7rem; line-height: 1.3; font-weight: 500;">
+                        Only people in this chat can read, listen to, or share them.
+                    </div>
+                </div>
+            </div>
+
+            @php $lastDate = null; @endphp
             @forelse($messages as $message)
-                <div class="d-flex mb-3 {{ $message->sender_id === auth()->id() ? 'justify-content-end' : '' }}">
-                    <div class="px-3 py-2 rounded {{ $message->sender_id === auth()->id() ? 'bg-primary text-dark' : 'bg-secondary bg-opacity-25 text-white' }}" style="max-width: 75%;">
-                        <div>{{ $message->body }}</div>
-                        <small class="{{ $message->sender_id === auth()->id() ? 'text-dark opacity-75' : 'text-muted' }} d-block mt-1" style="font-size: 0.65rem;">{{ $message->created_at->format('g:i A') }}</small>
+                @php
+                    $msgDateObj = $message->created_at;
+                    if ($msgDateObj->isToday()) {
+                        $dateString = 'Today';
+                    } elseif ($msgDateObj->isYesterday()) {
+                        $dateString = 'Yesterday';
+                    } else {
+                        $dateString = $msgDateObj->format('d/m/Y');
+                    }
+                @endphp
+
+                @if($lastDate !== $dateString)
+                    <div class="d-flex justify-content-center my-3">
+                        <div class="px-3 py-1 shadow-sm rounded-pill" style="background-color: #ffffff; color: rgba(0,0,0,0.6); font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(0,0,0,0.05);">
+                            {{ $dateString }}
+                        </div>
+                    </div>
+                    @php $lastDate = $dateString; @endphp
+                @endif
+                <div class="d-flex mb-3 message-wrapper {{ $message->sender_id === auth()->id() ? 'justify-content-end' : '' }}" data-msg-id="{{ $message->id }}">
+                    <div class="px-3 py-2 shadow-sm text-dark position-relative" 
+                         style="max-width: 75%; border-radius: 12px; background-color: {{ $message->sender_id === auth()->id() ? '#e2ffc7' : '#ffffff' }}; {{ $message->sender_id === auth()->id() ? 'border-top-right-radius: 0px;' : 'border-top-left-radius: 0px;' }}">
+                        
+                        @if($message->replyTo)
+                            <div class="mb-2 p-2 rounded" style="background-color: rgba(0,0,0,0.04); border-left: 4px solid {{ $message->sender_id === auth()->id() ? '#4ade80' : '#ff8c00' }}; font-size: 0.8rem;">
+                                <div class="fw-bold mb-1" style="color: {{ $message->sender_id === auth()->id() ? '#15803d' : '#d97700' }};">{{ $message->replyTo->sender_id === auth()->id() ? 'You' : $message->replyTo->sender->name }}</div>
+                                <div class="text-truncate" style="opacity: 0.75;">{{ $message->replyTo->body }}</div>
+                            </div>
+                        @endif
+
+                        <div style="font-size: 0.95rem;">{{ $message->body }}</div>
+                        <div class="d-flex align-items-center mt-1 justify-content-end text-dark opacity-75" style="font-size: 0.65rem; gap: 4px;">
+                            <span>{{ $message->created_at->format('g:i A') }}</span>
+                            @if($message->sender_id === auth()->id())
+                                @if($message->is_read)
+                                    {{-- Double Blue Tick --}}
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                      <polyline points="22 7 12 17 8 13"></polyline>
+                                      <polyline points="16 7 12 11"></polyline>
+                                      <polyline points="6 15 2 11"></polyline>
+                                    </svg>
+                                @elseif($activeUser->isOnline())
+                                    {{-- Double Gray Tick --}}
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50">
+                                      <polyline points="22 7 12 17 8 13"></polyline>
+                                      <polyline points="16 7 12 11"></polyline>
+                                      <polyline points="6 15 2 11"></polyline>
+                                    </svg>
+                                @else
+                                    {{-- Single Gray Tick --}}
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50">
+                                      <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                @endif
+                            @endif
+                        </div>
                     </div>
                 </div>
             @empty
@@ -61,12 +142,35 @@
             @endforelse
         </div>
 
+        @if($replyToId)
+            @php
+                $replyMessage = \App\Models\Message::find($replyToId);
+            @endphp
+            @if($replyMessage)
+                <div class="p-2 border-top border-secondary position-relative" style="background-color: #f8f9fa;">
+                    <div class="p-2 rounded shadow-sm" style="background-color: #ffffff; border-left: 4px solid #ff8c00;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold" style="color: #ff8c00; font-size: 0.8rem;">Replying to {{ $replyMessage->sender_id === auth()->id() ? 'Yourself' : $replyMessage->sender->name }}</span>
+                            <button wire:click="cancelReply" type="button" class="btn-close" style="font-size: 0.6rem;"></button>
+                        </div>
+                        <div class="text-truncate text-dark opacity-75" style="font-size: 0.8rem;">{{ $replyMessage->body }}</div>
+                    </div>
+                </div>
+            @endif
+        @endif
+
         <!-- Input Area -->
-        <div class="p-3 border-top border-secondary">
-            <form wire:submit.prevent="sendMessage" class="d-flex gap-2">
-                <input type="text" wire:model="body" class="form-control bg-transparent text-white border-secondary" placeholder="Type a message..." required>
-                <button type="submit" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        <div class="px-3 py-2" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
+            <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
+                <input type="text" wire:model="body"
+                    class="form-control text-white border-0"
+                    placeholder="Type a message..."
+                    required
+                    style="background: rgba(255,255,255,0.07); border-radius: 24px; padding: 0.5rem 1rem; font-size: 0.9rem; outline: none; box-shadow: none; border: 1px solid rgba(255,140,0,0.2) !important;">
+                <button type="submit"
+                    class="btn d-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </form>
         </div>
@@ -148,6 +252,51 @@
 
                 setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, duration);
             };
+
+            // Swipe to reply logic
+            document.addEventListener('DOMContentLoaded', () => {
+                let touchstartX = 0;
+                let touchendX = 0;
+                let currentMsgElement = null;
+                let originalTransform = '';
+
+                document.body.addEventListener('touchstart', e => {
+                    const bubble = e.target.closest('.message-wrapper');
+                    if (bubble) {
+                        touchstartX = e.changedTouches[0].screenX;
+                        currentMsgElement = bubble;
+                        originalTransform = bubble.style.transform;
+                        bubble.style.transition = 'none';
+                    }
+                }, {passive: true});
+
+                document.body.addEventListener('touchmove', e => {
+                    if (currentMsgElement) {
+                        const currentX = e.changedTouches[0].screenX;
+                        const diff = currentX - touchstartX;
+                        if (diff > 0 && diff < 80) { // Only swipe right
+                            currentMsgElement.style.transform = `translateX(${diff}px)`;
+                        }
+                    }
+                }, {passive: true});
+
+                document.body.addEventListener('touchend', e => {
+                    if (currentMsgElement) {
+                        touchendX = e.changedTouches[0].screenX;
+                        currentMsgElement.style.transition = 'transform 0.3s ease';
+                        currentMsgElement.style.transform = originalTransform;
+                        
+                        if (touchendX > touchstartX + 60) { // Trigger reply if swiped > 60px
+                            const msgId = currentMsgElement.getAttribute('data-msg-id');
+                            const wireEl = currentMsgElement.closest('[wire\\:id]');
+                            if (msgId && wireEl) {
+                                Livewire.find(wireEl.getAttribute('wire:id')).call('setReply', msgId);
+                            }
+                        }
+                        currentMsgElement = null;
+                    }
+                }, {passive: true});
+            });
         </script>
     @else
         <div class="d-flex h-100 justify-content-center align-items-center text-muted">

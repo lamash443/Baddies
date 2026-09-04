@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserPhoto extends Model
 {
-    protected $fillable = ['user_id', 'path', 'caption'];
+    protected $fillable = ['user_id', 'path', 'caption', 'is_main'];
+
+    protected $casts = [
+        'is_main' => 'boolean',
+    ];
 
     public function user(): BelongsTo
     {

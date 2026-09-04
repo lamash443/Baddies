@@ -387,7 +387,14 @@
 <body>
 <x-site-preloader />
 @php
-  $cover     = $user->profile_photo ? asset('storage/'.$user->profile_photo) : ($user->photos->first() ? asset('storage/'.$user->photos->first()->path) : asset('callboy-1.png'));
+  $mainPhoto = $user->photos->where('is_main', true)->first() ?? $user->photos->first();
+  $headerImage = $mainPhoto
+    ? asset('storage/' . $mainPhoto->path)
+    : "https://ui-avatars.com/api/?name=".urlencode(substr($user->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
+
+  $cardImage = $user->profile_photo
+    ? asset('storage/' . $user->profile_photo)
+    : $headerImage;
   $services  = $user->services ? (is_array($user->services) ? $user->services : json_decode($user->services, true)) : [];
   $services  = is_array($services) ? $services : [];
   $isVip     = $user->hasActiveSubscription() && in_array($user->subscription_plan, ['vip','prime_vip','prime-vip']);
@@ -412,7 +419,7 @@
 
 {{-- HERO --}}
 <section class="pv-hero">
-  <img class="pv-hero__bg" src="{{ $cover }}" alt="{{ $user->name }}">
+  <img class="pv-hero__bg" src="{{ $headerImage }}" alt="{{ $user->name }}">
   <div class="pv-hero__overlay"></div>
 
   {{-- Back button --}}
@@ -622,7 +629,7 @@
         <div class="pv-cta-card">
 
           <div class="pv-cta-avatar">
-            <img src="{{ $cover }}" alt="{{ $user->name }}">
+            <img src="{{ $cardImage }}" alt="{{ $user->name }}">
           </div>
 
           <div class="pv-cta-name">{{ $user->name }}</div>
@@ -739,8 +746,10 @@
     <div class="pv-similar-grid">
       @foreach($similarProfiles as $sp)
         @php
-          $spCover = $sp->profile_photo ? asset('storage/'.$sp->profile_photo)
-                   : ($sp->photos->first() ? asset('storage/'.$sp->photos->first()->path) : asset('callboy-1.png'));
+          $firstSpPhoto = $sp->photos->first();
+          $spCover = $firstSpPhoto
+            ? asset('storage/' . $firstSpPhoto->path)
+            : "https://ui-avatars.com/api/?name=".urlencode(substr($sp->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
         @endphp
         <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card">
           <img class="pv-similar-card__img" src="{{ $spCover }}" alt="{{ $sp->name }}" loading="lazy">
@@ -816,5 +825,7 @@
     .catch(console.error);
   }
 </script>
+
+<x-auth-modal />
 </body>
 </html>

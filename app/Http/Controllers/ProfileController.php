@@ -18,10 +18,31 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
         $user = $request->user();
-        $classifieds = \App\Models\Classified::where('user_id', $user->id)->latest()->get();
+        $deposits = $user->deposits()->latest()->paginate(6, ['*'], 'deposits_page')->withQueryString();
+
+        $userClassifiedsQuery = \App\Models\Classified::where('user_id', $user->id);
+        $classifiedsStats = [
+            'unpublished'   => (clone $userClassifiedsQuery)->where('payment_status', 'pending')->count(),
+            'in_moderation' => (clone $userClassifiedsQuery)->where('status', 'pending')->count(),
+            'approved'      => (clone $userClassifiedsQuery)->where('status', 'approved')->where('payment_status', 'paid')->count(),
+            'rejected'      => (clone $userClassifiedsQuery)->where('status', 'rejected')->count(),
+        ];
+        $classifieds = (clone $userClassifiedsQuery)->latest()->paginate(6, ['*'], 'classifieds_page')->withQueryString();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            if ($request->has('classifieds_page')) {
+                return response()->json([
+                    'html' => view('profile.partials.classifieds-history', ['classifieds' => $classifieds])->render()
+                ]);
+            }
+            return response()->json([
+                'html' => view('profile.partials.wallet-history', ['deposits' => $deposits])->render()
+            ]);
+        }
+
         $membershipPlans = MembershipPlan::whereNotIn('slug', ['chat'])->get();
 
         $sessions = [];
@@ -51,8 +72,9 @@ class ProfileController extends Controller
             'videos'                 => UserVideo::where('user_id', $user->id)->latest()->get(),
             'verificationSubmission' => \App\Models\VerificationSubmission::where('user_id', $user->id)->first(),
             'hasSubscription'        => $user->hasActiveSubscription(),
-            'deposits'               => $user->deposits()->latest()->get(),
+            'deposits'               => $deposits,
             'classifieds'            => $classifieds,
+            'classifiedsStats'       => $classifiedsStats,
             'membershipPlans'        => $membershipPlans,
             'sessions'               => $sessions,
         ]);
@@ -77,7 +99,7 @@ class ProfileController extends Controller
     /**
      * Upload / change the user's profile photo.
      */
-    public function uploadPhoto(Request $request): RedirectResponse
+    public function uploadPhoto(Request $request)
     {
         $request->validate([
             'profile_photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
@@ -95,7 +117,35 @@ class ProfileController extends Controller
 
         $user->update(['profile_photo' => $path]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'path' => asset('storage/' . $path)
+            ]);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'photo-updated');
+    }
+    /**
+     * Delete the user's profile photo.
+     */
+    public function deletePhoto(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+            $user->update(['profile_photo' => null]);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'initials_url' => 'https://ui-avatars.com/api/?name=' . urlencode(substr($user->name, 0, 2)) . '&background=ff8c00&color=000&size=200&bold=true'
+            ]);
+        }
+
+        return Redirect::route('profile.edit')->with('status', 'photo-deleted');
     }
 
     /**

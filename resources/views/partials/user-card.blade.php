@@ -1,6 +1,9 @@
 @php
-  // Determine profile image
-  $cover = $user->profile_photo ? asset('storage/' . $user->profile_photo) : ($user->photos->first() ? asset('storage/' . $user->photos->first()->path) : '/callboy-1.png');
+  // Listing card image: Prioritize user-selected main published photo (is_main = true), then first published photo
+  $mainPhoto = $user->photos->where('is_main', true)->first() ?? $user->photos->first();
+  $cover = $mainPhoto
+    ? asset('storage/' . $mainPhoto->path)
+    : "https://ui-avatars.com/api/?name=".urlencode(substr($user->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
   // Formatted name
   $name = $user->name ?? 'Member';
   // Age & City

@@ -62,47 +62,14 @@
     [data-bs-theme="light"] .form-select { background: #fff; color: #000; border-color: rgba(0,0,0,0.1); }
     [data-bs-theme="light"] .plan-list li { color: rgba(0,0,0,0.7); }
     [data-bs-theme="light"] .plan-list li span { color: #000; }
+    [data-bs-theme="light"] hr, [data-bs-theme="light"] .border-top, [data-bs-theme="light"] .border-bottom { border-color: rgba(0,0,0,0.1) !important; }
+    [data-bs-theme="light"] div[style*="background:rgba(255,255,255,0.03)"] { background: #f8f9fa !important; border-color: rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .text-light, [data-bs-theme="light"] .text-white { color: #111 !important; }
   </style>
 </head>
 <body>
 
-  {{-- ── TOAST NOTIFICATIONS ── --}}
-  <style>
-    .checkout-toast { position:fixed; top:5.5rem; right:2rem; z-index:99999; border-radius:14px; min-width:340px; max-width:500px; padding:0; backdrop-filter:blur(12px); box-shadow:0 12px 48px rgba(0,0,0,0.4); animation:toastSlide 0.45s cubic-bezier(0.175,0.885,0.32,1.275); transition:opacity 0.35s ease,top 0.35s ease; }
-    @keyframes toastSlide { from { transform:translateY(-20px) scale(0.93); opacity:0; } to { transform:translateY(0) scale(1); opacity:1; } }
-    .checkout-toast .toast-inner { display:flex; align-items:center; gap:1rem; padding:1rem 1.2rem; }
-    .checkout-toast .toast-icon { flex-shrink:0; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.15); }
-    .checkout-toast .toast-msg { flex:1; font-size:0.95rem; font-weight:600; letter-spacing:0.01em; line-height:1.4; }
-    .checkout-toast .toast-close { flex-shrink:0; background:none; border:none; color:inherit; opacity:0.7; cursor:pointer; padding:4px; border-radius:50%; transition:opacity 0.2s; }
-    .checkout-toast .toast-close:hover { opacity:1; }
-    .toast-success { background:rgba(25,135,84,0.95); color:#fff; border:1px solid rgba(40,167,69,0.5); }
-    .toast-error { background:rgba(220,53,69,0.95); color:#fff; border:1px solid rgba(220,53,69,0.5); }
-  </style>
-
-  @if(session('success'))
-    <div id="successToast" class="checkout-toast toast-success" role="alert">
-      <div class="toast-inner">
-        <div class="toast-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div class="toast-msg"><div style="font-size:0.78rem;opacity:0.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Success</div>{{ session('success') }}</div>
-        <button class="toast-close" onclick="dismissToast('successToast')" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-    </div>
-  @endif
-
-  @if($errors->has('wallet') || $errors->any())
-    <div id="errorToast" class="checkout-toast toast-error" role="alert">
-      <div class="toast-inner">
-        <div class="toast-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <div class="toast-msg"><div style="font-size:0.78rem;opacity:0.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Payment Failed</div>{{ $errors->first('wallet') ?: $errors->first() }}</div>
-        <button class="toast-close" onclick="dismissToast('errorToast')" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-    </div>
-  @endif
-
-  <script>
-    function dismissToast(id) { const t=document.getElementById(id); if(t){t.style.opacity='0';t.style.transform='translateY(-20px) scale(0.93)';setTimeout(()=>t.style.display='none',350);} }
-    ['successToast','errorToast'].forEach(id => setTimeout(()=>dismissToast(id),6000));
-  </script>
+  <x-checkout-toast />
 
 
 
@@ -175,7 +142,7 @@
       <!-- Right Column: Checkout Form -->
       <div class="col-12 col-lg-7 col-xl-8" x-data="{ 
         step: 1, 
-        planPrice: {{ $plan?->pricing ? max(array_values($plan->pricing)) : 4000 }}, 
+        planPrice: {{ $plan?->pricing ? max(array_values($plan->pricing)) : 2000 }}, 
         planDays: {{ $plan?->pricing ? array_key_last($plan->pricing) : 30 }},
         paymentMethod: 'mpesa',
         mpesaPhone: '', 
@@ -186,8 +153,9 @@
             @csrf
 
 
+
             <input type="hidden" name="plan_type" value="vip">
-            
+
             <!-- STEP 1: Plan Details -->
             <div x-show="step === 1" x-transition>
               <div class="row g-4 mb-4">
@@ -211,6 +179,12 @@
                   </select>
                 </div>
               </div>
+              <div class="mt-2" x-show="paymentMethod === 'mpesa'">
+                <span class="fee-note">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  {{ __('Transaction Fee:') }} <strong>0% + 0</strong> &mdash; {{ __('No hidden charges on MPESA.') }}
+                </span>
+              </div>
 
               <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
 
@@ -229,12 +203,15 @@
                 <button type="button" class="btn text-light py-2 py-sm-3 px-1 px-sm-3 fs-6 fs-sm-5 fw-medium w-50 d-flex align-items-center justify-content-center" style="border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="history.back()">
                   {{ __('Back') }}
                 </button>
+                <!-- If wallet selected, submit directly. If MPESA, go to step 2 -->
                 <button type="button" class="btn btn-orange py-2 py-sm-3 px-1 px-sm-3 fs-6 fs-sm-5 w-50 d-flex align-items-center justify-content-center text-center" style="border-radius:12px; line-height:1.2;"
                   @click="if(paymentMethod === 'wallet') { $el.closest('form').submit(); } else { step = 2; window.scrollTo({top: 0, behavior: 'smooth'}); }">
                   <span>{{ __('Pay & Subscribe') }}</span>
                 </button>
               </div>
-                <!-- STEP 2: M-PESA Phone Input (AJAX) -->
+            </div>
+
+            <!-- STEP 2: M-PESA Phone Input (AJAX) -->
             <div x-show="step === 2" style="display:none;" x-cloak x-transition>
               <!-- Stepper -->
               <div class="d-flex justify-content-between align-items-center mb-5 position-relative px-4">
@@ -299,13 +276,12 @@
                 <button class="btn-retry" id="rc-retry-timeout"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg> Try Again</button>
               </div>
 
-              <div class="d-flex justify-content-between mt-4">
-                <button type="button" id="rc-back-btn" class="btn btn-outline-secondary px-4 py-3" @click="step = 1; window.scrollTo({top: 0, behavior: 'smooth'});">{{ __('Back') }}</button>
-                <button type="button" id="rc-submit-btn" class="btn py-3 fw-bold rounded-2 d-flex align-items-center justify-content-center gap-2 flex-grow-1 ms-3 btn-orange" style="font-size:1.05rem; letter-spacing:0.5px;" :disabled="mpesaPhone.length < 9" :class="{ 'opacity-75': mpesaPhone.length < 9 }">
+              <div class="mt-4">
+                <button type="button" id="rc-submit-btn" class="btn py-2 fw-bold rounded-2 d-flex align-items-center justify-content-center gap-2 w-100 btn-orange" style="font-size:0.92rem; letter-spacing:0.4px; height:48px;" :disabled="mpesaPhone.length < 9" :class="{ 'opacity-75': mpesaPhone.length < 9 }">
                   <template x-if="!loading">
                     <span class="d-flex align-items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                      Send Payment Request to Phone
+                      Send Payment Request
                     </span>
                   </template>
                   <template x-if="loading">
@@ -378,7 +354,7 @@
   </style>
 
   <script>
-    // MPESA fetch-based payment
+    // MPESA fetch-based payment for regular-checkout
     (function() {
       const RC_PANELS = ['waiting','success','cancelled','failed','timeout'];
       function rcShowPanel(name) {
@@ -482,3 +458,4 @@
   </script>
 </body>
 </html>
+

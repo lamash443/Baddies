@@ -69,6 +69,37 @@
     .btn-orange:hover {
       background: orange; color: #000; box-shadow: 0 0 18px 4px rgba(255, 165, 0, 0.55);
     }
+
+    /* LIGHT THEME */
+    [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .dashboard-title { color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header p { color:#444444 !important; }
+    [data-bs-theme="light"] .dash-card {
+      background:#ffffff !important;
+      border:1px solid rgba(255,140,0,0.3) !important;
+      box-shadow:0 6px 25px rgba(0,0,0,0.05) !important;
+      color:#111 !important;
+    }
+    [data-bs-theme="light"] .stat-card {
+      background:#ffffff !important;
+      border:1.5px solid rgba(255,140,0,0.35) !important;
+      box-shadow:0 4px 15px rgba(255,140,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .stat-icon {
+      background:rgba(255,140,0,0.12) !important;
+      border:1px solid rgba(255,140,0,0.3) !important;
+    }
+    [data-bs-theme="light"] .stat-value { color:#111111 !important; }
+    [data-bs-theme="light"] .stat-label { color:#444444 !important; }
+    [data-bs-theme="light"] .activity-overview-title { color:#111111 !important; }
+    [data-bs-theme="light"] .stats-period-select {
+      background-color:#ffffff !important;
+      color:#111111 !important;
+      border:1px solid rgba(0,0,0,0.2) !important;
+      box-shadow:0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .border-top { border-top-color:rgba(0,0,0,0.12) !important; }
   </style>
 </head>
 <body>
@@ -77,7 +108,7 @@
   <div class="dashboard-header">
     <div class="container text-center">
       <h1 class="dashboard-title">Profile <span>Statistics</span></h1>
-      <p style="color:rgba(255,255,255,0.6); max-width:600px; margin:0 auto;">
+      <p style="max-width:600px; margin:0 auto;">
         Track the engagement on your public profile. See how many people are checking you out and trying to reach you.
       </p>
     </div>
@@ -112,13 +143,12 @@
           </div>
         </div>
       </div>
-      </div>
       
       <!-- Chart Section -->
-      <div class="mt-5 pt-4 border-top border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
+      <div class="mt-5 pt-4 border-top">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="fw-bold mb-0" style="font-size:1.5rem;">Activity Overview</h3>
-          <select id="periodSelect" name="period" class="form-select form-select-sm bg-dark text-light border-secondary" style="width: auto; cursor:pointer;">
+          <h3 class="fw-bold mb-0 activity-overview-title" style="font-size:1.5rem;">Activity Overview</h3>
+          <select id="periodSelect" name="period" class="form-select form-select-sm stats-period-select" style="width: auto; cursor:pointer;">
             <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>Today</option>
             <option value="7" {{ request('period') == '7' ? 'selected' : '' }}>Last 7 Days</option>
             <option value="30" {{ request('period', '30') == '30' ? 'selected' : '' }}>Last 30 Days</option>
@@ -146,6 +176,23 @@
   <script>
     const ctx = document.getElementById('statsChart').getContext('2d');
     
+    function getThemeColors() {
+      const currentTheme = document.documentElement.getAttribute('data-bs-theme') || localStorage.getItem('theme') || 'dark';
+      const isLight = currentTheme === 'light';
+      return {
+        isLight: isLight,
+        textColor: isLight ? '#111111' : 'rgba(255, 255, 255, 0.85)',
+        subTextColor: isLight ? '#222222' : 'rgba(255, 255, 255, 0.65)',
+        gridColor: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.07)',
+        tooltipBg: isLight ? '#ffffff' : 'rgba(17, 17, 17, 0.95)',
+        tooltipTitle: isLight ? '#111111' : '#ffffff',
+        tooltipBody: isLight ? '#333333' : 'rgba(255, 255, 255, 0.85)',
+        tooltipBorder: isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 140, 0, 0.3)'
+      };
+    }
+
+    let colors = getThemeColors();
+
     // Gradients
     const viewsGradient = ctx.createLinearGradient(0, 0, 0, 400);
     viewsGradient.addColorStop(0, 'rgba(255, 140, 0, 0.5)');
@@ -167,7 +214,7 @@
             backgroundColor: viewsGradient,
             borderWidth: 3,
             pointBackgroundColor: '#ff8c00',
-            pointBorderColor: '#111',
+            pointBorderColor: colors.isLight ? '#ffffff' : '#111111',
             pointBorderWidth: 2,
             pointRadius: 4,
             pointHoverRadius: 6,
@@ -181,7 +228,7 @@
             backgroundColor: callsGradient,
             borderWidth: 3,
             pointBackgroundColor: '#00c8ff',
-            pointBorderColor: '#111',
+            pointBorderColor: colors.isLight ? '#ffffff' : '#111111',
             pointBorderWidth: 2,
             pointRadius: 4,
             pointHoverRadius: 6,
@@ -199,13 +246,13 @@
         },
         plugins: {
           legend: {
-            labels: { color: 'rgba(255, 255, 255, 0.8)', font: { family: 'Outfit', size: 14 } }
+            labels: { color: colors.textColor, font: { family: 'Outfit', size: 14, weight: '600' } }
           },
           tooltip: {
-            backgroundColor: 'rgba(17, 17, 17, 0.9)',
-            titleColor: '#fff',
-            bodyColor: 'rgba(255, 255, 255, 0.8)',
-            borderColor: 'rgba(255, 140, 0, 0.3)',
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
             borderWidth: 1,
             padding: 12,
             displayColors: true,
@@ -215,16 +262,34 @@
         },
         scales: {
           x: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-            ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { family: 'Outfit' } }
+            grid: { color: colors.gridColor, drawBorder: false },
+            ticks: { color: colors.subTextColor, font: { family: 'Outfit', size: 12, weight: '600' } }
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
-            ticks: { color: 'rgba(255, 255, 255, 0.5)', font: { family: 'Outfit' }, stepSize: 1, beginAtZero: true }
+            grid: { color: colors.gridColor, drawBorder: false },
+            ticks: { color: colors.subTextColor, font: { family: 'Outfit', size: 12, weight: '600' }, stepSize: 1, beginAtZero: true }
           }
         }
       }
     });
+
+    // Observe theme toggle dynamically
+    const themeObserver = new MutationObserver(function() {
+      const c = getThemeColors();
+      statsChart.options.plugins.legend.labels.color = c.textColor;
+      statsChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+      statsChart.options.plugins.tooltip.titleColor = c.tooltipTitle;
+      statsChart.options.plugins.tooltip.bodyColor = c.tooltipBody;
+      statsChart.options.plugins.tooltip.borderColor = c.tooltipBorder;
+      statsChart.options.scales.x.grid.color = c.gridColor;
+      statsChart.options.scales.x.ticks.color = c.subTextColor;
+      statsChart.options.scales.y.grid.color = c.gridColor;
+      statsChart.options.scales.y.ticks.color = c.subTextColor;
+      statsChart.data.datasets[0].pointBorderColor = c.isLight ? '#ffffff' : '#111111';
+      statsChart.data.datasets[1].pointBorderColor = c.isLight ? '#ffffff' : '#111111';
+      statsChart.update();
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
 
     document.getElementById('periodSelect').addEventListener('change', function() {
       const period = this.value;

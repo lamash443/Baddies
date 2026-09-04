@@ -257,8 +257,18 @@
     [data-bs-theme="light"] .home-hero__bg { background: linear-gradient(160deg, #f4f6f9 0%, #fff4e6 40%, #f4f6f9 100%); }
     [data-bs-theme="light"] .home-hero__title { color: #111; }
     [data-bs-theme="light"] .home-hero__sub { color: rgba(0,0,0,0.65); }
-    [data-bs-theme="light"] .home-section-title { color: #111; }
-    [data-bs-theme="light"] .home-section-sub { color: rgba(0,0,0,0.6); }
+    [data-bs-theme="light"] .home-section-title { color: #111 !important; }
+    [data-bs-theme="light"] .home-section-sub { color: rgba(0,0,0,0.65) !important; }
+    [data-bs-theme="light"] .empty-listing-notice,
+    [data-bs-theme="light"] div[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] p[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] span[style*="color:rgba(255,255,255"] {
+      color: rgba(0,0,0,0.65) !important;
+    }
+    [data-bs-theme="light"] .empty-listing-notice a {
+      color: #e67e00 !important;
+      font-weight: 700;
+    }
     
     [data-bs-theme="light"] .cat-card { background: linear-gradient(145deg, #ffffff, #fdfdfd); border-color: rgba(255,140,0,0.25); color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
     [data-bs-theme="light"] .cat-card:hover { border-color: rgba(255,140,0,0.6); box-shadow: 0 8px 25px rgba(255,140,0,0.15); color: #ff8c00; }
@@ -581,7 +591,7 @@
       @forelse($vipGirls as $user)
         @include('partials.user-card', ['user' => $user])
       @empty
-        <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
+        <div class="col-12 text-center py-4 empty-listing-notice" style="font-size:.9rem;">
           No VIP girls listed yet. <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register" style="color:#ff8c00;">Subscribe to VIP</a> to appear here.
         </div>
       @endforelse
@@ -605,7 +615,7 @@
       @forelse($primeVipGirls as $user)
         @include('partials.user-card', ['user' => $user])
       @empty
-        <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
+        <div class="col-12 text-center py-4 empty-listing-notice" style="font-size:.9rem;">
           No Prime VIP girls listed yet. <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register" style="color:#ff8c00;">Subscribe to Prime VIP</a> to appear here.
         </div>
       @endforelse
@@ -629,7 +639,7 @@
       @forelse($primeGirls as $user)
         @include('partials.user-card', ['user' => $user])
       @empty
-        <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
+        <div class="col-12 text-center py-4 empty-listing-notice" style="font-size:.9rem;">
           No Prime girls listed yet. <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register" style="color:#ff8c00;">Subscribe to Prime</a> to appear here.
         </div>
       @endforelse
@@ -653,7 +663,7 @@
       @forelse($regularGirls as $user)
         @include('partials.user-card', ['user' => $user])
       @empty
-        <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
+        <div class="col-12 text-center py-4 empty-listing-notice" style="font-size:.9rem;">
           No profiles listed yet. <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register" style="color:#ff8c00;">Create a free account</a> to get listed.
         </div>
       @endforelse

@@ -112,14 +112,403 @@
       transform: translateY(-1px);
     }
 
-    /* LIGHT THEME */
-    [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }
-    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.1); }
-    [data-bs-theme="light"] .dashboard-sub { color:rgba(0,0,0,0.6); }
-    [data-bs-theme="light"] .dash-card { background:#fff; border-color:rgba(255,140,0,0.3); box-shadow:0 5px 20px rgba(0,0,0,0.05); }
-    [data-bs-theme="light"] .dash-card-title { color:#000; }
-    [data-bs-theme="light"] .dash-card-text { color:rgba(0,0,0,0.6); }
-    /* â”€â”€ PROFILE AVATAR CARD â”€â”€ */
+    /* LIGHT THEME OVERRIDES */
+    [data-bs-theme="light"] body {
+      background: #f4f5f8 !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dashboard-header {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .dashboard-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dashboard-sub {
+      color: rgba(0,0,0,0.6) !important;
+    }
+    [data-bs-theme="light"] .dash-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dash-card-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dash-card-text {
+      color: rgba(0,0,0,0.65) !important;
+    }
+
+    /* Text utility overrides in light mode */
+    [data-bs-theme="light"] .text-white,
+    [data-bs-theme="light"] .text-light,
+    [data-bs-theme="light"] .text-white-50 {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .text-secondary {
+      color: #666666 !important;
+    }
+
+    /* Sidebar Navigation Card */
+    [data-bs-theme="light"] .side-nav-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .side-nav-title {
+      color: rgba(0,0,0,0.45) !important;
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link {
+      color: rgba(0,0,0,0.7) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link:hover {
+      background: rgba(255,140,0,0.08) !important;
+      color: #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active {
+      background: rgba(255,140,0,0.12) !important;
+      color: #ff8c00 !important;
+    }
+
+    /* Form Controls & Inputs */
+    [data-bs-theme="light"] .form-label,
+    [data-bs-theme="light"] .settings-field-label {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .form-control,
+    [data-bs-theme="light"] .form-select,
+    [data-bs-theme="light"] .settings-input,
+    [data-bs-theme="light"] .settings-select {
+      background-color: #f9f9fb !important;
+      border: 1px solid rgba(0,0,0,0.15) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .form-control:focus,
+    [data-bs-theme="light"] .form-select:focus,
+    [data-bs-theme="light"] .settings-input:focus,
+    [data-bs-theme="light"] .settings-select:focus {
+      background-color: #ffffff !important;
+      border-color: orange !important;
+      color: #111111 !important;
+      box-shadow: 0 0 0 3px rgba(255,165,0,0.15) !important;
+    }
+    [data-bs-theme="light"] .form-control option,
+    [data-bs-theme="light"] .form-select option,
+    [data-bs-theme="light"] .settings-select option {
+      background-color: #ffffff !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .form-control::placeholder,
+    [data-bs-theme="light"] .settings-input::placeholder {
+      color: #888888 !important;
+    }
+    [data-bs-theme="light"] .form-control[readonly] {
+      background-color: #eef0f3 !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: #666666 !important;
+    }
+
+    /* Settings Tab */
+    [data-bs-theme="light"] .settings-wallet-card,
+    [data-bs-theme="light"] .settings-form-card,
+    [data-bs-theme="light"] .settings-sessions-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .settings-section-label {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-group-label {
+      color: #e67e00 !important;
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .settings-select-current {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-balance-inner {
+      background: rgba(255,140,0,0.06) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .settings-balance-amount,
+    [data-bs-theme="light"] .settings-balance-num {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-balance-sub,
+    [data-bs-theme="light"] .settings-help-text {
+      color: rgba(0,0,0,0.65) !important;
+    }
+    [data-bs-theme="light"] .settings-save-footer {
+      border-top-color: rgba(0,0,0,0.1) !important;
+    }
+    
+    .profile-stats-divider {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .profile-stats-vsep {
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    [data-bs-theme="light"] .profile-stats-divider {
+      border-top: 1px solid rgba(0,0,0,0.1) !important;
+      border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+    }
+    [data-bs-theme="light"] .profile-stats-vsep {
+      background: rgba(0,0,0,0.1) !important;
+    }
+
+    /* MAIN CARD IMAGE BUTTON & BADGE STYLES */
+    .btn-set-main-card {
+      background: rgba(0, 0, 0, 0.85) !important;
+      color: #ff8c00 !important;
+      border: 1.5px solid #ff8c00 !important;
+      font-size: 0.68rem !important;
+      font-weight: 700 !important;
+      padding: 0.35rem 0.65rem !important;
+      border-radius: 4px !important;
+      cursor: pointer !important;
+      transition: all 0.25s ease-in-out !important;
+      letter-spacing: 0.03em !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+    .btn-set-main-card:hover {
+      background: #ff8c00 !important;
+      color: #000000 !important;
+      border-color: #ff8c00 !important;
+      box-shadow: 0 0 14px 2px rgba(255, 140, 0, 0.65) !important;
+      transform: translateY(-1px) !important;
+    }
+    .btn-set-main-card:active {
+      transform: translateY(0) !important;
+    }
+    .btn-main-card-badge {
+      background: linear-gradient(135deg, #ff8c00, #ffb347) !important;
+      color: #000000 !important;
+      border: 1px solid #ff8c00 !important;
+      font-size: 0.68rem !important;
+      font-weight: 800 !important;
+      padding: 0.35rem 0.65rem !important;
+      border-radius: 4px !important;
+      letter-spacing: 0.03em !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.25rem !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+    [data-bs-theme="light"] .settings-sessions-card .list-group {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .settings-sessions-card .list-group-item {
+      background: #f8f9fa !important;
+      border-color: rgba(0,0,0,0.08) !important;
+      color: #111111 !important;
+    }
+
+    /* Photos & Videos Sidebar Cards */
+    [data-bs-theme="light"] .photos-sidebar-card,
+    [data-bs-theme="light"] .videos-sidebar-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .photos-locked-title {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .photos-locked-sub {
+      color: #666666 !important;
+    }
+    [data-bs-theme="light"] .media-upload-drop {
+      background: rgba(255,140,0,0.03) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .media-upload-drop span {
+      color: #444444 !important;
+    }
+
+    /* Photo Management Overlay Modal */
+    [data-bs-theme="light"] .photo-mgmt-panel {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.12) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header {
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header-sub {
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-close {
+      background: rgba(0,0,0,0.05) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn--upload {
+      background: rgba(255,140,0,0.06) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn-label {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn-desc {
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-divider {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+
+    /* Delete Account Modal */
+    [data-bs-theme="light"] .del-modal {
+      background: #ffffff !important;
+      border-color: rgba(220,53,69,0.3) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__header {
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .del-modal__close {
+      background: rgba(0,0,0,0.05) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: rgba(0,0,0,0.5) !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-box {
+      background: rgba(220,53,69,0.05) !important;
+      border-color: rgba(220,53,69,0.2) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-title {
+      color: #c82333 !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-list li {
+      color: #444444 !important;
+    }
+    [data-bs-theme="light"] .del-modal__label {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .del-modal__input {
+      background: #f9f9fb !important;
+      border-color: rgba(0,0,0,0.15) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__footer {
+      border-top-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .del-modal__btn-cancel {
+      background: rgba(0,0,0,0.05) !important;
+      color: #444444 !important;
+      border-color: rgba(0,0,0,0.1) !important;
+    }
+
+    /* Tables, Borders & Spans */
+    [data-bs-theme="light"] .table { color: #111111 !important; }
+    [data-bs-theme="light"] .table th,
+    [data-bs-theme="light"] .table td {
+      border-color: rgba(0,0,0,0.08) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .input-group-text {
+      background-color: rgba(255,140,0,0.1) !important;
+      border-color: rgba(0,0,0,0.15) !important;
+      color: #e67e00 !important;
+    }
+    [data-bs-theme="light"] div[style*="border-color: rgba(255,255,255"] {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] div[style*="background: rgba(0,0,0,0.2)"] {
+      background: #f8f9fa !important;
+    }
+    [data-bs-theme="light"] h4[style*="color:#fff"],
+    [data-bs-theme="light"] h4[style*="color: #fff"] {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] p[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] span[style*="color:rgba(255,255,255"] {
+      color: rgba(0,0,0,0.65) !important;
+    }
+
+    /* PAGINATION STYLING FOR WALLET & TABLES */
+    .pagination { gap: 3px; margin-bottom: 0; }
+    .pagination .page-item .page-link {
+      background: transparent;
+      border: 1px solid rgba(255,140,0,0.25);
+      color: orange;
+      padding: 0.32rem 0.7rem;
+      border-radius: 6px !important;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: "Outfit", sans-serif;
+      transition: all 0.2s ease;
+      box-shadow: none;
+    }
+    .pagination .page-item.active .page-link {
+      background: orange !important;
+      border-color: orange !important;
+      color: #000 !important;
+      font-weight: 800;
+      box-shadow: 0 0 12px rgba(255,165,0,0.4) !important;
+    }
+    .pagination .page-item.disabled .page-link {
+      background: transparent !important;
+      border-color: rgba(255,255,255,0.08) !important;
+      color: rgba(255,255,255,0.25) !important;
+    }
+    .pagination .page-item .page-link:hover:not(.active) {
+      background: rgba(255,140,0,0.15) !important;
+      border-color: orange !important;
+      color: orange !important;
+    }
+    [data-bs-theme="light"] .pagination .page-item.disabled .page-link {
+      border-color: rgba(0,0,0,0.08) !important;
+      color: rgba(0,0,0,0.3) !important;
+    }
+
+    /* Mobile Pagination Spacing (Previous on Left, Next on Right) */
+    @media (max-width: 575.98px) {
+      nav, nav > div, .pagination {
+        width: 100% !important;
+      }
+      .pagination {
+        display: flex !important;
+        justify-content: space-between !important;
+      }
+      .pagination .page-item:first-child,
+      .pagination .page-item:has(a[rel="prev"]) {
+        margin-right: auto !important;
+      }
+      .pagination .page-item:last-child,
+      .pagination .page-item:has(a[rel="next"]) {
+        margin-left: auto !important;
+      }
+    }
+
+    /* Table Transparent Background Overrides for Wallet & Classifieds History */
+    #walletHistoryContainer, #classifiedsHistoryContainer,
+    #walletHistoryContainer table, #classifiedsHistoryContainer table,
+    #walletHistoryContainer tr, #classifiedsHistoryContainer tr,
+    #walletHistoryContainer th, #classifiedsHistoryContainer th,
+    #walletHistoryContainer td, #classifiedsHistoryContainer td {
+      background: transparent !important;
+      background-color: transparent !important;
+      --bs-table-bg: transparent !important;
+      --bs-table-accent-bg: transparent !important;
+      --bs-table-striped-bg: transparent !important;
+      --bs-table-hover-bg: transparent !important;
+    }
+
+    /* ── PROFILE AVATAR CARD ── */
     .profile-avatar-wrap {
       position: relative;
       width: 120px; height: 120px;
@@ -127,62 +516,256 @@
       cursor: pointer;
       margin: 0 auto;
       overflow: hidden;
-      border: 2.5px solid rgba(255,140,0,0.5);
+      border: 3px solid rgba(255,140,0,0.5);
       background: rgba(255,140,0,0.07);
-      transition: border-color 0.3s ease;
+      box-shadow: 0 0 0 5px rgba(255,140,0,0.08), 0 8px 24px rgba(0,0,0,0.4);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    .profile-avatar-wrap:hover { border-color: orange; }
+    .profile-avatar-wrap:hover { border-color: #ff8c00; box-shadow: 0 0 0 6px rgba(255,140,0,0.18), 0 0 30px rgba(255,140,0,0.2); }
     .profile-avatar-img {
       width: 100%; height: 100%;
       object-fit: cover;
       border-radius: 50%;
       display: block;
     }
-    .profile-avatar-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-    }
     .profile-avatar-overlay {
       position: absolute; inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.72) 100%);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       color: #fff;
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.28s ease;
       border-radius: 50%;
+      gap: 4px;
     }
     .profile-avatar-wrap:hover .profile-avatar-overlay { opacity: 1; }
-    .alert-photo-success {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(40,167,69,0.12);
-      border: 1px solid rgba(40,167,69,0.35);
-      color: #28a745;
-      border-radius: 8px;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem; font-weight: 600;
+
+    /* ── PHOTO MANAGEMENT PANEL ── */
+    .photo-mgmt-backdrop {
+      display: none;
+      position: fixed; inset: 0; z-index: 1060;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      animation: mgmtFadeIn 0.2s ease both;
     }
+    .photo-mgmt-backdrop.open { display: flex; }
+    @keyframes mgmtFadeIn { from{opacity:0} to{opacity:1} }
+    .photo-mgmt-panel {
+      background: linear-gradient(160deg, #1a1100 0%, #111 60%, #0d0d0d 100%);
+      border: 1px solid rgba(255,140,0,0.28);
+      border-radius: 20px;
+      padding: 0;
+      width: 320px;
+      max-width: calc(100vw - 2rem);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,140,0,0.1), 0 0 60px rgba(255,140,0,0.06);
+      animation: mgmtSlideUp 0.3s cubic-bezier(0.34,1.4,0.64,1) both;
+      overflow: hidden;
+    }
+    @keyframes mgmtSlideUp { from{opacity:0;transform:translateY(24px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .photo-mgmt-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255,140,0,0.12);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .photo-mgmt-header-icon {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(255,140,0,0.12); border: 1px solid rgba(255,140,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: #ff8c00;
+    }
+    .photo-mgmt-header-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2; margin: 0; }
+    .photo-mgmt-header-sub  { font-size: 0.73rem; color: rgba(255,255,255,0.4); margin: 0; }
+    .photo-mgmt-close {
+      margin-left: auto; flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.45); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .photo-mgmt-close:hover { background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.4); color: #ff8c00; }
+    .photo-mgmt-preview {
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .photo-mgmt-avatar {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,140,0,0.4);
+      object-fit: cover;
+      box-shadow: 0 0 16px rgba(255,140,0,0.18);
+    }
+    .photo-mgmt-info { flex: 1; min-width: 0; }
+    .photo-mgmt-name { font-size: 0.9rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 0 0.2rem; }
+    .photo-mgmt-hint { font-size: 0.72rem; color: rgba(255,255,255,0.38); margin: 0; line-height: 1.4; }
+    .photo-mgmt-actions {
+      padding: 0 1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .photo-mgmt-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      width: 100%; padding: 0.8rem 1rem;
+      border-radius: 12px; border: 1.5px solid transparent;
+      font-family: "Outfit", sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; text-align: left; text-decoration: none;
+      transition: all 0.22s ease;
+    }
+    .photo-mgmt-btn-icon {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.22s;
+    }
+    .photo-mgmt-btn--upload {
+      background: rgba(255,140,0,0.08); border-color: rgba(255,140,0,0.25); color: #fff;
+    }
+    .photo-mgmt-btn--upload .photo-mgmt-btn-icon { background: rgba(255,140,0,0.15); color: #ff8c00; }
+    .photo-mgmt-btn--upload:hover {
+      background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.55); color: #fff;
+      box-shadow: 0 0 20px rgba(255,140,0,0.12);
+    }
+    .photo-mgmt-btn--upload:hover .photo-mgmt-btn-icon { background: rgba(255,140,0,0.28); }
+    .photo-mgmt-btn--remove {
+      background: rgba(220,53,69,0.06); border-color: rgba(220,53,69,0.18); color: rgba(255,255,255,0.65);
+    }
+    .photo-mgmt-btn--remove .photo-mgmt-btn-icon { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .photo-mgmt-btn--remove:hover {
+      background: rgba(220,53,69,0.14); border-color: rgba(220,53,69,0.45); color: #ff6b77;
+      box-shadow: 0 0 20px rgba(220,53,69,0.1);
+    }
+    .photo-mgmt-btn--remove:hover .photo-mgmt-btn-icon { background: rgba(220,53,69,0.22); }
+    .photo-mgmt-btn-text { flex: 1; }
+    .photo-mgmt-btn-label { display: block; font-size: 0.88rem; font-weight: 600; line-height: 1.2; }
+    .photo-mgmt-btn-desc  { display: block; font-size: 0.71rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .photo-mgmt-btn--upload .photo-mgmt-btn-desc { color: rgba(255,200,100,0.5); }
+    .photo-mgmt-btn-arrow { color: rgba(255,255,255,0.2); transition: transform 0.2s; }
+    .photo-mgmt-btn:hover .photo-mgmt-btn-arrow { transform: translateX(3px); color: rgba(255,255,255,0.45); }
+    .photo-mgmt-divider { margin: 0 1rem 0.6rem; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
   </style>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
+    function openPhotoMgmt() {
+      document.getElementById('photoMgmtBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closePhotoMgmt() {
+      document.getElementById('photoMgmtBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function showDynamicToast(title, message) {
+      const toastHtml = `
+      <div class="success-toast" id="dynamicToast" role="alert" aria-live="assertive" style="z-index: 999999;">
+        <div class="success-toast__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="success-toast__body">
+          <p class="success-toast__title">${title}</p>
+          <p class="success-toast__msg">${message}</p>
+        </div>
+        <button class="success-toast__close" onclick="this.closest('.success-toast').remove();" aria-label="Dismiss">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <div class="success-toast__bar"></div>
+      </div>`;
+      
+      const existing = document.getElementById('dynamicToast');
+      if (existing) existing.remove();
+      
+      document.body.insertAdjacentHTML('beforeend', toastHtml);
+      setTimeout(() => {
+        const t = document.getElementById('dynamicToast');
+        if (t) t.remove();
+      }, 6000);
+    }
     function previewAndSubmit(input) {
       if (!input.files || !input.files[0]) return;
+      closePhotoMgmt();
       var file = input.files[0];
       var reader = new FileReader();
       reader.onload = function(e) {
         var preview = document.getElementById('avatarPreview');
         var placeholder = document.getElementById('avatarPlaceholder');
-        preview.src = e.target.result;
-        preview.style.display = 'block';
+        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
         if (placeholder) placeholder.style.display = 'none';
       };
       reader.readAsDataURL(file);
-      // Show uploading spinner then auto-submit
-      document.getElementById('photoUploadStatus').style.display = 'flex';
-      setTimeout(function() {
-        document.getElementById('photoUploadForm').submit();
-      }, 300);
+      
+      var spinner = document.getElementById('photoUploadStatus');
+      if (spinner) spinner.style.display = 'flex';
+      
+      var formData = new FormData();
+      formData.append('profile_photo', file);
+      formData.append('_token', '{{ csrf_token() }}');
+      
+      fetch('{{ route("profile.photo") }}', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (spinner) spinner.style.display = 'none';
+        if (data.status === 'success') {
+          showDynamicToast('Photo Published', 'Your profile photo has been successfully updated.');
+          var removeBtn = document.getElementById('btnRemovePhoto');
+          if (removeBtn) removeBtn.style.display = 'flex';
+          var divider = document.getElementById('photoMgmtDivider');
+          if (divider) divider.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        if (spinner) spinner.style.display = 'none';
+        alert('Upload failed');
+      });
+      input.value = ''; // reset so same file can be selected again
     }
+    function confirmRemovePhoto() {
+      closePhotoMgmt();
+      if (confirm('Are you sure you want to remove your profile photo?')) {
+        var spinner = document.getElementById('photoUploadStatus');
+        if (spinner) spinner.style.display = 'flex';
+        
+        var formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('_method', 'DELETE');
+
+        fetch('{{ route("profile.photo.delete") }}', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (spinner) spinner.style.display = 'none';
+          if (data.status === 'success') {
+            var preview = document.getElementById('avatarPreview');
+            if (preview) preview.src = data.initials_url;
+            showDynamicToast('Photo Removed', 'Your profile photo has been successfully removed.');
+            var removeBtn = document.getElementById('btnRemovePhoto');
+            if (removeBtn) removeBtn.style.display = 'none';
+            var divider = document.getElementById('photoMgmtDivider');
+            if (divider) divider.style.display = 'none';
+          }
+        })
+        .catch(error => {
+          if (spinner) spinner.style.display = 'none';
+          alert('Delete failed');
+        });
+      }
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closePhotoMgmt();
+    });
   </script>
 </head>
 <body>
@@ -199,73 +782,118 @@
         <div class="dash-card p-4">
           <div class="mb-4 text-center">
 
-            {{-- ── Avatar with click-to-change overlay ── --}}
-            <form id="photoUploadForm" action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data">
+            {{-- ── Hidden forms ── --}}
+            <form id="photoUploadForm" action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data" style="display:none;">
               @csrf
-              <div class="profile-avatar-wrap mx-auto mb-3" onclick="document.getElementById('profilePhotoInput').click()" title="Click to change photo">
-                @if(auth()->user()->profile_photo)
-                  <img id="avatarPreview"
-                       src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
-                       alt="Profile Photo"
-                       class="profile-avatar-img" />
-                @else
-                  <img id="avatarPreview"
-                       src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=ff8c00&color=000&size=200&bold=true"
-                       alt="Profile Photo"
-                       class="profile-avatar-img" />
-                  <div id="avatarPlaceholder" class="profile-avatar-placeholder" style="display:none;">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.6)" stroke-width="1.5">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
+              <input type="file" id="profilePhotoInput" name="profile_photo"
+                     accept="image/jpeg,image/png,image/webp,image/gif"
+                     onchange="previewAndSubmit(this)" />
+              @error('profile_photo')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+              @enderror
+            </form>
+
+            @if(auth()->user()->profile_photo)
+            <form id="deletePhotoForm" action="{{ route('profile.photo.delete') }}" method="POST" style="display:none;">
+              @csrf @method('DELETE')
+            </form>
+            @endif
+
+            {{-- ── Avatar ── --}}
+            <div class="profile-avatar-wrap mx-auto mb-3" onclick="openPhotoMgmt()" title="Manage profile photo">
+              @if(auth()->user()->profile_photo)
+                <img id="avatarPreview"
+                     src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                     alt="Profile Photo" class="profile-avatar-img" />
+              @else
+                <img id="avatarPreview"
+                     src="https://ui-avatars.com/api/?name={{ urlencode(substr(auth()->user()->name, 0, 2)) }}&background=ff8c00&color=000&size=200&bold=true"
+                     alt="Profile Photo" class="profile-avatar-img" />
+              @endif
+              {{-- Hover overlay --}}
+              <div class="profile-avatar-overlay">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span style="font-size:0.68rem;font-weight:700;letter-spacing:0.04em;margin-top:4px;">MANAGE</span>
+              </div>
+              {{-- Upload spinner overlay --}}
+              <div id="photoUploadStatus" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;border-radius:50%;z-index:10;">
+                <div class="spinner-border text-warning" role="status" style="width:2rem;height:2rem;"></div>
+              </div>
+            </div>
+
+            {{-- ── Photo Management Modal Backdrop ── --}}
+            <div id="photoMgmtBackdrop" class="photo-mgmt-backdrop" onclick="if(event.target===this) closePhotoMgmt();">
+              <div class="photo-mgmt-panel">
+
+                {{-- Header --}}
+                <div class="photo-mgmt-header">
+                  <div class="photo-mgmt-header-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
                     </svg>
                   </div>
-                @endif
+                  <div>
+                    <p class="photo-mgmt-header-title">Profile Photo</p>
+                    <p class="photo-mgmt-header-sub">Manage your profile picture</p>
+                  </div>
+                  <button class="photo-mgmt-close" onclick="closePhotoMgmt()" aria-label="Close">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
 
-                {{-- Camera overlay --}}
-                <div class="profile-avatar-overlay">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                  </svg>
-                  <span style="font-size:0.72rem;font-weight:700;margin-top:3px;">Change</span>
+
+                {{-- Actions --}}
+                <div class="photo-mgmt-actions">
+
+                  <button type="button" class="photo-mgmt-btn photo-mgmt-btn--upload"
+                          onclick="document.getElementById('profilePhotoInput').click();">
+                    <span class="photo-mgmt-btn-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                    </span>
+                    <span class="photo-mgmt-btn-text">
+                      <span class="photo-mgmt-btn-label">Upload New Photo</span>
+                      <span class="photo-mgmt-btn-desc">Replace with a new image</span>
+                    </span>
+                    <svg class="photo-mgmt-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+
+                  <hr class="photo-mgmt-divider" id="photoMgmtDivider" style="display: {{ auth()->user()->profile_photo ? 'block' : 'none' }};">
+                  <button type="button" class="photo-mgmt-btn photo-mgmt-btn--remove" id="btnRemovePhoto"
+                          style="display: {{ auth()->user()->profile_photo ? 'flex' : 'none' }};"
+                          onclick="confirmRemovePhoto()">
+                    <span class="photo-mgmt-btn-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </span>
+                    <span class="photo-mgmt-btn-text">
+                      <span class="photo-mgmt-btn-label">Remove Photo</span>
+                      <span class="photo-mgmt-btn-desc">Revert to your initials avatar</span>
+                    </span>
+                    <svg class="photo-mgmt-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+
                 </div>
               </div>
-
-              {{-- Hidden file input --}}
-              <input type="file"
-                     id="profilePhotoInput"
-                     name="profile_photo"
-                     accept="image/jpeg,image/png,image/webp,image/gif"
-                     style="display:none;"
-                     onchange="previewAndSubmit(this)" />
-
-              {{-- Error message --}}
-              @error('profile_photo')
-                <div class="text-danger small mb-2">{{ $message }}</div>
-              @enderror
-
-              {{-- Upload status --}}
-              <div id="photoUploadStatus" style="display:none;" class="mb-2">
-                <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
-                <span class="text-secondary small ms-1">Uploadingâ€¦</span>
-              </div>
-
-              {{-- Success flash --}}
-              @if(session('status') === 'photo-updated')
-                <div class="alert-photo-success mb-2">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Photo updated successfully!
-                </div>
-              @endif
-
-            </form>
+            </div>
 
             {{-- User name below avatar --}}
             <div class="fw-bold text-white d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.3rem; letter-spacing:0.01em;">
               {{ auth()->user()->name }}
               @if(auth()->user()->is_verified)
-                <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:24px; height:24px; box-shadow:0 0 10px rgba(29,161,242,0.4);" title="Verified">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:17px; height:17px; box-shadow:0 0 6px rgba(29,161,242,0.4);" title="Verified">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
@@ -287,19 +915,19 @@
             </div>
           </div>
           
-          <div class="d-flex justify-content-around mb-4 border-top border-bottom border-secondary py-3" style="border-color: rgba(255,255,255,0.1) !important;">
+          <div class="d-flex justify-content-around mb-3 py-2 profile-stats-divider">
             <div class="text-center">
-              <div class="fs-4 fw-bold text-light">{{ number_format(auth()->user()->profile_views ?? 0) }}</div>
-              <div class="text-secondary small d-flex align-items-center justify-content-center gap-1">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;">{{ number_format(auth()->user()->profile_views ?? 0) }}</div>
+              <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 Views
               </div>
             </div>
-            <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
+            <div class="profile-stats-vsep"></div>
             <div class="text-center">
-              <div class="fs-4 fw-bold text-light">{{ number_format(auth()->user()->phone_calls ?? 0) }}</div>
-              <div class="text-secondary small d-flex align-items-center justify-content-center gap-1">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;">{{ number_format(auth()->user()->phone_calls ?? 0) }}</div>
+              <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 Calls
               </div>
             </div>
@@ -885,11 +1513,26 @@
                     @if($photos->count())
                       @foreach($photos as $photo)
                         <div class="col-6 col-sm-4 col-md-3">
-                          <div class="published-photo-card" data-img-url="{{ asset('storage/' . $photo->path) }}" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.15);cursor:pointer;" onclick="openMediaModal('{{ asset('storage/' . $photo->path) }}', 'image')">
+                          <div class="published-photo-card" data-img-url="{{ asset('storage/' . $photo->path) }}" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:{{ $photo->is_main ? '2.5px solid #ff8c00' : '1px solid rgba(255,255,255,0.15)' }};cursor:pointer;" onclick="openMediaModal('{{ asset('storage/' . $photo->path) }}', 'image')">
                             <img src="{{ asset('storage/' . $photo->path) }}" alt="Published Photo" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" class="d-flex align-items-center justify-content-center">
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                             </div>
+                            
+                            {{-- Main Card Cover Badge / Button --}}
+                            @if($photo->is_main)
+                              <span class="btn-main-card-badge" style="position:absolute;top:6px;left:6px;z-index:2;">
+                                ★ Main Card
+                              </span>
+                            @else
+                              <form action="{{ route('user.photos.set-main', $photo->id) }}" method="POST" style="position:absolute;top:6px;left:6px;z-index:2;" onclick="event.stopPropagation();">
+                                @csrf
+                                <button type="submit" class="btn-set-main-card" title="Set as Main Listing Card Cover">
+                                  Set as Main
+                                </button>
+                              </form>
+                            @endif
+
                             <form action="{{ route('user.photos.destroy', $photo->id) }}" method="POST" style="position:absolute;top:6px;right:6px;z-index:2;" onclick="event.stopPropagation();">
                               @csrf @method('DELETE')
                               <button type="submit" onclick="return confirm('Delete this photo?')" style="width:26px;height:26px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
@@ -936,69 +1579,35 @@
           <div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="wallet-tab">
             
             <div class="dash-card">
-              <header>
-                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text">{{ __('Check your current balance and add funds.') }}</p>
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Check your current balance and add funds. Available for premium features & upgrades.') }}</p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
               </div>
             </div>
 
             <div class="dash-card">
-              <header>
-                  <h2 class="dash-card-title">{{ __('Wallet History') }}</h2>
-                  <p class="dash-card-text">{{ __('Review your recent wallet transactions.') }}</p>
-              </header>
-              <div class="table-responsive">
-                @if($deposits->isEmpty())
-                  <div class="text-center py-5 rounded" style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1);">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-secondary mb-3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    <h5 class="text-secondary fw-normal">{{ __('No transaction history found.') }}</h5>
-                    <p class="small text-secondary mb-0">{{ __('When you add funds or an admin updates your balance, it will appear here.') }}</p>
-                  </div>
-                @else
-                  <table class="table table-borderless table-hover align-middle mb-0" style="color: #fff;">
-                    <thead>
-                      <tr style="border-bottom: 2px solid rgba(255,140,0,0.3);">
-                        <th class="text-uppercase text-secondary small fw-bold" style="letter-spacing:1px;">Date</th>
-                        <th class="text-uppercase text-secondary small fw-bold" style="letter-spacing:1px;">Ref / Method</th>
-                        <th class="text-uppercase text-secondary small fw-bold text-end" style="letter-spacing:1px;">Amount</th>
-                        <th class="text-uppercase text-secondary small fw-bold text-center" style="letter-spacing:1px;">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($deposits as $deposit)
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                          <td class="py-3 text-nowrap">
-                            <div class="fw-bold">{{ $deposit->created_at->format('M d, Y') }}</div>
-                            <div class="small text-secondary">{{ $deposit->created_at->format('h:i A') }}</div>
-                          </td>
-                          <td class="py-3">
-                            <div class="fw-bold text-light">{{ $deposit->reference ?? 'N/A' }}</div>
-                            <div class="small text-uppercase text-warning">{{ $deposit->payment_method }}</div>
-                          </td>
-                          <td class="py-3 text-end fw-bold fs-5">
-                            KSh {{ number_format($deposit->amount, 2) }}
-                          </td>
-                          <td class="py-3 text-center">
-                            @if($deposit->status === 'completed')
-                              <span class="text-success fw-bold">{{ ucfirst($deposit->status) }}</span>
-                            @elseif($deposit->status === 'failed')
-                              <span class="text-danger fw-bold">{{ ucfirst($deposit->status) }}</span>
-                            @else
-                              <span class="text-warning fw-bold">{{ ucfirst($deposit->status) }}</span>
-                            @endif
-                          </td>
-                        </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
+              <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 class="dash-card-title mb-1">{{ __('Wallet History') }}</h2>
+                  <p class="dash-card-text mb-0">{{ __('Review your recent wallet transactions.') }}</p>
+                </div>
+                @if(!$deposits->isEmpty())
+                  <span style="color:orange; font-weight:700; font-size:0.85rem;">
+                    {{ $deposits->total() }} Total {{ $deposits->total() == 1 ? 'Transaction' : 'Transactions' }}
+                  </span>
                 @endif
+              </header>
+
+              <div class="mt-3" id="walletHistoryContainer" style="transition: opacity 0.25s ease;">
+                @include('profile.partials.wallet-history')
               </div>
             </div>
 
@@ -1009,16 +1618,16 @@
             
             <!-- Available Wallet Balance -->
             <div class="dash-card mb-4">
-              <header>
-                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text">{{ __('Your available funds for membership upgrades and premium features.') }}</p>
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Your available funds for membership upgrades and premium features.') }}</p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
               </div>
             </div>
 
@@ -1127,16 +1736,17 @@
             <div x-show="!showCreate">
             <!-- Available Wallet Balance -->
             <div class="dash-card mb-4">
-              <header>
-                  <h2 class="dash-card-title">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text">{{ __('Your available funds for classified listings and features.') }}</p>
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Your available funds for classified listings and features. Available for premium features & upgrades.') }}</p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fs-3 fw-bold text-light mt-1">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange">{{ __('Add Funds') }}</a>
+                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
               </div>
             </div>
 
@@ -1150,29 +1760,29 @@
                   <p class="dash-card-text">{{ __('Manage and track the status of your classified listings.') }}</p>
               </header>
               
-              <div class="row g-3">
+              <div class="row g-2 g-md-3">
                 <div class="col-6 col-md-3">
-                  <div class="p-4 rounded text-center h-100" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
-                    <div class="fs-2 fw-bold text-light mb-1">{{ $classifieds->where('payment_status', 'pending')->count() }}</div>
-                    <div class="text-secondary small text-uppercase fw-bold" style="letter-spacing:0.5px;">Unpublished</div>
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
+                    <div class="fw-bold text-light mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['unpublished'] ?? 0 }}</div>
+                    <div class="text-secondary text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px;">Unpublished</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="p-4 rounded text-center h-100" style="background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2);">
-                    <div class="fs-2 fw-bold text-warning mb-1">{{ $classifieds->where('status', 'pending')->count() }}</div>
-                    <div class="text-warning small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">In Moderation</div>
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2);">
+                    <div class="fw-bold text-warning mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['in_moderation'] ?? 0 }}</div>
+                    <div class="text-warning text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">In Moderation</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="p-4 rounded text-center h-100" style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.2);">
-                    <div class="fs-2 fw-bold text-success mb-1">{{ $classifieds->where('status', 'approved')->where('payment_status', 'paid')->count() }}</div>
-                    <div class="text-success small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">Approved</div>
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.2);">
+                    <div class="fw-bold text-success mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['approved'] ?? 0 }}</div>
+                    <div class="text-success text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Approved</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="p-4 rounded text-center h-100" style="background:rgba(220,53,69,0.05); border:1px solid rgba(220,53,69,0.2);">
-                    <div class="fs-2 fw-bold text-danger mb-1">{{ $classifieds->where('status', 'rejected')->count() }}</div>
-                    <div class="text-danger small text-uppercase fw-bold" style="letter-spacing:0.5px; opacity:0.8;">Rejected</div>
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(220,53,69,0.05); border:1px solid rgba(220,53,69,0.2);">
+                    <div class="fw-bold text-danger mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['rejected'] ?? 0 }}</div>
+                    <div class="text-danger text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Rejected</div>
                   </div>
                 </div>
               </div>
@@ -1180,66 +1790,20 @@
 
             <!-- Classifieds History Table -->
             <div class="dash-card mt-4">
-              <header>
-                  <h2 class="dash-card-title">{{ __('Classifieds History') }}</h2>
-                  <p class="dash-card-text">{{ __('Review your recent classified listings and their statuses.') }}</p>
+              <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 class="dash-card-title mb-1">{{ __('Classifieds History') }}</h2>
+                  <p class="dash-card-text mb-0">{{ __('Review your recent classified listings and their statuses.') }}</p>
+                </div>
+                @if(!$classifieds->isEmpty())
+                  <span style="color:orange; font-weight:700; font-size:0.85rem;">
+                    {{ $classifieds->total() }} Total {{ $classifieds->total() == 1 ? 'Listing' : 'Listings' }}
+                  </span>
+                @endif
               </header>
-              <div class="table-responsive">
-                <table class="table table-dark table-striped table-hover align-middle mb-0" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.05);">
-                  <thead>
-                    <tr>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Date</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Title</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Amount</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Post Status</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Payment Gateway</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Payment Status</th>
-                      <th class="text-secondary fw-bold text-uppercase" style="font-size:0.75rem; letter-spacing:0.5px;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @forelse($classifieds as $c)
-                    <tr>
-                      <td class="text-secondary" style="font-size:0.85rem;">{{ $c->created_at->format('M d, Y') }}</td>
-                      <td class="text-light fw-medium">{{ $c->title }}</td>
-                      <td class="text-light">KSh {{ number_format($c->amount, 2) }}</td>
-                      <td>
-                        @if($c->status === 'approved')
-                          <span class="badge" style="background:rgba(40,167,69,0.2); color:#28a745; border:1px solid rgba(40,167,69,0.4);">Approved</span>
-                        @elseif($c->status === 'rejected')
-                          <span class="badge" style="background:rgba(220,53,69,0.2); color:#dc3545; border:1px solid rgba(220,53,69,0.4);">Rejected</span>
-                        @else
-                          <span class="badge" style="background:rgba(255,193,7,0.2); color:#ffc107; border:1px solid rgba(255,193,7,0.4);">Pending</span>
-                        @endif
-                      </td>
-                      <td class="text-secondary" style="font-size:0.85rem;">{{ $c->payment_status === 'paid' ? 'Wallet/M-Pesa' : 'N/A' }}</td>
-                      <td>
-                        @if($c->payment_status === 'paid')
-                          <span class="badge" style="background:rgba(40,167,69,0.2); color:#28a745; border:1px solid rgba(40,167,69,0.4);">Paid</span>
-                        @else
-                          <span class="badge" style="background:rgba(255,140,0,0.2); color:orange; border:1px solid rgba(255,140,0,0.4);">Pending</span>
-                        @endif
-                      </td>
-                      <td>
-                        @if($c->payment_status === 'paid')
-                          <a href="{{ route('classifieds.show', $c->id) }}" class="btn btn-sm btn-outline-warning" style="font-size:0.75rem;">View</a>
-                        @else
-                          <span class="text-secondary" style="font-size:0.8rem;">Awaiting payment</span>
-                        @endif
-                      </td>
-                    </tr>
-                    @empty
-                    <tr>
-                      <td colspan="7" class="text-center text-secondary py-4" style="font-size:0.9rem;">
-                        <div class="d-flex flex-column align-items-center justify-content-center py-3">
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-secondary" style="opacity:0.5;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                          No classifieds found.
-                        </div>
-                      </td>
-                    </tr>
-                    @endforelse
-                  </tbody>
-                </table>
+
+              <div class="mt-3" id="classifiedsHistoryContainer" style="transition: opacity 0.25s ease;">
+                @include('profile.partials.classifieds-history')
               </div>
             </div>
             </div>
@@ -1368,11 +1932,11 @@
               </div>
               <div class="d-flex align-items-center justify-content-between p-3 rounded settings-balance-inner">
                 <div>
-                  <div class="text-uppercase fw-bold mb-1" style="font-size:0.72rem;letter-spacing:1.5px;color:rgba(255,140,0,0.7);">Current Balance</div>
-                  <div class="fw-bold text-light" style="font-size:1.5rem;line-height:1;">
-                    KSh <span style="color:#fff;">{{ auth()->user()->wallet_balance ?? '0.00' }}</span>
+                  <div class="text-uppercase fw-bold mb-1" style="font-size:0.72rem;letter-spacing:1.5px;color:rgba(255,140,0,0.8);">Current Balance</div>
+                  <div class="fw-bold settings-balance-amount" style="font-size:1.5rem;line-height:1;">
+                    KSh <span class="settings-balance-num">{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
                   </div>
-                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);margin-top:0.3rem;">Available for premium features & upgrades</div>
+                  <div class="settings-balance-sub" style="font-size:0.8rem;margin-top:0.3rem;">Available for premium features & upgrades</div>
                 </div>
                 <a href="{{ route('wallet.add') }}" class="btn-settings-fund btn-sm">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -1399,7 +1963,7 @@
                 @csrf
                 @method('patch')
 
-                {{-- â”€â”€â”€ Privacy Settings â”€â”€â”€ --}}
+                {{-- Privacy Settings --}}
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   Privacy
@@ -1434,7 +1998,7 @@
                   </div>
                 </div>
 
-                {{-- ——— Notifications ——— --}}
+                {{-- Notifications --}}
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                   Notifications
@@ -1453,7 +2017,7 @@
                   </div>
                 </div>
 
-                {{-- â”€â”€â”€ Account â”€â”€â”€ --}}
+                {{-- Account --}}
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                   Account
@@ -1461,17 +2025,22 @@
 
                 <div class="row g-3 mb-4">
                   <div class="col-12 col-md-6">
-                    <label class="settings-field-label">Email Address</label>
-                    <div class="settings-input-wrap">
+                    <label class="settings-field-label">
+                      Email Address
+                      <span title="Email cannot be changed" style="margin-left:0.3rem;display:inline-flex;align-items:center;vertical-align:middle;opacity:0.45;cursor:default;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      </span>
+                    </label>
+                    <div class="settings-input-wrap" style="opacity:0.6; cursor:not-allowed;">
                       <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
                       </svg>
-                      <input type="email" class="form-control settings-input" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="your@email.com" />
+                      <input type="email" class="form-control settings-input" value="{{ auth()->user()->email ?? '' }}" readonly style="pointer-events:none; user-select:none;" />
                     </div>
                   </div>
                 </div>
 
-                {{-- â”€â”€â”€ Security â”€â”€â”€ --}}
+                {{-- Security --}}
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   Change Password
@@ -1504,13 +2073,13 @@
                       </svg>
                       <input type="password" class="form-control settings-input" name="current_password" placeholder="Required to save any changes" />
                     </div>
-                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-top:0.4rem;">You must enter your current password to apply any changes.</div>
+                    <div class="settings-help-text" style="font-size:0.78rem;margin-top:0.4rem;">You must enter your current password to apply any changes.</div>
                   </div>
                 </div>
 
-                {{-- â”€â”€â”€ Save â”€â”€â”€ --}}
-                <div class="d-flex align-items-center justify-content-between pt-3 mt-2" style="border-top:1px solid rgba(255,255,255,0.07);">
-                  <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">All changes are saved securely.</span>
+                {{-- Save --}}
+                <div class="d-flex align-items-center justify-content-between pt-3 mt-2 settings-save-footer">
+                  <span class="settings-help-text" style="font-size:0.8rem;">All changes are saved securely.</span>
                   <button type="submit" class="btn-save-settings">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                       <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
@@ -1540,28 +2109,18 @@
                 @if(isset($sessions) && count($sessions) > 1)
                   <form method="POST" action="{{ route('profile.sessions.terminate-others') }}">
                     @csrf
-                    <button type="submit" class="btn-danger-custom btn-sm py-2" onclick="return confirm('Are you sure you want to sign out of all other devices?')">
+                    <button type="submit"
+                      style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border-radius:8px;font-size:0.82rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.6);color:#dc3545;"
+                      onmouseover="this.style.background='rgba(220,53,69,0.12)'" onmouseout="this.style.background='transparent'"
+                      onclick="return confirm('Sign out of all other devices? This cannot be undone.')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                       Sign Out Other Devices
                     </button>
                   </form>
                 @endif
               </div>
 
-              @if(session('status') === 'session-terminated')
-                <div class="alert alert-success bg-success-subtle text-success border-success-subtle mb-4" role="alert">
-                  Session terminated successfully.
-                </div>
-              @endif
-              @if(session('status') === 'other-sessions-terminated')
-                <div class="alert alert-success bg-success-subtle text-success border-success-subtle mb-4" role="alert">
-                  All other sessions terminated successfully.
-                </div>
-              @endif
-              @if($errors->has('session'))
-                <div class="alert alert-danger bg-danger-subtle text-danger border-danger-subtle mb-4" role="alert">
-                  {{ $errors->first('session') }}
-                </div>
-              @endif
+
 
               <div class="list-group list-group-flush rounded border border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
                 @if(isset($sessions) && count($sessions) > 0)
@@ -1593,7 +2152,11 @@
                       @if(!$session->is_current_device)
                         <form method="POST" action="{{ route('profile.sessions.terminate', $session->id) }}">
                           @csrf
-                          <button type="submit" class="btn btn-outline-danger btn-sm px-3 py-1.5" style="font-weight: 600; border-radius: 6px; font-size: 0.8rem;" onclick="return confirm('Are you sure you want to terminate this session?')">
+                          <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.35rem 0.85rem;border-radius:7px;font-size:0.78rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.5);color:#dc3545;"
+                            onmouseover="this.style.background='rgba(220,53,69,0.1)'" onmouseout="this.style.background='transparent'"
+                            onclick="return confirm('Sign out this session?')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             Sign Out
                           </button>
                         </form>
@@ -1724,9 +2287,9 @@
           <!-- Photo Verification Tab -->
           <div class="tab-pane fade" id="tab-verification" role="tabpanel" aria-labelledby="verification-tab">
             
-            <div class="mb-4">
+            <div class="mb-3">
               <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
+                <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
                   <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">{{ __('Home') }}</a></li>
                   <li class="breadcrumb-item active text-secondary" aria-current="page">{{ __('Photo Verification') }}</li>
                 </ol>
@@ -1734,119 +2297,119 @@
             </div>
 
             <!-- Get Verified Hero -->
-            <div class="dash-card mb-4" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
-              <header class="d-flex align-items-center gap-3 mb-3">
-                  <div class="bg-orange text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px; background: orange;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <div class="dash-card mb-3 p-3" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
+              <header class="d-flex align-items-center gap-2 mb-2">
+                  <div class="bg-orange text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: orange;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                   </div>
                   <div>
-                    <h2 class="dash-card-title mb-1 text-warning" style="font-size: 1.5rem;">{{ __('Get Verified') }}</h2>
-                    <div class="badge bg-success text-dark fw-bold px-2 py-1">{{ __('"REAL PHOTOS" BADGE') }}</div>
+                    <h2 class="dash-card-title mb-0 text-warning" style="font-size: 1.15rem;">{{ __('Get Verified') }}</h2>
+                    <div class="badge bg-success text-dark fw-bold px-2 py-0.5" style="font-size:0.7rem;">{{ __('"REAL PHOTOS" BADGE') }}</div>
                   </div>
               </header>
-              <p class="dash-card-text text-light" style="font-size: 1.05rem;">
+              <p class="dash-card-text text-light mb-0" style="font-size: 0.85rem; line-height:1.5;">
                 {{ __('If you want to get the "REAL PHOTOS" badge use our totally free photo verification service, you can build trust in your visitors and have much more clients as well.') }}
               </p>
             </div>
 
-            <div class="row">
-              <div class="col-12 col-xl-7 mb-4">
+            <div class="row g-3">
+              <div class="col-12 col-xl-7 mb-3">
                 <!-- Upload Section -->
-                <div class="dash-card h-100">
-                  <header class="mb-4">
-                      <h3 class="dash-card-title">{{ __('Real Photo') }}</h3>
-                      <p class="dash-card-text mb-0">{{ __('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.') }}</p>
+                <div class="dash-card h-100 p-3">
+                  <header class="mb-3">
+                      <h3 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Real Photo') }}</h3>
+                      <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.') }}</p>
                   </header>
                   
-                  <div class="d-flex flex-column align-items-center justify-content-center p-4 mb-4 rounded text-center" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,140,0,0.4);">
-                    <div class="fs-1 mb-2">✋</div>
-                    <h4 class="text-light fw-bold mb-1">{{ __('Show this sign') }}</h4>
-                    <span class="text-secondary small">{{ __('(Palm)') }}</span>
+                  <div class="d-flex flex-column align-items-center justify-content-center p-3 mb-3 rounded text-center" style="background: rgba(0,0,0,0.3); border: 1.5px dashed rgba(255,140,0,0.4);">
+                    <div class="mb-1" style="font-size: 1.6rem; line-height: 1;">✋</div>
+                    <h6 class="text-light fw-bold mb-0" style="font-size: 0.9rem;">{{ __('Show this sign') }}</h6>
+                    <span class="text-secondary" style="font-size: 0.75rem;">{{ __('(Palm)') }}</span>
                   </div>
 
                   @if(session('verification_upload_success'))
-                    <div class="alert alert-success text-white border-0 mb-4" style="background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                    <div class="alert alert-success text-white border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
                         {{ session('verification_upload_success') }}
                     </div>
                   @endif
 
                   @if(auth()->user()->is_verified)
-                      <div class="alert alert-success text-white border-0 mb-4 text-center" style="background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                      <div class="alert alert-success text-white border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
                           <strong>Verified!</strong><br>Your account has been verified. You can now upload photos and videos.
                       </div>
                   @elseif(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
-                      <div class="alert alert-warning text-center border-0 mb-4" style="background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.3) !important;">
+                      <div class="alert alert-warning text-center border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.3) !important;">
                           <strong>Pending Review</strong><br>Your photo is currently being reviewed by our team. Please check back later.
                       </div>
                   @else
                       @if(isset($verificationSubmission) && $verificationSubmission->status === 'rejected')
-                          <div class="alert alert-danger border-0 mb-4 text-center" style="background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.3) !important;">
+                          <div class="alert alert-danger border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.3) !important;">
                               <strong>Rejected</strong><br>Your previous submission was rejected. Please carefully review the requirements and try again.
                           </div>
                       @endif
 
                       <form method="POST" action="{{ route('verification.submit') }}" enctype="multipart/form-data">
                         @csrf
-                        <div class="mb-4">
-                          <label class="form-label fw-bold">{{ __('Upload Photo') }}</label>
-                          <input type="file" name="photo" class="form-control py-2" accept="image/jpeg,image/png,image/webp" required />
+                        <div class="mb-3">
+                          <label class="form-label fw-bold" style="font-size: 0.85rem;">{{ __('Upload Photo') }}</label>
+                          <input type="file" name="photo" class="form-control form-control-sm py-1.5" accept="image/jpeg,image/png,image/webp" required style="font-size: 0.82rem;" />
                           @error('photo')
-                            <div class="text-danger small mt-1">{{ $message }}</div>
+                            <div class="text-danger small mt-1" style="font-size: 0.78rem;">{{ $message }}</div>
                           @enderror
                         </div>
-                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px;">{{ __('Submit for Verification') }}</button>
+                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px; font-size: 0.85rem;">{{ __('Submit for Verification') }}</button>
                       </form>
                   @endif
                 </div>
               </div>
 
-              <div class="col-12 col-xl-5 mb-4">
+              <div class="col-12 col-xl-5 mb-3">
                 <!-- Requirements Section -->
-                <div class="dash-card h-100" style="background: rgba(255,255,255,0.03);">
-                  <header class="mb-4">
-                      <h3 class="dash-card-title text-success d-flex align-items-center gap-2">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <div class="dash-card h-100 p-3" style="background: rgba(255,255,255,0.03);">
+                  <header class="mb-3">
+                      <h4 class="dash-card-title text-success d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                         {{ __('Accepted Photos') }}
-                      </h3>
+                      </h4>
                   </header>
-                  <ul class="list-unstyled text-secondary mb-4" style="line-height: 1.8;">
-                    <li class="d-flex gap-2 mb-3">
-                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                  <ul class="list-unstyled text-secondary mb-3" style="line-height: 1.5; font-size: 0.82rem;">
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
                       <div>{{ __('Showing this requested sign with hand.') }}</div>
                     </li>
-                    <li class="d-flex gap-2 mb-3">
-                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
                       <div>{{ __('We must see your FULL BODY without covering clothes (Lingerie Accepted).') }}</div>
                     </li>
-                    <li class="d-flex gap-2 mb-3">
-                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
                       <div>{{ __('Tattoo must be seen on the photo, if you have.') }}</div>
                     </li>
-                    <li class="d-flex gap-2 mb-3">
-                      <div class="text-success mt-2"><svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
                       <div>{{ __('Please use makeup that helps us to compare the photos.') }}</div>
                     </li>
                   </ul>
                   
-                  <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+                  <hr class="my-3" style="border-color: rgba(255,255,255,0.1);">
 
-                  <header class="mb-3">
-                      <h3 class="dash-card-title text-danger d-flex align-items-center gap-2">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                  <header class="mb-2">
+                      <h4 class="dash-card-title text-danger d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                         {{ __('Rejected Photos') }}
-                      </h3>
+                      </h4>
                   </header>
-                  <ul class="list-unstyled text-secondary" style="line-height: 1.8;">
+                  <ul class="list-unstyled text-secondary mb-0" style="line-height: 1.5; font-size: 0.82rem;">
                     <li class="d-flex gap-2 mb-2">
-                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
                       <div>{{ __('Face not visible or covered.') }}</div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
-                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
                       <div>{{ __('Not showing the requested hand sign.') }}</div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
-                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
                       <div>{{ __('Heavily filtered or edited photos.') }}</div>
                     </li>
                   </ul>
@@ -2275,6 +2838,89 @@
           }
         });
       });
+
+      // Auto-activate tab if URL hash or pagination query parameter is present
+      var searchParams = new URLSearchParams(window.location.search);
+      var currentHash = window.location.hash;
+      if (searchParams.has('classifieds_page') || currentHash === '#tab-classifieds') {
+        var classifiedsTabBtn = document.getElementById('classifieds-tab');
+        if (classifiedsTabBtn) {
+          var bsTab = new bootstrap.Tab(classifiedsTabBtn);
+          bsTab.show();
+        }
+      } else if (searchParams.has('deposits_page') || currentHash === '#tab-wallet') {
+        var walletTabBtn = document.getElementById('wallet-tab');
+        if (walletTabBtn) {
+          var bsTab = new bootstrap.Tab(walletTabBtn);
+          bsTab.show();
+        }
+      } else if (currentHash) {
+        var targetTab = document.querySelector('button[data-bs-target="' + currentHash + '"]');
+        if (targetTab) {
+          var bsTab = new bootstrap.Tab(targetTab);
+          bsTab.show();
+        }
+      }
+
+      // Seamless AJAX Pagination for Wallet & Classifieds History
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('#walletHistoryContainer .pagination a, #classifiedsHistoryContainer .pagination a');
+        if (!link) return;
+        e.preventDefault();
+
+        var href = link.getAttribute('href');
+        if (!href) return;
+
+        var container = link.closest('#classifiedsHistoryContainer') || link.closest('#walletHistoryContainer');
+        if (container) {
+          container.style.opacity = '0.4';
+          container.style.pointerEvents = 'none';
+        }
+
+        fetch(href, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (container && data.html) {
+            container.innerHTML = data.html;
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+          }
+        })
+        .catch(function(err) {
+          console.error('AJAX Pagination error:', err);
+          if (container) {
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+          }
+        });
+      });
+
+      // Disallow Emojis on Inputs Real-time
+      function stripEmojis(val) {
+        if (!val) return val;
+        try {
+          return val.replace(/\p{Extended_Pictographic}/gu, '');
+        } catch (e) {
+          return val.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}]/gu, '');
+        }
+      }
+
+      document.addEventListener('input', function(e) {
+        var target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+          if (target.type === 'file' || target.type === 'checkbox' || target.type === 'radio') return;
+          var cur = target.value;
+          var clean = stripEmojis(cur);
+          if (cur !== clean) {
+            target.value = clean;
+          }
+        }
+      }, true);
 
       @if(session('success'))
       // Show a toast notification

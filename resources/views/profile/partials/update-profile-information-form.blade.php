@@ -14,13 +14,13 @@
 
         <div class="mb-3">
             <label for="name" class="form-label">{{ __('Name') }}</label>
-            <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" readonly style="background-color: #161616; color: #777; cursor: not-allowed; border-color: #222;" autocomplete="name" />
+            <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" readonly style="cursor: not-allowed;" autocomplete="name" />
             @error('name')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-4">
             <label for="email" class="form-label">{{ __('Email') }}</label>
-            <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" readonly style="background-color: #161616; color: #777; cursor: not-allowed; border-color: #222;" autocomplete="username" />
+            <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" readonly style="cursor: not-allowed;" autocomplete="username" />
             @error('email')<div class="text-danger">{{ $message }}</div>@enderror
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
@@ -158,7 +158,7 @@
                 <label for="incalls_rate" class="form-label">{{ __('Incalls rate') }}</label>
                 <div class="input-group">
                     <input id="incalls_rate" name="incalls_rate" type="number" min="0" class="form-control" value="{{ old('incalls_rate', $user->incalls_rate) }}" />
-                    <span class="input-group-text" style="background-color: #1a1a1a; border-color: #333; color: #ff8c00;">Ksh</span>
+                    <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
                 @error('incalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
@@ -166,7 +166,7 @@
                 <label for="outcalls_rate" class="form-label">{{ __('Outcalls rate') }}</label>
                 <div class="input-group">
                     <input id="outcalls_rate" name="outcalls_rate" type="number" min="0" class="form-control" value="{{ old('outcalls_rate', $user->outcalls_rate) }}" />
-                    <span class="input-group-text" style="background-color: #1a1a1a; border-color: #333; color: #ff8c00;">Ksh</span>
+                    <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
                 @error('outcalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>

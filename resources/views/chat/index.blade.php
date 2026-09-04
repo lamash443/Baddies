@@ -17,19 +17,28 @@
         .nr-navbar .nav-link.active, .nr-navbar .nav-link:hover, .nr-navbar .nav-link:focus { color:#ffffff !important; text-decoration:none !important; box-shadow:none !important; }
         .nr-navbar .nav-link.active::after, .nr-navbar .nav-link:hover::after, .nr-navbar .nav-link:focus::after { transform:scaleX(1) !important; }
         
-        .chat-container { margin-top: 2rem; margin-bottom: 2rem; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,140,0,0.3); }
+        .chat-container { margin-top: 2rem; margin-bottom: 2rem; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,140,0,0.3); height: 75vh; }
+        .chat-list, .chat-box { height: 100% !important; }
+        
+        @media (max-width: 767px) {
+            body { overflow: hidden; padding-top: 0 !important; } /* Prevent body scrolling when full screen and remove navbar padding */
+            .nr-topbar, .nr-navbar, x-footer, footer, .site-footer, .nr-footer { display: none !important; }
+            .container { padding: 0 !important; max-width: 100% !important; }
+            .pb-5 { padding-bottom: 0 !important; }
+            .chat-container { margin: 0 !important; border-radius: 0 !important; border: none !important; height: 100dvh !important; width: 100vw !important; }
+        }
     </style>
 </head>
 <body>
     <x-navbar />
 
-    <div class="container pb-5">
+    <div class="container pb-5 h-100">
         <div class="chat-container shadow-lg">
-            <div class="row g-0">
-                <div class="col-md-4 col-lg-4 {{ isset($activeUserId) ? 'd-none d-md-block' : '' }}">
+            <div class="row g-0 h-100">
+                <div class="col-md-4 col-lg-4 h-100 {{ isset($activeUserId) ? 'd-none d-md-block' : '' }}">
                     @livewire('chat.chat-list', ['activeUserId' => $activeUserId ?? null])
                 </div>
-                <div class="col-md-8 col-lg-8 {{ !isset($activeUserId) ? 'd-none d-md-block' : '' }}">
+                <div class="col-md-8 col-lg-8 h-100 {{ !isset($activeUserId) ? 'd-none d-md-block' : '' }}">
                     @livewire('chat.chat-box', ['activeUserId' => $activeUserId ?? null])
                 </div>
             </div>

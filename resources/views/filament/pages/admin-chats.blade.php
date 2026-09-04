@@ -125,7 +125,7 @@
     @endif
 
     {{-- Chat history view --}}
-    <div class="chat-wrap">
+    <div class="chat-wrap" style="position: relative; padding-bottom: 70px;">
         <div class="chat-head">
             <button class="btn-back" wire:click="closeConversation">← Back</button>
             <span class="av av-a" style="width:20px;height:20px;font-size:8px">{{ strtoupper(substr($userA->name,0,1)) }}</span>
@@ -141,20 +141,39 @@
             </span>
             <span style="margin-left:auto;font-size:10px;color:#64748b">{{ count($messages) }} messages</span>
         </div>
-        <div class="chat-body">
+        <div class="chat-body" wire:poll.3s>
             @foreach($messages as $msg)
                 @php $isA = $msg->sender_id === $userA->id; @endphp
                 <div class="msg-row {{ $isA ? '' : 'me' }}">
                     <div>
                         <div class="bubble {{ $isA ? 'left' : 'right' }}">{{ $msg->body }}</div>
-                        <div class="msg-meta">
+                        <div class="msg-meta" style="justify-content: {{ $isA ? 'flex-start' : 'flex-end' }}">
                             <span>{{ $isA ? $userA->name : $userB->name }}</span>
                             <span>{{ $msg->created_at->format('M d, g:i A') }}</span>
-                            <span>{{ $msg->is_read ? '✓ Read' : '✓ Delivered' }}</span>
+                            <span>
+                                @if($msg->is_read)
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 6 11 13 8 10"></polyline><path d="M22 10l-7 7-3-3"></path></svg>
+                                @else
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 6 11 13 8 10"></polyline><path d="M22 10l-7 7-3-3"></path></svg>
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>
             @endforeach
+        </div>
+
+        {{-- Admin Reply Box --}}
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: #1e293b; border-top: 1px solid #334155; border-radius: 0 0 12px 12px; display: flex; gap: 10px; align-items: center;">
+            <input type="text" wire:model="newMessage" wire:keydown.enter="sendMessageAs({{ $userA->id }})" placeholder="Type a message to send..." style="flex: 1; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px;">
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button wire:click="sendMessageAs({{ $userA->id }})" style="background: #1d4ed8; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1d4ed8'">
+                    Send as {{ explode(' ', $userA->name)[0] }}
+                </button>
+                <button wire:click="sendMessageAs({{ $userB->id }})" style="background: #ea580c; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f97316'" onmouseout="this.style.background='#ea580c'">
+                    Send as {{ explode(' ', $userB->name)[0] }}
+                </button>
+            </div>
         </div>
     </div>
 
