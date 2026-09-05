@@ -174,10 +174,17 @@ class User extends Authenticatable implements FilamentUser
             return 0;
         }
 
+        $slug = str_replace('_', '-', $this->subscription_plan);
+        $plan = \App\Models\MembershipPlan::where('slug', $slug)->orWhere('slug', $this->subscription_plan)->first();
+        if ($plan && $plan->photo_limit !== null) {
+            return (int) $plan->photo_limit;
+        }
+
         return match ($this->subscription_plan) {
             'regular' => 4,
-            'prime' => 5,
-            'vip', 'prime_vip' => 10,
+            'prime' => 6,
+            'prime_vip', 'prime-vip' => 8,
+            'vip' => 10,
             default => 0,
         };
     }
@@ -191,10 +198,17 @@ class User extends Authenticatable implements FilamentUser
             return 0;
         }
 
+        $slug = str_replace('_', '-', $this->subscription_plan);
+        $plan = \App\Models\MembershipPlan::where('slug', $slug)->orWhere('slug', $this->subscription_plan)->first();
+        if ($plan && $plan->video_limit !== null) {
+            return (int) $plan->video_limit;
+        }
+
         return match ($this->subscription_plan) {
-            'regular' => 2,
-            'prime' => 3,
-            'vip', 'prime_vip' => 5,
+            'regular' => 0,
+            'prime' => 2,
+            'prime_vip', 'prime-vip' => 4,
+            'vip' => 6,
             default => 0,
         };
     }

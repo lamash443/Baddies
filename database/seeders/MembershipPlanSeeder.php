@@ -35,7 +35,7 @@ class MembershipPlanSeeder extends Seeder
                     'Show Phone Number: Yes',
                     'Top of List: No',
                 ],
-                'pricing' => ['3' => 400, '7' => 700, '15' => 1300, '30' => 2000],
+                'pricing' => ['3' => 450, '7' => 700, '15' => 1300, '30' => 2000],
             ],
             [
                 'name' => 'Prime',
@@ -77,7 +77,7 @@ class MembershipPlanSeeder extends Seeder
                     'Show Phone Number: Yes',
                     'Top of List: Yes',
                 ],
-                'pricing' => ['3' => 900, '7' => 1450, '15' => 2800, '30' => 5000],
+                'pricing' => ['3' => 950, '7' => 1450, '15' => 2800, '30' => 5000],
             ],
         ];
 

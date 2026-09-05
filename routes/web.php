@@ -12,7 +12,7 @@ Route::get('/', function () {
     $users = \App\Models\User::where('is_verified', true)
         ->activeSubscription()
         ->where(function($q) {
-            $q->where('gender', 'female')
+            $q->whereIn('gender', ['female', 'Female'])
               ->orWhereNull('gender')
               ->orWhere('gender', '');
         })
@@ -47,7 +47,7 @@ Route::get('/escort-girls', function () {
     $users = \App\Models\User::where('is_verified', true)
         ->activeSubscription()
         ->where(function($q) {
-            $q->where('gender', 'female')
+            $q->whereIn('gender', ['female', 'Female'])
               ->orWhereNull('gender')
               ->orWhere('gender', '');
         })
@@ -160,7 +160,7 @@ Route::get('/search', function (\Illuminate\Http\Request $request) {
 })->name('search');
 
 Route::get('/category/call-boys', function () {
-    $users = \App\Models\User::where('gender', 'male')
+    $users = \App\Models\User::whereIn('gender', ['male', 'Male'])
         ->where('is_verified', true)
         ->activeSubscription()
         ->with('photos')

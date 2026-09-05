@@ -1,123 +1,152 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-
-    @if(request('deletion_pending'))
-    {{-- Deletion Pending Toast --}}
-    <style>
-      .del-toast {
-        position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
-        display: flex; align-items: flex-start; gap: 0.85rem;
-        background: #0d0d0d;
-        border: 1px solid rgba(220,53,69,0.4);
-        border-left: 4px solid #dc3545;
-        border-radius: 14px;
-        padding: 1rem 1.25rem;
-        max-width: 360px; width: calc(100vw - 4rem);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
-        font-family: ui-sans-serif, system-ui, sans-serif;
-        animation: delToastIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Not Found - Kenyan Baddies Club</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { 
+        margin:0; padding:0; 
+        font-family: "Outfit", sans-serif; 
+        background-color: #0d0d0d; 
+        color: #fff; 
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
         overflow: hidden;
-      }
-      @keyframes delToastIn {
-        from { opacity:0; transform: translateY(24px) scale(0.94); }
-        to   { opacity:1; transform: translateY(0)    scale(1); }
-      }
-      .del-toast__icon {
-        flex-shrink:0; margin-top:2px;
-        width:36px; height:36px; border-radius:10px;
-        background:rgba(220,53,69,0.12); border:1px solid rgba(220,53,69,0.3);
-        display:flex; align-items:center; justify-content:center; color:#ff4d4d;
-      }
-      .del-toast__body { flex:1; min-width:0; }
-      .del-toast__title {
-        font-size:0.875rem; font-weight:700; color:#ff4d4d;
-        margin:0 0 0.2rem; line-height:1.2;
-      }
-      .del-toast__msg {
-        font-size:0.8rem; color:rgba(255,255,255,0.6);
-        margin:0; line-height:1.5;
-      }
-      .del-toast__close {
-        flex-shrink:0; align-self:flex-start;
-        background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-        border-radius:7px; width:26px; height:26px;
-        display:flex; align-items:center; justify-content:center;
-        color:rgba(255,255,255,0.45); cursor:pointer; padding:0;
-        transition:all 0.2s;
-      }
-      .del-toast__close:hover { background:rgba(220,53,69,0.15); border-color:rgba(220,53,69,0.35); color:#ff4d4d; }
-      .del-toast__bar {
-        position:absolute; bottom:0; left:0; height:3px;
-        background:linear-gradient(90deg,#dc3545,rgba(220,53,69,0.2));
-        border-radius:0 0 0 14px;
-        animation:delToastBar 6s linear both;
-      }
-      @keyframes delToastBar { from{width:100%} to{width:0%} }
-    </style>
+    }
+    
+    .bg-grid {
+        position: absolute; inset: 0; z-index: -1;
+        background-size: 40px 40px;
+        background-image: 
+            linear-gradient(to right, rgba(255,140,0,0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,140,0,0.05) 1px, transparent 1px);
+        mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+        -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+    }
 
-    <div class="del-toast" id="delToast" role="alert" aria-live="assertive">
-        <div class="del-toast__icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-        </div>
-        <div class="del-toast__body">
-            <p class="del-toast__title">Deletion Request Pending</p>
-            <p class="del-toast__msg">Your account deletion request is pending admin approval.</p>
-        </div>
-        <button class="del-toast__close" onclick="document.getElementById('delToast').remove();" aria-label="Dismiss">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-        </button>
-        <div class="del-toast__bar"></div>
+    .error-container {
+        position: relative;
+        z-index: 1;
+        padding: 3rem;
+        max-width: 600px;
+        background: rgba(17,17,17,0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,140,0,0.2);
+        border-radius: 24px;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.03), inset 0 0 40px rgba(255,140,0,0.05);
+        animation: slideUpFade 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(40px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .error-code {
+        font-size: clamp(4rem, 10vw, 7rem);
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #ff8c00, #ffb347);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 10px 20px rgba(255,140,0,0.3));
+    }
+
+    .error-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #fff;
+    }
+
+    .error-note {
+        font-size: 1.05rem;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .btn-return {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: #ff8c00;
+        color: #000;
+        font-weight: 700;
+        padding: 0.9rem 2rem;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid #ff8c00;
+        letter-spacing: 0.02em;
+    }
+
+    .btn-return:hover {
+        background: #000;
+        color: #ff8c00;
+        box-shadow: 0 10px 25px rgba(255,140,0,0.4);
+        transform: translateY(-2px);
+    }
+
+    /* Light Theme Override */
+    [data-bs-theme="light"] body { background-color: #f4f6f9; color: #111; }
+    [data-bs-theme="light"] .bg-grid { background-image: linear-gradient(to right, rgba(255,140,0,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,140,0,0.1) 1px, transparent 1px); }
+    [data-bs-theme="light"] .error-container { background: #ffffff; border-color: rgba(255,140,0,0.3); box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+    [data-bs-theme="light"] .error-title { color: #111; }
+    [data-bs-theme="light"] .error-note { color: rgba(0,0,0,0.6); }
+    [data-bs-theme="light"] .btn-return:hover { background: #ffffff; color: #ff8c00; }
+  </style>
+</head>
+<body>
+@php
+  $siteLogo = \App\Models\SiteSetting::get('logo');
+@endphp
+
+  <div class="bg-grid"></div>
+
+  <div class="error-container">
+    <div class="mb-4">
+        <a href="{{ url('/') }}" style="text-decoration: none; display: inline-block;">
+            @if(!empty($siteLogo))
+                <img src="{{ asset('storage/' . $siteLogo) }}" alt="Kenyan Baddies Club" style="max-height: 56px; width: auto; object-fit: contain;">
+            @else
+                <span style="font-size: 1.35rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;"><span style="color: #ff8c00;">Baddies-</span><span style="color: #fff;">Club</span></span>
+            @endif
+        </a>
     </div>
-    <script>setTimeout(()=>{const t=document.getElementById('delToast');if(t)t.remove();},6000);</script>
-    @endif
 
-</x-guest-layout>
+    <div class="error-title" style="font-size: 2.2rem;">Welcome!</div>
+    
+    <div class="error-note" style="margin-bottom: 1rem; font-size: 1.15rem; font-weight: 500;">
+        Seems like this page does not exist
+    </div>
+    
+    <div class="error-note" style="margin-bottom: 2rem;">
+        You can proceed to one of the website sections or follow either of the links below:
+    </div>
+
+    <a href="{{ url('/') }}" class="btn-return">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Home Page
+    </a>
+  </div>
+
+</body>
+</html>

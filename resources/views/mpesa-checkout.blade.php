@@ -213,7 +213,7 @@
             <div class="mb-4">
               <div class="input-group">
                 <span class="input-group-text" style="background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.3); border-right:none; color:orange; font-weight:800; font-size:0.9rem; padding:0.65rem 0.9rem; border-radius:8px 0 0 8px; user-select:none; pointer-events:none;">+254</span>
-                <input id="phone-suffix" type="tel" class="form-control" placeholder="7XXXXXXXX" maxlength="9" required autofocus autocomplete="tel" value="{{ session('checkout_prefilled_phone', '') }}" style="border-left:none; border-radius:0 8px 8px 0; text-align:left; letter-spacing:1.5px; font-size:0.95rem; padding:0.65rem 0.9rem;">
+                <input id="phone-suffix" type="tel" inputmode="numeric" pattern="[0-9]*" class="form-control" placeholder="Enter mobile number" maxlength="9" required autofocus autocomplete="tel" oninput="this.value = this.value.replace(/\D/g, '')" value="{{ session('checkout_prefilled_phone', '') }}" style="border-left:none; border-radius:0 8px 8px 0; text-align:left; font-size:0.95rem; padding:0.65rem 0.9rem;">
               </div>
               <div class="mt-1 small text-secondary" style="font-size:0.8rem;">e.g. 722 123 456 &mdash; enter digits after +254</div>
             </div>

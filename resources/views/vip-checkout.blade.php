@@ -115,7 +115,7 @@
     <div class="row g-4">
       
       <!-- Left Column: Plan Details -->
-      <div class="col-12 col-lg-5 col-xl-4">
+      <div class="col-12 col-lg-5 col-xl-4 d-none d-lg-block">
         <div class="dash-card h-100" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
           <div class="text-warning small fw-bold text-uppercase tracking-wider mb-2">{{ __('VIP MEMBERSHIP') }}</div>
           <h2 class="dash-card-title fs-3 mb-4">{{ __('Plan Details') }}</h2>
@@ -186,6 +186,25 @@
                 </span>
               </div>
 
+              <!-- Plan Details (Mobile Only - Step 1) -->
+              <div class="p-3 rounded my-3 d-lg-none" style="background:rgba(255,140,0,0.04); border:1px solid rgba(255,140,0,0.2); border-radius:12px;">
+                <div class="text-warning small fw-bold text-uppercase tracking-wider mb-2" style="font-size:0.78rem;">{{ strtoupper($plan?->name ?? 'Membership') }} {{ __('Plan Details & Limits') }}</div>
+                <ul class="list-unstyled mb-0" style="font-size:0.85rem; line-height:1.7;">
+                  @foreach($plan?->pricing ?? [] as $days => $price)
+                    <li class="d-flex align-items-center gap-2 text-secondary">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span class="text-light fw-medium">{{ $days }} {{ (int)$days === 1 ? 'Day' : 'Days' }} Listing</span> = <span class="text-warning">{{ number_format($price) }} Ksh</span>
+                    </li>
+                  @endforeach
+                  @foreach($plan?->features ?? [] as $feature)
+                    <li class="d-flex align-items-center gap-2 text-secondary">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      {{ $feature }}
+                    </li>
+                  @endforeach
+                </ul>
+              </div>
+
               <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
 
               <div class="p-4 rounded mb-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
@@ -241,7 +260,7 @@
                 <label class="form-label fw-bold" style="font-size:1rem;">M-PESA Phone Number</label>
                 <div class="input-group input-group-lg">
                   <span class="input-group-text" style="background:rgba(255,140,0,0.12); border:1px solid rgba(255,140,0,0.3); border-right:none; color:orange; font-weight:800; font-size:1rem; border-radius:8px 0 0 8px; user-select:none; pointer-events:none;">+254</span>
-                  <input id="rc-phone-suffix" type="tel" class="form-control form-control-lg" placeholder="7XXXXXXXX" x-model="mpesaPhone" maxlength="9" autocomplete="tel" @keydown.enter.prevent="if (mpesaPhone.length >= 9) document.getElementById('rc-submit-btn').click()" style="background:rgba(0,0,0,0.3); border-color:rgba(255,140,0,0.3); color:#fff; font-size:1.1rem; letter-spacing:3px; text-align:left; border-left:none; border-radius:0 8px 8px 0;">
+                  <input id="rc-phone-suffix" type="tel" inputmode="numeric" pattern="[0-9]*" class="form-control form-control-lg" placeholder="Enter mobile number" x-model="mpesaPhone" @input="mpesaPhone = $event.target.value.replace(/\D/g, '')" maxlength="9" autocomplete="tel" @keydown.enter.prevent="if (mpesaPhone.length >= 9) document.getElementById('rc-submit-btn').click()" style="background:rgba(0,0,0,0.3); border-color:rgba(255,140,0,0.3); color:#fff; font-size:1rem; text-align:left; border-left:none; border-radius:0 8px 8px 0;">
                 </div>
                 <div class="text-secondary mt-2" style="font-size:0.8rem;">e.g. 722 123 456 &mdash; enter digits after +254</div>
               </div>

@@ -456,48 +456,7 @@
 
 
 
-<!-- AUTH MODAL -->
-<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabelCB" aria-hidden="true" style="backdrop-filter:blur(5px);">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background-color:#000;border:1px solid #333;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-      <div class="modal-header border-bottom-0 pb-0 mt-2 mx-2">
-        <div class="w-100 d-flex justify-content-between align-items-center">
-          <h5 class="modal-title fw-bold fs-3" id="authModalLabelCB" style="color:orange;text-transform:uppercase;letter-spacing:1px;">Kenyan Baddies Club</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body pt-0 px-4 pb-4">
-        <ul class="nav nav-pills nav-justified mb-4 mt-4" id="authTabsCB" role="tablist">
-          <li class="nav-item" role="presentation"><button class="nav-link active rounded-pill fw-bold" id="tab-login-cb" data-bs-toggle="pill" data-bs-target="#content-login-cb" type="button" role="tab" style="color:white;border:1px solid orange;">Login</button></li>
-          <li class="nav-item" role="presentation"><button class="nav-link rounded-pill fw-bold ms-2" id="tab-register-cb" data-bs-toggle="pill" data-bs-target="#content-register-cb" type="button" role="tab" style="color:white;border:1px solid orange;">Sign Up</button></li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="content-login-cb" role="tabpanel">
-            <div class="text-center mb-4"><h4 class="text-light fw-bold">Member Log In</h4><p class="text-secondary small fw-bold">Access your Baddies Club account</p></div>
-            <form method="POST" action="{{ route('login') }}">
-              @csrf
-              <div class="mb-3"><label class="form-label text-light small fw-bold">Email</label><input type="email" name="email" class="auth-input" required placeholder="your@email.com" value="{{ old('email') }}">@error('email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror</div>
-              <div class="mb-4"><label class="form-label text-light small fw-bold">Password</label><input type="password" name="password" class="auth-input" required placeholder="••••••••">@error('password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror</div>
-              <button type="submit" class="auth-btn">Log In</button>
-            </form>
-            <div class="text-center mt-3"><a href="#" class="text-decoration-none small fw-bold" style="color:orange;" onclick="document.getElementById('tab-register-cb').click();return false;">No account? Sign Up</a></div>
-          </div>
-          <div class="tab-pane fade" id="content-register-cb" role="tabpanel">
-            <div class="text-center mb-4"><h4 class="text-light fw-bold">Create Account</h4><p class="text-secondary small fw-bold">Join Baddies Club for free</p></div>
-            <form method="POST" action="{{ route('register') }}">
-              @csrf
-              <div class="mb-3"><label class="form-label text-light small fw-bold">Full Name</label><input type="text" name="name" class="auth-input" required placeholder="Your name" value="{{ old('name') }}">@error('name')<div class="text-danger small mt-1">{{ $message }}</div>@enderror</div>
-              <div class="mb-3"><label class="form-label text-light small fw-bold">Email</label><input type="email" name="email" class="auth-input" required placeholder="your@email.com" value="{{ old('email') }}">@error('email')<div class="text-danger small mt-1">{{ $message }}</div>@enderror</div>
-              <div class="mb-3"><label class="form-label text-light small fw-bold">Password</label><input type="password" name="password" class="auth-input" required placeholder="••••••••">@error('password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror</div>
-              <div class="mb-4"><label class="form-label text-light small fw-bold">Confirm Password</label><input type="password" name="password_confirmation" class="auth-input" required placeholder="••••••••"></div>
-              <button type="submit" class="auth-btn">Create Account</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <x-footer />
 
@@ -509,8 +468,6 @@ function toggleWishlist(btn) {
   else { svg.style.fill='rgba(255,140,0,0.9)'; svg.style.stroke='rgba(255,140,0,0.9)'; btn.dataset.saved='1'; }
 }
 function setFilter(el) { document.querySelectorAll('.cb-filter-btn').forEach(function(b){b.classList.remove('active');}); el.classList.add('active'); }
-var authEl = document.getElementById('authModal');
-if (authEl) { authEl.addEventListener('show.bs.modal', function(event) { var tab=event.relatedTarget?event.relatedTarget.getAttribute('data-auth-tab'):null; var el=document.getElementById(tab==='register'?'tab-register-cb':'tab-login-cb'); if(el) new bootstrap.Tab(el).show(); }); }
 </script>
 
 <!-- -- AUTH MODAL -- -->

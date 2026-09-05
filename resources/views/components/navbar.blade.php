@@ -229,21 +229,29 @@
             @endif
         </a>
         
-        <!-- Desktop Search Bar -->
+        <!-- Desktop Search Bar (xxl+: full bar) -->
         @if(!isset($hideSearch) || !$hideSearch)
-        <form action="{{ route('search') }}" method="GET" class="d-none d-xl-flex align-items-center ms-5" role="search">
+        <form action="{{ route('search') }}" method="GET" class="d-none d-xxl-flex align-items-center ms-4" role="search">
           <div style="display:flex; align-items:stretch; border:2px solid orange; border-radius:8px; overflow:hidden; background:#1a1a1a;">
             <div style="position:relative; display:flex; align-items:center;">
               <svg style="position:absolute; left:10px; color:orange; pointer-events:none; flex-shrink:0;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" name="q" value="{{ request('q') }}" class="nr-navbar-search-input" placeholder="Search county, title, or category..." autocomplete="off" aria-label="Site search"
-                style="width:230px; padding:0.3rem 0.5rem 0.3rem 2.2rem; border:none; outline:none; background:transparent; color:#fff; font-family:'Outfit',sans-serif; font-size:0.82rem;">
+              <input type="text" name="q" value="{{ request('q') }}" class="nr-navbar-search-input" placeholder="Search listings..." autocomplete="off" aria-label="Site search"
+                style="width:200px; padding:0.3rem 0.5rem 0.3rem 2.2rem; border:none; outline:none; background:transparent; color:#fff; font-family:'Outfit',sans-serif; font-size:0.82rem;">
             </div>
             <button type="submit" style="background:orange; border:none; border-left:2px solid orange; color:#000; font-weight:800; font-size:0.78rem; padding:0 0.9rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.03em; white-space:nowrap;" onmouseover="this.style.background='#e07a00'" onmouseout="this.style.background='orange'">GO</button>
           </div>
         </form>
+
+        <!-- Desktop Search Icon Button (xl only: 1200–1399px) -->
+        <button class="btn p-0 d-none d-xl-flex d-xxl-none align-items-center justify-content-center ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchCollapse" aria-controls="mobileSearchCollapse" style="width:38px; height:38px; border-radius:50%; border:2px solid orange; background:transparent; flex-shrink:0;" title="Search">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
         @endif
 
         <div class="ms-auto d-flex align-items-center gap-2 d-xl-none">
@@ -287,9 +295,9 @@
         </div>
       </div>
 
-      <!-- Mobile Search Input Collapse -->
+      <!-- Search Input Collapse (mobile + xl icon btn) -->
       @if(!isset($hideSearch) || !$hideSearch)
-      <div class="collapse w-100 mt-2 pb-2 d-xl-none" id="mobileSearchCollapse">
+      <div class="collapse w-100 mt-2 pb-2 d-xxl-none" id="mobileSearchCollapse">
         <form action="{{ route('search') }}" method="GET" class="position-relative" role="search">
           <svg class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: orange; pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
