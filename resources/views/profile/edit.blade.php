@@ -163,12 +163,16 @@
       color: rgba(0,0,0,0.7) !important;
     }
     [data-bs-theme="light"] .side-nav-link:hover {
-      background: rgba(255,140,0,0.08) !important;
-      color: #ff8c00 !important;
+      background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.3) !important;
+      box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
     }
     [data-bs-theme="light"] .side-nav-link.active {
-      background: rgba(255,140,0,0.12) !important;
-      color: #ff8c00 !important;
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
     }
 
     /* Form Controls & Inputs */
@@ -1021,6 +1025,14 @@
               </button>
             </li>
 
+            {{-- My Referrals --}}
+            <li role="presentation">
+              <button class="side-nav-link" id="referrals-tab" data-bs-toggle="tab" data-bs-target="#tab-referrals" type="button" role="tab" aria-controls="tab-referrals" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+                My Referrals
+              </button>
+            </li>
+
           </ul>
         </div>
         
@@ -1040,26 +1052,48 @@
           }
           .side-nav-link {
             display: flex; align-items: center; gap: 0.75rem;
-            width: 100%; padding: 0.7rem 0.85rem; border-radius: 10px;
-            color: rgba(255,255,255,0.72); text-decoration: none;
+            width: 100%; padding: 0.75rem 0.9rem; border-radius: 12px;
+            color: rgba(255,255,255,0.75); text-decoration: none;
             font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
-            background: transparent; border: none; text-align: left;
-            transition: background 0.2s, color 0.2s;
-            margin-bottom: 2px; cursor: pointer;
+            background: transparent; border: 1px solid transparent; text-align: left;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 3px; cursor: pointer; position: relative;
           }
           .side-nav-link:hover {
-            background: rgba(255,140,0,0.1); color: orange;
+            background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
+            color: #ff9d1a;
+            border-color: rgba(255,140,0,0.25);
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 3px 0 0 #ff8c00;
           }
-          .side-nav-link svg { flex-shrink: 0; opacity: 0.8; }
-          .side-nav-link:hover svg { opacity: 1; }
+          .side-nav-link svg {
+            flex-shrink: 0; opacity: 0.75;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+          }
+          .side-nav-link:hover svg {
+            opacity: 1; color: #ff8c00;
+            transform: scale(1.18);
+            filter: drop-shadow(0 0 6px rgba(255,140,0,0.5));
+          }
           .side-nav-link.active {
-            background: rgba(255,140,0,0.15) !important; color: orange !important;
+            background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+            color: #ff8c00 !important;
+            border-color: rgba(255,140,0,0.35) !important;
             font-weight: 700;
+            box-shadow: inset 3px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
           }
-          .side-nav-link.active svg { opacity: 1; }
+          .side-nav-link.active svg {
+            opacity: 1; color: #ff8c00;
+            filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
+          }
           [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
-          [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.65); }
-          [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08); color:orange; }
+          [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7); }
+          [data-bs-theme="light"] .side-nav-link:hover {
+            background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+            color: #e67e00 !important;
+            border-color: rgba(255,140,0,0.3) !important;
+            box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+          }
         </style>
 
         {{-- â”€â”€ PHOTOS CARD â”€â”€ --}}
@@ -1131,7 +1165,7 @@
             @endif
 
             {{-- Upload form --}}
-            @if(auth()->user()->photos()->count() < auth()->user()->photo_limit)
+            @if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit)
               <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
                 @csrf
                 <label for="photoUploadInput" class="media-upload-drop w-100" id="photoDropLabel">
@@ -1293,7 +1327,7 @@
             @endif
 
             {{-- Upload form --}}
-            @if(auth()->user()->videos()->count() < auth()->user()->video_limit)
+            @if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit)
               <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
                 @csrf
                 <label for="videoUploadInput" class="media-upload-drop w-100">
@@ -1406,8 +1440,8 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   <span style="font-size:0.85rem;color:rgba(255,255,255,0.75);">Active Plan: <strong style="color:orange;">{{ ucfirst(auth()->user()->subscription_plan) }}</strong></span>
                   <span class="ms-auto" style="font-size:0.78rem;color:rgba(255,255,255,0.4);">
-                    Photos: {{ $photos->count() }}/{{ auth()->user()->photo_limit }} &nbsp;·&nbsp;
-                    Videos: {{ $videos->count() }}/{{ auth()->user()->video_limit }}
+                    Photos: {{ auth()->user()->photosCountForLimit() }}/{{ auth()->user()->photo_limit }} &nbsp;·&nbsp;
+                    Videos: {{ auth()->user()->videosCountForLimit() }}/{{ auth()->user()->video_limit }}
                   </span>
                 </div>
 
@@ -1420,9 +1454,9 @@
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         Publish Photo
                       </h3>
-                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ $photos->count() }} of {{ auth()->user()->photo_limit }} used</p>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ auth()->user()->photosCountForLimit() }} of {{ auth()->user()->photo_limit }} used</p>
 
-                      @if(auth()->user()->photos()->count() < auth()->user()->photo_limit)
+                      @if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit)
                         <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishPhotoForm">
                           @csrf
                           <label for="publishPhotoInput" id="publishPhotoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
@@ -1459,9 +1493,9 @@
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                         Publish Video
                       </h3>
-                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ $videos->count() }} of {{ auth()->user()->video_limit }} used</p>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ auth()->user()->videosCountForLimit() }} of {{ auth()->user()->video_limit }} used</p>
 
-                      @if(auth()->user()->videos()->count() < auth()->user()->video_limit)
+                      @if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit)
                         <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishVideoForm">
                           @csrf
                           <label for="publishVideoInput" id="publishVideoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
@@ -1655,11 +1689,11 @@
                     <div class="d-flex gap-4">
                       <div>
                         <span class="text-secondary small">Photos:</span>
-                        <span class="fw-bold">{{ auth()->user()->photos()->count() }} / {{ auth()->user()->photo_limit }}</span>
+                        <span class="fw-bold">{{ auth()->user()->photosCountForLimit() }} / {{ auth()->user()->photo_limit }}</span>
                       </div>
                       <div>
                         <span class="text-secondary small">Videos:</span>
-                        <span class="fw-bold">{{ auth()->user()->videos()->count() }} / {{ auth()->user()->video_limit }}</span>
+                        <span class="fw-bold">{{ auth()->user()->videosCountForLimit() }} / {{ auth()->user()->video_limit }}</span>
                       </div>
                     </div>
                   </div>
@@ -2418,10 +2452,365 @@
             </div>
 
           </div>
-        </div>
+
+          {{-- ─────────────────────────────────────────────────────────────── --}}
+          {{-- TAB: MY REFERRALS (proper Blade pane inside .tab-content) --}}
+          {{-- ─────────────────────────────────────────────────────────────── --}}
+          @php
+            $authUser        = auth()->user();
+            $refLink         = $authUser->referral_link;
+            $totalReferred   = $authUser->referrals()->count();
+            $totalEarned     = $authUser->total_referral_earnings;
+            $redeemable      = (float) $authUser->referral_balance;
+            $refEarnings     = $authUser->referralEarnings()->with('referee')->latest()->get();
+          @endphp
+          <div class="tab-pane fade" id="tab-referrals" role="tabpanel" aria-labelledby="referrals-tab">
+
+            {{-- Breadcrumb --}}
+            <div class="mb-3">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
+                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">Home</a></li>
+                  <li class="breadcrumb-item active text-secondary" aria-current="page">My Referrals</li>
+                </ol>
+              </nav>
+            </div>
+
+            {{-- Hero card --}}
+            <div class="dash-card mb-3 p-3" style="background:linear-gradient(135deg,rgba(255,140,0,0.12),rgba(0,0,0,0.04));border:1px solid rgba(255,140,0,0.4);">
+              <header class="d-flex align-items-center gap-2 mb-1">
+                <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:36px;height:36px;background:orange;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <h2 class="dash-card-title mb-0 text-warning" style="font-size:1.15rem;">My Referrals</h2>
+                  <p class="text-muted mb-0" style="font-size:0.8rem;">Invite friends &amp; earn 10% bonus on every wallet top-up they make</p>
+                </div>
+              </header>
+            </div>
+
+            {{-- Global navbar handles success toast. Form errors are handled below input fields (none here) --}}
+
+            {{-- Stats row --}}
+            <div class="row g-3 mb-3">
+              <div class="col-6 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">{{ $totalReferred }}</div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Friends Referred</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh {{ number_format($totalEarned, 2) }}</div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Earned</div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(40,167,69,0.35);">
+                  <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh {{ number_format($redeemable, 2) }}</div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Available to Redeem</div>
+                </div>
+              </div>
+            </div>
+
+            {{-- Referral Link Card --}}
+            <div class="dash-card mb-3">
+              <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:0.6rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Your Referral Link
+              </h3>
+              <p class="text-muted" style="font-size:0.82rem;margin-bottom:0.85rem;">Share this link. When friends sign up &amp; top up their wallet, you earn 10% bonus!</p>
+              <div class="d-flex gap-2 align-items-center flex-wrap">
+                <input id="referralLinkInput" type="text" value="{{ $refLink }}" readonly
+                  class="form-control form-control-sm font-monospace"
+                  style="flex:1;min-width:0;border-color:rgba(255,140,0,0.3);border-radius:8px;padding:0.6rem 1rem;font-size:0.8rem;outline:none;">
+                <button id="copyReferralBtn" type="button" onclick="copyReferralLink()"
+                  style="background:transparent;border:2px solid orange;color:orange;padding:0.58rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;display:inline-flex;align-items:center;gap:0.4rem;font-family:inherit;"
+                  onmouseover="this.style.background='orange';this.style.color='#000'"
+                  onmouseout="this.style.background='transparent';this.style.color='orange'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy Link
+                </button>
+              </div>
+              <div id="copyReferralSuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">Link copied to clipboard!</div>
+            </div>
+
+            {{-- Redeem Card (only when balance > 0) --}}
+            @if($redeemable > 0)
+            <div class="dash-card mb-3" style="border-color:rgba(40,167,69,0.4);background:rgba(40,167,69,0.05);">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                  <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:0.3rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Redeem Bonus to Wallet
+                  </h3>
+                  <p class="text-muted" style="font-size:0.82rem;margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh {{ number_format($redeemable, 2) }}</strong> to your main wallet instantly.</p>
+                </div>
+                <form method="POST" action="{{ route('referrals.redeem') }}"
+                  onsubmit="return confirm('Redeem KSh {{ number_format($redeemable, 2) }} to your wallet?')">
+                  @csrf
+                  <button type="submit"
+                    style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.62rem 1.4rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;font-family:inherit;"
+                    onmouseover="this.style.background='#28a745';this.style.color='#fff'"
+                    onmouseout="this.style.background='transparent';this.style.color='#28a745'">
+                    Redeem KSh {{ number_format($redeemable, 2) }}
+                  </button>
+                </form>
+              </div>
+            </div>
+            @else
+            <div class="dash-card mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(128,128,128,0.1);border:1px solid rgba(128,128,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted" style="opacity:0.4;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                  <div class="text-muted" style="font-size:0.88rem;font-weight:700;">No bonus available yet</div>
+                  <div class="text-muted" style="font-size:0.78rem;margin-top:0.2rem;opacity:0.7;">Refer friends and have them top up their wallet to earn your bonus.</div>
+                </div>
+              </div>
+            </div>
+            @endif
+
+            {{-- Earnings History --}}
+            <div class="dash-card">
+              <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:1rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Earnings History
+              </h3>
+              <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:1px solid rgba(128,128,128,0.15);">
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Friend</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Date</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Deposit</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Bonus</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @forelse($refEarnings as $earning)
+                      <tr style="border-bottom:1px solid rgba(128,128,128,0.07);">
+                        <td class="dash-card-title" style="padding:0.65rem 0.75rem;font-size:0.85rem;">{{ $earning->referee?->name ?? 'Unknown' }}</td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.8rem;">{{ $earning->created_at->format('d M Y') }}</td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.85rem;">KSh {{ number_format($earning->deposit_amount, 2) }}</td>
+                        <td style="padding:0.65rem 0.75rem;color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh {{ number_format($earning->bonus_amount, 2) }}</td>
+                        <td style="padding:0.65rem 0.75rem;">
+                          @if($earning->status === 'redeemed')
+                            <span style="background:rgba(40,167,69,0.15);color:#28a745;border:1px solid rgba(40,167,69,0.3);border-radius:4px;padding:0.2rem 0.55rem;font-size:0.72rem;font-weight:700;">Redeemed</span>
+                          @else
+                            <span style="color:rgba(255,140,0,0.7);font-size:0.78rem;font-weight:600;">Awarded</span>
+                          @endif
+                        </td>
+                      </tr>
+                    @empty
+                      <tr>
+                        <td colspan="5" class="text-muted" style="text-align:center;padding:2.5rem;font-size:0.85rem;">
+                          No referral earnings yet. Share your link to get started!
+                        </td>
+                      </tr>
+                    @endforelse
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>{{-- end #tab-referrals --}}
+
+        </div>{{-- end .tab-content --}}
       </div>
     </div>
   </div>
+
+  <script>
+  function copyReferralLink() {
+    var input = document.getElementById('referralLinkInput');
+    var btn   = document.getElementById('copyReferralBtn');
+    var msg   = document.getElementById('copyReferralSuccess');
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(function() {
+      if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 3000); }
+      if (btn) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(function(){
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link';
+        }, 3000);
+      }
+    }).catch(function() {
+      input.select(); document.execCommand('copy');
+      if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
+    });
+  }
+  </script>
+
+  <script>
+  (function() {
+    // Build and inject #tab-referrals pane into .tab-content
+    var tabContent = document.querySelector('.tab-content');
+    if (!tabContent) return;
+
+    var referralLink = {{ Js::from(auth()->user()->referral_link) }};
+    var totalReferred = {{ auth()->user()->referrals()->count() }};
+    var totalEarned = {{ number_format(auth()->user()->total_referral_earnings, 2) }};
+    var redeemable = {{ number_format(auth()->user()->referral_balance, 2) }};
+    var earnings = {{ Js::from(auth()->user()->referralEarnings()->with('referee')->latest()->get()->map(fn($e) => [
+      'date'          => $e->created_at->format('d M Y'),
+      'referee_name'  => $e->referee?->name ?? 'Unknown',
+      'deposit_amount'=> number_format($e->deposit_amount, 2),
+      'bonus_amount'  => number_format($e->bonus_amount, 2),
+      'status'        => ucfirst($e->status),
+    ])) }};
+
+    var pane = document.createElement('div');
+    pane.className = 'tab-pane fade';
+    pane.id = 'tab-referrals';
+    pane.setAttribute('role', 'tabpanel');
+    pane.setAttribute('aria-labelledby', 'referrals-tab');
+
+    var earnRows = earnings.length ? earnings.map(function(e) {
+      var badge = e.status === 'Redeemed'
+        ? '<span class="badge" style="background:rgba(40,167,69,0.15);color:#28a745;border:1px solid rgba(40,167,69,0.3);font-size:0.72rem;">Redeemed</span>'
+        : '<span class="badge" style="background:rgba(255,140,0,0.15);color:orange;border:1px solid rgba(255,140,0,0.3);font-size:0.72rem;">Awarded</span>';
+      return '<tr><td style="color:rgba(255,255,255,0.85);font-size:0.85rem;">' + e.referee_name + '</td><td style="color:rgba(255,255,255,0.6);font-size:0.82rem;">' + e.date + '</td><td style="color:rgba(255,255,255,0.75);font-size:0.85rem;">KSh ' + e.deposit_amount + '</td><td style="color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh ' + e.bonus_amount + '</td><td>' + badge + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.35);padding:2rem;font-size:0.85rem;">No referral earnings yet. Share your link to get started!</td></tr>';
+
+    pane.innerHTML = `
+      <div class="mb-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
+            <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active text-secondary" aria-current="page">My Referrals</li>
+          </ol>
+        </nav>
+      </div>
+
+      <!-- Hero card -->
+      <div class="dash-card mb-3 p-3" style="background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(17,17,17,0.9));border:1px solid rgba(255,140,0,0.4);">
+        <header class="d-flex align-items-center gap-2 mb-2">
+          <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:36px;height:36px;background:orange;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title mb-0 text-warning" style="font-size:1.15rem;">My Referrals</h2>
+            <p class="text-secondary mb-0" style="font-size:0.8rem;">Invite friends &amp; earn 10% bonus on every deposit they make</p>
+          </div>
+        </header>
+      </div>
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+            <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">${totalReferred}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Friends Referred</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+            <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh ${totalEarned}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Earned</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(40,167,69,0.35);">
+            <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh ${redeemable}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Available to Redeem</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Referral Link Card -->
+      <div class="dash-card mb-3">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.75rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Your Referral Link
+        </h3>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:1rem;">Share this link with friends. When they sign up and deposit, you earn 10% bonus!</p>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          <input id="referralLinkInput" type="text" value="${referralLink}" readonly
+            style="flex:1;min-width:0;background:rgba(0,0,0,0.35);border:1px solid rgba(255,140,0,0.3);color:rgba(255,255,255,0.85);border-radius:8px;padding:0.6rem 1rem;font-size:0.82rem;font-family:monospace;">
+          <button id="copyReferralBtn" onclick="copyReferralLink()" type="button"
+            style="background:transparent;border:2px solid orange;color:orange;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;display:inline-flex;align-items:center;gap:0.4rem;"
+            onmouseover="this.style.background='orange';this.style.color='#000'"
+            onmouseout="this.style.background='transparent';this.style.color='orange'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Link
+          </button>
+        </div>
+        <div id="copySuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">
+          ✓ Link copied to clipboard!
+        </div>
+      </div>
+
+      <!-- Redeem Card -->
+      ${parseFloat(redeemable) > 0 ? `
+      <div class="dash-card mb-3" style="border-color:rgba(40,167,69,0.4);background:rgba(40,167,69,0.05);">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.3rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Redeem Bonus to Wallet
+            </h3>
+            <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh ${redeemable}</strong> from your referral balance to your main wallet.</p>
+          </div>
+          <form method="POST" action="{{ route('referrals.redeem') }}" onsubmit="return confirm('Redeem KSh ${redeemable} to your wallet?')">
+            @csrf
+            <button type="submit"
+              style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;"
+              onmouseover="this.style.background='#28a745';this.style.color='#fff'"
+              onmouseout="this.style.background='transparent';this.style.color='#28a745'">
+              💰 Redeem KSh ${redeemable}
+            </button>
+          </form>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Earnings History Table -->
+      <div class="dash-card">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Earnings History
+        </h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Friend</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Date</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Deposit</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Bonus</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Status</th>
+              </tr>
+            </thead>
+            <tbody>${earnRows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    tabContent.appendChild(pane);
+  })();
+
+  function copyReferralLink() {
+    var input = document.getElementById('referralLinkInput');
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(function() {
+      var success = document.getElementById('copySuccess');
+      var btn = document.getElementById('copyReferralBtn');
+      if (success) { success.style.display = 'block'; setTimeout(function(){ success.style.display='none'; }, 3000); }
+      if (btn) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(function(){
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link';
+        }, 3000);
+      }
+    }).catch(function() {
+      input.select(); document.execCommand('copy');
+    });
+  }
+  </script>
   
   <x-footer />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -2922,35 +3311,9 @@
         }
       }, true);
 
-      @if(session('success'))
-      // Show a toast notification
-      var toastEl = document.createElement('div');
-      toastEl.innerHTML = `
-        <div id="classifiedToast" style="
-          position:fixed; top:80px; right:2rem; z-index:9999;
-          background:linear-gradient(135deg,rgba(40,167,69,0.95),rgba(25,110,45,0.95));
-          border:1px solid rgba(40,167,69,0.5);
-          border-radius:12px; padding:1.25rem 1.5rem;
-          color:#fff; font-family:'Outfit',sans-serif;
-          font-size:0.95rem; font-weight:500;
-          box-shadow:0 8px 24px rgba(0,0,0,0.4);
-          display:flex; align-items:center; gap:0.75rem;
-          max-width:360px;
-          animation: slideInToast 0.4s ease;
-        ">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span>{{ session('success') }}</span>
-        </div>
-      `;
-      document.body.appendChild(toastEl);
-      setTimeout(function() {
-        var t = document.getElementById('classifiedToast');
-        if (t) { t.style.opacity = '0'; t.style.transition = 'opacity 0.5s'; setTimeout(function(){ t.parentNode && t.parentNode.removeChild(t.parentNode); }, 500); }
-      }, 4000);
 
       // Auto-activate classifieds tab if success from classified payment
+      @if(session('success'))
       var classifiedsTabBtn = document.getElementById('classifieds-tab');
       if (classifiedsTabBtn) {
         var bsTab = new bootstrap.Tab(classifiedsTabBtn);
@@ -2958,6 +3321,20 @@
       }
       @endif
 
+      // Auto-activate tab from URL hash (e.g. #tab-wallet)
+      function activateTabFromHash() {
+        var hash = window.location.hash;
+        if (hash) {
+          var targetId = hash.replace('#', '');
+          var tabBtn = document.querySelector('[data-bs-target="' + hash + '"]') || document.getElementById(targetId.replace('tab-', '') + '-tab');
+          if (tabBtn && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            var bsTab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+            bsTab.show();
+          }
+        }
+      }
+      activateTabFromHash();
+      window.addEventListener('hashchange', activateTabFromHash);
     });
   </script>
 

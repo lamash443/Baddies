@@ -9,8 +9,21 @@
   // Age & City
   $age = $user->age ? $user->age . ' Yo' : null;
   $city = $user->city_town ?? null;
-  // Subscription plan badge
-  $plan = $user->subscription_plan ?? null;
+  // Subscription plan normalization
+  $rawPlan = strtolower(trim($user->subscription_plan ?? 'regular'));
+  if (in_array($rawPlan, ['prime_vip', 'prime-vip', 'primevip'])) {
+      $planType = 'prime_vip';
+      $planLabel = 'Prime VIP';
+  } elseif (in_array($rawPlan, ['prime', 'prime_escort'])) {
+      $planType = 'prime';
+      $planLabel = 'Prime';
+  } elseif (in_array($rawPlan, ['vip', 'vip_escort'])) {
+      $planType = 'vip';
+      $planLabel = 'VIP';
+  } else {
+      $planType = 'regular';
+      $planLabel = 'Regular';
+  }
   // Gender-aware card label
   $gender = strtolower($user->gender ?? '');
   $cardLabel = $gender === 'female' ? 'Escort Girl' : ($gender === 'male' ? 'Call Boy' : 'Escort');
@@ -23,13 +36,13 @@
     <div class="nr-listing-card__media-wrap">
       <img class="nr-listing-card__media" src="{{ $cover }}" alt="{{ $name }}" loading="lazy">
 
-      @if($plan === 'prime_vip')
+      @if($planType === 'prime_vip')
         <span class="nr-plan-badge nr-plan-badge--prime-vip">Prime VIP</span>
-      @elseif($plan === 'prime')
+      @elseif($planType === 'prime')
         <span class="nr-plan-badge nr-plan-badge--prime">Prime</span>
-      @elseif($plan === 'vip')
+      @elseif($planType === 'vip')
         <span class="nr-plan-badge nr-plan-badge--vip">VIP</span>
-      @elseif($plan === 'regular')
+      @else
         <span class="nr-plan-badge nr-plan-badge--regular">Regular</span>
       @endif
     </div>

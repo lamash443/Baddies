@@ -17,7 +17,7 @@ class UserVideoController extends Controller
 
         $user = auth()->user();
 
-        if ($user->videos()->count() >= $user->video_limit) {
+        if ($user->videosCountForLimit() >= $user->video_limit) {
             return back()->withFragment('tab-publish-media')->withErrors(['video' => 'You have reached the video upload limit for your current subscription plan.']);
         }
 

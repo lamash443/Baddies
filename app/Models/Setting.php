@@ -25,6 +25,8 @@ class Setting extends Model
         'online_threshold_minutes',
         // Email Verification
         'verification_toast_message',
+        // Referral
+        'referral_commission_rate',
     ];
 
     protected $casts = [
@@ -34,6 +36,7 @@ class Setting extends Model
         'show_online_status_in_chat'=> 'boolean',
         'online_toast_duration'     => 'integer',
         'online_threshold_minutes'  => 'integer',
+        'referral_commission_rate'  => 'decimal:2',
     ];
 
     /**
@@ -59,6 +62,7 @@ class Setting extends Model
             'show_online_status_in_chat' => true,
             'online_threshold_minutes'   => 5,
             'verification_toast_message' => 'A new verification link has been sent to your email address.',
+            'referral_commission_rate'   => 10.00,
         ]);
     }
 }

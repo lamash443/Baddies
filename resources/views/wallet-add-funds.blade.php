@@ -108,22 +108,40 @@
     }
     .side-nav-link {
       display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.7rem 0.85rem; border-radius: 10px;
-      color: rgba(255,255,255,0.72); text-decoration: none;
-      font-size: 0.92rem; font-weight: 500;
-      transition: background 0.2s, color 0.2s;
-      margin-bottom: 2px;
+      width: 100%; padding: 0.75rem 0.9rem; border-radius: 12px;
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
+      background: transparent; border: 1px solid transparent; text-align: left;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 3px; cursor: pointer; position: relative;
     }
     .side-nav-link:hover {
-      background: rgba(255,140,0,0.1); color: orange;
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
+      color: #ff9d1a;
+      border-color: rgba(255,140,0,0.25);
+      transform: translateX(6px);
+      box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 3px 0 0 #ff8c00;
     }
-    .side-nav-link svg { flex-shrink: 0; opacity: 0.8; }
-    .side-nav-link:hover svg { opacity: 1; }
+    .side-nav-link svg {
+      flex-shrink: 0; opacity: 0.75;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+    }
+    .side-nav-link:hover svg {
+      opacity: 1; color: #ff8c00;
+      transform: scale(1.18);
+      filter: drop-shadow(0 0 6px rgba(255,140,0,0.5));
+    }
     .side-nav-link.active {
-      background: rgba(255,140,0,0.15); color: orange;
+      background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+      color: #ff8c00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
       font-weight: 700;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
     }
-    .side-nav-link.active svg { opacity: 1; }
+    .side-nav-link.active svg {
+      opacity: 1; color: #ff8c00;
+      filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
+    }
 
     /* LIGHT THEME OVERRIDES */
     [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
@@ -172,8 +190,18 @@
     [data-bs-theme="light"] .side-nav-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 4px 20px rgba(0,0,0,0.04) !important; }
     [data-bs-theme="light"] .side-nav-title { color:rgba(0,0,0,0.45) !important; border-bottom-color:rgba(0,0,0,0.08) !important; }
     [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7) !important; }
-    [data-bs-theme="light"] .side-nav-link:hover { background:rgba(255,140,0,0.08) !important; color:#ff8c00 !important; }
-    [data-bs-theme="light"] .side-nav-link.active { background:rgba(255,140,0,0.12) !important; color:#ff8c00 !important; }
+    [data-bs-theme="light"] .side-nav-link:hover {
+      background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.3) !important;
+      box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
 
     [data-bs-theme="light"] .stepper-line { background: rgba(0,0,0,0.1) !important; }
     [data-bs-theme="light"] .step-circle.bg-dark { background: #f0f0f4 !important; border-color: rgba(0,0,0,0.15) !important; color: #666 !important; }
@@ -257,6 +285,11 @@
           <a href="{{ route('profile.edit') }}#tab-verification" class="side-nav-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
             Photo Verification
+          </a>
+
+          <a href="{{ route('profile.edit') }}#tab-referrals" class="side-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+            My Referrals
           </a>
         </div>
       </div>

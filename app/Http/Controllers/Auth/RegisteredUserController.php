@@ -17,9 +17,13 @@ class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
+     * Stores the referral code in session so it survives browsing before registering.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        if ($request->filled('ref') && ! session()->has('ref_code')) {
+            session(['ref_code' => $request->input('ref')]);
+        }
         return view('auth.register');
     }
 
@@ -45,10 +49,19 @@ class RegisteredUserController extends Controller
             'password.regex' => 'The password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number or symbol.',
         ]);
 
+        // Resolve referrer from URL param, form field, or session
+        $refCode  = $request->input('ref') ?? $request->input('referral_code') ?? session('ref_code');
+        $referrer = null;
+        if ($refCode) {
+            $referrer = User::where('referral_code', trim($refCode))->first();
+            session()->forget('ref_code');
+        }
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name'           => $request->name,
+            'email'          => $request->email,
+            'password'       => Hash::make($request->password),
+            'referred_by_id' => $referrer?->id,
         ]);
 
         event(new Registered($user));

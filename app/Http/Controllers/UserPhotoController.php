@@ -17,7 +17,7 @@ class UserPhotoController extends Controller
 
         $user = auth()->user();
 
-        if ($user->photos()->count() >= $user->photo_limit) {
+        if ($user->photosCountForLimit() >= $user->photo_limit) {
             return back()->withFragment('tab-publish-media')->withErrors(['photo' => 'You have reached the photo upload limit for your current subscription plan.']);
         }
 

@@ -101,8 +101,8 @@
 
     /* PAGINATION */
     .cb-pagination { display:flex; justify-content:center; gap:0.4rem; padding:1rem 0 3rem; }
-    .cb-page-btn { width:38px; height:38px; border-radius:8px; border:1.5px solid rgba(255,140,0,0.2); background:transparent; color:rgba(255,255,255,0.5); font-family:"Outfit",sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center; }
-    .cb-page-btn:hover { border-color:rgba(255,140,0,0.55); color:#fff; background:rgba(255,140,0,0.08); }
+    .cb-page-btn { width:38px; height:38px; border-radius:8px; border:1.5px solid rgba(255,140,0,0.2); background:transparent; color:rgba(255,255,255,0.5); font-family:"Outfit",sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center; text-decoration:none; }
+    .cb-page-btn:hover { border-color:rgba(255,140,0,0.55); color:#fff; background:rgba(255,140,0,0.08); text-decoration:none; }
     .cb-page-btn.active { background:orange; border-color:orange; color:#000; }
 
     /* PROFILE MODAL */
@@ -259,63 +259,50 @@
 <!-- FILTER BAR -->
 <div class="cb-filter-bar">
   <div class="container">
-    <div class="cb-filters">
-      <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase;">Filter By</span>
-      <select class="cb-filter-select" aria-label="Select Gender">
-        <option>Select Gender</option>
-        <option>Female</option>
-        <option>Male</option>
-      </select>
-      <select class="cb-filter-select" aria-label="Select Sexual Orientation">
-        <option>Select Sexual Orientation</option>
-        <option>Straight</option>
-        <option>Bisexual</option>
-        <option>Gay</option>
-      </select>
-      <div class="ms-auto">
-        <select class="cb-filter-select" aria-label="Sort by">
-          <option>Sort: Featured</option>
-          <option>Sort: Newest</option>
-          <option>Sort: Most Viewed</option>
-          <option>Sort: Price Low to High</option>
+    <form method="GET" action="{{ route('location.show', $searchLocation) }}" id="locationFilterForm">
+      <div class="cb-filters">
+        <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; flex-shrink:0;">Filter By</span>
+
+        <select name="gender" class="cb-filter-select" aria-label="Select Gender" onchange="document.getElementById('locationFilterForm').submit()">
+          <option value="">Select Gender</option>
+          <option value="Female" {{ ($gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
+          <option value="Male"   {{ ($gender ?? '') === 'Male'   ? 'selected' : '' }}>Male</option>
+          <option value="Other"  {{ ($gender ?? '') === 'Other'  ? 'selected' : '' }}>Other</option>
         </select>
+
+        <select name="orientation" class="cb-filter-select" aria-label="Select Sexual Orientation" onchange="document.getElementById('locationFilterForm').submit()">
+          <option value="">Select Sexual Orientation</option>
+          <option value="Straight"  {{ ($orientation ?? '') === 'Straight'  ? 'selected' : '' }}>Straight</option>
+          <option value="Bisexual"  {{ ($orientation ?? '') === 'Bisexual'  ? 'selected' : '' }}>Bisexual</option>
+          <option value="Gay"       {{ ($orientation ?? '') === 'Gay'       ? 'selected' : '' }}>Gay</option>
+          <option value="Lesbian"   {{ ($orientation ?? '') === 'Lesbian'   ? 'selected' : '' }}>Lesbian</option>
+        </select>
+
+        <div class="ms-auto">
+          <select name="sort" class="cb-filter-select" aria-label="Sort by" onchange="document.getElementById('locationFilterForm').submit()">
+            <option value="featured" {{ ($sort ?? 'featured') === 'featured' ? 'selected' : '' }}>Sort: Featured</option>
+            <option value="newest"   {{ ($sort ?? '') === 'newest'   ? 'selected' : '' }}>Sort: Newest</option>
+            <option value="oldest"   {{ ($sort ?? '') === 'oldest'   ? 'selected' : '' }}>Sort: Oldest</option>
+            <option value="name_asc" {{ ($sort ?? '') === 'name_asc' ? 'selected' : '' }}>Sort: Name A–Z</option>
+          </select>
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
 <!<!-- GRID -->
 <main class="container">
 
-  @if($vipUsers->isNotEmpty())
+  @if($users->isNotEmpty())
   <div class="mb-5">
-    <h2 class="fs-4 fw-bold mb-4" style="color:rgba(255,140,0,0.9); display:flex; align-items:center; gap:0.5rem;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      VIP Members
-    </h2>
     <div class="nr-card-grid">
-      @foreach($vipUsers as $user)
+      @foreach($users as $user)
         @include('partials.user-card', ['user' => $user])
       @endforeach
     </div>
   </div>
-  @endif
-
-  @if($regularUsers->isNotEmpty())
-  <div class="mb-5">
-    <h2 class="fs-4 fw-bold mb-4" style="color:#fff; display:flex; align-items:center; gap:0.5rem;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Verified Members
-    </h2>
-    <div class="nr-card-grid">
-      @foreach($regularUsers as $user)
-        @include('partials.user-card', ['user' => $user])
-      @endforeach
-    </div>
-  </div>
-  @endif
-
-  @if($vipUsers->isEmpty() && $regularUsers->isEmpty())
+  @else
     <div class="text-center py-5">
       <div style="max-width: 540px; margin: 0 auto; background: linear-gradient(145deg, rgba(26,15,0,0.8), rgba(13,13,13,0.9)); border: 1px solid rgba(255, 140, 0, 0.25); border-radius: 20px; padding: 3.5rem 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);">
         <div style="width: 72px; height: 72px; background: rgba(255, 140, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid rgba(255, 140, 0, 0.2);">
@@ -339,13 +326,41 @@
   @endif
 
 </main>
+
   <!-- PAGINATION -->
+  @if($users->hasPages())
   <div class="cb-pagination">
-    <button class="cb-page-btn active">1</button>
-    <button class="cb-page-btn">2</button>
-    <button class="cb-page-btn">3</button>
-    <button class="cb-page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+
+    {{-- Previous --}}
+    @if($users->onFirstPage())
+      <span class="cb-page-btn" style="opacity:0.3; cursor:default;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </span>
+    @else
+      <a class="cb-page-btn" href="{{ $users->previousPageUrl() }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+    @endif
+
+    {{-- Page numbers --}}
+    @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+      <a class="cb-page-btn {{ $page === $users->currentPage() ? 'active' : '' }}"
+         href="{{ $url }}">{{ $page }}</a>
+    @endforeach
+
+    {{-- Next --}}
+    @if($users->hasMorePages())
+      <a class="cb-page-btn" href="{{ $users->nextPageUrl() }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </a>
+    @else
+      <span class="cb-page-btn" style="opacity:0.3; cursor:default;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </span>
+    @endif
+
   </div>
+  @endif
 </main>
 
 

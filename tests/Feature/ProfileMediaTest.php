@@ -16,7 +16,7 @@ class ProfileMediaTest extends TestCase
 
     public function test_unauthenticated_user_cannot_upload_photo(): void
     {
-        $photo = UploadedFile::fake()->image('photo.jpg');
+        $photo = UploadedFile::fake()->create('photo.jpg', 10, 'image/jpeg');
 
         $response = $this->post('/profile/photos', [
             'photo' => $photo,
@@ -36,7 +36,7 @@ class ProfileMediaTest extends TestCase
             'subscription_expires_at' => now()->addDays(30),
         ]);
 
-        $photo = UploadedFile::fake()->image('photo.jpg');
+        $photo = UploadedFile::fake()->create('photo.jpg', 10, 'image/jpeg');
 
         $response = $this->actingAs($user)->post('/profile/photos', [
             'photo' => $photo,
@@ -73,7 +73,7 @@ class ProfileMediaTest extends TestCase
             ]);
         }
 
-        $photo = UploadedFile::fake()->image('extra.jpg');
+        $photo = UploadedFile::fake()->create('extra.jpg', 10, 'image/jpeg');
 
         $response = $this->actingAs($user)->post('/profile/photos', [
             'photo' => $photo,
@@ -107,7 +107,7 @@ class ProfileMediaTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('photo_delete_success', 'Photo deleted.');
 
-        $this->assertDatabaseMissing('user_photos', [
+        $this->assertSoftDeleted('user_photos', [
             'id' => $photo->id,
         ]);
 
@@ -148,7 +148,7 @@ class ProfileMediaTest extends TestCase
         Storage::fake('public');
 
         $user = User::factory()->create([
-            'subscription_plan' => 'regular',
+            'subscription_plan' => 'prime',
             'subscription_expires_at' => now()->addDays(30),
         ]);
 
@@ -231,7 +231,7 @@ class ProfileMediaTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('video_delete_success', 'Video deleted.');
 
-        $this->assertDatabaseMissing('user_videos', [
+        $this->assertSoftDeleted('user_videos', [
             'id' => $video->id,
         ]);
 
@@ -265,5 +265,37 @@ class ProfileMediaTest extends TestCase
         ]);
 
         Storage::disk('public')->assertExists('user-videos/test/video.mp4');
+    }
+
+    public function test_deleted_photo_still_counts_towards_photo_limit(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'subscription_plan' => 'regular',
+            'subscription_expires_at' => now()->addDays(30),
+        ]);
+
+        for ($i = 1; $i <= 4; $i++) {
+            UserPhoto::create([
+                'user_id' => $user->id,
+                'path' => "user-photos/{$user->id}/photo-{$i}.jpg",
+                'caption' => "Photo {$i}",
+            ]);
+        }
+
+        $photoToDelete = UserPhoto::where('user_id', $user->id)->first();
+        $this->actingAs($user)->delete("/profile/photos/{$photoToDelete->id}");
+
+        $this->assertEquals(3, $user->photos()->count());
+        $this->assertEquals(4, $user->photosCountForLimit());
+
+        $extraPhoto = UploadedFile::fake()->create('extra.jpg', 10, 'image/jpeg');
+        $response = $this->actingAs($user)->post('/profile/photos', [
+            'photo' => $extraPhoto,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('photo');
     }
 }

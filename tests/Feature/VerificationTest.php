@@ -15,7 +15,7 @@ class VerificationTest extends TestCase
 
     public function test_unauthenticated_user_cannot_submit_verification_photo(): void
     {
-        $photo = UploadedFile::fake()->image('verification.jpg');
+        $photo = UploadedFile::fake()->create('verification.jpg', 10, 'image/jpeg');
 
         $response = $this->post('/profile/verification', [
             'photo' => $photo,
@@ -34,7 +34,7 @@ class VerificationTest extends TestCase
             'is_verified' => false,
         ]);
 
-        $photo = UploadedFile::fake()->image('verification.jpg');
+        $photo = UploadedFile::fake()->create('verification.jpg', 10, 'image/jpeg');
 
         $response = $this->actingAs($user)->post('/profile/verification', [
             'photo' => $photo,
@@ -105,7 +105,7 @@ class VerificationTest extends TestCase
             'status' => 'rejected',
         ]);
 
-        $photo = UploadedFile::fake()->image('new-photo.jpg');
+        $photo = UploadedFile::fake()->create('new-photo.jpg', 10, 'image/jpeg');
 
         $response = $this->actingAs($user)->post('/profile/verification', [
             'photo' => $photo,

@@ -180,27 +180,50 @@ Route::get('/category/call-boys', function () {
 Route::get('/location/{name}', function ($name) {
     // Decode the location name (e.g. from %20 to space)
     $searchLocation = urldecode($name);
-    
-    $users = \App\Models\User::where('is_verified', true)
-        ->activeSubscription()
-        ->where(function ($query) use ($searchLocation) {
-            $query->where('county', 'LIKE', '%' . $searchLocation . '%')
-                  ->orWhere('city_town', 'LIKE', '%' . $searchLocation . '%')
-                  ->orWhere('location', 'LIKE', '%' . $searchLocation . '%')
-                  ->orWhere('area', 'LIKE', '%' . $searchLocation . '%');
-        })
-        ->with('photos')
-        ->get();
-        
-    $vipUsers = $users->filter(function($u) {
-        return in_array($u->subscription_plan, ['vip', 'prime_vip', 'prime-vip']) && $u->hasActiveSubscription();
-    });
-    
-    $regularUsers = $users->filter(function($u) {
-        return !in_array($u->subscription_plan, ['vip', 'prime_vip', 'prime-vip']) || !$u->hasActiveSubscription();
-    });
 
-    return view('location', compact('vipUsers', 'regularUsers', 'searchLocation'));
+    // Filter inputs
+    $gender      = request('gender');
+    $orientation = request('orientation');
+    $sort        = request('sort', 'featured');
+
+    $query = \App\Models\User::where('is_verified', true)
+        ->activeSubscription()
+        ->where(function ($q) use ($searchLocation) {
+            $q->where('county', 'LIKE', '%' . $searchLocation . '%')
+              ->orWhere('city_town', 'LIKE', '%' . $searchLocation . '%')
+              ->orWhere('location', 'LIKE', '%' . $searchLocation . '%')
+              ->orWhere('area', 'LIKE', '%' . $searchLocation . '%');
+        })
+        ->with('photos');
+
+    // Apply gender filter
+    if ($gender && $gender !== '') {
+        $query->where('gender', 'LIKE', '%' . $gender . '%');
+    }
+
+    // Apply sexual orientation filter
+    if ($orientation && $orientation !== '') {
+        $query->where('sexual_orientation', 'LIKE', '%' . $orientation . '%');
+    }
+
+    // Apply sort
+    match ($sort) {
+        'newest'    => $query->orderBy('created_at', 'desc'),
+        'oldest'    => $query->orderBy('created_at', 'asc'),
+        'name_asc'  => $query->orderBy('name', 'asc'),
+        default     => $query->orderByRaw("FIELD(subscription_plan,'prime_vip','prime-vip','prime','vip','regular') ASC"),
+    };
+
+    $users = $query->paginate(16)->withQueryString();
+
+    $vipUsers     = $users->getCollection()->filter(fn($u) =>
+        in_array($u->subscription_plan, ['vip', 'prime_vip', 'prime-vip', 'prime']) && $u->hasActiveSubscription()
+    );
+    $regularUsers = $users->getCollection()->filter(fn($u) =>
+        !in_array($u->subscription_plan, ['vip', 'prime_vip', 'prime-vip', 'prime']) || !$u->hasActiveSubscription()
+    );
+
+    return view('location', compact('users', 'vipUsers', 'regularUsers', 'searchLocation', 'gender', 'orientation', 'sort'));
 })->name('location.show');
 
 // Public profile view
@@ -232,15 +255,39 @@ Route::get('/profile/{id}', function ($id) {
         ]);
     }
 
-    // Similar profiles: same gender, verified, exclude current
-    $similarProfiles = \App\Models\User::with('photos')
+    // Similar profiles: prioritise same subscription plan, then fill with others
+    $viewedPlan = $user->subscription_plan ?? 'regular';
+
+    // Pass 1: same gender + same plan (up to 6)
+    $samePlanProfiles = \App\Models\User::with('photos')
         ->where('is_verified', true)
         ->activeSubscription()
         ->where('id', '!=', $user->id)
         ->when($user->gender, fn($q) => $q->where('gender', $user->gender))
+        ->where('subscription_plan', $viewedPlan)
         ->inRandomOrder()
         ->limit(6)
         ->get();
+
+    $remaining = 6 - $samePlanProfiles->count();
+
+    // Pass 2: fill remaining slots with any other plan (exclude already fetched IDs)
+    $otherProfiles = collect();
+    if ($remaining > 0) {
+        $excludeIds = $samePlanProfiles->pluck('id')->push($user->id);
+        $otherProfiles = \App\Models\User::with('photos')
+            ->where('is_verified', true)
+            ->activeSubscription()
+            ->whereNotIn('id', $excludeIds)
+            ->when($user->gender, fn($q) => $q->where('gender', $user->gender))
+            ->inRandomOrder()
+            ->limit($remaining)
+            ->get();
+    }
+
+    // Merge: same-plan first, then others
+    $similarProfiles = $samePlanProfiles->concat($otherProfiles);
+
 
     return view('profile-view', compact('user', 'similarProfiles'));
 })->where('id', '[0-9]+')->name('profile.view');
@@ -436,7 +483,7 @@ Route::middleware('auth')->group(function () {
             if ($request->payment_method === 'wallet') {
                 $user = auth()->user();
                 if ($user->wallet_balance < $cost) {
-                    return back()->withErrors(['wallet' => 'Insufficient wallet balance. Please add funds.']);
+                    return redirect()->route('profile.edit', ['#tab-wallet'])->withErrors(['wallet' => 'Insufficient wallet balance. Please add funds.']);
                 }
                 $user->decrement('wallet_balance', $cost);
                 $paymentStatus = 'paid';
@@ -459,7 +506,7 @@ Route::middleware('auth')->group(function () {
             ]);
 
             if ($paymentStatus === 'paid') {
-                return redirect()->route('profile.edit', ['#tab-classifieds'])
+                return redirect()->route('profile.edit', ['#tab-wallet'])
                     ->with('success', 'Your classified post has been published! Your wallet has been debited KSh ' . number_format($cost, 2) . '.');
             }
 
@@ -476,7 +523,7 @@ Route::middleware('auth')->group(function () {
             $user = auth()->user();
 
             if ($user->wallet_balance < $cost) {
-                return back()->withErrors(['wallet' => 'Insufficient wallet balance. Please add funds.']);
+                return redirect()->route('profile.edit', ['#tab-wallet'])->withErrors(['wallet' => 'Insufficient wallet balance. Please add funds.']);
             }
 
             // Deduct cost from wallet
@@ -508,8 +555,8 @@ Route::middleware('auth')->group(function () {
                 ->withProperties(['plan' => $planType, 'days' => $planDays, 'cost' => $cost, 'method' => 'wallet'])
                 ->log("Subscribed to {$planLabel} plan via wallet");
 
-            // Redirect back to same checkout page with success toast
-            return back()->with('success', "You're now subscribed to the {$planLabel} plan!");
+            // Redirect to profile wallet tab with success toast
+            return redirect()->route('profile.edit', ['#tab-wallet'])->with('success', "You're now subscribed to the {$planLabel} plan!");
         }
         
         // Save to session or database to process later for MPESA
@@ -557,6 +604,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/payment/initiate', [PaymentController::class, 'initiate'])->name('payment.initiate');
     Route::get('/payment/status/{reference}', [PaymentController::class, 'status'])->name('payment.status');
+
+    // Referral bonus redemption
+    Route::post('/referrals/redeem', [\App\Http\Controllers\ReferralController::class, 'redeem'])->name('referrals.redeem');
 });
 
 

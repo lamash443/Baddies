@@ -439,6 +439,7 @@
               clearInterval(window._rcPoll);
               rcShowPanel('timeout');
               submitBtn.disabled = false;
+              setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-wallet", 2500);
               return;
             }
             fetch('/payment/status/' + data.reference)
@@ -447,7 +448,7 @@
               if (s.status === 'completed') {
                 clearInterval(window._rcPoll);
                 rcShowPanel('success');
-                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-membership", 2000);
+                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-wallet", 2000);
               } else if (s.status === 'failed') {
                 clearInterval(window._rcPoll);
                 if (s.is_cancelled) {
@@ -460,6 +461,7 @@
                   rcShowPanel('failed');
                 }
                 submitBtn.disabled = false;
+                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-wallet", 2500);
               }
             })
             .catch(err => console.error('Poll error:', err));
@@ -471,6 +473,7 @@
           rcShowPanel('failed');
           alpineData.loading = false;
           submitBtn.disabled = false;
+          setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-wallet", 2500);
         });
       });
     })();

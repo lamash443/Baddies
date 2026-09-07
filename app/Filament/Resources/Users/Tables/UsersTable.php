@@ -36,6 +36,18 @@ class UsersTable
                     ->numeric(2)
                     ->prefix('Ksh ')
                     ->sortable(),
+                TextColumn::make('referral_balance')
+                    ->label('Ref. Balance')
+                    ->numeric(2)
+                    ->prefix('Ksh ')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('total_referral_earnings')
+                    ->label('Total Ref. Earned')
+                    ->numeric(2)
+                    ->prefix('Ksh ')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('gender')
                     ->sortable(),
                 TextColumn::make('age')

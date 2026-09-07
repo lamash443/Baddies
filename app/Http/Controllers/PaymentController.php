@@ -6,8 +6,10 @@ use App\Models\Deposit;
 use App\Models\User;
 use App\Models\Classified;
 use App\Models\MembershipPlan;
+use App\Models\ReferralEarning;
 use App\Services\PayHeroService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -290,5 +292,9 @@ class PaymentController extends Controller
                 }
             }
         }
+
+        // ── REFERRAL BONUS ──────────────────────────────────────────────────────
+        // Referral bonus calculation is now handled automatically by the Deposit 
+        // model's booted() observer whenever a deposit status becomes 'completed'.
     }
 }

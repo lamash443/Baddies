@@ -75,7 +75,27 @@ class User extends Authenticatable implements FilamentUser
         'online_toast_duration',
         'online_toast_sound',
         'online_threshold_minutes',
+        // Referral system
+        'referral_code',
+        'referred_by_id',
+        'referral_balance',
+        'total_referral_earnings',
     ];
+
+    /**
+     * Auto-generate a unique referral code for new users.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->referral_code)) {
+                do {
+                    $code = 'REF' . strtoupper(\Illuminate\Support\Str::random(6));
+                } while (static::where('referral_code', $code)->exists());
+                $user->referral_code = $code;
+            }
+        });
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -95,22 +115,25 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'email_verified_at'        => 'datetime',
-            'password'                 => 'hashed',
-            'is_admin'                 => 'boolean',
-            'is_blocked'               => 'boolean',
-            'is_verified'              => 'boolean',
-            'services'                 => 'array',
-            'subscription_expires_at'  => 'datetime',
-            'chat_expires_at'          => 'datetime',
-            'wallet_balance'           => 'decimal:2',
-            'deletion_requested_at'    => 'datetime',
-            'last_seen_at'             => 'datetime',
+            'email_verified_at'          => 'datetime',
+            'password'                   => 'hashed',
+            'is_admin'                   => 'boolean',
+            'is_blocked'                 => 'boolean',
+            'is_verified'                => 'boolean',
+            'services'                   => 'array',
+            'subscription_expires_at'    => 'datetime',
+            'chat_expires_at'            => 'datetime',
+            'wallet_balance'             => 'decimal:2',
+            'deletion_requested_at'      => 'datetime',
+            'last_seen_at'               => 'datetime',
             'online_toast_enabled'       => 'boolean',
             'show_online_status_in_chat' => 'boolean',
             'force_online'               => 'boolean',
             'online_toast_duration'      => 'integer',
             'online_threshold_minutes'   => 'integer',
+            // Referral
+            'referral_balance'           => 'decimal:2',
+            'total_referral_earnings'    => 'decimal:2',
         ];
     }
 
@@ -228,6 +251,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(\App\Models\UserVideo::class);
     }
 
+    public function photosCountForLimit(): int
+    {
+        return $this->photos()->withTrashed()->count();
+    }
+
+    public function videosCountForLimit(): int
+    {
+        return $this->videos()->withTrashed()->count();
+    }
+
     public function deposits()
     {
         return $this->hasMany(Deposit::class);
@@ -251,5 +284,31 @@ class User extends Authenticatable implements FilamentUser
     public function messagesReceived(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(\App\Models\Message::class, 'receiver_id');
+    }
+
+    // ── REFERRAL RELATIONSHIPS ──────────────────────────────────────────────────
+
+    /** The user who referred this user (nullable) */
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by_id');
+    }
+
+    /** All users that were referred by this user */
+    public function referrals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by_id');
+    }
+
+    /** All referral bonus earnings for this user (as referrer) */
+    public function referralEarnings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\ReferralEarning::class, 'referrer_id');
+    }
+
+    /** Full referral link the user can share */
+    public function getReferralLinkAttribute(): string
+    {
+        return url('/register') . '?ref=' . $this->referral_code;
     }
 }

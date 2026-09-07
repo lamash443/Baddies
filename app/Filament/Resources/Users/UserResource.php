@@ -36,6 +36,8 @@ class UserResource extends Resource
     {
         return [
             RelationManagers\DepositsRelationManager::class,
+            RelationManagers\ReferralsRelationManager::class,
+            RelationManagers\ReferralEarningsRelationManager::class,
         ];
     }
 

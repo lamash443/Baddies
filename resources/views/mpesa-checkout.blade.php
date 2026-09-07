@@ -382,6 +382,7 @@
           document.getElementById('panel-failed-reason').textContent = data.message || 'Could not initiate payment. Please try again.';
           showPanel('failed');
           resetForm();
+          setTimeout(() => { window.location.href = "{{ route('profile.edit') }}#tab-wallet"; }, 2500);
           return;
         }
 
@@ -399,6 +400,7 @@
             clearInterval(window._mpesaPoll); window._mpesaPoll = null;
             showPanel('timeout');
             resetForm();
+            setTimeout(() => { window.location.href = "{{ route('profile.edit') }}#tab-wallet"; }, 2500);
             return;
           }
 
@@ -409,9 +411,7 @@
               clearInterval(window._mpesaPoll); window._mpesaPoll = null;
               showPanel('success');
               setTimeout(() => {
-                if (purpose === 'classified')  window.location.href = "{{ route('profile.edit') }}#tab-classifieds";
-                else if (purpose === 'wallet') window.location.href = "{{ route('wallet.add') }}";
-                else                           window.location.href = "{{ route('profile.edit') }}#tab-membership";
+                window.location.href = "{{ route('profile.edit') }}#tab-wallet";
               }, 2000);
 
             } else if (s.status === 'failed') {
@@ -428,6 +428,7 @@
                 showPanel('failed');
               }
               resetForm();
+              setTimeout(() => { window.location.href = "{{ route('profile.edit') }}#tab-wallet"; }, 2500);
             }
           })
           .catch(err => console.error('Polling error:', err));
@@ -438,6 +439,7 @@
         document.getElementById('panel-failed-reason').textContent = 'An unexpected error occurred. Please check your connection and try again.';
         showPanel('failed');
         resetForm();
+        setTimeout(() => { window.location.href = "{{ route('profile.edit') }}#tab-wallet"; }, 2500);
       });
     });
   </script>

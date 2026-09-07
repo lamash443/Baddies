@@ -22,6 +22,65 @@
     background: #ffffff !important;
   }
 
+  /* ── Search dropdown panel (anchored below icon, no layout shift) ── */
+  .nr-search-wrap {
+    position: relative;
+  }
+  .nr-search-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    background: #111;
+    border: 1.5px solid rgba(255,140,0,0.7);
+    border-radius: 10px;
+    padding: 0.5rem 0.6rem;
+    z-index: 2000;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 14px rgba(255,140,0,0.15);
+  }
+  .nr-search-panel.is-open {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    animation: searchPanelIn 0.18s ease;
+  }
+  @keyframes searchPanelIn {
+    from { opacity:0; transform: translateY(-6px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .nr-search-panel .nr-search-icon-inner {
+    color: orange;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+  .nr-search-panel input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.84rem;
+    padding: 0.3rem 0;
+  }
+  .nr-search-panel input::placeholder { color: rgba(255,255,255,0.38); }
+  .nr-search-panel button[type=submit] {
+    background: orange;
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: 800;
+    font-size: 0.72rem;
+    padding: 0.26rem 0.65rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .nr-search-panel button[type=submit]:hover { background: #e07a00; }
+
   /* NAVBAR STYLES */
   body {
     padding-top: 85px; /* Account for fixed navbar */
@@ -229,30 +288,6 @@
             @endif
         </a>
         
-        <!-- Desktop Search Bar (xxl+: full bar) -->
-        @if(!isset($hideSearch) || !$hideSearch)
-        <form action="{{ route('search') }}" method="GET" class="d-none d-xxl-flex align-items-center ms-4" role="search">
-          <div style="display:flex; align-items:stretch; border:2px solid orange; border-radius:8px; overflow:hidden; background:#1a1a1a;">
-            <div style="position:relative; display:flex; align-items:center;">
-              <svg style="position:absolute; left:10px; color:orange; pointer-events:none; flex-shrink:0;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" name="q" value="{{ request('q') }}" class="nr-navbar-search-input" placeholder="Search listings..." autocomplete="off" aria-label="Site search"
-                style="width:200px; padding:0.3rem 0.5rem 0.3rem 2.2rem; border:none; outline:none; background:transparent; color:#fff; font-family:'Outfit',sans-serif; font-size:0.82rem;">
-            </div>
-            <button type="submit" style="background:orange; border:none; border-left:2px solid orange; color:#000; font-weight:800; font-size:0.78rem; padding:0 0.9rem; cursor:pointer; transition:background 0.2s; letter-spacing:0.03em; white-space:nowrap;" onmouseover="this.style.background='#e07a00'" onmouseout="this.style.background='orange'">GO</button>
-          </div>
-        </form>
-
-        <!-- Desktop Search Icon Button (xl only: 1200–1399px) -->
-        <button class="btn p-0 d-none d-xl-flex d-xxl-none align-items-center justify-content-center ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchCollapse" aria-controls="mobileSearchCollapse" style="width:38px; height:38px; border-radius:50%; border:2px solid orange; background:transparent; flex-shrink:0;" title="Search">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-        @endif
 
         <div class="ms-auto d-flex align-items-center gap-2 d-xl-none">
 
@@ -295,9 +330,9 @@
         </div>
       </div>
 
-      <!-- Search Input Collapse (mobile + xl icon btn) -->
+      <!-- Search Input Collapse (mobile) -->
       @if(!isset($hideSearch) || !$hideSearch)
-      <div class="collapse w-100 mt-2 pb-2 d-xxl-none" id="mobileSearchCollapse">
+      <div class="collapse w-100 mt-2 pb-2 d-xl-none" id="mobileSearchCollapse">
         <form action="{{ route('search') }}" method="GET" class="position-relative" role="search">
           <svg class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: orange; pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -342,8 +377,29 @@
           <div class="nr-navbar__actions d-none d-xl-block">
             <div class="d-flex flex-column flex-xl-row justify-content-xl-end align-items-xl-center gap-3">
               
+              @if(!isset($hideSearch) || !$hideSearch)
+              <!-- Desktop Search Icon (right side, opens dropdown below) -->
+              <div class="nr-search-wrap">
+                <button class="btn p-0 d-flex align-items-center justify-content-center" type="button" id="desktopSearchToggle" aria-label="Search" style="background:transparent; flex-shrink:0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </button>
+                <div class="nr-search-panel" id="desktopSearchPanel">
+                  <span class="nr-search-icon-inner">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  </span>
+                  <form action="{{ route('search') }}" method="GET" style="display:contents;" role="search">
+                    <input type="text" name="q" value="{{ request('q') }}" class="nr-navbar-search-input" placeholder="Search listings..." autocomplete="off" aria-label="Site search" id="desktopSearchInput">
+                    <button type="submit">GO</button>
+                  </form>
+                </div>
+              </div>
+              @endif
+
               <!-- Desktop Theme Toggle -->
-              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="width: 42px; height: 42px; border-radius: 50%; border: 2px solid orange; background-color: transparent; flex-shrink: 0;" title="Toggle Theme">
+              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="background-color: transparent; flex-shrink: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Toggle Theme">
                 <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
                   <circle cx="12" cy="12" r="5"></circle>
                   <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -464,6 +520,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (btnDesktop) btnDesktop.addEventListener('click', toggleTheme);
   if (btnMobile) btnMobile.addEventListener('click', toggleTheme);
+
+  // ── Search dropdown panels ──
+  function initSearchToggle(toggleId, panelId, inputId) {
+    const btn   = document.getElementById(toggleId);
+    const panel = document.getElementById(panelId);
+    const input = document.getElementById(inputId);
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const open = panel.classList.toggle('is-open');
+      if (open && input) {
+        setTimeout(() => input.focus(), 50);
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        panel.classList.remove('is-open');
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') panel.classList.remove('is-open');
+    });
+  }
+
+  initSearchToggle('desktopSearchToggle', 'desktopSearchPanel', 'desktopSearchInput');
+  initSearchToggle('mobileSearchToggle',  'mobileSearchPanel',  'mobileSearchInput');
 });
 </script>
 
@@ -495,6 +582,9 @@ document.addEventListener('DOMContentLoaded', function() {
   } elseif (session('status') === 'profile-updated') {
     $toastTitle = 'Profile Updated';
     $toastMsg = 'Your profile information has been saved successfully.';
+  } elseif (session('success')) {
+    $toastTitle = 'Success';
+    $toastMsg = session('success');
   }
 @endphp
 

@@ -126,6 +126,22 @@ class SettingResource extends Resource
                             ->helperText('A user is considered "Online" if they were active within this many minutes.')
                             ->default(5),
                     ]),
+
+                Section::make('Referral Program Settings')
+                    ->description('Configure the referral bonus percentage awarded to users who invite friends.')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('referral_commission_rate')
+                            ->label('Referral Commission Rate (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->step(0.5)
+                            ->suffix('%')
+                            ->default(10.00)
+                            ->helperText('Percentage of each wallet top-up credited to the referrer as a bonus. e.g. 10 = 10%.')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

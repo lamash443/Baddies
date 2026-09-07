@@ -58,6 +58,28 @@ class UserForm
                             ->columnSpanFull(),
                     ]),
 
+                Section::make('Referrals')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('referral_code')
+                            ->maxLength(255),
+                        Select::make('referred_by_id')
+                            ->label('Referred By')
+                            ->relationship('referrer', 'name')
+                            ->searchable()
+                            ->preload(),
+                        TextInput::make('referral_balance')
+                            ->label('Referral Balance (Ksh)')
+                            ->numeric()
+                            ->default(0.00)
+                            ->prefix('Ksh'),
+                        TextInput::make('total_referral_earnings')
+                            ->label('Total Referral Earnings (Ksh)')
+                            ->numeric()
+                            ->default(0.00)
+                            ->prefix('Ksh'),
+                    ]),
+
                 Section::make('Statistics')
                     ->columns(2)
                     ->schema([

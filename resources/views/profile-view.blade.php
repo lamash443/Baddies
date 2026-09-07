@@ -8,6 +8,7 @@
   <meta name="description" content="View the full profile of {{ $user->name }} on Kenyan Baddies Club. {{ $user->age ? $user->age.' years old. ' : '' }}{{ $user->city_town ? 'Based in '.$user->city_town.'. ' : '' }}{{ $user->services ? 'Services: '.implode(', ', array_slice(is_array($user->services) ? $user->services : json_decode($user->services, true) ?? [], 0, 3)).'.' : '' }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; font-family: "Outfit", sans-serif; background: #0d0d0d; color: #fff; min-height: 100vh; }
@@ -750,9 +751,22 @@
           $spCover = $firstSpPhoto
             ? asset('storage/' . $firstSpPhoto->path)
             : "https://ui-avatars.com/api/?name=".urlencode(substr($sp->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
+          // Plan badge
+          $spRawPlan = strtolower(trim($sp->subscription_plan ?? 'regular'));
+          if (in_array($spRawPlan, ['prime_vip', 'prime-vip', 'primevip'])) {
+              $spPlanType  = 'prime_vip';  $spPlanLabel = 'Prime VIP';
+          } elseif (in_array($spRawPlan, ['prime', 'prime_escort'])) {
+              $spPlanType  = 'prime';       $spPlanLabel = 'Prime';
+          } elseif (in_array($spRawPlan, ['vip', 'vip_escort'])) {
+              $spPlanType  = 'vip';         $spPlanLabel = 'VIP';
+          } else {
+              $spPlanType  = 'regular';     $spPlanLabel = 'Regular';
+          }
         @endphp
-        <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card">
+        <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card" style="position:relative;">
           <img class="pv-similar-card__img" src="{{ $spCover }}" alt="{{ $sp->name }}" loading="lazy">
+          {{-- Plan badge --}}
+          <span class="nr-plan-badge nr-plan-badge--{{ str_replace('_','-',$spPlanType) }}" style="top:.55rem;left:.55rem;">{{ $spPlanLabel }}</span>
           <div class="pv-similar-card__info">
             <div class="pv-similar-card__name">{{ $sp->name }}</div>
             <div class="pv-similar-card__meta">
