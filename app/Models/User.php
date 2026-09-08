@@ -34,6 +34,8 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'google_id',
+        'avatar',
         'is_admin',
         'is_blocked',
         'is_verified',

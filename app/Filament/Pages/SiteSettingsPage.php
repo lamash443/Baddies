@@ -85,6 +85,19 @@ class SiteSettingsPage extends Page implements HasForms
             'editorial_services_body'  => SiteSetting::get('editorial_services_body', "Your wish is our escort girls' command. Whether you are bored, want to blow off some steam, or are thirsty for extraordinary sexual experiences, you only need to find the right lady to accompany you.\n\nHere's a glimpse at the Kenya escort services you can receive with Baddies\u2011Club:\n- Massage services that get as erotic as you can imagine\n- Luxury and VIP companionship (events or private)\n- Erotic dancing that will leave you speechless\n- Video calls and remote ways of satisfying your desires\n- Incall and outcall sex services\n\nEnjoy time with your escort in a way you're comfortable with. Whether you want her to come over to your place or get away from the usual surroundings, we are at your service."),
             'editorial_meet_title'     => SiteSetting::get('editorial_meet_title', "Know Whom You're Going to Meet"),
             'editorial_meet_body'      => SiteSetting::get('editorial_meet_body', "Our escorts in Kenya are hot, but you don't have to take our word for it. The portfolio of every service provider on Baddies\u2011Club is complete with appearance details and photos, so you can let your eyes choose. These are verified to minimize the risk of unexpected encounters and unwanted surprises on the meeting day.\n\nAs you get familiar with a call girl's portfolio, you'll also discover:\n- Everything she is ready (and isn't ready) to do for you\n- The list of areas covered\n- The fees she would charge for her escort services\n- Contact information"),
+
+            // ── PayHero Payment Gateway ─────────────────────────────────────────
+            'payhero_username'     => SiteSetting::get('payhero_username', config('services.payhero.username')),
+            'payhero_password'     => SiteSetting::get('payhero_password', config('services.payhero.password')),
+            'payhero_auth_token'   => SiteSetting::get('payhero_auth_token', config('services.payhero.auth_token')),
+            'payhero_channel_id'   => SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id')),
+            'payhero_account_id'   => SiteSetting::get('payhero_account_id', config('services.payhero.account_id')),
+            'payhero_callback_url' => SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url')),
+
+            // ── Google OAuth Login Settings ────────────────────────────────────
+            'google_client_id'     => SiteSetting::get('google_client_id', config('services.google.client_id')),
+            'google_client_secret' => SiteSetting::get('google_client_secret', config('services.google.client_secret')),
+            'google_redirect_uri'  => SiteSetting::get('google_redirect_uri', config('services.google.redirect', url('/auth/google/callback'))),
         ]);
     }
 
@@ -219,6 +232,66 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Know Whom — Body (use "- item" on its own line for bullet points)')
                             ->rows(6),
                     ]),
+
+                // ── PAYHERO PAYMENT GATEWAY ───────────────────────────────────────
+                Section::make('PayHero M-Pesa Payment Credentials')
+                    ->description('Manage PayHero API credentials, Channel ID, Account ID, and Webhook Callback URL for M-Pesa automated payments.')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('payhero_username')
+                            ->label('PayHero Username')
+                            ->placeholder('e.g. IlvxJNuM91zkYWIdu8jN')
+                            ->maxLength(255),
+                        TextInput::make('payhero_password')
+                            ->label('PayHero Password')
+                            ->password()
+                            ->revealable()
+                            ->maxLength(255),
+                        TextInput::make('payhero_auth_token')
+                            ->label('PayHero Auth Token (Basic Auth Base64)')
+                            ->password()
+                            ->revealable()
+                            ->columnSpanFull()
+                            ->helperText('Optional pre-encoded Base64 string (Username:Password). If left blank, it will be automatically computed.'),
+                        TextInput::make('payhero_channel_id')
+                            ->label('PayHero Channel ID')
+                            ->placeholder('e.g. 11727')
+                            ->maxLength(255),
+                        TextInput::make('payhero_account_id')
+                            ->label('PayHero Account ID')
+                            ->placeholder('e.g. 7806')
+                            ->maxLength(255),
+                        TextInput::make('payhero_callback_url')
+                            ->label('PayHero Callback / Webhook URL')
+                            ->url()
+                            ->columnSpanFull()
+                            ->placeholder('https://endif-ruth-digest-veterans.trycloudflare.com/webhook/payhero')
+                            ->helperText('Public URL where PayHero sends M-Pesa payment status webhooks.'),
+                    ]),
+
+                // ── GOOGLE OAUTH SETTINGS ─────────────────────────────────────────
+                Section::make('Google OAuth Authentication')
+                    ->description('Configure Google Client ID and Secret to enable "Login with Google" on the login & sign-up popups.')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('google_client_id')
+                            ->label('Google Client ID')
+                            ->placeholder('e.g. 123456789-abc.apps.googleusercontent.com')
+                            ->columnSpanFull()
+                            ->maxLength(255),
+                        TextInput::make('google_client_secret')
+                            ->label('Google Client Secret')
+                            ->password()
+                            ->revealable()
+                            ->columnSpanFull()
+                            ->maxLength(255),
+                        TextInput::make('google_redirect_uri')
+                            ->label('Google OAuth Redirect URI')
+                            ->url()
+                            ->columnSpanFull()
+                            ->placeholder(url('/auth/google/callback'))
+                            ->helperText('The Authorized Redirect URI registered in Google Cloud Console.'),
+                    ]),
             ]);
     }
 
@@ -249,6 +322,12 @@ class SiteSettingsPage extends Page implements HasForms
             'editorial_local_title', 'editorial_local_body',
             'editorial_services_title', 'editorial_services_body',
             'editorial_meet_title', 'editorial_meet_body',
+            // PayHero Payment Gateway
+            'payhero_username', 'payhero_password',
+            'payhero_auth_token', 'payhero_channel_id',
+            'payhero_account_id', 'payhero_callback_url',
+            // Google OAuth
+            'google_client_id', 'google_client_secret', 'google_redirect_uri',
         ];
 
         foreach ($allKeys as $key) {

@@ -21,7 +21,7 @@
     .nr-footer a:hover,.nr-footer a:focus{color:#fff;text-decoration:none;}
     .nr-footer a:hover::after,.nr-footer a:focus::after{transform:scaleX(1);}
     .nr-footer__logo-text {
-      font-size:1.6rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
+      font-size:1.25rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
       background:linear-gradient(135deg,#ff8c00,#ffb347);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
       display:inline-block;
@@ -37,7 +37,7 @@
         <div class="nr-footer__logo mb-3">
           <a href="/" class="text-decoration-none">
             @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:45px;width:auto;object-fit:contain;">
+                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:32px;width:auto;object-fit:contain;">
             @else
                 <span class="nr-footer__logo-text">Baddies Club</span>
             @endif
@@ -160,7 +160,9 @@
       
       // Add hover effect
       toggleBtn.addEventListener('mouseenter', function() { toggleBtn.style.opacity = '1'; });
-      toggleBtn.addEventListener('mouseleave', function() { toggleBtn.style.opacity = '0.7'; });
     });
   });
 </script>
+
+<x-age-verification-modal />
+

@@ -153,7 +153,7 @@
       gap: 1.25rem;
     }
 
-    /* ── CATEGORY CARDS ── */
+    /* ── STATIC CATEGORY CARDS (Adult Classifieds Grid) ── */
     .cat-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -165,7 +165,7 @@
         gap: 1.5rem;
       }
     }
-    .cat-card {
+    .cat-grid .cat-card {
       background: linear-gradient(145deg, #1a1200, #111);
       border: 1px solid rgba(255,140,0,0.3);
       border-radius: 1rem;
@@ -175,21 +175,189 @@
       color: #fff;
       transition: all .3s ease;
       display: block;
+      width: 100%;
+      min-width: auto;
+      max-width: 100%;
+      flex: none;
     }
-    .cat-card:hover {
+    .cat-grid .cat-card:hover {
       border-color: rgba(255,140,0,0.8);
       box-shadow: 0 0 20px rgba(255,140,0,0.35);
       color: #ff8c00;
       transform: translateY(-3px);
     }
-    .cat-card__icon {
-      font-size: 2.4rem; margin-bottom: .75rem; display: block;
+    .cat-grid .cat-card__name {
+      font-weight: 700; font-size: .95rem; color: #fff;
     }
-    .cat-card__name {
-      font-weight: 700; font-size: .95rem;
-    }
-    .cat-card__count {
+    .cat-grid .cat-card__count {
       font-size: .78rem; color: rgba(255,140,0,0.7); margin-top: .25rem;
+    }
+
+    /* ── CATEGORY CARDS MARQUEE (RIGHT TO LEFT ANIMATED MOTION) ── */
+    .cat-marquee-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden !important;
+      padding: 0.5rem 0;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+    }
+
+    .cat-marquee-track {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      gap: 0.9rem !important;
+      width: max-content !important;
+      animation: catMarqueeScroll 28s linear infinite !important;
+      will-change: transform;
+    }
+
+    .cat-marquee-wrapper:hover .cat-marquee-track {
+      animation-play-state: paused !important;
+    }
+
+    @keyframes catMarqueeScroll {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+      100% {
+        transform: translate3d(-50%, 0, 0);
+      }
+    }
+
+    .cat-marquee-track .cat-card {
+      flex: 0 0 190px !important;
+      flex-shrink: 0 !important;
+      width: 190px !important;
+      min-width: 190px !important;
+      max-width: 190px !important;
+      height: 60px !important;
+      min-height: 60px !important;
+      box-sizing: border-box !important;
+      background: linear-gradient(145deg, #1a1200 0%, #0d0902 50%, #080501 100%);
+      border: 1px solid rgba(255, 140, 0, 0.35);
+      border-radius: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      text-align: left;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      gap: 0.7rem !important;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .cat-marquee-track .cat-card:hover {
+      border-color: rgba(255, 140, 0, 0.95);
+      box-shadow: 0 0 20px rgba(255, 140, 0, 0.45);
+      color: #ff8c00;
+      transform: translateY(-2px);
+      background: linear-gradient(145deg, #281c00 0%, #150d02 100%);
+    }
+
+    .cat-marquee-track .cat-card__icon {
+      width: 40px !important;
+      height: 40px !important;
+      flex-shrink: 0 !important;
+      border-radius: 50%;
+      background: rgba(255, 140, 0, 0.12);
+      border: 1px solid rgba(255, 140, 0, 0.35);
+      color: #ff8c00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0 !important;
+      transition: all 0.3s ease;
+    }
+
+    .cat-marquee-track .cat-card__icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .cat-marquee-track .cat-card:hover .cat-card__icon {
+      background: rgba(255, 140, 0, 0.25);
+      transform: scale(1.08) rotate(5deg);
+      border-color: #ff8c00;
+      box-shadow: 0 0 12px rgba(255, 140, 0, 0.3);
+    }
+
+    .cat-marquee-track .cat-card__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .cat-marquee-track .cat-card__name {
+      font-weight: 800;
+      font-size: 0.92rem;
+      margin-bottom: 0;
+      line-height: 1.2;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cat-marquee-track .cat-card:hover .cat-card__name {
+      color: #ff8c00;
+    }
+
+    .cat-marquee-track .cat-card__count {
+      font-size: 0.73rem;
+      color: rgba(255, 140, 0, 0.85);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-top: 0.1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cat-card__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 140, 0, 0.12);
+      border: 1px solid rgba(255, 140, 0, 0.35);
+      color: #ff8c00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .cat-card:hover .cat-card__icon {
+      background: rgba(255, 140, 0, 0.25);
+      transform: scale(1.1) rotate(6deg);
+      border-color: #ff8c00;
+      box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+    }
+
+    .cat-card__name {
+      font-weight: 800;
+      font-size: 1.02rem;
+      margin-bottom: 0.25rem;
+      color: #ffffff;
+    }
+
+    .cat-card:hover .cat-card__name {
+      color: #ff8c00;
+    }
+
+    .cat-card__count {
+      font-size: 0.78rem;
+      color: rgba(255, 140, 0, 0.85);
+      font-weight: 500;
     }
 
     /* ── HOW IT WORKS ── */
@@ -270,8 +438,32 @@
       font-weight: 700;
     }
     
-    [data-bs-theme="light"] .cat-card { background: linear-gradient(145deg, #ffffff, #fdfdfd); border-color: rgba(255,140,0,0.25); color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
-    [data-bs-theme="light"] .cat-card:hover { border-color: rgba(255,140,0,0.6); box-shadow: 0 8px 25px rgba(255,140,0,0.15); color: #ff8c00; }
+    [data-bs-theme="light"] .cat-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(255,140,0,0.4) !important;
+      color: #111111 !important;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .cat-card:hover {
+      background: #fff9f2 !important;
+      border-color: #ff8c00 !important;
+      box-shadow: 0 6px 20px rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .cat-card__name {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .cat-card:hover .cat-card__name {
+      color: #e67300 !important;
+    }
+    [data-bs-theme="light"] .cat-card__count {
+      color: #d96d00 !important;
+      font-weight: 600 !important;
+    }
+    [data-bs-theme="light"] .cat-card__icon {
+      background: rgba(255,140,0,0.12) !important;
+      border-color: rgba(255,140,0,0.4) !important;
+      color: #ff8c00 !important;
+    }
     
     [data-bs-theme="light"] .hiw-card { background: #ffffff; border-color: rgba(255,140,0,0.25); box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
     [data-bs-theme="light"] .hiw-card__num { color: rgba(255,140,0,0.15); }
@@ -357,23 +549,131 @@
         <div class="home-section-line"></div>
       </div>
     </div>
-    <div class="cat-grid">
-      <a href="{{ route('escort-girls') }}" class="cat-card">
-        <div class="cat-card__name">Escort Girls</div>
-        <div class="cat-card__count">VIP & Featured</div>
-      </a>
-      <a href="/category/call-boys" class="cat-card">
-        <div class="cat-card__name">Call Boys</div>
-        <div class="cat-card__count">Verified Males</div>
-      </a>
-      <a href="/classifieds" class="cat-card">
-        <div class="cat-card__name">Adult Classifieds</div>
-        <div class="cat-card__count">Personals & Ads</div>
-      </a>
-      <a href="/videos" class="cat-card">
-        <div class="cat-card__name">Videos</div>
-        <div class="cat-card__count">Adult Content</div>
-      </a>
+    <div class="cat-marquee-wrapper">
+      <div class="cat-marquee-track">
+        <!-- FIRST SET OF CATEGORIES -->
+        <a href="{{ route('escort-girls') }}" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Escort Girls</div>
+            <div class="cat-card__count">VIP & Featured</div>
+          </div>
+        </a>
+
+        <a href="/category/call-boys" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Call Boys</div>
+            <div class="cat-card__count">Verified Males</div>
+          </div>
+        </a>
+
+        <a href="/classifieds" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="13" y2="16"></line></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Adult Classifieds</div>
+            <div class="cat-card__count">Personals & Ads</div>
+          </div>
+        </a>
+
+        <a href="/videos" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Videos</div>
+            <div class="cat-card__count">Adult Content</div>
+          </div>
+        </a>
+
+        <a href="{{ route('escort-girls') }}" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Hot Hookups</div>
+            <div class="cat-card__count">Discreet Dates</div>
+          </div>
+        </a>
+
+        <a href="{{ route('chat.memberships') }}" class="cat-card">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">VIP Membership</div>
+            <div class="cat-card__count">Exclusive Perks</div>
+          </div>
+        </a>
+
+        <!-- DUPLICATE SET FOR INFINITE SEAMLESS LOOP -->
+        <a href="{{ route('escort-girls') }}" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Escort Girls</div>
+            <div class="cat-card__count">VIP & Featured</div>
+          </div>
+        </a>
+
+        <a href="/category/call-boys" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Call Boys</div>
+            <div class="cat-card__count">Verified Males</div>
+          </div>
+        </a>
+
+        <a href="/classifieds" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="13" y2="16"></line></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Adult Classifieds</div>
+            <div class="cat-card__count">Personals & Ads</div>
+          </div>
+        </a>
+
+        <a href="/videos" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Videos</div>
+            <div class="cat-card__count">Adult Content</div>
+          </div>
+        </a>
+
+        <a href="{{ route('escort-girls') }}" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">Hot Hookups</div>
+            <div class="cat-card__count">Discreet Dates</div>
+          </div>
+        </a>
+
+        <a href="{{ route('chat.memberships') }}" class="cat-card" aria-hidden="true">
+          <div class="cat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+          </div>
+          <div class="cat-card__info">
+            <div class="cat-card__name">VIP Membership</div>
+            <div class="cat-card__count">Exclusive Perks</div>
+          </div>
+        </a>
+
+      </div>
     </div>
   </div>
 </section>

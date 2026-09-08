@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -11,15 +12,17 @@ class PayHeroService
     protected ?string $password;
     protected ?string $authToken;
     protected int $channelId;
+    protected ?string $accountId;
     protected ?string $callbackUrl;
 
     public function __construct()
     {
-        $this->username    = config('services.payhero.username');
-        $this->password    = config('services.payhero.password');
-        $this->authToken   = config('services.payhero.auth_token');
-        $this->channelId   = (int) config('services.payhero.channel_id');
-        $this->callbackUrl = config('services.payhero.callback_url');
+        $this->username    = SiteSetting::get('payhero_username', config('services.payhero.username'));
+        $this->password    = SiteSetting::get('payhero_password', config('services.payhero.password'));
+        $this->authToken   = SiteSetting::get('payhero_auth_token', config('services.payhero.auth_token'));
+        $this->channelId   = (int) SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id'));
+        $this->accountId   = SiteSetting::get('payhero_account_id', config('services.payhero.account_id'));
+        $this->callbackUrl = SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url'));
     }
 
     /**
@@ -39,6 +42,10 @@ class PayHeroService
             'external_reference' => $reference,
             'callback_url'       => $this->callbackUrl,
         ];
+
+        if (!empty($this->accountId)) {
+            $payload['account_id'] = (int) $this->accountId;
+        }
 
         Log::info('PayHero Payment Initiation Payload:', $payload);
 
