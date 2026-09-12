@@ -37,7 +37,7 @@
         <div class="nr-footer__logo mb-3">
           <a href="/" class="text-decoration-none">
             @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:32px;width:auto;object-fit:contain;">
+                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:48px;width:auto;object-fit:contain;">
             @else
                 <span class="nr-footer__logo-text">Baddies Club</span>
             @endif

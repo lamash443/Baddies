@@ -68,19 +68,6 @@
       text-align:center;
       background:linear-gradient(180deg,#141414 0%,#111111 100%);
     }
-    .hero-badge {
-      display:inline-block;
-      background:rgba(255,140,0,0.1);
-      border:1px solid rgba(255,140,0,0.3);
-      border-radius:50px;
-      padding:6px 18px;
-      font-size:0.72rem;
-      letter-spacing:0.14em;
-      text-transform:uppercase;
-      color:#ff8c00;
-      font-weight:700;
-      margin-bottom:22px;
-    }
     .hero-title {
       font-size:2rem;
       font-weight:900;
@@ -145,15 +132,17 @@
     }
     .cta-btn {
       display:inline-block;
-      background:linear-gradient(135deg,#ff8c00,#ffb347);
-      color:#000000 !important;
-      font-size:1rem;
-      font-weight:800;
-      padding:16px 48px;
-      border-radius:12px;
+      background:linear-gradient(135deg,#ff8c00 0%,#e07800 100%);
+      color:#ffffff !important;
+      font-size:0.9rem;
+      font-weight:700;
+      padding:15px 52px;
+      border-radius:8px;
       text-decoration:none !important;
-      letter-spacing:0.04em;
-      box-shadow:0 8px 32px rgba(255,140,0,0.38);
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      box-shadow:0 4px 24px rgba(255,140,0,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
+      border:1px solid rgba(255,120,0,0.6);
     }
     .cta-note {
       margin-top:16px;
@@ -231,7 +220,7 @@
   $subject       = \App\Models\SiteSetting::get('welcome_email_subject',       'Welcome to Kenyan Baddies Club – Please Verify Your Email');
   $subheading    = \App\Models\SiteSetting::get('welcome_email_subheading',    "Your account has been created. You're now part of Kenya's most exclusive companion network.");
   $body          = \App\Models\SiteSetting::get('welcome_email_body',          "We're thrilled to have you join Kenyan Baddies Club — a premium, members-only platform connecting Kenya's most exclusive companions with discerning clients.\n\nTo activate your account and unlock full access, please verify your email address by clicking the button below. Your verification link expires in 60 minutes.");
-  $btnText       = \App\Models\SiteSetting::get('welcome_email_button_text',   '&#x2705; Verify My Email Address');
+  $btnText       = \App\Models\SiteSetting::get('welcome_email_button_text',   'Verify My Email Address');
   $brandTagline  = \App\Models\SiteSetting::get('welcome_email_brand_tagline', "Kenya's Premier Companion Network");
 
   $feat1Title    = \App\Models\SiteSetting::get('welcome_email_feat1_title', 'VIP Profiles');
@@ -259,18 +248,16 @@
   {{-- HEADER --}}
   <div class="header-band">
     @if($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo))
-      <img src="{{ asset('storage/'.$logo) }}" alt="Kenyan Baddies Club" style="max-height:50px;width:auto;margin:0 auto 10px;" />
+      <img src="{{ asset('storage/'.$logo) }}" alt="Kenyan Baddies Club" style="max-height:56px;width:auto;margin:0 auto;display:block;" />
     @else
       <div class="brand-name">
         <span class="accent">KENYAN</span>&nbsp;<span style="color:#fff;">BADDIES</span>&nbsp;<span class="dim">CLUB</span>
       </div>
     @endif
-    <div class="brand-tagline">{{ $brandTagline }}</div>
   </div>
 
   {{-- HERO --}}
   <div class="hero">
-    <div class="hero-badge">&#x1F525; New Member</div>
     <h1 class="hero-title">
       Welcome to the<br><span class="orange">Inner Circle</span>
     </h1>
@@ -279,8 +266,7 @@
 
   {{-- BODY --}}
   <div class="body-section">
-    <p class="greeting">Hi, <strong>{{ $user->name }}</strong> &#x1F44B; welcome aboard.</p>
-    <div class="divider"></div>
+    <p class="greeting">Hi, <strong>{{ $user->name }}</strong>, welcome aboard.</p>
     <p class="body-text">{!! nl2br(e($body)) !!}</p>
   </div>
 
@@ -289,17 +275,23 @@
     <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
       <tr>
         <td width="33%" style="padding:14px 8px;text-align:center;vertical-align:top;">
-          <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);margin:0 auto 10px;line-height:46px;font-size:1.3rem;">&#x1F48E;</div>
+          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto 10px;">
+            <tr><td style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);text-align:center;vertical-align:middle;font-size:20px;color:#ff8c00;font-weight:900;line-height:46px;">&#9733;</td></tr>
+          </table>
           <div style="font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:4px;">{{ $feat1Title }}</div>
           <div style="font-size:0.69rem;color:rgba(255,255,255,0.38);line-height:1.5;">{{ $feat1Desc }}</div>
         </td>
         <td width="33%" style="padding:14px 8px;text-align:center;vertical-align:top;">
-          <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);margin:0 auto 10px;line-height:46px;font-size:1.3rem;">&#x2705;</div>
+          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto 10px;">
+            <tr><td style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);text-align:center;vertical-align:middle;font-size:20px;color:#ff8c00;font-weight:900;line-height:46px;">&#10003;</td></tr>
+          </table>
           <div style="font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:4px;">{{ $feat2Title }}</div>
           <div style="font-size:0.69rem;color:rgba(255,255,255,0.38);line-height:1.5;">{{ $feat2Desc }}</div>
         </td>
         <td width="33%" style="padding:14px 8px;text-align:center;vertical-align:top;">
-          <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);margin:0 auto 10px;line-height:46px;font-size:1.3rem;">&#x1F4AC;</div>
+          <table cellpadding="0" cellspacing="0" role="presentation" style="margin:0 auto 10px;">
+            <tr><td style="width:46px;height:46px;border-radius:12px;background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.2);text-align:center;vertical-align:middle;font-size:20px;color:#ff8c00;font-weight:900;line-height:46px;">&#9993;</td></tr>
+          </table>
           <div style="font-size:0.78rem;font-weight:700;color:#fff;margin-bottom:4px;">{{ $feat3Title }}</div>
           <div style="font-size:0.69rem;color:rgba(255,255,255,0.38);line-height:1.5;">{{ $feat3Desc }}</div>
         </td>
@@ -336,25 +328,20 @@
     </div>
   </div>
 
-  <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,140,0,0.12) 30%,rgba(255,140,0,0.12) 70%,transparent);margin:4px 40px 36px;"></div>
+
 
   {{-- CTA --}}
   <div class="cta-section">
-    <div class="cta-eyebrow">Action Required</div>
     <a href="{{ $verificationUrl }}" class="cta-btn">{!! $btnText !!}</a>
     <p class="cta-note">
       This link expires in <strong style="color:rgba(255,255,255,0.45);">60 minutes</strong>.
       If expired, you can request a new one from your profile page.
     </p>
-    <div class="cta-link-box">
-      <span style="font-size:0.67rem;color:#3a3a3a;display:block;margin-bottom:5px;">Or copy &amp; paste this link into your browser:</span>
-      <a href="{{ $verificationUrl }}">{{ $verificationUrl }}</a>
-    </div>
   </div>
 
   {{-- SECURITY NOTICE --}}
   <div class="info-notice">
-    <strong>&#x1F512; Security Notice:</strong>
+    <strong>Security Notice:</strong>
     {{ $securityNote }}
   </div>
 

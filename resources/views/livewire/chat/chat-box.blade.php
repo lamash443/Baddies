@@ -264,7 +264,7 @@
         }
     </style>
 
-    @if($activeUser)
+    @if($activeUser || $activeUserId === 'announcement')
         <!-- Header -->
         <div class="position-relative flex-shrink-0" style="height: 62px; min-height: 62px; max-height: 62px; overflow: hidden; border-bottom: 1px solid rgba(255,140,0,0.25); background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
             
@@ -277,49 +277,78 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </a>
 
-                @php
-                    $hasPhoto = $activeUser->profile_photo || $activeUser->photos->first();
-                    $cover = $activeUser->profile_photo ? asset('storage/'.$activeUser->profile_photo) : ($hasPhoto ? asset('storage/'.$activeUser->photos->first()->path) : null);
-                    $initials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $activeUser->name), 0, 2));
-                @endphp
+
 
                 {{-- Avatar --}}
-                <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none d-block flex-shrink-0">
-                    @if($hasPhoto)
-                        <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
-                            <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
-                        </div>
-                    @else
-                        <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
-                            <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
-                                {{ $initials ?: 'U' }}
+                @if($activeUserId === 'announcement')
+                    @php
+                        $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
+                        $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+                    @endphp
+                    <div class="text-decoration-none d-block flex-shrink-0">
+                        @if($announcementLogo)
+                            <div class="d-flex align-items-center justify-content-center bg-dark" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
+                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
                             </div>
-                        </div>
-                    @endif
-                </a>
+                        @else
+                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
+                                <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
+                                    KB
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    @php
+                        $hasPhoto = $activeUser->profile_photo || $activeUser->photos->first();
+                        $cover = $activeUser->profile_photo ? asset('storage/'.$activeUser->profile_photo) : ($hasPhoto ? asset('storage/'.$activeUser->photos->first()->path) : null);
+                        $initials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $activeUser->name), 0, 2));
+                    @endphp
+                    <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none d-block flex-shrink-0">
+                        @if($hasPhoto)
+                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                                <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                            </div>
+                        @else
+                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                                <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
+                                    {{ $initials ?: 'U' }}
+                                </div>
+                            </div>
+                        @endif
+                    </a>
+                @endif
 
                 {{-- Name + Status --}}
                 <div class="ms-3 flex-grow-1" style="min-width: 0;">
-                    <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
-                        <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
-                    </a>
-                    @php
-                        $chatSettings = \App\Models\Setting::getSettings();
-                        $showStatusInChat = $activeUser->show_online_status_in_chat ?? $chatSettings->show_online_status_in_chat;
-                    @endphp
-                    @if($showStatusInChat)
-                        @if($activeUser->isOnline())
-                            <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">Online</small>
-                        @elseif($activeUser->last_seen_at)
-                            <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Last seen {{ $activeUser->last_seen_at->diffForHumans() }}</small>
-                        @else
-                            <small style="color: rgba(255,255,255,0.4); font-size: 0.7rem;">Offline</small>
+                    @if($activeUserId === 'announcement')
+                        <div class="fw-bold text-white d-flex align-items-center gap-1" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            Kenyan Baddies
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                        </div>
+                        <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Message</small>
+                    @else
+                        <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
+                            <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
+                        </a>
+                        @php
+                            $chatSettings = \App\Models\Setting::getSettings();
+                            $showStatusInChat = $activeUser->show_online_status_in_chat ?? $chatSettings->show_online_status_in_chat;
+                        @endphp
+                        @if($showStatusInChat)
+                            @if($activeUser->isOnline())
+                                <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">Online</small>
+                            @elseif($activeUser->last_seen_at)
+                                <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Last seen {{ $activeUser->last_seen_at->diffForHumans() }}</small>
+                            @else
+                                <small style="color: rgba(255,255,255,0.4); font-size: 0.7rem;">Offline</small>
+                            @endif
                         @endif
                     @endif
                 </div>
 
                 {{-- Phone Call Icon --}}
-                @if($activeUser->phone_number)
+                @if($activeUser && $activeUser->phone_number)
                     <a href="tel:{{ $activeUser->phone_number }}" class="flex-shrink-0 d-flex align-items-center justify-content-center text-decoration-none ms-2" title="Call {{ $activeUser->name }}"
                        style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.4); color: #ff8c00; transition: all 0.2s; box-shadow: 0 0 10px rgba(255,140,0,0.2);">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(270deg);">
@@ -369,6 +398,45 @@
             </div>
 
             @php $lastDate = null; @endphp
+
+            @if($activeUserId === 'announcement')
+                {{-- Global Announcement (System Message) --}}
+                @php
+                    $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
+                    $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
+                    $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+                @endphp
+                @if(!empty($announcementMessage))
+                    <div class="d-flex w-100 mb-4 mt-2 justify-content-start align-items-end gap-2 position-relative">
+                        {{-- Avatar --}}
+                        @if($announcementLogo)
+                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-dark" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; padding:1px; box-shadow: 0 0 6px rgba(255,140,0,0.3);">
+                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                            </div>
+                        @else
+                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
+                                <span class="fw-bold text-white" style="font-size: 0.7rem;">KB</span>
+                            </div>
+                        @endif
+                        
+                        {{-- Bubble --}}
+                        <div class="px-3 py-2 shadow-sm position-relative" 
+                             style="max-width: 85%; border-radius: 12px; border-bottom-left-radius: 2px; background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.25);">
+                            <div class="d-flex align-items-center gap-1 mb-1" style="font-size: 0.8rem; font-weight: 800; color: #ff8c00;">
+                                Kenyan Baddies
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                                <span class="ms-1" style="font-size: 0.55rem; color: #fff; background: rgba(255,140,0,0.25); padding: 2px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Pinned</span>
+                            </div>
+                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text); line-height: 1.5;">{!! nl2br(e($announcementMessage)) !!}</div>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center text-muted mt-5">
+                        No active announcements.
+                    </div>
+                @endif
+            @endif
+
             @forelse($messages as $message)
                 @php
                     $msgDateObj = $message->created_at;
@@ -467,9 +535,11 @@
                     </div>
                 </div>
             @empty
-                <div class="text-center text-muted mt-5">
-                    Say hello to start the conversation!
-                </div>
+                @if($activeUserId !== 'announcement')
+                    <div class="text-center text-muted mt-5">
+                        Say hello to start the conversation!
+                    </div>
+                @endif
             @endforelse
         </div>
 
@@ -494,31 +564,38 @@
             <div x-init="if(!replyData) { replyData = { id: {{ $replyToId }}, name: 'User', text: '...' }; }"></div>
         @endif
 
-        <!-- Input Area -->
-        <div class="px-3 py-2 flex-shrink-0" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
-            <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
-                <input type="text" wire:model="body"
-                    class="form-control border-0 chat-input-field shadow-none"
-                    placeholder="Type a message..."
-                    required
-                    style="border-radius: 24px; padding: 0.5rem 1rem; font-size: 0.95rem; outline: none; border: 1px solid rgba(255,140,0,0.2) !important;">
-                <button type="submit"
-                    class="btn d-flex align-items-center justify-content-center flex-shrink-0"
-                    style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </form>
-        </div>
+        @if($activeUserId !== 'announcement')
+            <!-- Input Area -->
+            <div class="px-3 py-2 flex-shrink-0" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
+                <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
+                    <input type="text" wire:model="body"
+                        class="form-control border-0 chat-input-field shadow-none"
+                        placeholder="Type a message..."
+                        required
+                        style="border-radius: 24px; padding: 0.5rem 1rem; font-size: 0.95rem; outline: none; border: 1px solid rgba(255,140,0,0.2) !important;">
+                    <button type="submit"
+                        class="btn d-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </form>
+            </div>
+        @else
+            <!-- Announcement Footer (No Input) -->
+            <div class="px-3 py-3 flex-shrink-0 text-center" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
+                <small class="text-muted fw-bold">This is a system announcement. Replies are disabled.</small>
+            </div>
+        @endif
 
         <script>
             // ── Toast config: re-runs each poll (reads PHP values) ───────────
             @php
                 $gSettings = \App\Models\Setting::getSettings();
-                $tEnabled  = $activeUser->online_toast_enabled ?? $gSettings->online_toast_enabled;
-                $tMessage  = $activeUser->online_toast_message ?: ($gSettings->online_toast_message ?? '💚 {name} is now online!');
-                $tDuration = $activeUser->online_toast_duration ?: ($gSettings->online_toast_duration ?? 4000);
-                $tPosition = $activeUser->online_toast_position ?: ($gSettings->online_toast_position ?? 'bottom-right');
-                $tSound    = $activeUser->online_toast_sound ?: ($gSettings->online_toast_sound ?? 'none');
+                $tEnabled  = $activeUser?->online_toast_enabled ?? $gSettings->online_toast_enabled;
+                $tMessage  = $activeUser?->online_toast_message ?: ($gSettings->online_toast_message ?? '💚 {name} is now online!');
+                $tDuration = $activeUser?->online_toast_duration ?: ($gSettings->online_toast_duration ?? 4000);
+                $tPosition = $activeUser?->online_toast_position ?: ($gSettings->online_toast_position ?? 'bottom-right');
+                $tSound    = $activeUser?->online_toast_sound ?: ($gSettings->online_toast_sound ?? 'none');
             @endphp
             window.chatToastConfig = {
                 enabled:  {{ $tEnabled ? 'true' : 'false' }},

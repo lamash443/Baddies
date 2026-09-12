@@ -273,7 +273,7 @@
         <!-- Mobile Centered Logo -->
         <a class="navbar-brand d-flex d-xl-none align-items-center gap-2 position-absolute start-50 translate-middle-x" href="{{ Auth::check() ? route('dashboard') : url('/') }}" style="text-decoration: none; z-index: 1;">
             @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:36px;width:auto;object-fit:contain;">
+                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:52px;width:auto;object-fit:contain;">
             @else
                 <span class="fw-bold" style="text-transform: uppercase; letter-spacing: 1px; font-size: 1.15rem;"><span style="color: orange;">Baddies-</span><span style="color: white;">Club</span></span>
             @endif
@@ -282,7 +282,7 @@
         <!-- Desktop Logo -->
         <a class="navbar-brand d-none d-xl-flex align-items-center gap-2 me-0" href="{{ Auth::check() ? route('dashboard') : url('/') }}" style="text-decoration: none;">
             @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:42px;width:auto;object-fit:contain;">
+                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:60px;width:auto;object-fit:contain;">
             @else
                 <span class="fw-bold fs-4" style="text-transform: uppercase; letter-spacing: 1px;"><span style="color: orange;">Baddies-</span><span style="color: white;">Club</span></span>
             @endif

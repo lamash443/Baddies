@@ -48,6 +48,13 @@ class VerificationSubmissionResource extends Resource
                 TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
+                TextColumn::make('user.email_verified_at')
+                    ->label('Email Verified')
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => $state ? 'Verified' : 'Not Verified')
+                    ->color(fn ($state): string => $state ? 'success' : 'danger')
+                    ->icon(fn ($state): string => $state ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
+                    ->sortable(),
                 ImageColumn::make('photo_path')
                     ->label('Photo')
                     ->disk('public')

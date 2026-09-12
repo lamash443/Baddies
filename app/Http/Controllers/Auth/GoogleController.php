@@ -103,6 +103,24 @@ class GoogleController extends Controller
             }
 
             // Create new user if not found
+            $currentIp = request()->ip();
+            $refCode   = session('ref_code');
+            $referrer  = null;
+
+            if ($refCode) {
+                $referrer = User::where('referral_code', trim($refCode))->first();
+                session()->forget('ref_code');
+
+                // Block referral if same IP
+                if ($referrer) {
+                    if ($referrer->registration_ip === $currentIp) {
+                        $referrer = null;
+                    } elseif (User::where('registration_ip', $currentIp)->exists()) {
+                        $referrer = null;
+                    }
+                }
+            }
+
             $newUser = User::create([
                 'name'              => $googleUser->getName() ?: ($googleUser->getNickname() ?: 'Google User'),
                 'email'             => $googleUser->getEmail(),
@@ -111,6 +129,8 @@ class GoogleController extends Controller
                 'password'          => Hash::make(Str::random(24)),
                 'email_verified_at' => now(),
                 'is_verified'       => false,
+                'registration_ip'   => $currentIp,
+                'referred_by_id'    => $referrer?->id,
             ]);
 
             Auth::login($newUser, true);

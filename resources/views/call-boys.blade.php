@@ -322,6 +322,7 @@
   </style>
 </head>
 <body>
+<x-site-preloader />
 
 <x-navbar :hideSearch="true" />
 

@@ -52,13 +52,13 @@ class SendEmailPage extends Page implements HasForms
                         Select::make('recipient_type')
                             ->label('Send To')
                             ->options([
-                                'all'          => '📣 All Users',
-                                'specific'     => '👤 Specific Users (select below)',
-                                'plan'         => '💎 Filter by Subscription Plan',
-                                'gender'       => '⚧  Filter by Gender',
-                                'verified'     => '✅ Verified Users Only',
-                                'unverified'   => '❌ Unverified Users Only',
-                                'blocked'      => '🚫 Blocked Users Only',
+                                'all'          => 'All Users',
+                                'specific'     => 'Specific Users (select below)',
+                                'plan'         => 'Filter by Subscription Plan',
+                                'gender'       => 'Filter by Gender',
+                                'verified'     => 'Verified Users Only',
+                                'unverified'   => 'Unverified Users Only',
+                                'blocked'      => 'Blocked Users Only',
                             ])
                             ->default('all')
                             ->live()
@@ -179,7 +179,7 @@ class SendEmailPage extends Page implements HasForms
         $count = $users->count();
 
         Notification::make()
-            ->title("✅ Email queued for {$count} " . ($count === 1 ? 'user' : 'users') . '!')
+            ->title("Email queued for {$count} " . ($count === 1 ? 'user' : 'users') . '.')
             ->body('Emails are being sent in the background via the queue.')
             ->success()
             ->duration(6000)

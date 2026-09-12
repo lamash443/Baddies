@@ -9,7 +9,7 @@
             </div>
             <div>
                 <h3 class="dash-card-title mb-0" style="text-align:left; font-size:1.15rem;">Messages</h3>
-                <p class="mb-0" style="font-size:0.78rem; color:rgba(255,255,255,0.45); margin-top:2px;">
+                <p class="mb-0 text-muted" style="font-size:0.78rem; margin-top:2px;">
                     @if($totalUnread > 0)
                         <span style="color:#ff8c00; font-weight:700;">{{ $totalUnread }} unread</span> message{{ $totalUnread > 1 ? 's' : '' }}
                     @else
@@ -27,15 +27,15 @@
     </div>
 
     @if(!$user->hasActiveChatSubscription())
-        <div class="text-center py-4" style="border:1px dashed rgba(255,140,0,0.2); border-radius:12px;">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,140,0,0.4); margin-bottom:0.75rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <p class="mb-3" style="color:rgba(255,255,255,0.5); font-size:0.88rem;">Activate a chat plan to send &amp; receive private messages.</p>
+        <div class="text-center py-4 dash-empty-state" style="border:1px dashed var(--bs-border-color); border-radius:12px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-muted" style="margin-bottom:0.75rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p class="mb-3 text-muted" style="font-size:0.88rem;">Activate a chat plan to send &amp; receive private messages.</p>
             <a href="{{ route('chat.memberships') }}" class="btn-orange" style="width:auto; display:inline-flex; padding:0.55rem 1.4rem; font-size:0.85rem;">Get Chat Plan</a>
         </div>
     @elseif($unreadMessages->isEmpty())
-        <div class="text-center py-4" style="border:1px dashed rgba(255,255,255,0.07); border-radius:12px;">
-            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,0.15); margin-bottom:0.75rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <p class="mb-0" style="color:rgba(255,255,255,0.3); font-size:0.88rem;">Your inbox is empty. Start a conversation from a member profile!</p>
+        <div class="text-center py-4 dash-empty-state" style="border:1px dashed var(--bs-border-color); border-radius:12px;">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" class="text-muted" style="margin-bottom:0.75rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p class="mb-0 text-muted" style="font-size:0.88rem;">Your inbox is empty. Start a conversation from a member profile!</p>
         </div>
     @else
         <div class="d-flex flex-column" style="gap:0.6rem;">
@@ -51,8 +51,8 @@
                     $timeAgo = $latest->created_at->diffForHumans(null, true);
                 @endphp
                 <a href="{{ route('chat.show', $senderId) }}"
-                   class="msg-row d-flex align-items-center gap-3 text-decoration-none"
-                   style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
+                   class="msg-row d-flex align-items-center gap-3 text-decoration-none bg-body-tertiary"
+                   style="border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
                     <div class="position-relative flex-shrink-0">
                         <img src="{{ $cover }}" alt="{{ $sender->name }}"
                              style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,140,0,0.3);">
@@ -60,11 +60,11 @@
                     </div>
                     <div class="flex-grow-1" style="min-width:0;">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span style="font-size:0.9rem; font-weight:700; color:#fff;">{{ $sender->name }}</span>
-                            <span style="font-size:0.7rem; color:rgba(255,255,255,0.35); white-space:nowrap; margin-left:0.5rem;">{{ $timeAgo }}</span>
+                            <span class="text-body" style="font-size:0.9rem; font-weight:700;">{{ $sender->name }}</span>
+                            <span class="text-muted" style="font-size:0.7rem; white-space:nowrap; margin-left:0.5rem;">{{ $timeAgo }}</span>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-2">
-                            <span style="font-size:0.8rem; color:rgba(255,255,255,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $snippet }}</span>
+                            <span class="text-muted" style="font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $snippet }}</span>
                             <span style="flex-shrink:0; min-width:20px; height:20px; background:#ff8c00; border-radius:50px; font-size:0.68rem; font-weight:800; color:#000; display:flex; align-items:center; justify-content:center; padding:0 5px;">{{ $count }}</span>
                         </div>
                     </div>

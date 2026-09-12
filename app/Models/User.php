@@ -39,6 +39,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'is_admin',
         'is_blocked',
         'is_verified',
+        'registration_ip',
         'profile_photo',
         'phone_number',
         'gender',

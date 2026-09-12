@@ -16,7 +16,7 @@ class ChatBox extends Component
     public function mount($activeUserId = null)
     {
         $this->activeUserId = $activeUserId;
-        if ($this->activeUserId) {
+        if ($this->activeUserId && $this->activeUserId !== 'announcement') {
             $this->markMessagesAsRead();
         }
     }
@@ -113,7 +113,7 @@ class ChatBox extends Component
     public function render()
     {
         $activeUser = null;
-        if ($this->activeUserId) {
+        if ($this->activeUserId && $this->activeUserId !== 'announcement') {
             $activeUser = User::find($this->activeUserId);
         }
 
@@ -126,7 +126,7 @@ class ChatBox extends Component
         }
 
         $messages = [];
-        if ($this->activeUserId) {
+        if ($this->activeUserId && $this->activeUserId !== 'announcement') {
             $myId = auth()->id();
             $messages = Message::with('replyTo')->where(function ($query) use ($myId) {
                 $query->where('sender_id', $myId)

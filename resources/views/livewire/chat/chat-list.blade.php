@@ -80,7 +80,7 @@
         <div class="d-flex align-items-center gap-2 flex-grow-1">
             <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
                 @if(!empty($siteSettings['logo']))
-                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:36px;width:auto;object-fit:contain;margin-left:0.2rem;">
+                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:28px;width:auto;object-fit:contain;margin-left:0.2rem;">
                 @else
                     <h5 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: 0.2rem;">Baddies Club</h5>
                 @endif
@@ -95,6 +95,53 @@
             @endif
         </div>
     </div>
+
+    {{-- Global Announcement --}}
+    @php
+        $announcementActive = \App\Models\SiteSetting::get('chat_announcement_active');
+        $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
+        $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
+        $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+    @endphp
+    @if($announcementActive && !empty($announcementMessage))
+        <div class="px-1 pt-1 pb-1">
+            <a href="{{ route('chat.show', 'announcement') }}" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.85rem 1rem; transition: all 0.2s ease;">
+                <div class="d-flex align-items-start gap-3">
+                    {{-- Avatar --}}
+                    <div class="position-relative flex-shrink-0">
+                        @if($announcementLogo)
+                            <div class="d-flex align-items-center justify-content-center bg-dark" style="width:46px; height:46px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 10px rgba(255,140,0,0.4);">
+                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                            </div>
+                        @else
+                            <div class="d-flex align-items-center justify-content-center" style="width:46px; height:46px; border-radius:50%; border: 2px solid #ff8c00; box-shadow: 0 0 10px rgba(255,140,0,0.4); background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
+                                <span class="fw-bold text-white">KB</span>
+                            </div>
+                        @endif
+                        {{-- Pinned Badge Overlay --}}
+                        <div class="position-absolute align-items-center justify-content-center bg-primary rounded-circle d-flex" 
+                             style="width: 20px; height: 20px; bottom: -2px; right: -2px; border: 2px solid #1a1a1a;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        </div>
+                    </div>
+
+                    {{-- Name + Message --}}
+                    <div class="flex-grow-1" style="min-width: 0;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="d-flex align-items-center gap-1" style="font-size: 0.95rem; font-weight: 800; color: #ff8c00;">
+                                Kenyan Baddies
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                            </span>
+                            <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5;">
+                            {!! nl2br(e($announcementMessage)) !!}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    @endif
 
     {{-- Conversation Rows --}}
     <div class="list-group list-group-flush mt-2" wire:poll.10s>

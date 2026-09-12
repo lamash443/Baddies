@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         // Inject site settings into front-end views only (exclude admin/Filament views)
         if (!request()->is('admin') && !request()->is('admin/*')) {
             View::composer('*', SiteSettingsComposer::class);

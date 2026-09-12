@@ -27,11 +27,11 @@
         .chat-list, .chat-box { height: 100% !important; overflow-x: hidden; }
         
         @media (max-width: 767px) {
-            body { overflow: hidden; padding-top: 0 !important; } /* Prevent body scrolling when full screen and remove navbar padding */
+            html, body { height: 100%; overflow: hidden; padding-top: 0 !important; margin: 0 !important; } /* Prevent body scrolling when full screen and remove navbar padding */
             .nr-topbar, .nr-navbar, x-footer, footer, .site-footer, .nr-footer { display: none !important; }
-            .container { padding: 0 !important; max-width: 100% !important; }
+            .container { padding: 0 !important; max-width: 100% !important; height: 100% !important; }
             .pb-5 { padding-bottom: 0 !important; }
-            .chat-container { margin: 0 !important; border-radius: 0 !important; border: none !important; height: 100dvh !important; width: 100vw !important; }
+            .chat-container { margin: 0 !important; border-radius: 0 !important; border: none !important; height: 100% !important; width: 100vw !important; }
         }
     </style>
 </head>

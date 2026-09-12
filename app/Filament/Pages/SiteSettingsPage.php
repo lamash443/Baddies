@@ -131,6 +131,11 @@ class SiteSettingsPage extends Page implements HasForms
             'welcome_email_step3_desc'     => SiteSetting::get('welcome_email_step3_desc', 'Go VIP, Prime VIP, or Regular to get featured and start receiving clients.'),
             // Security notice
             'welcome_email_security_note'  => SiteSetting::get('welcome_email_security_note', 'If you did not create this account, simply ignore this email. Your email address will not be linked to any profile without verification. No further action is needed.'),
+            
+            // ── Global Chat Announcement ──────────────────────────────────────
+            'chat_announcement_active'  => (bool) SiteSetting::get('chat_announcement_active', false),
+            'chat_announcement_logo'    => $this->getValidFileSetting('chat_announcement_logo'),
+            'chat_announcement_message' => SiteSetting::get('chat_announcement_message', ''),
         ]);
     }
 
@@ -505,6 +510,26 @@ class SiteSettingsPage extends Page implements HasForms
                             ]),
 
                     ])->columns(1),
+
+                // ── GLOBAL CHAT ANNOUNCEMENT ──────────────────────────────────────
+                Section::make('Global Chat Announcement')
+                    ->description('Display a global announcement message at the top of the chat list for all users.')
+                    ->schema([
+                        \Filament\Forms\Components\Toggle::make('chat_announcement_active')
+                            ->label('Enable Global Announcement')
+                            ->helperText('Turn this on to display the announcement in the chat section.'),
+                        FileUpload::make('chat_announcement_logo')
+                            ->label('Announcement Sender Logo')
+                            ->disk('public')
+                            ->directory('site')
+                            ->image()
+                            ->helperText('Optional: Upload a logo/avatar for the announcement. If left blank, the site logo is used.'),
+                        Textarea::make('chat_announcement_message')
+                            ->label('Announcement Message')
+                            ->rows(3)
+                            ->placeholder('e.g. Maintenance scheduled for tonight...')
+                            ->helperText('This message will be visible to all users at the top of their chat inbox.'),
+                    ]),
             ]);
     }
 
@@ -512,7 +537,7 @@ class SiteSettingsPage extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background'];
+        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
 
         $allKeys = [
             // Branding
@@ -555,6 +580,8 @@ class SiteSettingsPage extends Page implements HasForms
             'welcome_email_step2_title', 'welcome_email_step2_desc',
             'welcome_email_step3_title', 'welcome_email_step3_desc',
             'welcome_email_security_note',
+            // Chat Announcement
+            'chat_announcement_active', 'chat_announcement_message', 'chat_announcement_logo',
         ];
 
         foreach ($allKeys as $key) {

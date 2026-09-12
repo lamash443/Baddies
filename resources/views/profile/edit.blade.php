@@ -2533,6 +2533,26 @@
                 </button>
               </div>
               <div id="copyReferralSuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">Link copied to clipboard!</div>
+              
+              {{-- Social Share Links --}}
+              <div class="mt-4 d-flex align-items-center gap-3 flex-wrap">
+                  <span class="text-muted" style="font-size:0.85rem;font-weight:600;">Share via:</span>
+                  
+                  {{-- WhatsApp --}}
+                  <a href="https://api.whatsapp.com/send?text={{ urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits! ' . $refLink) }}" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#25D366;color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on WhatsApp">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  </a>
+                  
+                  {{-- X (Twitter) --}}
+                  <a href="https://twitter.com/intent/tweet?text={{ urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits!') }}&url={{ urlencode($refLink) }}" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#000;color:#fff;border-radius:50%;border:1px solid rgba(255,255,255,0.2);text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on X">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+
+                  {{-- Instagram --}}
+                  <a href="https://instagram.com/" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Open Instagram">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                  </a>
+              </div>
             </div>
 
             {{-- Redeem Card (only when balance > 0) --}}

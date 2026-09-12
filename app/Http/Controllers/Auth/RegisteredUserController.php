@@ -61,11 +61,27 @@ class RegisteredUserController extends Controller
             session()->forget('ref_code');
         }
 
+        // Check for self-referral / IP abuse
+        $currentIp = $request->ip();
+        if ($referrer) {
+            // Prevent if referrer's registration IP matches current IP
+            if ($referrer->registration_ip === $currentIp) {
+                $referrer = null;
+            } else {
+                // Also prevent if any other user has already registered with this IP
+                $ipExists = User::where('registration_ip', $currentIp)->exists();
+                if ($ipExists) {
+                    $referrer = null;
+                }
+            }
+        }
+
         $user = User::create([
-            'name'           => $request->name,
-            'email'          => $request->email,
-            'password'       => Hash::make($request->password),
-            'referred_by_id' => $referrer?->id,
+            'name'            => $request->name,
+            'email'           => $request->email,
+            'password'        => Hash::make($request->password),
+            'registration_ip' => $currentIp,
+            'referred_by_id'  => $referrer?->id,
         ]);
 
         // event(new Registered($user)); // Disabled to prevent Laravel from sending the default plain-text verification email

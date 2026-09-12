@@ -162,6 +162,7 @@
   </style>
 </head>
 <body>
+<x-site-preloader />
   <x-navbar :hideSearch="true" />
 
   <section class="hero">

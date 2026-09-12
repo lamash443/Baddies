@@ -14,7 +14,7 @@
             $modalLogo = \App\Models\SiteSetting::get('logo');
           @endphp
           @if(!empty($modalLogo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($modalLogo))
-            <img src="{{ asset('storage/' . $modalLogo) }}" alt="Logo" style="max-height:45px;width:auto;object-fit:contain;">
+            <img src="{{ asset('storage/' . $modalLogo) }}" alt="Logo" style="max-height:64px;width:auto;object-fit:contain;">
           @else
             <span style="color:#ff8c00;">Baddies-</span><span class="auth-brand-club" style="color:#fff;">Club</span>
           @endif

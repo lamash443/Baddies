@@ -211,7 +211,7 @@
       </a>
       <a href="{{ url('/') }}" style="text-decoration:none;">
         @if(!empty($siteLogo))
-          <img src="{{ asset('storage/' . $siteLogo) }}" alt="Kenyan Baddies Club" style="max-height:44px;width:auto;">
+          <img src="{{ asset('storage/' . $siteLogo) }}" alt="Kenyan Baddies Club" style="max-height:64px;width:auto;">
         @else
           <div class="auth-brand"><span class="orange">Baddies-</span><span class="white">Club</span></div>
         @endif
@@ -314,7 +314,7 @@
 
     <div class="auth-footer">
       <span>Already have an account?</span>
-      <a href="{{ url('/') }}"> Back to Homepage →</a>
+      <a href="{{ route('login') }}"> Login here →</a>
     </div>
 
     <p class="text-center mt-3 mb-0" style="color:rgba(255,255,255,0.4);font-size:0.78rem;line-height:1.5;">

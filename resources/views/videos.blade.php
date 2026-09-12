@@ -186,6 +186,7 @@
   </style>
 </head>
 <body>
+<x-site-preloader />
 
 <!-- NAVBAR -->
 <x-navbar :hideSearch="true" />

@@ -16,6 +16,7 @@ class DashboardStatsWidget extends BaseWidget
         $verifiedUsers = User::where('is_verified', true)->count();
         $newRegistrations = User::where('created_at', '>=', now()->startOfDay())->count();
         $totalDeposits = \App\Models\Deposit::where('status', 'completed')->sum('amount');
+        $verifiedEmails = User::whereNotNull('email_verified_at')->count();
         
         // Count active sessions in the file driver (last 15 minutes) as a proxy for online users
         $onlineUsers = 0;
@@ -43,6 +44,11 @@ class DashboardStatsWidget extends BaseWidget
                 ->description('Total completed deposits')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
+
+            Stat::make('Verified Emails', $verifiedEmails)
+                ->description(number_format(($totalUsers ? ($verifiedEmails / $totalUsers) * 100 : 0), 1) . '% of all users')
+                ->descriptionIcon('heroicon-m-envelope-open')
+                ->color('info'),
 
             Stat::make('New Registrations', $newRegistrations)
                 ->description('Users joined today')
