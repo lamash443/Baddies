@@ -9,7 +9,6 @@ use Livewire\Component;
 class ChatBox extends Component
 {
     public $activeUserId;
-    public $activeUser;
     public $body = '';
 
     public $replyToId = null;
@@ -18,7 +17,6 @@ class ChatBox extends Component
     {
         $this->activeUserId = $activeUserId;
         if ($this->activeUserId) {
-            $this->activeUser = User::find($this->activeUserId);
             $this->markMessagesAsRead();
         }
     }
@@ -41,6 +39,52 @@ class ChatBox extends Component
     public function cancelReply()
     {
         $this->replyToId = null;
+    }
+
+    public function deleteMessage($messageId)
+    {
+        $this->deleteMessagesForEveryone([$messageId]);
+    }
+
+    public function deleteMessages(array $messageIds)
+    {
+        $this->deleteMessagesForEveryone($messageIds);
+    }
+
+    public function deleteMessagesForEveryone(array $messageIds)
+    {
+        if (!$this->activeUserId || empty($messageIds)) return;
+
+        $myId = auth()->id();
+        // Only messages sent by current user can be deleted for everyone
+        Message::whereIn('id', $messageIds)
+            ->where('sender_id', $myId)
+            ->update(['is_deleted' => true]);
+
+        if (in_array($this->replyToId, $messageIds)) {
+            $this->replyToId = null;
+        }
+    }
+
+    public function deleteMessagesForMe(array $messageIds)
+    {
+        if (!$this->activeUserId || empty($messageIds)) return;
+
+        $myId = auth()->id();
+
+        // Messages sent by me -> set deleted_by_sender
+        Message::whereIn('id', $messageIds)
+            ->where('sender_id', $myId)
+            ->update(['deleted_by_sender' => true]);
+
+        // Messages received by me -> set deleted_by_receiver
+        Message::whereIn('id', $messageIds)
+            ->where('receiver_id', $myId)
+            ->update(['deleted_by_receiver' => true]);
+
+        if (in_array($this->replyToId, $messageIds)) {
+            $this->replyToId = null;
+        }
     }
 
     public function sendMessage()
@@ -68,14 +112,17 @@ class ChatBox extends Component
 
     public function render()
     {
-        // Always reload the other user so last_seen_at / isOnline() is live
+        $activeUser = null;
         if ($this->activeUserId) {
-            $this->activeUser = User::find($this->activeUserId);
+            $activeUser = User::find($this->activeUserId);
         }
 
-        // Keep the current user's own last_seen_at fresh on every poll tick
+        // Keep current user's last_seen_at fresh (throttled to at most once per 30s)
         if (auth()->check()) {
-            auth()->user()->update(['last_seen_at' => now()]);
+            $user = auth()->user();
+            if (!$user->last_seen_at || $user->last_seen_at->diffInSeconds(now()) > 30) {
+                \DB::table('users')->where('id', $user->id)->update(['last_seen_at' => now()]);
+            }
         }
 
         $messages = [];
@@ -96,6 +143,7 @@ class ChatBox extends Component
 
         return view('livewire.chat.chat-box', [
             'messages' => $messages,
+            'activeUser' => $activeUser,
         ]);
     }
 }

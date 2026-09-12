@@ -23,21 +23,6 @@
             <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" readonly style="cursor: not-allowed;" autocomplete="username" />
             @error('email')<div class="text-danger">{{ $message }}</div>@enderror
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div class="mt-3">
-                    <p class="text-white-50" style="font-size: 0.9rem;">
-                        {{ __('Your email address is unverified.') }}
-                        <button form="send-verification" class="btn btn-link p-0 m-0 align-baseline text-warning text-decoration-none">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 text-success" style="font-size:0.85rem;">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
         </div>
 
         <div class="mb-3">

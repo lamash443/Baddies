@@ -13,11 +13,15 @@ class Message extends Model
         'is_read', 
         'reply_to_id', 
         'deleted_by_sender', 
-        'deleted_by_receiver'
+        'deleted_by_receiver',
+        'is_deleted'
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
+        'is_deleted' => 'boolean',
+        'deleted_by_sender' => 'boolean',
+        'deleted_by_receiver' => 'boolean',
     ];
 
     public function sender()

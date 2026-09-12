@@ -575,10 +575,11 @@
 
         {{-- Photo Gallery --}}
         @php
-            $canSeePhotos = ($user->photos_visibility ?? 'everybody') === 'everybody'
-                || (auth()->check() && auth()->id() === $user->id);
+            $profileOwnerHasSub = $user->hasActiveSubscription();
+            $isOwnProfile = auth()->check() && auth()->id() === $user->id;
+            $canSeeMedia  = $isOwnProfile || $profileOwnerHasSub;
         @endphp
-        @if($photos->count() > 0 && $canSeePhotos)
+        @if($photos->count() > 0 && $canSeeMedia)
         <div class="pv-card">
           <div class="pv-section-title">Photo Gallery ({{ $photos->count() }} {{ Str::plural('photo', $photos->count()) }})</div>
           <div class="pv-gallery">
@@ -595,15 +596,10 @@
             @endforeach
           </div>
         </div>
-        @elseif($photos->count() > 0 && !$canSeePhotos)
-        <div class="pv-card" style="text-align:center;padding:2rem;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.6)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:1rem;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <div style="color:rgba(255,255,255,0.45);font-size:0.9rem;">Photos are set to private by this user.</div>
-        </div>
         @endif
 
         {{-- Videos --}}
-        @if($user->videos->count() > 0)
+        @if($user->videos->count() > 0 && $canSeeMedia)
         <div class="pv-card">
           <div class="pv-section-title">Videos ({{ $user->videos->count() }})</div>
           <div class="row g-3">

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +12,7 @@ use Filament\Panel;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, LogsActivity;
@@ -162,6 +162,23 @@ class User extends Authenticatable implements FilamentUser
             return false;
         }
         return true;
+    }
+
+    /**
+     * Purges all uploaded photos and videos if the user's subscription has expired.
+     */
+    public function purgeMediaIfSubscriptionExpired(): void
+    {
+        if (!$this->hasActiveSubscription()) {
+            foreach ($this->photos as $photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($photo->path);
+                $photo->delete();
+            }
+            foreach ($this->videos as $video) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($video->path);
+                $video->delete();
+            }
+        }
     }
 
     /**

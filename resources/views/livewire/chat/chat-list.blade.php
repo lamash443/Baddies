@@ -7,7 +7,7 @@
                 if(!this.selectedChats.includes(id)) {
                     this.selectedChats.push(id);
                 }
-            }, 500); // 500ms long press
+            }, 250); // 250ms fast long press
         },
         endPress() {
             if (this.longPressTimer) {
@@ -78,8 +78,12 @@
     {{-- Header --}}
     <div class="p-3 border-bottom border-secondary d-flex align-items-center gap-2">
         <div class="d-flex align-items-center gap-2 flex-grow-1">
-            <a href="{{ route('dashboard') }}" class="text-decoration-none" title="Back to Dashboard">
-                <h5 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: 0.2rem;">Baddies Club</h5>
+            <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
+                @if(!empty($siteSettings['logo']))
+                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:36px;width:auto;object-fit:contain;margin-left:0.2rem;">
+                @else
+                    <h5 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: 0.2rem;">Baddies Club</h5>
+                @endif
             </a>
             @php
                 $totalUnread = auth()->user()->messagesReceived()->where('is_read', false)->where('deleted_by_receiver', false)->count();
@@ -136,14 +140,8 @@
                 $initials   = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $user->name), 0, 2));
                 $online     = $user->isOnline();
 
-                // Get last message between the two users
-                $lastMsg = \App\Models\Message::where(function($q) use ($user) {
-                    $q->where('sender_id', auth()->id())->where('receiver_id', $user->id)->where('deleted_by_sender', false);
-                })->orWhere(function($q) use ($user) {
-                    $q->where('sender_id', $user->id)->where('receiver_id', auth()->id())->where('deleted_by_receiver', false);
-                })->orderBy('created_at', 'desc')->first();
-
-                $unread  = \App\Models\Message::where('sender_id', $user->id)->where('receiver_id', auth()->id())->where('is_read', false)->where('deleted_by_receiver', false)->count();
+                $lastMsg = $user->last_message;
+                $unread  = $user->unread_count ?? 0;
                 $snippet = $lastMsg ? \Illuminate\Support\Str::limit($lastMsg->body, 35) : 'No messages yet';
                 $timeAgo = '';
                 if ($lastMsg) {

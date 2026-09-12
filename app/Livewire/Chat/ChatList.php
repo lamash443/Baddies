@@ -101,20 +101,25 @@ class ChatList extends Component
     {
         $userId = auth()->id();
 
-        // Get unique user IDs from messages that haven't been deleted by me
-        $userIds = Message::where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)
-                  ->where('deleted_by_sender', false);
+        if (!$userId) {
+            return view('livewire.chat.chat-list', [
+                'conversations' => collect(),
+                'archivedConversations' => collect(),
+            ]);
+        }
+
+        // Efficiently aggregate conversation partner IDs via DB query
+        $userIds = \DB::table('messages')
+            ->select(\DB::raw('CASE WHEN sender_id = ' . (int)$userId . ' THEN receiver_id ELSE sender_id END as partner_id'), \DB::raw('MAX(created_at) as max_created_at'))
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)->where('deleted_by_sender', false);
             })
             ->orWhere(function ($q) use ($userId) {
-                $q->where('receiver_id', $userId)
-                  ->where('deleted_by_receiver', false);
+                $q->where('receiver_id', $userId)->where('deleted_by_receiver', false);
             })
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->flatMap(function ($message) use ($userId) {
-                return [$message->sender_id === $userId ? $message->receiver_id : $message->sender_id];
-            })->unique()->values();
+            ->groupBy('partner_id')
+            ->orderByDesc('max_created_at')
+            ->pluck('partner_id');
 
         if ($this->activeUserId && !$userIds->contains($this->activeUserId)) {
             $userIds->prepend((int)$this->activeUserId);
@@ -130,6 +135,21 @@ class ChatList extends Component
         $allConversations = User::whereIn('id', $userIds)
             ->with('photos')
             ->get();
+
+        // Pre-attach last message and unread count to avoid N+1 queries in Blade view
+        foreach ($allConversations as $user) {
+            $user->last_message = Message::where(function($q) use ($user, $userId) {
+                $q->where('sender_id', $userId)->where('receiver_id', $user->id)->where('deleted_by_sender', false);
+            })->orWhere(function($q) use ($user, $userId) {
+                $q->where('sender_id', $user->id)->where('receiver_id', $userId)->where('deleted_by_receiver', false);
+            })->latest()->first();
+
+            $user->unread_count = Message::where('sender_id', $user->id)
+                ->where('receiver_id', $userId)
+                ->where('is_read', false)
+                ->where('deleted_by_receiver', false)
+                ->count();
+        }
 
         $conversations = $allConversations->whereIn('id', $activeUserIdsList)->sortBy(function($user) use ($activeUserIdsList) {
             return array_search($user->id, $activeUserIdsList->toArray());

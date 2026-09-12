@@ -146,7 +146,14 @@
                 @php $isA = $msg->sender_id === $userA->id; @endphp
                 <div class="msg-row {{ $isA ? '' : 'me' }}">
                     <div>
-                        <div class="bubble {{ $isA ? 'left' : 'right' }}">{{ $msg->body }}</div>
+                        <div class="bubble {{ $isA ? 'left' : 'right' }}">
+                            @if($msg->is_deleted || $msg->deleted_by_sender || $msg->deleted_by_receiver)
+                                <span style="background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);font-size:9px;padding:2px 6px;margin-right:6px;border-radius:4px;font-weight:bold;display:inline-flex;align-items:center;gap:3px;">
+                                    🗑️ Deleted
+                                </span>
+                            @endif
+                            {{ $msg->body }}
+                        </div>
                         <div class="msg-meta" style="justify-content: {{ $isA ? 'flex-start' : 'flex-end' }}">
                             <span>{{ $isA ? $userA->name : $userB->name }}</span>
                             <span>{{ $msg->created_at->format('M d, g:i A') }}</span>

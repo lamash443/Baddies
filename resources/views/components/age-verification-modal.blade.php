@@ -23,12 +23,12 @@
   .age-modal-card {
     position: relative;
     width: 100%;
-    max-width: 480px;
+    max-width: 400px;
     background: #000000 !important;
     border: 1px solid rgba(255, 140, 0, 0.5) !important;
     box-shadow: 0 0 40px rgba(255, 140, 0, 0.25) !important;
-    border-radius: 1.5rem !important;
-    padding: 2.25rem 2rem 2.5rem;
+    border-radius: 1.25rem !important;
+    padding: 1.5rem 1.5rem 1.75rem;
     text-align: center;
     color: #ffffff;
     font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -39,8 +39,8 @@
 
   @media (max-width: 767.98px) {
     .age-modal-card {
-      border-radius: 1.25rem !important;
-      padding: 1.75rem 1.5rem 2rem;
+      border-radius: 1rem !important;
+      padding: 1.25rem 1.15rem 1.5rem;
     }
   }
 
@@ -54,36 +54,36 @@
     justify-content: center;
     gap: 0.25rem;
     font-weight: 800;
-    font-size: 1.5rem;
-    margin-bottom: 1.25rem;
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
   }
 
   .age-badge-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 72px;
-    height: 72px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: rgba(255, 140, 0, 0.12);
     border: 1px solid rgba(255, 140, 0, 0.4);
     color: #ff8c00;
-    margin-bottom: 1rem;
-    box-shadow: 0 0 20px rgba(255, 140, 0, 0.2);
+    margin-bottom: 0.65rem;
+    box-shadow: 0 0 16px rgba(255, 140, 0, 0.2);
   }
 
   .age-modal-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #ffffff;
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.45rem;
   }
 
   .age-modal-sub {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.7);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
   }
 
   .age-modal-sub strong {
@@ -93,20 +93,20 @@
   .age-requirements-box {
     background: rgba(0, 0, 0, 0.4) !important;
     border: 1px solid rgba(255, 140, 0, 0.25) !important;
-    border-radius: 0.75rem !important;
-    padding: 1rem 1.15rem;
-    margin-bottom: 1.75rem;
+    border-radius: 0.6rem !important;
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 1.1rem;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.45rem;
   }
 
   .age-req-item {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    font-size: 0.88rem;
+    gap: 0.5rem;
+    font-size: 0.78rem;
     color: rgba(255, 255, 255, 0.85);
   }
 
@@ -118,7 +118,7 @@
   .age-modal-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.55rem;
   }
 
   .btn-age-confirm-lg {
@@ -126,9 +126,9 @@
     border: 2px solid #ff8c00;
     color: #000;
     font-weight: 700;
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: 0.6rem;
     transition: all 0.3s ease;
     letter-spacing: 0.02em;
     cursor: pointer;
@@ -136,7 +136,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .btn-age-confirm-lg:hover {
@@ -152,9 +152,9 @@
     border: 2px solid #ff8c00;
     color: #fff;
     font-weight: 700;
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: 0.6rem;
     transition: all 0.3s ease;
     letter-spacing: 0.02em;
     cursor: pointer;
@@ -213,14 +213,14 @@
           $ageModalLogo = \App\Models\SiteSetting::get('logo');
         @endphp
         @if(!empty($ageModalLogo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($ageModalLogo))
-          <img src="{{ asset('storage/' . $ageModalLogo) }}" alt="Logo" style="max-height:45px;width:auto;object-fit:contain;">
+          <img src="{{ asset('storage/' . $ageModalLogo) }}" alt="Logo" style="max-height:32px;width:auto;object-fit:contain;">
         @else
           <span style="color:#ff8c00;">Baddies-</span><span style="color:#fff;">Club</span>
         @endif
       </div>
 
       <div class="age-badge-icon">
-        <span style="font-size: 2.1rem; font-weight: 900; line-height: 1;">18+</span>
+        <span style="font-size: 1.5rem; font-weight: 900; line-height: 1;">18+</span>
       </div>
 
       <h2 id="ageModalTitle" class="age-modal-title">Age Verification</h2>

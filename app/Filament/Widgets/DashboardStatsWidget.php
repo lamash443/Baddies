@@ -53,6 +53,12 @@ class DashboardStatsWidget extends BaseWidget
                 ->description('Active in the last 15 mins')
                 ->descriptionIcon('heroicon-m-globe-alt')
                 ->color('info'),
+
+            Stat::make('Emails Sent', number_format(\App\Models\EmailLog::sent()->count()))
+                ->description(\App\Models\EmailLog::sent()->today()->count() . ' sent today')
+                ->descriptionIcon('heroicon-m-paper-airplane')
+                ->color('success'),
         ];
+
     }
 }

@@ -324,7 +324,7 @@ Route::post('/profile/{id}/track-call', function ($id) {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile/statistics', function (\Illuminate\Http\Request $request) {
@@ -535,6 +535,9 @@ Route::middleware('auth')->group(function () {
                     'chat_expires_at'  => now()->addDays($planDays),
                 ]);
             } else {
+                // If the user's previous subscription already expired, wipe their old media before applying the new one
+                $user->purgeMediaIfSubscriptionExpired();
+
                 $updateData = [
                     'subscription_plan'       => $planType,
                     'subscription_expires_at' => now()->addDays($planDays),

@@ -265,6 +265,9 @@ class PaymentController extends Controller
                         ]);
                         Log::info("PayHero Deposit: Chat subscription activated for user {$user->id}");
                     } else {
+                        // If the user's previous subscription already expired, wipe their old media before applying the new one
+                        $user->purgeMediaIfSubscriptionExpired();
+
                         $updateData = [
                             'subscription_plan' => $planType,
                             'subscription_expires_at' => now()->addDays($planDays),

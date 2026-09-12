@@ -98,6 +98,39 @@ class SiteSettingsPage extends Page implements HasForms
             'google_client_id'     => SiteSetting::get('google_client_id', config('services.google.client_id')),
             'google_client_secret' => SiteSetting::get('google_client_secret', config('services.google.client_secret')),
             'google_redirect_uri'  => SiteSetting::get('google_redirect_uri', config('services.google.redirect', url('/auth/google/callback'))),
+
+            // ── SMTP Mail Settings ─────────────────────────────────────────────
+            'mail_mailer'       => SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
+            'mail_host'         => SiteSetting::get('mail_host', config('mail.mailers.smtp.host', '')),
+            'mail_port'         => SiteSetting::get('mail_port', config('mail.mailers.smtp.port', '587')),
+            'mail_encryption'   => SiteSetting::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls')),
+            'mail_username'     => SiteSetting::get('mail_username', config('mail.mailers.smtp.username', '')),
+            'mail_password'     => SiteSetting::get('mail_password', config('mail.mailers.smtp.password', '')),
+            'mail_from_address' => SiteSetting::get('mail_from_address', config('mail.from.address', '')),
+            'mail_from_name'    => SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club')),
+
+            // ── Welcome Email Template ──────────────────────────────────────────
+            'welcome_email_subject'        => SiteSetting::get('welcome_email_subject', 'Welcome to Kenyan Baddies Club – Please Verify Your Email'),
+            'welcome_email_subheading'     => SiteSetting::get('welcome_email_subheading', "Your account has been created. You're now part of Kenya's most exclusive companion network."),
+            'welcome_email_body'           => SiteSetting::get('welcome_email_body', "We're thrilled to have you join Kenyan Baddies Club — a premium, members-only platform connecting Kenya's most exclusive companions with discerning clients.\n\nTo activate your account and unlock full access, please verify your email address by clicking the button below. Your verification link expires in 60 minutes."),
+            'welcome_email_button_text'    => SiteSetting::get('welcome_email_button_text', '✅ Verify My Email Address'),
+            'welcome_email_brand_tagline'  => SiteSetting::get('welcome_email_brand_tagline', "Kenya's Premier Companion Network"),
+            // Feature highlights
+            'welcome_email_feat1_title'    => SiteSetting::get('welcome_email_feat1_title', 'VIP Profiles'),
+            'welcome_email_feat1_desc'     => SiteSetting::get('welcome_email_feat1_desc', 'Stand out with premium tier placement'),
+            'welcome_email_feat2_title'    => SiteSetting::get('welcome_email_feat2_title', 'Verified Badge'),
+            'welcome_email_feat2_desc'     => SiteSetting::get('welcome_email_feat2_desc', 'Build trust with a real photo badge'),
+            'welcome_email_feat3_title'    => SiteSetting::get('welcome_email_feat3_title', 'Private Chat'),
+            'welcome_email_feat3_desc'     => SiteSetting::get('welcome_email_feat3_desc', 'Message members discreetly & securely'),
+            // Onboarding steps
+            'welcome_email_step1_title'    => SiteSetting::get('welcome_email_step1_title', 'Verify Your Email'),
+            'welcome_email_step1_desc'     => SiteSetting::get('welcome_email_step1_desc', 'Click the button below to confirm your address and fully activate your account.'),
+            'welcome_email_step2_title'    => SiteSetting::get('welcome_email_step2_title', 'Complete Your Profile'),
+            'welcome_email_step2_desc'     => SiteSetting::get('welcome_email_step2_desc', 'Add photos, set your location, list your services, and personalise your listing.'),
+            'welcome_email_step3_title'    => SiteSetting::get('welcome_email_step3_title', 'Choose a Membership Plan'),
+            'welcome_email_step3_desc'     => SiteSetting::get('welcome_email_step3_desc', 'Go VIP, Prime VIP, or Regular to get featured and start receiving clients.'),
+            // Security notice
+            'welcome_email_security_note'  => SiteSetting::get('welcome_email_security_note', 'If you did not create this account, simply ignore this email. Your email address will not be linked to any profile without verification. No further action is needed.'),
         ]);
     }
 
@@ -292,6 +325,186 @@ class SiteSettingsPage extends Page implements HasForms
                             ->placeholder(url('/auth/google/callback'))
                             ->helperText('The Authorized Redirect URI registered in Google Cloud Console.'),
                     ]),
+
+                // ── SMTP MAIL SETTINGS ────────────────────────────────────────────
+                Section::make('SMTP Mail / Email Settings')
+                    ->description('Configure the outgoing mail server used for sending emails to users. Required for the Broadcast Email feature.')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('mail_mailer')
+                            ->label('Mail Driver')
+                            ->placeholder('smtp')
+                            ->default('smtp')
+                            ->required()
+                            ->helperText('Options: smtp, sendmail, log (testing). Use "smtp" for Gmail, Mailgun, Postmark.'),
+
+                        TextInput::make('mail_encryption')
+                            ->label('Encryption')
+                            ->placeholder('tls')
+                            ->default('tls')
+                            ->helperText('Options: tls (port 587) · ssl (port 465) · leave blank for none.'),
+
+                        TextInput::make('mail_host')
+                            ->label('SMTP Host')
+                            ->placeholder('smtp.gmail.com')
+                            ->helperText('e.g. smtp.gmail.com, smtp.mailgun.org')
+                            ->maxLength(255),
+
+                        TextInput::make('mail_port')
+                            ->label('SMTP Port')
+                            ->placeholder('587')
+                            ->helperText('Common: 587 (TLS) or 465 (SSL)')
+                            ->maxLength(10),
+
+                        TextInput::make('mail_username')
+                            ->label('SMTP Username / Email')
+                            ->placeholder('your@gmail.com')
+                            ->maxLength(255),
+
+                        TextInput::make('mail_password')
+                            ->label('SMTP Password / App Password')
+                            ->password()
+                            ->revealable()
+                            ->maxLength(255)
+                            ->helperText('For Gmail: use an App Password (not your main password).'),
+
+                        TextInput::make('mail_from_address')
+                            ->label('From Email Address')
+                            ->placeholder('noreply@baddiesclub.com')
+                            ->email()
+                            ->columnSpanFull()
+                            ->maxLength(255),
+
+                        TextInput::make('mail_from_name')
+                            ->label('From Name')
+                            ->placeholder('Baddies Club')
+                            ->columnSpanFull()
+                            ->maxLength(255)
+                            ->helperText('The sender name users will see in their inbox.'),
+                    ]),
+
+                // ── WELCOME EMAIL TEMPLATE ────────────────────────────────────────
+                Section::make('Welcome Email Template')
+                    ->description('Customise every part of the automatic welcome email sent to new members on sign-up. Changes take effect immediately for all future registrations.')
+                    ->schema([
+
+                        // — Core fields —
+                        Section::make('Core Content')
+                            ->description('The subject line, hero subtitle, and main body text of the email.')
+                            ->compact()
+                            ->schema([
+                                TextInput::make('welcome_email_subject')
+                                    ->label('Email Subject Line')
+                                    ->placeholder('Welcome to Kenyan Baddies Club – Please Verify Your Email')
+                                    ->maxLength(255)
+                                    ->columnSpanFull()
+                                    ->helperText('This is what users see in their inbox before opening the email.'),
+
+                                TextInput::make('welcome_email_subheading')
+                                    ->label('Hero Subtitle')
+                                    ->placeholder("Your account has been created. You're now part of Kenya's most exclusive companion network.")
+                                    ->maxLength(400)
+                                    ->columnSpanFull()
+                                    ->helperText('Appears below the "Welcome to the Inner Circle" hero heading.'),
+
+                                Textarea::make('welcome_email_body')
+                                    ->label('Intro Body Message')
+                                    ->rows(5)
+                                    ->columnSpanFull()
+                                    ->helperText('Shown after the personalised greeting. Use blank lines to separate paragraphs.'),
+
+                                TextInput::make('welcome_email_button_text')
+                                    ->label('Verify Button Text')
+                                    ->placeholder('✅ Verify My Email Address')
+                                    ->maxLength(100)
+                                    ->helperText('Text on the orange CTA verification button.'),
+
+                                TextInput::make('welcome_email_brand_tagline')
+                                    ->label('Brand Tagline')
+                                    ->placeholder("Kenya's Premier Companion Network")
+                                    ->maxLength(100)
+                                    ->helperText('Small tagline shown below the brand name in the email header.'),
+                            ])->columns(2),
+
+                        // — Feature Highlights —
+                        Section::make('Feature Highlights (3 Icon Tiles)')
+                            ->description('The three feature tiles shown in the email — edit their titles and short descriptions.')
+                            ->compact()
+                            ->schema([
+                                TextInput::make('welcome_email_feat1_title')
+                                    ->label('Feature 1 Title (💎)')
+                                    ->placeholder('VIP Profiles')
+                                    ->maxLength(60),
+                                TextInput::make('welcome_email_feat1_desc')
+                                    ->label('Feature 1 Description')
+                                    ->placeholder('Stand out with premium tier placement')
+                                    ->maxLength(120),
+
+                                TextInput::make('welcome_email_feat2_title')
+                                    ->label('Feature 2 Title (✅)')
+                                    ->placeholder('Verified Badge')
+                                    ->maxLength(60),
+                                TextInput::make('welcome_email_feat2_desc')
+                                    ->label('Feature 2 Description')
+                                    ->placeholder('Build trust with a real photo badge')
+                                    ->maxLength(120),
+
+                                TextInput::make('welcome_email_feat3_title')
+                                    ->label('Feature 3 Title (💬)')
+                                    ->placeholder('Private Chat')
+                                    ->maxLength(60),
+                                TextInput::make('welcome_email_feat3_desc')
+                                    ->label('Feature 3 Description')
+                                    ->placeholder('Message members discreetly & securely')
+                                    ->maxLength(120),
+                            ])->columns(2),
+
+                        // — Onboarding Steps —
+                        Section::make('Onboarding Steps ("Get Started in 3 Steps")')
+                            ->description('The numbered step-by-step guide that walks new members through getting started.')
+                            ->compact()
+                            ->schema([
+                                TextInput::make('welcome_email_step1_title')
+                                    ->label('Step 1 Title')
+                                    ->placeholder('Verify Your Email')
+                                    ->maxLength(80),
+                                Textarea::make('welcome_email_step1_desc')
+                                    ->label('Step 1 Description')
+                                    ->rows(2)
+                                    ->placeholder('Click the button below to confirm your address and fully activate your account.'),
+
+                                TextInput::make('welcome_email_step2_title')
+                                    ->label('Step 2 Title')
+                                    ->placeholder('Complete Your Profile')
+                                    ->maxLength(80),
+                                Textarea::make('welcome_email_step2_desc')
+                                    ->label('Step 2 Description')
+                                    ->rows(2)
+                                    ->placeholder('Add photos, set your location, list your services, and personalise your listing.'),
+
+                                TextInput::make('welcome_email_step3_title')
+                                    ->label('Step 3 Title')
+                                    ->placeholder('Choose a Membership Plan')
+                                    ->maxLength(80),
+                                Textarea::make('welcome_email_step3_desc')
+                                    ->label('Step 3 Description')
+                                    ->rows(2)
+                                    ->placeholder('Go VIP, Prime VIP, or Regular to get featured and start receiving clients.'),
+                            ])->columns(2),
+
+                        // — Security Notice —
+                        Section::make('Security / Footer Notice')
+                            ->description('Displayed at the bottom of the email for users who did not register.')
+                            ->compact()
+                            ->schema([
+                                Textarea::make('welcome_email_security_note')
+                                    ->label('Security Notice Text')
+                                    ->rows(3)
+                                    ->columnSpanFull()
+                                    ->placeholder('If you did not create this account, simply ignore this email...'),
+                            ]),
+
+                    ])->columns(1),
             ]);
     }
 
@@ -328,6 +541,20 @@ class SiteSettingsPage extends Page implements HasForms
             'payhero_account_id', 'payhero_callback_url',
             // Google OAuth
             'google_client_id', 'google_client_secret', 'google_redirect_uri',
+            // SMTP Mail
+            'mail_mailer', 'mail_host', 'mail_port', 'mail_encryption',
+            'mail_username', 'mail_password', 'mail_from_address', 'mail_from_name',
+            // Welcome Email Template
+            'welcome_email_subject', 'welcome_email_subheading',
+            'welcome_email_body', 'welcome_email_button_text',
+            'welcome_email_brand_tagline',
+            'welcome_email_feat1_title', 'welcome_email_feat1_desc',
+            'welcome_email_feat2_title', 'welcome_email_feat2_desc',
+            'welcome_email_feat3_title', 'welcome_email_feat3_desc',
+            'welcome_email_step1_title', 'welcome_email_step1_desc',
+            'welcome_email_step2_title', 'welcome_email_step2_desc',
+            'welcome_email_step3_title', 'welcome_email_step3_desc',
+            'welcome_email_security_note',
         ];
 
         foreach ($allKeys as $key) {
