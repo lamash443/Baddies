@@ -15,6 +15,12 @@ class Setting extends Model
         'profile_banner_title',
         'profile_banner_description',
         'profile_banner_button_text',
+        // Announcement Card
+        'announcement_card_enabled',
+        'announcement_card_title',
+        'announcement_card_description',
+        'announcement_card_button_text',
+        'announcement_card_button_url',
         // Online Status Controls
         'online_toast_enabled',
         'online_toast_message',
@@ -32,6 +38,7 @@ class Setting extends Model
     protected $casts = [
         'unlock_banner_enabled'     => 'boolean',
         'profile_banner_enabled'    => 'boolean',
+        'announcement_card_enabled' => 'boolean',
         'online_toast_enabled'      => 'boolean',
         'show_online_status_in_chat'=> 'boolean',
         'online_toast_duration'     => 'integer',
@@ -53,6 +60,12 @@ class Setting extends Model
             'profile_banner_title'       => 'Complete Your Profile',
             'profile_banner_description' => 'Your profile is incomplete. Add your phone number, gender, age, nationality and location so clients can find you.',
             'profile_banner_button_text' => 'Update Profile',
+            // Announcement Card defaults
+            'announcement_card_enabled'      => true,
+            'announcement_card_title'        => 'Unlock Exclusive Account',
+            'announcement_card_description'  => 'Please verify your account first. Complete the verification process to unlock an Exclusive Account with priority visibility.',
+            'announcement_card_button_text'  => 'Verify Account',
+            'announcement_card_button_url'   => '/verify-account',
             // Online defaults
             'online_toast_enabled'       => true,
             'online_toast_message'       => '💚 {name} is now online!',

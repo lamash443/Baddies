@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <x-site-favicon />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -142,8 +148,156 @@
       .btn-verify { width: 100%; justify-content: center; }
     }
 
+    /* ANNOUNCEMENT PROMOTIONAL CARD */
+    .promo-card {
+      background: linear-gradient(135deg, rgba(255,140,0,0.18) 0%, rgba(30,10,0,0.95) 60%, rgba(255,100,0,0.08) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,140,0,0.45);
+      border-radius: 20px;
+      padding: 2rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(255,140,0,0.12), 0 2px 8px rgba(0,0,0,0.6);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+    .promo-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 50px rgba(255,140,0,0.22), 0 0 0 1px rgba(255,140,0,0.5) inset;
+    }
+    /* Radial glow blobs */
+    .promo-card::before {
+      content: "";
+      position: absolute; top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(255,140,0,0.22) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .promo-card::after {
+      content: "";
+      position: absolute; bottom: -50px; left: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(255,80,0,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    /* Announcement icon (top-right) */
+    .promo-icon {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,100,0,0.05));
+      border: 1px solid rgba(255,140,0,0.3);
+      border-radius: 50%;
+      color: #ffb347;
+      opacity: 0.9;
+      animation: promo-pulse 3s infinite;
+    }
+    @keyframes promo-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 140, 0, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); }
+    }
+    .promo-card-title {
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.55rem;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 30%, #ffb347 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .promo-card-desc {
+      font-size: 0.84rem;
+      color: rgba(255,255,255,0.68);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .btn-promo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #ff8c00, #ff5c00) !important;
+      border: none !important;
+      color: #fff !important;
+      padding: 0.7rem 1.6rem !important;
+      border-radius: 10px !important;
+      font-size: 0.9rem !important;
+      font-weight: 800 !important;
+      font-family: "Outfit", sans-serif !important;
+      text-decoration: none !important;
+      transition: all 0.3s ease !important;
+      letter-spacing: 0.03em;
+      box-shadow: 0 4px 18px rgba(255,140,0,0.4);
+      width: 100%;
+    }
+    .btn-promo:hover {
+      background: linear-gradient(135deg, #ffaa00, #ff6a00) !important;
+      box-shadow: 0 6px 28px rgba(255,140,0,0.6), 0 0 40px rgba(255,140,0,0.2) !important;
+      transform: translateY(-2px) !important;
+      color: #fff !important;
+    }
+    .btn-promo:active { transform: translateY(0) !important; }
+    /* Shimmer sweep animation */
+    @keyframes promo-shimmer {
+      0%   { transform: translateX(-100%) skewX(-20deg); }
+      100% { transform: translateX(250%) skewX(-20deg); }
+    }
+    .promo-shimmer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    .promo-shimmer::after {
+      content: "";
+      position: absolute;
+      top: -50%; height: 200%;
+      width: 50px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: promo-shimmer 4s ease-in-out infinite;
+    }
 
-    /* LIGHT THEME */
+    /* Mobile adjustments for promo card */
+    @media (max-width: 768px) {
+      .promo-card {
+        padding: 1.5rem 1.25rem;
+        padding-right: 4rem; /* leave space for the icon */
+      }
+      .promo-icon {
+        width: 38px;
+        height: 38px;
+        top: 1.25rem;
+        right: 1.25rem;
+      }
+      .promo-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    /* light-theme overrides for promo card */
+    [data-bs-theme="light"] .promo-card {
+      background: linear-gradient(135deg, rgba(255,140,0,0.1) 0%, #fff8f0 60%, rgba(255,100,0,0.05) 100%) !important;
+      border-color: rgba(255,140,0,0.4) !important;
+      box-shadow: 0 8px 30px rgba(255,140,0,0.1) !important;
+    }
+    [data-bs-theme="light"] .promo-card-title {
+      background: linear-gradient(135deg, #1a1a1a 30%, #cc6600 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    [data-bs-theme="light"] .promo-card-desc { color: rgba(0,0,0,0.6) !important; }
+    [data-bs-theme="light"] .promo-icon { color: #cc6600 !important; border-color: rgba(204,102,0,0.3) !important; background: rgba(204,102,0,0.05) !important; }
+
+
     [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
     [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.08) !important; }
     [data-bs-theme="light"] .dashboard-sub { color:rgba(0,0,0,0.65) !important; }
@@ -180,6 +334,12 @@
 </head>
 <body>
 <x-site-preloader />
+@php
+  $dashSetting = \App\Models\Setting::getSettings();
+  $user = Auth::user();
+  $profileComplete = $user->phone_number && $user->gender && $user->age && $user->nationality && $user->city_town;
+  $showUnlockBanner = $dashSetting->unlock_banner_enabled && is_null($user->email_verified_at);
+@endphp
 
   <!-- NAVBAR -->
   <x-navbar :hideSearch="true" />
@@ -187,10 +347,7 @@
   <!-- HEADER -->
   <div class="dashboard-header">
     <div class="container">
-      @php
-        $dashSetting = \App\Models\Setting::getSettings();
-      @endphp
-      
+
       @if($dashSetting->unlock_banner_enabled && is_null(Auth::user()->email_verified_at))
       <div class="verify-banner">
         <div class="verify-banner-content">
@@ -204,11 +361,6 @@
       </div>
       @endif
 
-      @php
-        $user = Auth::user();
-        $profileComplete = $user->phone_number && $user->gender && $user->age && $user->nationality && $user->city_town;
-        $showUnlockBanner = $dashSetting->unlock_banner_enabled && is_null($user->email_verified_at);
-      @endphp
       @if($dashSetting->profile_banner_enabled && !$profileComplete)
       <div class="verify-banner" style="margin-top: {{ $showUnlockBanner ? '1rem' : '1.5rem' }};">
         <div class="verify-banner-content">
@@ -236,7 +388,23 @@
   <div class="container pb-5 mb-5">
     <div class="row g-4 justify-content-center">
       
+      <!-- ANNOUNCEMENT PROMOTIONAL CARD -->
+      @if($dashSetting->announcement_card_enabled)
+      <div class="col-12">
+        <div class="promo-card">
+          <div class="promo-shimmer"></div>
+          <div class="promo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+          </div>
+          <div class="promo-card-title">{{ $dashSetting->announcement_card_title }}</div>
+          <p class="promo-card-desc">{{ $dashSetting->announcement_card_description }}</p>
+
+        </div>
+      </div>
+      @endif
+
       <!-- WALLET CARD -->
+
       <div class="col-12 col-md-6 col-xl-4">
         <div class="dash-card">
           <div class="dash-card-icon">
@@ -326,3 +494,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

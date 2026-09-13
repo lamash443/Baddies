@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profile - Baddies Club</title>
@@ -1056,31 +1062,29 @@
             color: rgba(255,255,255,0.75); text-decoration: none;
             font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
             background: transparent; border: 1px solid transparent; text-align: left;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
             margin-bottom: 3px; cursor: pointer; position: relative;
           }
           .side-nav-link:hover {
             background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
-            color: #ff9d1a;
+            color: #ffffff;
             border-color: rgba(255,140,0,0.25);
-            transform: translateX(6px);
-            box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 3px 0 0 #ff8c00;
+            box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
           }
           .side-nav-link svg {
             flex-shrink: 0; opacity: 0.75;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+            transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
           }
           .side-nav-link:hover svg {
             opacity: 1; color: #ff8c00;
-            transform: scale(1.18);
-            filter: drop-shadow(0 0 6px rgba(255,140,0,0.5));
+            transform: scale(1.1);
           }
           .side-nav-link.active {
             background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
             color: #ff8c00 !important;
             border-color: rgba(255,140,0,0.35) !important;
             font-weight: 700;
-            box-shadow: inset 3px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+            box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
           }
           .side-nav-link.active svg {
             opacity: 1; color: #ff8c00;
@@ -1089,10 +1093,10 @@
           [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
           [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7); }
           [data-bs-theme="light"] .side-nav-link:hover {
-            background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
-            color: #e67e00 !important;
+            background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
+            color: #000000 !important;
             border-color: rgba(255,140,0,0.3) !important;
-            box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+            box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
           }
         </style>
 
@@ -1104,13 +1108,16 @@
         @if(!$isVerified)
         <div class="dash-card p-4 photos-sidebar-card" style="margin-top:0;">
           <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="photos-icon-wrap">
+            <div class="photos-icon-wrap" style="width:auto; padding: 0 0.5rem; gap: 4px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
                 <polyline points="21 15 16 10 5 21"/>
               </svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
             </div>
-            <span class="fw-bold text-white" style="font-size:1rem;">Photos</span>
+            <span class="fw-bold text-white" style="font-size:1rem;">Photos & Videos</span>
             @if($isVerified)
               <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;">{{ $photos->count() }} uploaded</span>
             @endif
@@ -1125,10 +1132,10 @@
                 </svg>
               </div>
               <p class="photos-locked-title mb-1">Only Verified Accounts</p>
-              <p class="photos-locked-title mb-1">can Upload Photos.</p>
+              <p class="photos-locked-title mb-1">can Upload Photos and videos</p>
               <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
               <a href="{{ route('profile.edit') }}#tab-verification"
-                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el) el.click(); var hdr=document.getElementById('get-verified-header'); if(hdr) hdr.scrollIntoView({behavior:'smooth', block:'start'}); },300);"
                  class="btn-verify-now w-100">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 Verify Now
@@ -1262,112 +1269,6 @@
           .media-video-wrap .media-delete-form { top: 4px; right: 4px; }
           .media-video-wrap .media-delete-btn { opacity: 1; }
         </style>
-
-        {{-- â”€â”€ VIDEOS CARD â”€â”€ --}}
-        @if(!$isVerified)
-        <div class="dash-card p-4 videos-sidebar-card" style="margin-top:0;">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="videos-icon-wrap">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-              </svg>
-            </div>
-            <span style="font-size:1rem;font-weight:700;color:#fff;">Videos</span>
-            @if($isVerified && $hasSub)
-              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;">{{ $videos->count() }} uploaded</span>
-            @endif
-          </div>
-
-          @if(!$isVerified)
-            {{-- LOCKED STATE --}}
-            <div class="text-center py-2">
-              <div class="lock-icon-wrap mx-auto mb-3">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-              </div>
-              <p class="photos-locked-title mb-1">Only Verified Accounts</p>
-              <p class="photos-locked-title mb-1">can Upload Videos.</p>
-              <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
-              <a href="{{ route('profile.edit') }}#tab-verification"
-                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
-                 class="btn-verify-now w-100">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                Verify Now
-              </a>
-            </div>
-
-          @elseif(!$hasSub)
-            {{-- PLAN GATE STATE --}}
-            <div class="text-center py-2">
-              <div class="mx-auto mb-3" style="width:60px;height:60px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              </div>
-              <p class="photos-locked-title mb-1" style="color:rgba(255,200,0,0.9);">Unlock Video Uploads</p>
-              <p class="photos-locked-sub mb-1">You're verified! Now choose a</p>
-              <p class="photos-locked-sub mb-4">membership plan to start uploading.</p>
-              <a href="{{ route('profile.edit') }}#tab-membership"
-                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
-                 class="btn-verify-now w-100" style="margin-bottom:0.5rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                Subscribe Now
-              </a>
-              <a href="{{ route('profile.edit') }}#tab-membership"
-                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
-                 style="font-size:0.75rem;color:rgba(255,140,0,0.6);text-decoration:none;">View all plans</a>
-            </div>
-
-          @else
-            {{-- VIDEO UPLOAD STATE --}}
-            @if(session('video_upload_success'))
-              <div class="alert-photo-success mb-3">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {{ session('video_upload_success') }}
-              </div>
-            @endif
-
-            {{-- Upload form --}}
-            @if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit)
-              <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
-                @csrf
-                <label for="videoUploadInput" class="media-upload-drop w-100">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.8" stroke-linecap="round">
-                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                  </svg>
-                  <span style="font-size:0.82rem;color:rgba(255,255,255,0.6);">Click to upload videos</span>
-                  <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);">MP4, MOV, WEBM â€” max 100MB</span>
-                </label>
-                <input type="file" id="videoUploadInput" name="video" accept="video/mp4,video/mov,video/avi,video/webm,video/x-matroska" style="display:none;" onchange="this.closest('form').submit()">
-                @error('video')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
-              </form>
-            @else
-              <div class="alert alert-warning py-2 small mb-3" style="background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3); color: orange;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                You've reached your limit of {{ auth()->user()->video_limit }} videos for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
-              </div>
-            @endif
-
-            {{-- Video list --}}
-            @if($videos->count())
-              @foreach($videos as $vid)
-                <div class="media-video-wrap mb-2">
-                  <video class="video-thumb" controls preload="none">
-                    <source src="{{ asset('storage/' . $vid->path) }}">
-                  </video>
-                  <form action="{{ route('user.videos.destroy', $vid->id) }}" method="POST" class="media-delete-form">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="media-delete-btn" title="Delete" onclick="return confirm('Delete this video?')">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                  </form>
-                </div>
-              @endforeach
-            @else
-              <p class="text-secondary small text-center mb-0">No videos yet. Upload your first one!</p>
-            @endif
-          @endif
-        </div>
-        @endif
 
       </div>
 
@@ -2049,6 +1950,17 @@
                       <div class="settings-select-current">{{ ucfirst(old('email_notifications', auth()->user()->email_notifications ?? 'messages')) }}</div>
                     </div>
                   </div>
+                  
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Receive Phone Calls</label>
+                    <div class="settings-input-wrap d-flex align-items-center justify-content-between px-3" style="height: 48px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08);">
+                      <span class="text-white opacity-75" style="font-size: 0.9rem;">Allow users to view your number and call you</span>
+                      <div class="form-check form-switch m-0">
+                        <input type="hidden" name="calls_enabled" value="0">
+                        <input class="form-check-input" type="checkbox" role="switch" name="calls_enabled" value="1" {{ old('calls_enabled', auth()->user()->calls_enabled) ? 'checked' : '' }} style="border-color: rgba(255,140,0,0.5);">
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {{-- Account --}}
@@ -2331,7 +2243,7 @@
             </div>
 
             <!-- Get Verified Hero -->
-            <div class="dash-card mb-3 p-3" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
+            <div id="get-verified-header" class="dash-card mb-3 p-3" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
               <header class="d-flex align-items-center gap-2 mb-2">
                   <div class="bg-orange text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: orange;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -3368,3 +3280,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

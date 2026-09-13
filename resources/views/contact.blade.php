@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <x-site-favicon />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -269,3 +275,4 @@
   @endif
 </body>
 </html>
+

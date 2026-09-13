@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" style="overflow-y:auto!important;height:auto!important;">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <x-site-favicon />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -654,10 +660,17 @@
             </a>
             @endif
             @if($user->phone_number)
-            <a href="tel:{{ $user->phone_number }}" class="pv-cta-btn pv-cta-btn--ghost" onclick="trackCall({{ $user->id }})">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Call Now
-            </a>
+            @if($user->calls_enabled ?? true)
+              <a href="tel:{{ $user->phone_number }}" class="pv-cta-btn pv-cta-btn--ghost" onclick="trackCall({{ $user->id }})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Call Now
+              </a>
+            @else
+              <button type="button" class="pv-cta-btn pv-cta-btn--ghost" onclick="showCallsDisabledToast()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Call Now
+              </button>
+            @endif
             @else
             <a href="#" class="pv-cta-btn pv-cta-btn--primary" onclick="alert('This member has not added a contact number yet.');return false;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -837,5 +850,33 @@
 </script>
 
 <x-auth-modal />
+{{-- Calls Disabled Toast Container --}}
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999; margin-top: 70px;">
+  <div id="callsDisabledToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,140,0,0.4) !important; border-radius: 12px;">
+    <div class="d-flex">
+      <div class="toast-body d-flex align-items-center gap-3 text-white">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span style="font-family: 'Outfit', sans-serif; font-size: 0.95rem;">
+          This user has disabled calls. Only chat is enabled.
+        </span>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showCallsDisabledToast() {
+  const toastEl = document.getElementById('callsDisabledToast');
+  if (toastEl) {
+    const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+    toast.show();
+  } else {
+    alert('This user has disabled calls. Only chat is enabled.');
+  }
+}
+</script>
+
 </body>
 </html>
+

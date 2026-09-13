@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Add Funds - Baddies Club</title>
@@ -112,24 +118,22 @@
       color: rgba(255,255,255,0.75); text-decoration: none;
       font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
       background: transparent; border: 1px solid transparent; text-align: left;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
       margin-bottom: 3px; cursor: pointer; position: relative;
     }
     .side-nav-link:hover {
       background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
-      color: #ff9d1a;
+      color: #ffffff;
       border-color: rgba(255,140,0,0.25);
-      transform: translateX(6px);
-      box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 3px 0 0 #ff8c00;
+      box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
     }
     .side-nav-link svg {
       flex-shrink: 0; opacity: 0.75;
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+      transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
     }
     .side-nav-link:hover svg {
       opacity: 1; color: #ff8c00;
-      transform: scale(1.18);
-      filter: drop-shadow(0 0 6px rgba(255,140,0,0.5));
+      transform: scale(1.1);
     }
     .side-nav-link.active {
       background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
@@ -457,3 +461,4 @@
   </script>
 </body>
 </html>
+

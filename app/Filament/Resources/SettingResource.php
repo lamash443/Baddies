@@ -58,6 +58,28 @@ class SettingResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
+                Section::make('📢 Announcements Card (Dashboard)')
+                    ->description('Display a prominent promotional / announcement card at the top of the dashboard cards grid. Toggle it on or off at any time.')
+                    ->columns(2)
+                    ->schema([
+                        Toggle::make('announcement_card_enabled')
+                            ->label('Enable Announcement Card')
+                            ->helperText('When ON, the card appears at the top of the dashboard for all logged-in users.')
+                            ->columnSpanFull(),
+                        TextInput::make('announcement_card_title')
+                            ->label('Card Title')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull()
+                            ->placeholder('Unlock Exclusive Account'),
+                        Textarea::make('announcement_card_description')
+                            ->label('Card Description')
+                            ->columnSpanFull()
+                            ->rows(3)
+                            ->placeholder('Please verify your account first. Complete the verification process to unlock an Exclusive Account with priority visibility.'),
+                    ]),
+
+
                 Section::make('Complete Your Profile Banner')
                     ->columns(2)
                     ->schema([
@@ -149,6 +171,12 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
+                IconColumn::make('announcement_card_enabled')
+                    ->label('Announcement Card')
+                    ->boolean(),
+                TextColumn::make('announcement_card_title')
+                    ->label('Announcement Title')
+                    ->limit(40),
                 IconColumn::make('unlock_banner_enabled')
                     ->label('Unlock Banner Active')
                     ->boolean(),

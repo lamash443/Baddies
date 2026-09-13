@@ -52,6 +52,34 @@
     </div>
 
     <x-footer />
+    
+    {{-- Calls Disabled Toast Container --}}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999; margin-top: 70px;">
+      <div id="callsDisabledToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,140,0,0.4) !important; border-radius: 12px;">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-3 text-white">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span style="font-family: 'Outfit', sans-serif; font-size: 0.95rem;">
+              This user has disabled calls. Only chat is enabled.
+            </span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    function showCallsDisabledToast() {
+      const toastEl = document.getElementById('callsDisabledToast');
+      if (toastEl) {
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+      } else {
+        alert('This user has disabled calls. Only chat is enabled.');
+      }
+    }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
 </body>

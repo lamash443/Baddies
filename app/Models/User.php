@@ -11,6 +11,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
@@ -69,6 +70,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'favorites_visibility',
         'photos_visibility',
         'email_notifications',
+        'calls_enabled',
         'last_seen_at',
         'online_toast_enabled',
         'show_online_status_in_chat',
@@ -129,6 +131,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'wallet_balance'             => 'decimal:2',
             'deletion_requested_at'      => 'datetime',
             'last_seen_at'               => 'datetime',
+            'calls_enabled'              => 'boolean',
             'online_toast_enabled'       => 'boolean',
             'show_online_status_in_chat' => 'boolean',
             'force_online'               => 'boolean',
@@ -330,5 +333,13 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function getReferralLinkAttribute(): string
     {
         return url('/register') . '?ref=' . $this->referral_code;
+    }
+
+    /**
+     * Send the password reset notification using our custom branded template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

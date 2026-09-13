@@ -59,6 +59,7 @@ class ProfileUpdateRequest extends FormRequest
             'favorites_visibility' => ['nullable', 'string', 'in:everybody,favourites,nobody'],
             'photos_visibility' => ['nullable', 'string', 'in:everybody,favourites,nobody'],
             'email_notifications' => ['nullable', 'string', 'in:messages,none'],
+            'calls_enabled' => ['boolean'],
         ];
     }
 }

@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Escorts and Call Girls in {{ ucwords($searchLocation) }} - Baddies Club</title>
@@ -426,3 +432,4 @@ if (authEl) { authEl.addEventListener('show.bs.modal', function(event) { var tab
 <x-auth-modal />
 </body>
 </html>
+
