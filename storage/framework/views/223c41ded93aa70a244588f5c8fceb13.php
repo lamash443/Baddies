@@ -47,7 +47,7 @@
         }
     }">
 
-    {{-- Action Bar Overlay (Appears when chats are selected) --}}
+    
     <div x-transition.opacity 
          :class="selectedChats.length > 0 ? 'd-flex' : 'd-none'"
          class="position-absolute top-0 start-0 w-100 p-3 bg-dark align-items-center justify-content-between" 
@@ -60,71 +60,71 @@
              <span class="text-white fw-bold fs-5" x-text="selectedChats.length"></span>
          </div>
          <div class="d-flex align-items-center gap-4">
-             @if(!$showArchived)
+             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$showArchived): ?>
              <button @click="archiveSelected" class="btn text-white p-0" title="Archive">
                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
              </button>
-             @else
+             <?php else: ?>
              <button @click="unarchiveSelected" class="btn text-white p-0" title="Unarchive">
                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
              </button>
-             @endif
+             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
              <button @click="deleteSelected" class="btn text-danger p-0" title="Delete">
                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
              </button>
          </div>
     </div>
 
-    {{-- Header --}}
+    
     <div class="p-3 border-bottom border-secondary d-flex align-items-center gap-2">
         <div class="d-flex align-items-center gap-2 flex-grow-1">
-            <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
-                @if(!empty($siteSettings['logo']))
-                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:48px;width:auto;object-fit:contain;margin-left:0.2rem;">
-                @else
+            <a href="<?php echo e(route('dashboard')); ?>" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($siteSettings['logo'])): ?>
+                    <img src="<?php echo e(asset('storage/' . $siteSettings['logo'])); ?>" alt="Logo" style="max-height:48px;width:auto;object-fit:contain;margin-left:0.2rem;">
+                <?php else: ?>
                     <h4 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: 0.2rem;">Baddies Club</h4>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
-            @php
+            <?php
                 $totalUnread = auth()->user()->messagesReceived()->where('is_read', false)->where('deleted_by_receiver', false)->count();
-            @endphp
-            @if($totalUnread > 0)
+            ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($totalUnread > 0): ?>
                 <span style="background: #ff8c00; color: #000; font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 50px; letter-spacing: 0.03em; margin-left: auto;">
-                    {{ $totalUnread }} New
+                    <?php echo e($totalUnread); ?> New
                 </span>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     </div>
 
-    {{-- Global Announcement --}}
-    @php
+    
+    <?php
         $announcementActive = \App\Models\SiteSetting::get('chat_announcement_active');
         $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
         $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
         $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-    @endphp
-    @if($announcementActive && !empty($announcementMessage))
-        <a href="{{ route('chat.show', 'announcement') }}" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
+    ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($announcementActive && !empty($announcementMessage)): ?>
+        <a href="<?php echo e(route('chat.show', 'announcement')); ?>" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
             <div class="d-flex align-items-start gap-3">
-                {{-- Avatar --}}
+                
                 <div class="position-relative flex-shrink-0">
-                    @if($announcementLogo)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($announcementLogo): ?>
                         <div class="d-flex align-items-center justify-content-center bg-dark" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 10px rgba(255,140,0,0.4);">
-                            <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                            <img src="<?php echo e($announcementLogo); ?>" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; box-shadow: 0 0 10px rgba(255,140,0,0.4); background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
                             <span class="fw-bold text-white">KB</span>
                         </div>
-                    @endif
-                    {{-- Pinned Badge Overlay --}}
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    
                     <div class="position-absolute align-items-center justify-content-center bg-primary rounded-circle d-flex" 
                          style="width: 20px; height: 20px; bottom: -2px; right: -2px; border: 2px solid #1a1a1a;">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                     </div>
                 </div>
 
-                {{-- Name + Message --}}
+                
                 <div class="flex-grow-1" style="min-width: 0;">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="d-flex align-items-center gap-1" style="font-size: 0.95rem; font-weight: 800; color: #ff8c00;">
@@ -134,16 +134,17 @@
                         <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
                     </div>
                     <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5;">
-                        {!! nl2br(e($announcementMessage)) !!}
+                        <?php echo nl2br(e($announcementMessage)); ?>
+
                     </div>
                 </div>
             </div>
         </a>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- Conversation Rows --}}
+    
     <div class="list-group list-group-flush mt-2" wire:poll.10s>
-        @if(!$showArchived && count($archivedConversations) > 0)
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$showArchived && count($archivedConversations) > 0): ?>
             <div class="position-relative chat-row-wrapper mb-2 mx-2" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer;" wire:click="toggleArchived">
                 <div class="chat-row text-decoration-none d-block w-100" style="padding: 0.5rem 1rem; transition: all 0.2s ease;">
                     <div class="d-flex align-items-center justify-content-between">
@@ -154,12 +155,13 @@
                             <div class="fw-bold text-white" style="font-size: 0.9rem;">Archived</div>
                         </div>
                         <div class="text-muted fw-bold pe-2" style="font-size: 0.8rem;">
-                            {{ count($archivedConversations) }}
+                            <?php echo e(count($archivedConversations)); ?>
+
                         </div>
                     </div>
                 </div>
             </div>
-        @elseif($showArchived)
+        <?php elseif($showArchived): ?>
             <div class="position-relative chat-row-wrapper mb-2 mx-2" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer;" wire:click="toggleArchived">
                 <div class="chat-row text-decoration-none d-block w-100" style="padding: 0.5rem 1rem; transition: all 0.2s ease;">
                     <div class="d-flex align-items-center justify-content-between">
@@ -172,14 +174,14 @@
                     </div>
                 </div>
             </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        @php
+        <?php
             $displayConversations = $showArchived ? $archivedConversations : $conversations;
-        @endphp
+        ?>
 
-        @forelse($displayConversations as $user)
-            @php
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $displayConversations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+            <?php
                 $hasPhoto   = $user->profile_photo || $user->photos->first();
                 $cover      = $user->profile_photo ? asset('storage/'.$user->profile_photo) : ($hasPhoto ? asset('storage/'.$user->photos->first()->path) : null);
                 $initials   = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $user->name), 0, 2));
@@ -200,74 +202,79 @@
                     }
                 }
                 $isActive = $activeUserId == $user->id;
-            @endphp
+            ?>
 
             <div class="position-relative chat-row-wrapper mb-1" 
-                 :class="{ 'bg-secondary bg-opacity-25': selectedChats.includes({{ $user->id }}) }"
-                 style="background: {{ $isActive ? 'rgba(255,140,0,0.08)' : 'transparent' }}; border-left: 3px solid {{ $isActive ? '#ff8c00' : 'transparent' }}; transition: background 0.2s;">
+                 :class="{ 'bg-secondary bg-opacity-25': selectedChats.includes(<?php echo e($user->id); ?>) }"
+                 style="background: <?php echo e($isActive ? 'rgba(255,140,0,0.08)' : 'transparent'); ?>; border-left: 3px solid <?php echo e($isActive ? '#ff8c00' : 'transparent'); ?>; transition: background 0.2s;">
                 
-                <a href="{{ route('chat.show', $user->id) }}" class="chat-row text-decoration-none d-block w-100" 
+                <a href="<?php echo e(route('chat.show', $user->id)); ?>" class="chat-row text-decoration-none d-block w-100" 
                    style="padding: 0.55rem 0.75rem; transition: all 0.2s ease;"
-                   @touchstart="startPress({{ $user->id }})"
+                   @touchstart="startPress(<?php echo e($user->id); ?>)"
                    @touchend="endPress()"
                    @touchmove="endPress()"
-                   @mousedown="startPress({{ $user->id }})"
+                   @mousedown="startPress(<?php echo e($user->id); ?>)"
                    @mouseup="endPress()"
                    @mouseleave="endPress()"
-                   @click="handleClick({{ $user->id }}, $event)">
+                   @click="handleClick(<?php echo e($user->id); ?>, $event)">
                     <div class="d-flex align-items-start gap-3">
 
-                        {{-- Avatar --}}
+                        
                         <div class="position-relative flex-shrink-0">
-                            @if($hasPhoto)
-                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid {{ $online ? '#ff8c00' : 'rgba(255,255,255,0.15)' }}; padding:2px; box-shadow: {{ $online ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
-                                    <img src="{{ $cover }}" alt="{{ $user->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($hasPhoto): ?>
+                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid <?php echo e($online ? '#ff8c00' : 'rgba(255,255,255,0.15)'); ?>; padding:2px; box-shadow: <?php echo e($online ? '0 0 8px rgba(255,140,0,0.5)' : 'none'); ?>;">
+                                    <img src="<?php echo e($cover); ?>" alt="<?php echo e($user->name); ?>" class="rounded-circle w-100 h-100" style="object-fit: cover;">
                                 </div>
-                            @else
-                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid {{ $online ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $online ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                            <?php else: ?>
+                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid <?php echo e($online ? '#ff8c00' : 'rgba(255,140,0,0.3)'); ?>; padding:2px; box-shadow: <?php echo e($online ? '0 0 8px rgba(255,140,0,0.5)' : 'none'); ?>;">
                                     <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1.1rem; background: linear-gradient(135deg, rgba(255,140,0,0.25), rgba(255,140,0,0.1));">
-                                        {{ $initials ?: 'U' }}
+                                        <?php echo e($initials ?: 'U'); ?>
+
                                     </div>
                                 </div>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                            {{-- Selection Checkmark Overlay on Avatar --}}
-                            <div :class="selectedChats.includes({{ $user->id }}) ? 'd-flex' : 'd-none'" 
+                            
+                            <div :class="selectedChats.includes(<?php echo e($user->id); ?>) ? 'd-flex' : 'd-none'" 
                                  class="position-absolute align-items-center justify-content-center bg-success rounded-circle" 
                                  style="display: none; width: 22px; height: 22px; bottom: -2px; right: -2px; z-index: 5; border: 2px solid #1a1a1a;">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
 
-                        {{-- Name + Last Message --}}
+                        
                         <div class="flex-grow-1" style="min-width: 0;">
-                            {{-- Top row: Name + Time --}}
+                            
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span style="font-size: 0.92rem; font-weight: 700; color: {{ $unread > 0 ? '#fff' : 'rgba(255,255,255,0.85)' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $user->name }}
+                                <span style="font-size: 0.92rem; font-weight: 700; color: <?php echo e($unread > 0 ? '#fff' : 'rgba(255,255,255,0.85)'); ?>; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <?php echo e($user->name); ?>
+
                                 </span>
-                                <span style="font-size: 0.62rem; color: {{ $unread > 0 ? '#ff8c00' : 'rgba(255,255,255,0.3)' }}; white-space: nowrap; margin-left: 0.5rem; font-weight: 600;">
-                                    {{ $timeAgo }}
+                                <span style="font-size: 0.62rem; color: <?php echo e($unread > 0 ? '#ff8c00' : 'rgba(255,255,255,0.3)'); ?>; white-space: nowrap; margin-left: 0.5rem; font-weight: 600;">
+                                    <?php echo e($timeAgo); ?>
+
                                 </span>
                             </div>
 
-                            {{-- Bottom row: Snippet + Status/Badge --}}
+                            
                             <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-size: 0.78rem; color: {{ $unread > 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)' }}; font-weight: {{ $unread > 0 ? '600' : '400' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 0.5rem;">
-                                    @if($lastMsg && $lastMsg->sender_id === auth()->id())
+                                <span style="font-size: 0.78rem; color: <?php echo e($unread > 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)'); ?>; font-weight: <?php echo e($unread > 0 ? '600' : '400'); ?>; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 0.5rem;">
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($lastMsg && $lastMsg->sender_id === auth()->id()): ?>
                                         <span style="color: rgba(255,255,255,0.3);">You: </span>
-                                    @endif
-                                    {{ $snippet }}
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    <?php echo e($snippet); ?>
+
                                 </span>
                                 <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                                    @if($online)
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($online): ?>
                                         <span style="font-size: 0.62rem; font-weight: 700; color: #ff8c00; letter-spacing: 0.03em;">Online</span>
-                                    @endif
-                                    @if($unread > 0)
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($unread > 0): ?>
                                         <span style="min-width: 16px; height: 16px; background: #ff8c00; border-radius: 50px; font-size: 0.55rem; font-weight: 800; color: #000; display: flex; align-items: center; justify-content: center; padding: 0 4px;">
-                                            {{ $unread }}
+                                            <?php echo e($unread); ?>
+
                                         </span>
-                                    @endif
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -275,15 +282,15 @@
                 </a>
 
             </div>
-        @empty
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <div class="d-flex flex-column align-items-center justify-content-center py-5 px-3" style="color: rgba(255,255,255,0.3);">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.3;">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                <p class="mb-1 fw-bold" style="font-size: 0.95rem; color: rgba(255,255,255,0.5);">{{ $showArchived ? 'No archived chats' : 'No conversations yet' }}</p>
-                <p class="mb-0" style="font-size: 0.78rem;">{{ $showArchived ? '' : 'Start a chat from a member\'s profile!' }}</p>
+                <p class="mb-1 fw-bold" style="font-size: 0.95rem; color: rgba(255,255,255,0.5);"><?php echo e($showArchived ? 'No archived chats' : 'No conversations yet'); ?></p>
+                <p class="mb-0" style="font-size: 0.78rem;"><?php echo e($showArchived ? '' : 'Start a chat from a member\'s profile!'); ?></p>
             </div>
-        @endforelse
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
 
     <style>
@@ -294,3 +301,4 @@
     </style>
     </div>
 </div>
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/livewire/chat/chat-list.blade.php ENDPATH**/ ?>

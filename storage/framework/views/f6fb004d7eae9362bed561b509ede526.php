@@ -71,11 +71,11 @@
                 if (bubble) {
                     const textEl = bubble.querySelector('.msg-body-text');
                     const senderId = bubble.getAttribute('data-sender-id');
-                    const isMe = senderId == {{ auth()->id() }};
+                    const isMe = senderId == <?php echo e(auth()->id()); ?>;
                     
                     this.replyData = {
                         id: id,
-                        name: isMe ? 'Yourself' : '{{ $activeUser ? addslashes($activeUser->name) : 'User' }}',
+                        name: isMe ? 'Yourself' : '<?php echo e($activeUser ? addslashes($activeUser->name) : 'User'); ?>',
                         text: textEl ? textEl.innerText.trim() : 'Message'
                     };
                     
@@ -96,7 +96,7 @@
         },
         openDeleteModal() {
             if (this.selectedIds.length === 0) return;
-            const currentUserId = {{ auth()->id() }};
+            const currentUserId = <?php echo e(auth()->id()); ?>;
             const selectedBubbles = document.querySelectorAll('.msg-bubble');
             let allMine = true;
             this.selectedIds.forEach(id => {
@@ -264,111 +264,112 @@
         }
     </style>
 
-    @if($activeUser || $activeUserId === 'announcement')
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser || $activeUserId === 'announcement'): ?>
         <!-- Header -->
         <div class="position-relative flex-shrink-0" style="height: 62px; min-height: 62px; max-height: 62px; overflow: hidden; border-bottom: 1px solid rgba(255,140,0,0.25); background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
             
-            {{-- Standard Header --}}
+            
             <div id="chat-std-header" :class="selectedIds.length === 0 ? 'd-flex' : 'd-none'" class="d-flex align-items-center px-3 py-2 h-100 w-100">
                 
-                {{-- Back button --}}
-                <a href="{{ route('chat.index') }}" class="text-decoration-none me-2 d-flex align-items-center justify-content-center flex-shrink-0" title="Back"
+                
+                <a href="<?php echo e(route('chat.index')); ?>" class="text-decoration-none me-2 d-flex align-items-center justify-content-center flex-shrink-0" title="Back"
                    style="width: 34px; height: 34px; border-radius: 50%; color: #ff8c00;">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </a>
 
 
 
-                {{-- Avatar --}}
-                @if($activeUserId === 'announcement')
-                    @php
+                
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId === 'announcement'): ?>
+                    <?php
                         $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
                         $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-                    @endphp
+                    ?>
                     <div class="text-decoration-none d-block flex-shrink-0">
-                        @if($announcementLogo)
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($announcementLogo): ?>
                             <div class="d-flex align-items-center justify-content-center bg-dark" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
-                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                                <img src="<?php echo e($announcementLogo); ?>" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
                                 <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
                                     KB
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
-                @else
-                    @php
+                <?php else: ?>
+                    <?php
                         $hasPhoto = $activeUser->profile_photo || $activeUser->photos->first();
                         $cover = $activeUser->profile_photo ? asset('storage/'.$activeUser->profile_photo) : ($hasPhoto ? asset('storage/'.$activeUser->photos->first()->path) : null);
                         $initials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $activeUser->name), 0, 2));
-                    @endphp
-                    <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none d-block flex-shrink-0">
-                        @if($hasPhoto)
-                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
-                                <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                    ?>
+                    <a href="<?php echo e(route('profile.view', $activeUser->id)); ?>" class="text-decoration-none d-block flex-shrink-0">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($hasPhoto): ?>
+                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid <?php echo e($activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)'); ?>; padding:2px; box-shadow: <?php echo e($activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none'); ?>;">
+                                <img src="<?php echo e($cover); ?>" alt="<?php echo e($activeUser->name); ?>" class="rounded-circle w-100 h-100" style="object-fit: cover;">
                             </div>
-                        @else
-                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
+                        <?php else: ?>
+                            <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid <?php echo e($activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)'); ?>; padding:2px; box-shadow: <?php echo e($activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none'); ?>;">
                                 <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
-                                    {{ $initials ?: 'U' }}
+                                    <?php echo e($initials ?: 'U'); ?>
+
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </a>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                {{-- Name + Status --}}
+                
                 <div class="ms-3 flex-grow-1" style="min-width: 0;">
-                    @if($activeUserId === 'announcement')
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId === 'announcement'): ?>
                         <div class="fw-bold text-white d-flex align-items-center gap-1" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             Kenyan Baddies
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
                         </div>
                         <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Message</small>
-                    @else
-                        <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
-                            <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
+                    <?php else: ?>
+                        <a href="<?php echo e(route('profile.view', $activeUser->id)); ?>" class="text-decoration-none">
+                            <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo e($activeUser->name); ?></div>
                         </a>
-                        @php
+                        <?php
                             $chatSettings = \App\Models\Setting::getSettings();
                             $showStatusInChat = $activeUser->show_online_status_in_chat ?? $chatSettings->show_online_status_in_chat;
-                        @endphp
-                        @if($showStatusInChat)
-                            @if($activeUser->isOnline())
+                        ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($showStatusInChat): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser->isOnline()): ?>
                                 <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">Online</small>
-                            @elseif($activeUser->last_seen_at)
-                                <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Last seen {{ $activeUser->last_seen_at->diffForHumans() }}</small>
-                            @else
+                            <?php elseif($activeUser->last_seen_at): ?>
+                                <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Last seen <?php echo e($activeUser->last_seen_at->diffForHumans()); ?></small>
+                            <?php else: ?>
                                 <small style="color: rgba(255,255,255,0.4); font-size: 0.7rem;">Offline</small>
-                            @endif
-                        @endif
-                    @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
-                {{-- Phone Call Icon --}}
-                @if($activeUser && $activeUser->phone_number)
-                    @if($activeUser->calls_enabled ?? true)
-                        <a href="tel:{{ $activeUser->phone_number }}" class="flex-shrink-0 d-flex align-items-center justify-content-center text-decoration-none ms-2" title="Call {{ $activeUser->name }}"
+                
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser && $activeUser->phone_number): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser->calls_enabled ?? true): ?>
+                        <a href="tel:<?php echo e($activeUser->phone_number); ?>" class="flex-shrink-0 d-flex align-items-center justify-content-center text-decoration-none ms-2" title="Call <?php echo e($activeUser->name); ?>"
                            style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.4); color: #ff8c00; transition: all 0.2s; box-shadow: 0 0 10px rgba(255,140,0,0.2);">
                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(270deg);">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
                         </a>
-                    @else
-                        <button type="button" class="flex-shrink-0 d-flex align-items-center justify-content-center border-0 ms-2" title="Call {{ $activeUser->name }}"
+                    <?php else: ?>
+                        <button type="button" class="flex-shrink-0 d-flex align-items-center justify-content-center border-0 ms-2" title="Call <?php echo e($activeUser->name); ?>"
                            style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,140,0,0.15); border: 1px solid rgba(255,140,0,0.4) !important; color: #ff8c00; transition: all 0.2s; box-shadow: 0 0 10px rgba(255,140,0,0.2); padding: 0;"
                            onclick="showCallsDisabledToast()">
                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(270deg);">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
                             </svg>
                         </button>
-                    @endif
-                @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Selection Action Header — Swapped cleanly via Alpine --}}
+            
             <div id="chat-sel-header" x-cloak x-show="selectedIds.length > 0" :class="selectedIds.length > 0 ? 'd-flex' : 'd-none'"
                  class="align-items-center justify-content-between position-absolute top-0 start-0 w-100 h-100 px-3"
                  style="z-index: 50; background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
@@ -407,29 +408,29 @@
                 </div>
             </div>
 
-            @php $lastDate = null; @endphp
+            <?php $lastDate = null; ?>
 
-            @if($activeUserId === 'announcement')
-                {{-- Global Announcement (System Message) --}}
-                @php
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId === 'announcement'): ?>
+                
+                <?php
                     $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
                     $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
                     $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-                @endphp
-                @if(!empty($announcementMessage))
+                ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($announcementMessage)): ?>
                     <div class="d-flex w-100 mb-4 mt-2 justify-content-start align-items-end gap-2 position-relative">
-                        {{-- Avatar --}}
-                        @if($announcementLogo)
+                        
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($announcementLogo): ?>
                             <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-dark" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; padding:1px; box-shadow: 0 0 6px rgba(255,140,0,0.3);">
-                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                                <img src="<?php echo e($announcementLogo); ?>" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
                                 <span class="fw-bold text-white" style="font-size: 0.7rem;">KB</span>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         
-                        {{-- Bubble --}}
+                        
                         <div class="px-3 py-2 shadow-sm position-relative" 
                              style="max-width: 85%; border-radius: 12px; border-bottom-left-radius: 2px; background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.25);">
                             <div class="d-flex align-items-center gap-1 mb-1" style="font-size: 0.8rem; font-weight: 800; color: #ff8c00;">
@@ -437,18 +438,18 @@
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
                                 <span class="ms-1" style="font-size: 0.55rem; color: #fff; background: rgba(255,140,0,0.25); padding: 2px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Pinned</span>
                             </div>
-                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text); line-height: 1.5;">{!! nl2br(e($announcementMessage)) !!}</div>
+                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text); line-height: 1.5;"><?php echo nl2br(e($announcementMessage)); ?></div>
                         </div>
                     </div>
-                @else
+                <?php else: ?>
                     <div class="text-center text-muted mt-5">
                         No active announcements.
                     </div>
-                @endif
-            @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-            @forelse($messages as $message)
-                @php
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <?php
                     $msgDateObj = $message->created_at;
                     if ($msgDateObj->isToday()) {
                         $dateString = 'Today';
@@ -457,50 +458,52 @@
                     } else {
                         $dateString = $msgDateObj->format('d/m/Y');
                     }
-                @endphp
+                ?>
 
-                @if($lastDate !== $dateString)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($lastDate !== $dateString): ?>
                     <div class="d-flex justify-content-center my-3 position-sticky" style="top: 12px; z-index: 5;">
                         <div class="px-3 py-1 shadow-sm rounded-pill" style="background-color: var(--date-bg); color: var(--date-text); font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(4px);">
-                            {{ $dateString }}
+                            <?php echo e($dateString); ?>
+
                         </div>
                     </div>
-                    @php $lastDate = $dateString; @endphp
-                @endif
-                <div class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper {{ $message->sender_id === auth()->id() ? 'justify-content-end' : 'justify-content-start' }}" data-msg-id="{{ $message->id }}">
+                    <?php $lastDate = $dateString; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <div class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper <?php echo e($message->sender_id === auth()->id() ? 'justify-content-end' : 'justify-content-start'); ?>" data-msg-id="<?php echo e($message->id); ?>">
                     
                     <div class="px-3 py-2 shadow-sm position-relative msg-bubble" 
-                         :class="{ 'selected-bubble': selectedIds.includes({{ $message->id }}) }"
-                         @touchstart="startPress({{ $message->id }})"
+                         :class="{ 'selected-bubble': selectedIds.includes(<?php echo e($message->id); ?>) }"
+                         @touchstart="startPress(<?php echo e($message->id); ?>)"
                          @touchend="endPress()"
                          @touchmove="cancelPress()"
-                         @mousedown="startPress({{ $message->id }})"
+                         @mousedown="startPress(<?php echo e($message->id); ?>)"
                          @mouseup="endPress()"
                          @mouseleave="cancelPress()"
-                         @click="handleClick({{ $message->id }}, $event)"
-                         data-msg-id="{{ $message->id }}"
-                         data-sender-id="{{ $message->sender_id }}"
-                         data-is-deleted="{{ $message->is_deleted ? '1' : '0' }}"
-                         style="max-width: 75%; border-radius: 12px; cursor: pointer; user-select: none; touch-action: pan-y; background-color: {{ $message->is_deleted ? 'var(--deleted-bg)' : ($message->sender_id === auth()->id() ? 'var(--bubble-sent-bg)' : 'var(--bubble-received-bg)') }}; {{ $message->sender_id === auth()->id() ? 'border-top-right-radius: 0px;' : 'border-top-left-radius: 0px;' }} {{ $message->is_deleted ? 'border: 1px solid rgba(0,0,0,0.08);' : '' }}">
+                         @click="handleClick(<?php echo e($message->id); ?>, $event)"
+                         data-msg-id="<?php echo e($message->id); ?>"
+                         data-sender-id="<?php echo e($message->sender_id); ?>"
+                         data-is-deleted="<?php echo e($message->is_deleted ? '1' : '0'); ?>"
+                         style="max-width: 75%; border-radius: 12px; cursor: pointer; user-select: none; touch-action: pan-y; background-color: <?php echo e($message->is_deleted ? 'var(--deleted-bg)' : ($message->sender_id === auth()->id() ? 'var(--bubble-sent-bg)' : 'var(--bubble-received-bg)')); ?>; <?php echo e($message->sender_id === auth()->id() ? 'border-top-right-radius: 0px;' : 'border-top-left-radius: 0px;'); ?> <?php echo e($message->is_deleted ? 'border: 1px solid rgba(0,0,0,0.08);' : ''); ?>">
                         
-                        {{-- Swipe to Reply Icon --}}
-                        @if(!$message->is_deleted)
+                        
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$message->is_deleted): ?>
                             <div class="reply-swipe-icon position-absolute d-flex align-items-center justify-content-center text-warning opacity-0" 
-                                 style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,140,0,0.2); transition: opacity 0.15s ease, transform 0.15s ease; transform: scale(0.5); flex-shrink: 0; pointer-events: none; top: 50%; transform: translateY(-50%) scale(0.5); {{ $message->sender_id === auth()->id() ? 'left: -38px;' : 'right: -38px;' }}">
+                                 style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,140,0,0.2); transition: opacity 0.15s ease, transform 0.15s ease; transform: scale(0.5); flex-shrink: 0; pointer-events: none; top: 50%; transform: translateY(-50%) scale(0.5); <?php echo e($message->sender_id === auth()->id() ? 'left: -38px;' : 'right: -38px;'); ?>">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97700" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         
-                        @if($message->replyTo && !$message->is_deleted)
-                            <div class="mb-2 p-2 rounded" style="background-color: var(--reply-bg); border-left: 4px solid {{ $message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)' }}; font-size: 0.8rem;">
-                                <div class="fw-bold mb-1" style="color: {{ $message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)' }};">{{ $message->replyTo->sender_id === auth()->id() ? 'You' : ($message->replyTo->sender ? $message->replyTo->sender->name : 'User') }}</div>
-                                <div class="text-truncate {{ $message->replyTo->is_deleted ? 'fst-italic opacity-50' : '' }}" style="opacity: 0.75; color: var(--bubble-text);">
-                                    {{ $message->replyTo->is_deleted ? 'This message was deleted' : $message->replyTo->body }}
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->replyTo && !$message->is_deleted): ?>
+                            <div class="mb-2 p-2 rounded" style="background-color: var(--reply-bg); border-left: 4px solid <?php echo e($message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)'); ?>; font-size: 0.8rem;">
+                                <div class="fw-bold mb-1" style="color: <?php echo e($message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)'); ?>;"><?php echo e($message->replyTo->sender_id === auth()->id() ? 'You' : ($message->replyTo->sender ? $message->replyTo->sender->name : 'User')); ?></div>
+                                <div class="text-truncate <?php echo e($message->replyTo->is_deleted ? 'fst-italic opacity-50' : ''); ?>" style="opacity: 0.75; color: var(--bubble-text);">
+                                    <?php echo e($message->replyTo->is_deleted ? 'This message was deleted' : $message->replyTo->body); ?>
+
                                 </div>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                        @if($message->is_deleted)
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->is_deleted): ?>
                             <div class="d-flex align-items-center justify-content-between gap-3 text-secondary fst-italic py-0.5" style="font-size: 0.82rem; color: var(--deleted-text) !important;">
                                 <div class="d-flex align-items-center gap-2">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
@@ -510,47 +513,48 @@
                                     <span style="font-weight: 450; white-space: nowrap;">This message was deleted</span>
                                 </div>
                                 <span class="fst-normal" style="font-size: 0.64rem; white-space: nowrap; flex-shrink: 0; margin-left: 6px; color: var(--bubble-meta);">
-                                    {{ $message->created_at->format('g:i A') }}
+                                    <?php echo e($message->created_at->format('g:i A')); ?>
+
                                 </span>
                             </div>
-                        @else
-                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text);">{{ $message->body }}</div>
+                        <?php else: ?>
+                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text);"><?php echo e($message->body); ?></div>
 
                             <div class="d-flex align-items-center mt-1 justify-content-end" style="font-size: 0.65rem; gap: 4px; color: var(--bubble-meta);">
-                                <span>{{ $message->created_at->format('g:i A') }}</span>
-                                @if($message->sender_id === auth()->id())
-                                    @if($message->is_read)
-                                        {{-- Double Blue Tick --}}
+                                <span><?php echo e($message->created_at->format('g:i A')); ?></span>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->sender_id === auth()->id()): ?>
+                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($message->is_read): ?>
+                                        
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                           <polyline points="22 7 12 17 8 13"></polyline>
                                           <polyline points="16 7 12 11"></polyline>
                                           <polyline points="6 15 2 11"></polyline>
                                         </svg>
-                                    @elseif($activeUser->isOnline())
-                                        {{-- Double Gray Tick --}}
+                                    <?php elseif($activeUser->isOnline()): ?>
+                                        
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50">
                                           <polyline points="22 7 12 17 8 13"></polyline>
                                           <polyline points="16 7 12 11"></polyline>
                                           <polyline points="6 15 2 11"></polyline>
                                         </svg>
-                                    @else
-                                        {{-- Single Gray Tick --}}
+                                    <?php else: ?>
+                                        
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50">
                                           <polyline points="20 6 9 17 4 12"></polyline>
                                         </svg>
-                                    @endif
-                                @endif
+                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                 </div>
-            @empty
-                @if($activeUserId !== 'announcement')
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId !== 'announcement'): ?>
                     <div class="text-center text-muted mt-5">
                         Say hello to start the conversation!
                     </div>
-                @endif
-            @endforelse
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
 
         <!-- Instant Alpine Reply Preview -->
@@ -569,12 +573,12 @@
             </div>
         </div>
 
-        @if($replyToId)
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($replyToId): ?>
             <!-- Fallback for Livewire reload if replyData wasn't initialized -->
-            <div x-init="if(!replyData) { replyData = { id: {{ $replyToId }}, name: 'User', text: '...' }; }"></div>
-        @endif
+            <div x-init="if(!replyData) { replyData = { id: <?php echo e($replyToId); ?>, name: 'User', text: '...' }; }"></div>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        @if($activeUserId !== 'announcement')
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId !== 'announcement'): ?>
             <!-- Input Area -->
             <div class="px-3 py-2 flex-shrink-0" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
                 <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
@@ -590,29 +594,29 @@
                     </button>
                 </form>
             </div>
-        @else
+        <?php else: ?>
             <!-- Announcement Footer (No Input) -->
             <div class="px-3 py-3 flex-shrink-0 text-center" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
                 <small class="text-muted fw-bold">This is a system announcement. Replies are disabled.</small>
             </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <script>
             // ── Toast config: re-runs each poll (reads PHP values) ───────────
-            @php
+            <?php
                 $gSettings = \App\Models\Setting::getSettings();
                 $tEnabled  = $activeUser?->online_toast_enabled ?? $gSettings->online_toast_enabled;
                 $tMessage  = $activeUser?->online_toast_message ?: ($gSettings->online_toast_message ?? '💚 {name} is now online!');
                 $tDuration = $activeUser?->online_toast_duration ?: ($gSettings->online_toast_duration ?? 4000);
                 $tPosition = $activeUser?->online_toast_position ?: ($gSettings->online_toast_position ?? 'bottom-right');
                 $tSound    = $activeUser?->online_toast_sound ?: ($gSettings->online_toast_sound ?? 'none');
-            @endphp
+            ?>
             window.chatToastConfig = {
-                enabled:  {{ $tEnabled ? 'true' : 'false' }},
-                message:  @json($tMessage),
-                duration: {{ $tDuration }},
-                position: @json($tPosition),
-                sound:    @json($tSound),
+                enabled:  <?php echo e($tEnabled ? 'true' : 'false'); ?>,
+                message:  <?php echo json_encode($tMessage, 15, 512) ?>,
+                duration: <?php echo e($tDuration); ?>,
+                position: <?php echo json_encode($tPosition, 15, 512) ?>,
+                sound:    <?php echo json_encode($tSound, 15, 512) ?>,
             };
 
             function scrollToBottom() { const el = document.getElementById('chat-messages'); if (el) el.scrollTop = el.scrollHeight; }
@@ -665,9 +669,10 @@
         </div>
     </div>
 
-    @else
+    <?php else: ?>
         <div class="d-flex h-100 justify-content-center align-items-center text-muted">
             Select a conversation to start chatting.
         </div>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/livewire/chat/chat-box.blade.php ENDPATH**/ ?>

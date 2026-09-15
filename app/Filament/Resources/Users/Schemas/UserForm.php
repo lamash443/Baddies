@@ -45,6 +45,9 @@ class UserForm
                         Toggle::make('is_verified')
                             ->label('Verified')
                             ->helperText('Approve verification photo — unlocks plan selection.'),
+                        Toggle::make('calls_enabled')
+                            ->label('Calls Enabled')
+                            ->helperText('Allows users to call this profile.'),
                         DateTimePicker::make('deletion_requested_at')
                             ->label('Deletion Requested At')
                             ->disabled()

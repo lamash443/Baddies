@@ -1897,6 +1897,9 @@
               <form class="mt-2" method="POST" action="{{ route('profile.update') }}">
                 @csrf
                 @method('patch')
+                {{-- Hidden fields required by ProfileUpdateRequest validation --}}
+                <input type="hidden" name="name" value="{{ auth()->user()->name }}">
+                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
 
                 {{-- Privacy Settings --}}
                 <div class="settings-group-label">
@@ -1957,7 +1960,18 @@
                       <span class="text-white opacity-75" style="font-size: 0.9rem;">Allow users to view your number and call you</span>
                       <div class="form-check form-switch m-0">
                         <input type="hidden" name="calls_enabled" value="0">
-                        <input class="form-check-input" type="checkbox" role="switch" name="calls_enabled" value="1" {{ old('calls_enabled', auth()->user()->calls_enabled) ? 'checked' : '' }} style="border-color: rgba(255,140,0,0.5);">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="callsEnabledToggle"
+                          name="calls_enabled"
+                          value="1"
+                          {{ auth()->user()->calls_enabled ? 'checked' : '' }}
+                          style="border-color: rgba(255,140,0,0.5); cursor:pointer;"
+                          data-toggle-url="{{ route('profile.toggle-calls') }}"
+                          data-csrf="{{ csrf_token() }}"
+                        >
                       </div>
                     </div>
                   </div>
@@ -3278,6 +3292,59 @@
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  (function () {
+    var toggle = document.getElementById('callsEnabledToggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('change', function () {
+      var enabled = this.checked ? 1 : 0;
+      var url     = this.dataset.toggleUrl;
+      var csrf    = this.dataset.csrf;
+
+      // Optimistically update hidden sibling so the form also submits the new value
+      var hidden = this.previousElementSibling;
+      if (hidden && hidden.type === 'hidden') hidden.value = enabled ? '0' : '0'; // hidden always 0; checkbox carries 1
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ calls_enabled: enabled }),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          if (data.calls_enabled) {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Calls Enabled', 'Users can now call you.');
+            }
+          } else {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Calls Disabled', 'Your number is now hidden.');
+            }
+          }
+        } else {
+          // Revert toggle on error
+          toggle.checked = !toggle.checked;
+          if (typeof showDynamicToast === 'function') {
+            showDynamicToast('Update Failed', 'Failed to update. Please try again.');
+          }
+        }
+      })
+      .catch(function () {
+        toggle.checked = !toggle.checked;
+        if (typeof showDynamicToast === 'function') {
+          showDynamicToast('Update Failed', 'Failed to update. Please try again.');
+        }
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
 

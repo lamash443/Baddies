@@ -386,6 +386,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/sessions/{id}/terminate', [ProfileController::class, 'terminateSession'])->name('profile.sessions.terminate');
     Route::post('/profile/sessions/terminate-others', [ProfileController::class, 'terminateAllOtherSessions'])->name('profile.sessions.terminate-others');
+    Route::post('/profile/toggle-calls', [ProfileController::class, 'toggleCalls'])->name('profile.toggle-calls');
     // User Photos
     Route::post('/profile/photos', [UserPhotoController::class, 'store'])->name('user.photos.store');
     Route::post('/profile/photos/{photo}/set-main', [UserPhotoController::class, 'setMain'])->name('user.photos.set-main');

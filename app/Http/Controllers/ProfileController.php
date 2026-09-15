@@ -97,6 +97,25 @@ class ProfileController extends Controller
     }
 
     /**
+     * Toggle the calls_enabled flag for the authenticated user (AJAX).
+     */
+    public function toggleCalls(Request $request)
+    {
+        $request->validate([
+            'calls_enabled' => ['required', 'boolean'],
+        ]);
+
+        $user = $request->user();
+        $user->calls_enabled = (bool) $request->input('calls_enabled');
+        $user->save();
+
+        return response()->json([
+            'success'       => true,
+            'calls_enabled' => $user->calls_enabled,
+        ]);
+    }
+
+    /**
      * Upload / change the user's profile photo.
      */
     public function uploadPhoto(Request $request)

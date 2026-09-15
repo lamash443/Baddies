@@ -8,13 +8,34 @@
     })();
   </script>
   <meta charset="utf-8">
-  <x-site-favicon />
+  <?php if (isset($component)) { $__componentOriginald9e77967a5438b63fd29d241808e49d9 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginald9e77967a5438b63fd29d241808e49d9 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.site-favicon','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('site-favicon'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginald9e77967a5438b63fd29d241808e49d9)): ?>
+<?php $attributes = $__attributesOriginald9e77967a5438b63fd29d241808e49d9; ?>
+<?php unset($__attributesOriginald9e77967a5438b63fd29d241808e49d9); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginald9e77967a5438b63fd29d241808e49d9)): ?>
+<?php $component = $__componentOriginald9e77967a5438b63fd29d241808e49d9; ?>
+<?php unset($__componentOriginald9e77967a5438b63fd29d241808e49d9); ?>
+<?php endif; ?>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{{ $user->name ?? 'Profile' }} – Kenyan Baddies Club</title>
-  <meta name="description" content="View the full profile of {{ $user->name }} on Kenyan Baddies Club. {{ $user->age ? $user->age.' years old. ' : '' }}{{ $user->city_town ? 'Based in '.$user->city_town.'. ' : '' }}{{ $user->services ? 'Services: '.implode(', ', array_slice(is_array($user->services) ? $user->services : json_decode($user->services, true) ?? [], 0, 3)).'.' : '' }}">
+  <title><?php echo e($user->name ?? 'Profile'); ?> – Kenyan Baddies Club</title>
+  <meta name="description" content="View the full profile of <?php echo e($user->name); ?> on Kenyan Baddies Club. <?php echo e($user->age ? $user->age.' years old. ' : ''); ?><?php echo e($user->city_town ? 'Based in '.$user->city_town.'. ' : ''); ?><?php echo e($user->services ? 'Services: '.implode(', ', array_slice(is_array($user->services) ? $user->services : json_decode($user->services, true) ?? [], 0, 3)).'.' : ''); ?>">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
+  <link rel="stylesheet" href="<?php echo e(asset('css/listing-card.css')); ?>">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; font-family: "Outfit", sans-serif; background: #0d0d0d; color: #fff; min-height: 100vh; }
@@ -392,8 +413,29 @@
   </style>
 </head>
 <body>
-<x-site-preloader />
-@php
+<?php if (isset($component)) { $__componentOriginalfc3c7128ad5039337c318ebdcd975711 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc3c7128ad5039337c318ebdcd975711 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.site-preloader','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('site-preloader'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $attributes = $__attributesOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $component = $__componentOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__componentOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
+<?php
   $mainPhoto = $user->photos->where('is_main', true)->first() ?? $user->photos->first();
   $headerImage = $mainPhoto
     ? asset('storage/' . $mainPhoto->path)
@@ -419,17 +461,38 @@
   $outcalls  = $user->outcalls_rate;
   $otherSvc  = $user->other_services;
   $otherCit  = $user->other_cities;
-@endphp
+?>
 
-{{-- NAVBAR --}}
-<x-navbar />
 
-{{-- HERO --}}
+<?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+
+
 <section class="pv-hero">
-  <img class="pv-hero__bg" src="{{ $headerImage }}" alt="{{ $user->name }}">
+  <img class="pv-hero__bg" src="<?php echo e($headerImage); ?>" alt="<?php echo e($user->name); ?>">
   <div class="pv-hero__overlay"></div>
 
-  {{-- Back button --}}
+  
   <a href="javascript:history.back()" class="pv-back-btn" aria-label="Go back">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
   </a>
@@ -437,161 +500,163 @@
   <div class="pv-hero__content container">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 w-100">
       <h1 class="pv-hero__name mb-0">
-        <span>{{ $user->name }}</span>
+        <span><?php echo e($user->name); ?></span>
       </h1>
       
       <div class="pv-hero__badge mb-0 mt-2">
-        @if($isVip) <span class="pv-hero__vip">VIP</span> @endif
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isVip): ?> <span class="pv-hero__vip">VIP</span> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         Available Now
       </div>
     </div>
 
     <div class="pv-hero__meta">
-      @if($age)
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($age): ?>
       <span class="pv-hero__meta-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0 2c4.42 0 8 2.24 8 5v1H4v-1c0-2.76 3.58-5 8-5Z"/></svg>
-        {{ $age }} years old
+        <?php echo e($age); ?> years old
       </span>
-      @endif
-      @if($city)
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($city): ?>
       <span class="pv-hero__meta-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        {{ $city }}@if($county), {{ $county }}@endif
+        <?php echo e($city); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($county): ?>, <?php echo e($county); ?><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
       </span>
-      @endif
-      @if($nation)
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($nation): ?>
       <span class="pv-hero__meta-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
-        {{ $nation }}
+        <?php echo e($nation); ?>
+
       </span>
-      @endif
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
   </div>
 </section>
 
-{{-- BODY --}}
+
 <div class="pv-body">
   <div class="container">
     <div class="row g-4">
 
-      {{-- LEFT: Main content --}}
+      
       <div class="col-lg-8">
 
-        {{-- About --}}
-        @if($otherSvc || $nearby || $otherCit)
+        
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($otherSvc || $nearby || $otherCit): ?>
         <div class="pv-card">
           <div class="pv-section-title">About</div>
           <p class="pv-about-text mb-0">
-            {{ $otherSvc ?? '' }}
-            @if($nearby) Located near: {{ $nearby }}.@endif
-            @if($otherCit) Also available in: {{ $otherCit }}.@endif
+            <?php echo e($otherSvc ?? ''); ?>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($nearby): ?> Located near: <?php echo e($nearby); ?>.<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($otherCit): ?> Also available in: <?php echo e($otherCit); ?>.<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </p>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        {{-- Details --}}
+        
         <div class="pv-card">
           <div class="pv-section-title">Details</div>
           <div class="pv-details-grid">
-            @if($age)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($age): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Age</div>
-              <div class="pv-detail-chip__val">{{ $age }} years</div>
+              <div class="pv-detail-chip__val"><?php echo e($age); ?> years</div>
             </div>
-            @endif
-            @if($gender)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($gender): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Gender</div>
-              <div class="pv-detail-chip__val">{{ ucfirst($gender) }}</div>
+              <div class="pv-detail-chip__val"><?php echo e(ucfirst($gender)); ?></div>
             </div>
-            @endif
-            @if($orient)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($orient): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Orientation</div>
-              <div class="pv-detail-chip__val">{{ ucwords(str_replace('_', ' ', $orient)) }}</div>
+              <div class="pv-detail-chip__val"><?php echo e(ucwords(str_replace('_', ' ', $orient))); ?></div>
             </div>
-            @endif
-            @if($nation)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($nation): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Nationality</div>
-              <div class="pv-detail-chip__val">{{ $nation }}</div>
+              <div class="pv-detail-chip__val"><?php echo e($nation); ?></div>
             </div>
-            @endif
-            @if($city)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($city): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">City</div>
-              <div class="pv-detail-chip__val">{{ $city }}</div>
+              <div class="pv-detail-chip__val"><?php echo e($city); ?></div>
             </div>
-            @endif
-            @if($county)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($county): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">County</div>
-              <div class="pv-detail-chip__val">{{ $county }}</div>
+              <div class="pv-detail-chip__val"><?php echo e($county); ?></div>
             </div>
-            @endif
-            @if($location)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($location): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Location</div>
-              <div class="pv-detail-chip__val">{{ $location }}</div>
+              <div class="pv-detail-chip__val"><?php echo e($location); ?></div>
             </div>
-            @endif
-            @if($area)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($area): ?>
             <div class="pv-detail-chip">
               <div class="pv-detail-chip__key">Area</div>
-              <div class="pv-detail-chip__val">{{ $area }}</div>
+              <div class="pv-detail-chip__val"><?php echo e($area); ?></div>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </div>
         </div>
 
-        {{-- Rates --}}
-        @if($incalls || $outcalls)
+        
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($incalls || $outcalls): ?>
         <div class="pv-card">
           <div class="pv-section-title">Rates</div>
           <div class="pv-rates">
-            @if($incalls)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($incalls): ?>
             <div class="pv-rate-card">
               <div class="pv-rate-card__type">In-calls</div>
-              <div class="pv-rate-card__price">KES {{ number_format($incalls) }}</div>
+              <div class="pv-rate-card__price">KES <?php echo e(number_format($incalls)); ?></div>
               <div class="pv-rate-card__per">per session</div>
             </div>
-            @endif
-            @if($outcalls)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($outcalls): ?>
             <div class="pv-rate-card">
               <div class="pv-rate-card__type">Out-calls</div>
-              <div class="pv-rate-card__price">KES {{ number_format($outcalls) }}</div>
+              <div class="pv-rate-card__price">KES <?php echo e(number_format($outcalls)); ?></div>
               <div class="pv-rate-card__per">per session</div>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </div>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        {{-- Services --}}
-        @if(count($services) > 0)
+        
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(count($services) > 0): ?>
         <div class="pv-card">
           <div class="pv-section-title">Services Offered</div>
           <div class="pv-tags">
-            @foreach($services as $svc)
-              <span class="pv-tag">{{ $svc }}</span>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $svc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+              <span class="pv-tag"><?php echo e($svc); ?></span>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
           </div>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        {{-- Photo Gallery --}}
-        @php
+        
+        <?php
             $profileOwnerHasSub = $user->hasActiveSubscription();
             $isOwnProfile = auth()->check() && auth()->id() === $user->id;
             $canSeeMedia  = $isOwnProfile || $profileOwnerHasSub;
-        @endphp
-        @if($photos->count() > 0 && $canSeeMedia)
+        ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count() > 0 && $canSeeMedia): ?>
         <div class="pv-card">
-          <div class="pv-section-title">Photo Gallery ({{ $photos->count() }} {{ Str::plural('photo', $photos->count()) }})</div>
+          <div class="pv-section-title">Photo Gallery (<?php echo e($photos->count()); ?> <?php echo e(Str::plural('photo', $photos->count())); ?>)</div>
           <div class="pv-gallery">
-            @foreach($photos as $i => $photo)
-            <div class="pv-gallery__item" onclick="openLightbox('{{ asset('storage/'.$photo->path) }}')" title="View photo">
-              <img src="{{ asset('storage/'.$photo->path) }}" alt="{{ $user->name }} photo {{ $i+1 }}" loading="lazy">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $photos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $photo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+            <div class="pv-gallery__item" onclick="openLightbox('<?php echo e(asset('storage/'.$photo->path)); ?>')" title="View photo">
+              <img src="<?php echo e(asset('storage/'.$photo->path)); ?>" alt="<?php echo e($user->name); ?> photo <?php echo e($i+1); ?>" loading="lazy">
               <div class="pv-gallery__overlay">
                 <span class="pv-gallery__overlay-text">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -599,86 +664,86 @@
                 </span>
               </div>
             </div>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
           </div>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        {{-- Videos --}}
-        @if($user->videos->count() > 0 && $canSeeMedia)
+        
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user->videos->count() > 0 && $canSeeMedia): ?>
         <div class="pv-card">
-          <div class="pv-section-title">Videos ({{ $user->videos->count() }})</div>
+          <div class="pv-section-title">Videos (<?php echo e($user->videos->count()); ?>)</div>
           <div class="row g-3">
-            @foreach($user->videos as $video)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $user->videos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $video): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
             <div class="col-sm-6">
               <div style="border-radius:12px;overflow:hidden;border:1.5px solid rgba(255,140,0,.18);">
-                <video controls preload="metadata" style="width:100%;display:block;background:#0d0d0d;max-height:240px;object-fit:cover;" onplay="trackVideoPlay({{ $video->id }}, this)">
-                  <source src="{{ asset('storage/'.$video->path) }}">
+                <video controls preload="metadata" style="width:100%;display:block;background:#0d0d0d;max-height:240px;object-fit:cover;" onplay="trackVideoPlay(<?php echo e($video->id); ?>, this)">
+                  <source src="<?php echo e(asset('storage/'.$video->path)); ?>">
                 </video>
                 <div class="p-2 text-white-50" style="font-size:0.85rem;">
-                  <span class="video-views-count">{{ number_format($video->views) }}</span> views
+                  <span class="video-views-count"><?php echo e(number_format($video->views)); ?></span> views
                 </div>
               </div>
             </div>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
           </div>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-      </div>{{-- /col-lg-8 --}}
+      </div>
 
-      {{-- RIGHT: CTA card --}}
+      
       <div class="col-lg-4">
         <div class="pv-cta-card">
 
           <div class="pv-cta-avatar">
-            <img src="{{ $cardImage }}" alt="{{ $user->name }}">
+            <img src="<?php echo e($cardImage); ?>" alt="<?php echo e($user->name); ?>">
           </div>
 
-          <div class="pv-cta-name">{{ $user->name }}</div>
+          <div class="pv-cta-name"><?php echo e($user->name); ?></div>
           <div class="pv-cta-sub">
-            @if($city){{ $city }}@if($county), {{ $county }}@endif @endif
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($city): ?><?php echo e($city); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($county): ?>, <?php echo e($county); ?><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </div>
 
-          @if($isVip)
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isVip): ?>
           <div class="text-center mb-3">
             <span class="pv-hero__vip">VIP Member</span>
           </div>
-          @endif
+          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-          {{-- Chat / Call CTA — auth-gated --}}
-          @auth
-            @if(auth()->user()->hasActiveChatSubscription())
-            <a href="{{ route('chat.show', $user->id) }}" class="pv-cta-btn pv-cta-btn--primary">
+          
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->hasActiveChatSubscription()): ?>
+            <a href="<?php echo e(route('chat.show', $user->id)); ?>" class="pv-cta-btn pv-cta-btn--primary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               Chat Now
             </a>
-            @else
-            <a href="{{ route('chat.memberships') }}" class="pv-cta-btn pv-cta-btn--primary">
+            <?php else: ?>
+            <a href="<?php echo e(route('chat.memberships')); ?>" class="pv-cta-btn pv-cta-btn--primary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               Chat Now
             </a>
-            @endif
-            @if($user->phone_number)
-            @if($user->calls_enabled ?? true)
-              <a href="tel:{{ $user->phone_number }}" class="pv-cta-btn pv-cta-btn--ghost" onclick="trackCall({{ $user->id }})">
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user->phone_number): ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user->calls_enabled ?? true): ?>
+              <a href="tel:<?php echo e($user->phone_number); ?>" class="pv-cta-btn pv-cta-btn--ghost" onclick="trackCall(<?php echo e($user->id); ?>)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 Call Now
               </a>
-            @else
+            <?php else: ?>
               <button type="button" class="pv-cta-btn pv-cta-btn--ghost" onclick="showCallsDisabledToast()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12.34a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.62h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.22a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 Call Now
               </button>
-            @endif
-            @else
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php else: ?>
             <a href="#" class="pv-cta-btn pv-cta-btn--primary" onclick="alert('This member has not added a contact number yet.');return false;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               Contact
             </a>
-            @endif
-          @else
-            {{-- Guest: show auth gate with toast --}}
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+          <?php else: ?>
+            
             <div class="pv-auth-gate">
               <span class="pv-auth-gate__icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(255,255,255,0.7);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -689,48 +754,48 @@
                 Sign In to Chat
               </button>
             </div>
-          @endauth
+          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
           <hr class="pv-cta-divider">
 
-          {{-- Quick Stats --}}
+          
           <div>
-            @if($age)
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($age): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Age</span>
-              <span class="pv-cta-stat__val">{{ $age }} years</span>
+              <span class="pv-cta-stat__val"><?php echo e($age); ?> years</span>
             </div>
-            @endif
-            @if($nation)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($nation): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Nationality</span>
-              <span class="pv-cta-stat__val">{{ $nation }}</span>
+              <span class="pv-cta-stat__val"><?php echo e($nation); ?></span>
             </div>
-            @endif
-            @if($incalls)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($incalls): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">In-call Rate</span>
-              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES {{ number_format($incalls) }}</span>
+              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES <?php echo e(number_format($incalls)); ?></span>
             </div>
-            @endif
-            @if($outcalls)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($outcalls): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Out-call Rate</span>
-              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES {{ number_format($outcalls) }}</span>
+              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES <?php echo e(number_format($outcalls)); ?></span>
             </div>
-            @endif
-            @if(count($services) > 0)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(count($services) > 0): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Services</span>
-              <span class="pv-cta-stat__val">{{ count($services) }} listed</span>
+              <span class="pv-cta-stat__val"><?php echo e(count($services)); ?> listed</span>
             </div>
-            @endif
-            @if($photos->count() > 0)
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count() > 0): ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Photos</span>
-              <span class="pv-cta-stat__val">{{ $photos->count() }}</span>
+              <span class="pv-cta-stat__val"><?php echo e($photos->count()); ?></span>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Status</span>
               <span class="pv-cta-stat__val" style="color:#4ade80;">Verified</span>
@@ -742,20 +807,20 @@
             Always meet in safe, public places. Stay safe.
           </p>
         </div>
-      </div>{{-- /col-lg-4 --}}
+      </div>
 
-    </div>{{-- /row --}}
-  </div>{{-- /container --}}
+    </div>
+  </div>
 </div>
 
-{{-- SIMILAR PROFILES --}}
-@if(isset($similarProfiles) && $similarProfiles->isNotEmpty())
+
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($similarProfiles) && $similarProfiles->isNotEmpty()): ?>
 <section class="pv-similar">
   <div class="container">
     <div class="pv-section-title">You May Also Like</div>
     <div class="pv-similar-grid">
-      @foreach($similarProfiles as $sp)
-        @php
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $similarProfiles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sp): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+        <?php
           $firstSpPhoto = $sp->photos->first();
           $spCover = $firstSpPhoto
             ? asset('storage/' . $firstSpPhoto->path)
@@ -771,25 +836,26 @@
           } else {
               $spPlanType  = 'regular';     $spPlanLabel = 'Regular';
           }
-        @endphp
-        <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card" style="position:relative;">
-          <img class="pv-similar-card__img" src="{{ $spCover }}" alt="{{ $sp->name }}" loading="lazy">
-          {{-- Plan badge --}}
-          <span class="nr-plan-badge nr-plan-badge--{{ str_replace('_','-',$spPlanType) }}" style="top:.55rem;left:.55rem;">{{ $spPlanLabel }}</span>
+        ?>
+        <a href="<?php echo e(url('profile', $sp->id)); ?>" class="pv-similar-card" style="position:relative;">
+          <img class="pv-similar-card__img" src="<?php echo e($spCover); ?>" alt="<?php echo e($sp->name); ?>" loading="lazy">
+          
+          <span class="nr-plan-badge nr-plan-badge--<?php echo e(str_replace('_','-',$spPlanType)); ?>" style="top:.55rem;left:.55rem;"><?php echo e($spPlanLabel); ?></span>
           <div class="pv-similar-card__info">
-            <div class="pv-similar-card__name">{{ $sp->name }}</div>
+            <div class="pv-similar-card__name"><?php echo e($sp->name); ?></div>
             <div class="pv-similar-card__meta">
-              {{ $sp->age ? $sp->age.' yrs' : '' }}{{ $sp->age && $sp->city_town ? ' · ' : '' }}{{ $sp->city_town ?? '' }}
+              <?php echo e($sp->age ? $sp->age.' yrs' : ''); ?><?php echo e($sp->age && $sp->city_town ? ' · ' : ''); ?><?php echo e($sp->city_town ?? ''); ?>
+
             </div>
           </div>
         </a>
-      @endforeach
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </div>
   </div>
 </section>
-@endif
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-{{-- LIGHTBOX --}}
+
 <div class="pv-lightbox" id="pv-lightbox" onclick="closeLightbox(event)">
   <button class="pv-lightbox__close" onclick="closeLightbox()" aria-label="Close">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -797,8 +863,29 @@
   <img class="pv-lightbox__img" id="pv-lightbox-img" src="" alt="Photo">
 </div>
 
-{{-- FOOTER --}}
-<x-footer />
+
+<?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -822,7 +909,7 @@
     fetch('/profile/' + id + '/track-call', {
       method: 'POST',
       headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
         'Content-Type': 'application/json'
       }
     }).catch(console.error);
@@ -833,7 +920,7 @@
     fetch('/videos/' + id + '/view', {
       method: 'POST',
       headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
         'Accept': 'application/json'
       }
     })
@@ -849,7 +936,28 @@
   }
 </script>
 
-<x-auth-modal />
+<?php if (isset($component)) { $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auth-modal','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('auth-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $attributes = $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $component = $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
 <script>
 function showCallsDisabledToast() {
   const toastHtml = `
@@ -883,3 +991,4 @@ function showCallsDisabledToast() {
 </body>
 </html>
 
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/profile-view.blade.php ENDPATH**/ ?>

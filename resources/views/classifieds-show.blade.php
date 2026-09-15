@@ -167,7 +167,7 @@
           @if($classified->user && !($classified->user->calls_enabled ?? true))
             <button type="button" class="btn-contact border-0" onclick="showCallsDisabledToast()">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              {{ $classified->phone }}
+              Number Hidden
             </button>
           @else
             <a href="tel:{{ $classified->phone }}" class="btn-contact">
@@ -184,30 +184,33 @@
 
   <x-footer />
 
-  {{-- Calls Disabled Toast Container --}}
-  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999; margin-top: 70px;">
-    <div id="callsDisabledToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,140,0,0.4) !important; border-radius: 12px;">
-      <div class="d-flex">
-        <div class="toast-body d-flex align-items-center gap-3 text-white">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span style="font-family: 'Outfit', sans-serif; font-size: 0.95rem;">
-            This user has disabled calls. Only chat is enabled.
-          </span>
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-
   <script>
   function showCallsDisabledToast() {
-    const toastEl = document.getElementById('callsDisabledToast');
-    if (toastEl) {
-      const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-      toast.show();
-    } else {
-      alert('This user has disabled calls. Only chat is enabled.');
-    }
+    const toastHtml = `
+    <div class="warning-toast" id="callsDisabledToast" role="alert" aria-live="assertive" style="z-index: 999999;">
+      <div class="warning-toast__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="warning-toast__body">
+        <p class="warning-toast__title">Calls Disabled</p>
+        <p class="warning-toast__msg">This user has disabled calls. Only chat is enabled.</p>
+      </div>
+      <button class="warning-toast__close" onclick="this.closest('.warning-toast').remove();" aria-label="Dismiss">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="warning-toast__bar"></div>
+    </div>`;
+    
+    const existing = document.getElementById('callsDisabledToast');
+    if (existing) existing.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    setTimeout(() => {
+      const t = document.getElementById('callsDisabledToast');
+      if (t) t.remove();
+    }, 6000);
   }
   </script>
 

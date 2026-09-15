@@ -212,47 +212,47 @@
           .mobile-profile-dropdown-toggle::after { display: none !important; }
         </style>
         <div class="dropdown d-xl-none" style="flex-shrink:0; z-index:2;">
-          <button class="btn p-0 mobile-icon-hover dropdown-toggle mobile-profile-dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width:42px;height:42px;border-radius:50%;border:2px solid orange;background-color:{{ Auth::check() ? 'orange' : 'transparent' }};display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
-            @if(Auth::check())
-              @if(Auth::user()->profile_photo)
-                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
-              @else
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(substr(Auth::user()->name, 0, 2)) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
-              @endif
-            @else
+          <button class="btn p-0 mobile-icon-hover dropdown-toggle mobile-profile-dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width:42px;height:42px;border-radius:50%;border:2px solid orange;background-color:<?php echo e(Auth::check() ? 'orange' : 'transparent'); ?>;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()->profile_photo): ?>
+                <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo)); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+              <?php else: ?>
+                <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(Auth::user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            <?php else: ?>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </button>
           
           <ul class="dropdown-menu dropdown-menu-dark shadow border-secondary mt-2" style="min-width: 200px; background-color: black;">
-            @if(Auth::check())
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
             <li>
               <div class="px-3 py-2">
-                <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;">{{ Auth::user()->name ?? 'User' }}</span></div>
+                <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
                 <div class="small" style="color: rgba(255,255,255,0.6); line-height:1.4;">Manage your profile &amp; settings.</div>
               </div>
             </li>
             <li><hr class="dropdown-divider border-secondary"></li>
             <li>
-              <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="{{ route('profile.edit') }}">
+              <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('profile.edit')); ?>">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
                 My Profile
               </a>
             </li>
             <li><hr class="dropdown-divider border-secondary"></li>
             <li>
-              <form method="POST" action="{{ route('logout') }}" class="m-0">
-                @csrf
-                <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+              <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
+                <?php echo csrf_field(); ?>
+                <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
                   Logout
                 </a>
               </form>
             </li>
-            @else
+            <?php else: ?>
             <li>
               <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg> 
@@ -266,40 +266,40 @@
                 Sign Up
               </a>
             </li>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </ul>
         </div>
 
         <!-- Mobile Centered Logo -->
-        <a class="navbar-brand d-flex d-xl-none align-items-center gap-2 position-absolute start-50 translate-middle-x" href="{{ Auth::check() ? route('dashboard') : url('/') }}" style="text-decoration: none; z-index: 1;">
-            @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:52px;width:auto;object-fit:contain;">
-            @else
+        <a class="navbar-brand d-flex d-xl-none align-items-center gap-2 position-absolute start-50 translate-middle-x" href="<?php echo e(Auth::check() ? route('dashboard') : url('/')); ?>" style="text-decoration: none; z-index: 1;">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($siteSettings['logo'])): ?>
+                <img src="<?php echo e(asset('storage/' . $siteSettings['logo'])); ?>" alt="Logo" style="max-height:52px;width:auto;object-fit:contain;">
+            <?php else: ?>
                 <span class="fw-bold" style="text-transform: uppercase; letter-spacing: 1px; font-size: 1.15rem;"><span style="color: orange;">Baddies-</span><span style="color: white;">Club</span></span>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </a>
         
         <!-- Desktop Logo -->
-        <a class="navbar-brand d-none d-xl-flex align-items-center gap-2 me-0" href="{{ Auth::check() ? route('dashboard') : url('/') }}" style="text-decoration: none;">
-            @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:60px;width:auto;object-fit:contain;">
-            @else
+        <a class="navbar-brand d-none d-xl-flex align-items-center gap-2 me-0" href="<?php echo e(Auth::check() ? route('dashboard') : url('/')); ?>" style="text-decoration: none;">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($siteSettings['logo'])): ?>
+                <img src="<?php echo e(asset('storage/' . $siteSettings['logo'])); ?>" alt="Logo" style="max-height:60px;width:auto;object-fit:contain;">
+            <?php else: ?>
                 <span class="fw-bold fs-4" style="text-transform: uppercase; letter-spacing: 1px;"><span style="color: orange;">Baddies-</span><span style="color: white;">Club</span></span>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </a>
         
 
         <div class="ms-auto d-flex align-items-center gap-2 d-xl-none">
 
           <!-- Mobile Search Toggle Button -->
-          @if(!isset($hideSearch) || !$hideSearch)
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!isset($hideSearch) || !$hideSearch): ?>
           <button class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchCollapse" aria-controls="mobileSearchCollapse" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
           </button>
-          @endif
+          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           
           <!-- Mobile Theme Toggle Button -->
           <button id="themeToggleBtnMobile" class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme">
@@ -331,17 +331,17 @@
       </div>
 
       <!-- Search Input Collapse (mobile) -->
-      @if(!isset($hideSearch) || !$hideSearch)
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!isset($hideSearch) || !$hideSearch): ?>
       <div class="collapse w-100 mt-2 pb-2 d-xl-none" id="mobileSearchCollapse">
-        <form action="{{ route('search') }}" method="GET" class="position-relative" role="search">
+        <form action="<?php echo e(route('search')); ?>" method="GET" class="position-relative" role="search">
           <svg class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: orange; pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" name="q" value="{{ request('q') }}" class="form-control nr-navbar-search-input text-white bg-dark ps-5 py-2" placeholder="Search county, title, or category..." style="border: 2px solid orange; box-shadow: none; border-radius: 8px; width: 100%;" autocomplete="off" aria-label="Site search">
+          <input type="text" name="q" value="<?php echo e(request('q')); ?>" class="form-control nr-navbar-search-input text-white bg-dark ps-5 py-2" placeholder="Search county, title, or category..." style="border: 2px solid orange; box-shadow: none; border-radius: 8px; width: 100%;" autocomplete="off" aria-label="Site search">
         </form>
       </div>
-      @endif
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
       <!-- Collapsed Mobile / Desktop Nav Links -->
       <div class="collapse navbar-collapse" id="publicNavbar">
@@ -350,25 +350,25 @@
             
             <ul class="navbar-nav nr-navbar__menu gap-xl-2 text-center text-xl-start">
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->routeIs('home') ? 'active' : ''); ?>" href="<?php echo e(route('home')); ?>">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->routeIs('escort-girls') ? 'active' : '' }}" href="{{ route('escort-girls') }}">Escort Girls</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->routeIs('escort-girls') ? 'active' : ''); ?>" href="<?php echo e(route('escort-girls')); ?>">Escort Girls</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->is('category/call-boys') ? 'active' : '' }}" href="/category/call-boys">Call Boys</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->is('category/call-boys') ? 'active' : ''); ?>" href="/category/call-boys">Call Boys</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->is('videos') ? 'active' : '' }}" href="/videos">Videos</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->is('videos') ? 'active' : ''); ?>" href="/videos">Videos</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->is('classifieds') ? 'active' : '' }}" href="/classifieds">Adult Classifieds</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->is('classifieds') ? 'active' : ''); ?>" href="/classifieds">Adult Classifieds</a>
               </li>
-              @auth
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
               <li class="nav-item">
-                <a class="nav-link custom-orange-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
+                <a class="nav-link custom-orange-link <?php echo e(request()->is('dashboard') ? 'active' : ''); ?>" href="<?php echo e(route('dashboard')); ?>">Dashboard</a>
               </li>
-              @endauth
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </ul>
 
           </div>
@@ -377,7 +377,7 @@
           <div class="nr-navbar__actions d-none d-xl-block">
             <div class="d-flex flex-column flex-xl-row justify-content-xl-end align-items-xl-center gap-3">
               
-              @if(!isset($hideSearch) || !$hideSearch)
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!isset($hideSearch) || !$hideSearch): ?>
               <!-- Desktop Search Icon (right side, opens dropdown below) -->
               <div class="nr-search-wrap">
                 <button class="btn p-0 d-flex align-items-center justify-content-center" type="button" id="desktopSearchToggle" aria-label="Search" style="background:transparent; flex-shrink:0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
@@ -390,13 +390,13 @@
                   <span class="nr-search-icon-inner">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                   </span>
-                  <form action="{{ route('search') }}" method="GET" style="display:contents;" role="search">
-                    <input type="text" name="q" value="{{ request('q') }}" class="nr-navbar-search-input" placeholder="Search listings..." autocomplete="off" aria-label="Site search" id="desktopSearchInput">
+                  <form action="<?php echo e(route('search')); ?>" method="GET" style="display:contents;" role="search">
+                    <input type="text" name="q" value="<?php echo e(request('q')); ?>" class="nr-navbar-search-input" placeholder="Search listings..." autocomplete="off" aria-label="Site search" id="desktopSearchInput">
                     <button type="submit">GO</button>
                   </form>
                 </div>
               </div>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
               <!-- Desktop Theme Toggle -->
               <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="background-color: transparent; flex-shrink: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Toggle Theme">
@@ -418,47 +418,47 @@
 
               <!-- Desktop Profile Dropdown -->
               <div class="dropdown d-none d-xl-block">
-                <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px; border-radius: 50%; border: 2px solid orange; background-color: {{ Auth::check() ? 'orange' : 'transparent' }}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; padding: 0;">
-                  @if(Auth::check())
-                    @if(Auth::user()->profile_photo)
-                      <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
-                    @else
-                      <img src="https://ui-avatars.com/api/?name={{ urlencode(substr(Auth::user()->name, 0, 2)) }}&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
-                    @endif
-                  @else
+                <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px; border-radius: 50%; border: 2px solid orange; background-color: <?php echo e(Auth::check() ? 'orange' : 'transparent'); ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; padding: 0;">
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()->profile_photo): ?>
+                      <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo)); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                    <?php else: ?>
+                      <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(Auth::user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                  <?php else: ?>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                  @endif
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </button>
                 
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-secondary mt-2" style="min-width: 200px; background-color: black;">
-                  @if(Auth::check())
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
                   <li>
                     <div class="px-3 py-2">
-                      <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;">{{ Auth::user()->name ?? 'User' }}</span></div>
+                      <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
                       <div class="small" style="color: rgba(255,255,255,0.6); line-height:1.4;">Manage your profile &amp; settings.</div>
                     </div>
                   </li>
                   <li><hr class="dropdown-divider border-secondary"></li>
                   <li>
-                    <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="{{ route('profile.edit') }}">
+                    <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('profile.edit')); ?>">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
                       My Profile
                     </a>
                   </li>
                   <li><hr class="dropdown-divider border-secondary"></li>
                   <li>
-                    <form method="POST" action="{{ route('logout') }}" class="m-0">
-                      @csrf
-                      <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
+                      <?php echo csrf_field(); ?>
+                      <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
                         Logout
                       </a>
                     </form>
                   </li>
-                  @else
+                  <?php else: ?>
                   <li>
                     <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg> 
@@ -472,7 +472,7 @@
                       Sign Up
                     </a>
                   </li>
-                  @endif
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </ul>
               </div>
             </div>
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-@php
+<?php
   $toastTitle = 'Success';
   $toastMsg = null;
 
@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $toastTitle = 'Success';
     $toastMsg = session('success');
   }
-@endphp
+?>
 
 <style>
   .success-toast {
@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 </style>
 
-@if($toastMsg)
+<?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($toastMsg): ?>
 <div class="success-toast" id="successToast" role="alert" aria-live="assertive">
   <div class="success-toast__icon">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -680,8 +680,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </svg>
   </div>
   <div class="success-toast__body">
-    <p class="success-toast__title">{{ $toastTitle }}</p>
-    <p class="success-toast__msg">{{ $toastMsg }}</p>
+    <p class="success-toast__title"><?php echo e($toastTitle); ?></p>
+    <p class="success-toast__msg"><?php echo e($toastMsg); ?></p>
   </div>
   <button class="success-toast__close" onclick="document.getElementById('successToast').remove();" aria-label="Dismiss">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="success-toast__bar"></div>
 </div>
 <script>setTimeout(()=>{const t=document.getElementById('successToast');if(t)t.remove();},6000);</script>
-@endif
+<?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
 <script>
   (function () {
@@ -729,3 +729,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }, true);
   })();
 </script>
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/components/navbar.blade.php ENDPATH**/ ?>
