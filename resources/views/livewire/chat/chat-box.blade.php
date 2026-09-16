@@ -7,6 +7,13 @@
         showDeleteModal: false,
         canDeleteForEveryone: false,
         replyData: null,
+        lightboxImage: null,
+        openLightbox(imgUrl) {
+            this.lightboxImage = imgUrl;
+        },
+        closeLightbox() {
+            this.lightboxImage = null;
+        },
         get canReply() {
             if (this.selectedIds.length !== 1) return false;
             const bubble = document.querySelector(`.msg-bubble[data-msg-id='${this.selectedIds[0]}']`);
@@ -467,9 +474,24 @@
                     </div>
                     @php $lastDate = $dateString; @endphp
                 @endif
-                <div class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper {{ $message->sender_id === auth()->id() ? 'justify-content-end' : 'justify-content-start' }}" data-msg-id="{{ $message->id }}">
+                @php
+                    $isSender = $message->sender_id === auth()->id();
+                    $bgStyle = '';
+                    $borderStyle = '';
+                    if ($message->is_deleted) {
+                        $bgStyle = 'var(--deleted-bg)';
+                        $borderStyle = '1px solid rgba(0,0,0,0.08)';
+                    } elseif ($message->image_path) {
+                        $bgStyle = 'transparent';
+                        $borderStyle = '2px solid ' . ($isSender ? '#ff8c00' : 'var(--bubble-received-bg)');
+                    } else {
+                        $bgStyle = $isSender ? 'var(--bubble-sent-bg)' : 'var(--bubble-received-bg)';
+                        $borderStyle = 'none';
+                    }
+                @endphp
+                <div class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper {{ $isSender ? 'justify-content-end' : 'justify-content-start' }}" data-msg-id="{{ $message->id }}">
                     
-                    <div class="px-3 py-2 shadow-sm position-relative msg-bubble" 
+                    <div class="px-2 py-2 shadow-sm position-relative msg-bubble" 
                          :class="{ 'selected-bubble': selectedIds.includes({{ $message->id }}) }"
                          @touchstart="startPress({{ $message->id }})"
                          @touchend="endPress()"
@@ -481,7 +503,7 @@
                          data-msg-id="{{ $message->id }}"
                          data-sender-id="{{ $message->sender_id }}"
                          data-is-deleted="{{ $message->is_deleted ? '1' : '0' }}"
-                         style="max-width: 75%; border-radius: 12px; cursor: pointer; user-select: none; touch-action: pan-y; background-color: {{ $message->is_deleted ? 'var(--deleted-bg)' : ($message->sender_id === auth()->id() ? 'var(--bubble-sent-bg)' : 'var(--bubble-received-bg)') }}; {{ $message->sender_id === auth()->id() ? 'border-top-right-radius: 0px;' : 'border-top-left-radius: 0px;' }} {{ $message->is_deleted ? 'border: 1px solid rgba(0,0,0,0.08);' : '' }}">
+                         style="max-width: 75%; border-radius: 12px; cursor: pointer; user-select: none; touch-action: pan-y; background-color: {{ $bgStyle }}; border: {{ $borderStyle }}; {{ $isSender ? 'border-top-right-radius: 0px;' : 'border-top-left-radius: 0px;' }}">
                         
                         {{-- Swipe to Reply Icon --}}
                         @if(!$message->is_deleted)
@@ -495,7 +517,13 @@
                             <div class="mb-2 p-2 rounded" style="background-color: var(--reply-bg); border-left: 4px solid {{ $message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)' }}; font-size: 0.8rem;">
                                 <div class="fw-bold mb-1" style="color: {{ $message->sender_id === auth()->id() ? 'var(--reply-border-me)' : 'var(--reply-border-other)' }};">{{ $message->replyTo->sender_id === auth()->id() ? 'You' : ($message->replyTo->sender ? $message->replyTo->sender->name : 'User') }}</div>
                                 <div class="text-truncate {{ $message->replyTo->is_deleted ? 'fst-italic opacity-50' : '' }}" style="opacity: 0.75; color: var(--bubble-text);">
-                                    {{ $message->replyTo->is_deleted ? 'This message was deleted' : $message->replyTo->body }}
+                                    @if($message->replyTo->is_deleted)
+                                        This message was deleted
+                                    @elseif($message->replyTo->image_path)
+                                        📷 Photo @if($message->replyTo->body) - {{ $message->replyTo->body }} @endif
+                                    @else
+                                        {{ $message->replyTo->body }}
+                                    @endif
                                 </div>
                             </div>
                         @endif
@@ -514,7 +542,20 @@
                                 </span>
                             </div>
                         @else
-                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text);">{{ $message->body }}</div>
+                            @if($message->image_path)
+                                <div class="mb-1 text-center" 
+                                     @click.stop="openLightbox('{{ asset('storage/' . $message->image_path) }}')"
+                                     @contextmenu.prevent
+                                     style="-webkit-touch-callout: none; user-select: none; -webkit-user-select: none;">
+                                    <img src="{{ asset('storage/' . $message->image_path) }}" 
+                                         alt="Photo" 
+                                         class="img-fluid rounded" 
+                                         style="max-width: 260px; max-height: 300px; object-fit: cover; cursor: pointer; pointer-events: none; -webkit-user-drag: none;">
+                                </div>
+                            @endif
+                            @if($message->body)
+                                <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text);">{{ $message->body }}</div>
+                            @endif
 
                             <div class="d-flex align-items-center mt-1 justify-content-end" style="font-size: 0.65rem; gap: 4px; color: var(--bubble-meta);">
                                 <span>{{ $message->created_at->format('g:i A') }}</span>
@@ -575,18 +616,56 @@
         @endif
 
         @if($activeUserId !== 'announcement')
+
+
             <!-- Input Area -->
             <div class="px-3 py-2 flex-shrink-0" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
                 <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
+                    <!-- Attach Photo Area -->
+                    <div class="position-relative flex-shrink-0" style="width: 42px; height: 42px;">
+                        <label class="btn d-flex align-items-center justify-content-center m-0 position-absolute top-0 start-0 w-100 h-100 p-0"
+                               style="border-radius: 50%; background: var(--input-bg-color); border: 1px solid rgba(255,140,0,0.3) !important; color: #ff8c00; cursor: pointer; transition: all 0.2s; overflow: hidden;"
+                               title="Attach Photo">
+                            
+                            @if($photo)
+                                <img src="{{ $photo->temporaryUrl() }}" class="w-100 h-100" style="object-fit: cover; border-radius: 50%;">
+                            @else
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                </svg>
+                            @endif
+
+                            <!-- Loader while uploading -->
+                            <div wire:loading.flex wire:target="photo" class="position-absolute align-items-center justify-content-center w-100 h-100" style="background: rgba(0,0,0,0.5); border-radius: 50%; top: 0; left: 0; z-index: 10;">
+                                <div class="spinner-border text-light" role="status" style="width: 1rem; height: 1rem; border-width: 0.15em;"></div>
+                            </div>
+                            <input type="file" wire:model="photo" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="d-none">
+                        </label>
+                        
+                        @if($photo)
+                            <!-- Remove Photo Button -->
+                            <button type="button" wire:click="removePhoto" class="btn btn-sm btn-danger position-absolute d-flex align-items-center justify-content-center shadow" style="width: 16px; height: 16px; padding: 0; border-radius: 50%; top: -2px; right: -2px; z-index: 15;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        @endif
+                    </div>
+
                     <input type="text" wire:model="body"
-                        class="form-control border-0 chat-input-field shadow-none"
-                        placeholder="Type a message..."
-                        required
+                        class="form-control border-0 chat-input-field shadow-none flex-grow-1"
+                        placeholder="{{ $photo ? 'Add a caption...' : 'Type a message...' }}"
                         style="border-radius: 24px; padding: 0.5rem 1rem; font-size: 0.95rem; outline: none; border: 1px solid rgba(255,140,0,0.2) !important;">
                     <button type="submit"
-                        class="btn d-flex align-items-center justify-content-center flex-shrink-0"
-                        style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;">
+                        class="btn d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
+                        style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;"
+                        wire:loading.attr="disabled"
+                        wire:target="photo">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        
+                        @if($photo)
+                            <span class="position-absolute d-flex align-items-center justify-content-center fw-bold shadow" style="width: 18px; height: 18px; font-size: 0.7rem; background: #dc3545; color: white; border-radius: 50%; top: -3px; right: -3px; z-index: 10;">
+                                1
+                            </span>
+                        @endif
                     </button>
                 </form>
             </div>
@@ -670,4 +749,31 @@
             Select a conversation to start chatting.
         </div>
     @endif
+
+    <!-- Image Lightbox Overlay -->
+    <div x-cloak x-show="lightboxImage" 
+         :class="lightboxImage ? 'd-flex' : 'd-none'"
+         class="position-fixed top-0 start-0 w-100 h-100 align-items-center justify-content-center"
+         style="z-index: 100000; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px);"
+         @keydown.window.escape="closeLightbox()">
+        <!-- Lightbox Actions -->
+        <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2" style="z-index: 10;">
+            <a :href="lightboxImage" download class="btn text-white d-flex align-items-center justify-content-center p-0" style="width:40px; height:40px; background: rgba(255,255,255,0.1); border-radius: 50%; border: none; backdrop-filter: blur(4px);" title="Download">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </a>
+
+            <button type="button" @click="closeLightbox()" class="btn text-white d-flex align-items-center justify-content-center p-0" style="width:40px; height:40px; background: rgba(255,255,255,0.1); border-radius: 50%; border: none; backdrop-filter: blur(4px);" title="Close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <img :src="lightboxImage" class="img-fluid" style="max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+    </div>
 </div>

@@ -5,11 +5,14 @@ namespace App\Livewire\Chat;
 use App\Models\Message;
 use App\Models\User;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ChatBox extends Component
 {
+    use WithFileUploads;
     public $activeUserId;
     public $body = '';
+    public $photo;
 
     public $replyToId = null;
 
@@ -87,14 +90,32 @@ class ChatBox extends Component
         }
     }
 
+    public function removePhoto()
+    {
+        $this->photo = null;
+    }
+
     public function sendMessage()
     {
-        if (!trim($this->body) || !$this->activeUserId) return;
+        if ((!trim($this->body) && !$this->photo) || !$this->activeUserId) return;
+
+        // Validation for photo (optional but recommended)
+        if ($this->photo) {
+            $this->validate([
+                'photo' => 'image|max:8192', // 8MB max
+            ]);
+        }
+
+        $imagePath = null;
+        if ($this->photo) {
+            $imagePath = $this->photo->store('chat-images', 'public');
+        }
 
         Message::create([
             'sender_id'   => auth()->id(),
             'receiver_id' => $this->activeUserId,
             'body'        => $this->body,
+            'image_path'  => $imagePath,
             'reply_to_id' => $this->replyToId,
         ]);
 
@@ -106,6 +127,7 @@ class ChatBox extends Component
         })->delete();
 
         $this->body = '';
+        $this->photo = null;
         $this->replyToId = null;
         $this->dispatch('messageSent');
     }

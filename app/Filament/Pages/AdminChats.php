@@ -11,6 +11,8 @@ use Filament\Notifications\Notification;
 
 class AdminChats extends Page
 {
+    use \Livewire\WithFileUploads;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
     protected static string|\UnitEnum|null $navigationGroup = 'Communication';
     protected static ?string $navigationLabel = 'Conversations';
@@ -28,6 +30,7 @@ class AdminChats extends Page
 
     // Admin reply
     public ?string $newMessage = null;
+    public $photo = null;
 
     // Online settings bound to form
     public bool $force_online               = false;
@@ -38,6 +41,11 @@ class AdminChats extends Page
     public ?int $online_toast_duration      = null;
     public ?string $online_toast_sound      = null;
     public ?int $online_threshold_minutes   = null;
+
+    public function removePhoto(): void
+    {
+        $this->photo = null;
+    }
 
     public function openSettingsForUser(int $userId): void
     {
@@ -140,7 +148,7 @@ class AdminChats extends Page
         return $conversations;
     }
 
-    public function getMessages()
+    public function getChatMessages()
     {
         if (!$this->activeUserA || !$this->activeUserB) return collect();
         return Message::with(['sender', 'receiver'])
@@ -152,10 +160,18 @@ class AdminChats extends Page
 
     public function sendMessageAs(int $senderId): void
     {
-        if (!$this->newMessage || trim($this->newMessage) === '') return;
+        if ((!$this->newMessage || trim($this->newMessage) === '') && !$this->photo) return;
         if (!$this->activeUserA || !$this->activeUserB) return;
 
         $receiverId = ($senderId === $this->activeUserA) ? $this->activeUserB : $this->activeUserA;
+
+        $imagePath = null;
+        if ($this->photo) {
+            $this->validate([
+                'photo' => 'image|max:8192',
+            ]);
+            $imagePath = $this->photo->store('chat-images', 'public');
+        }
 
         // Mark previous messages from the receiver as read (since the sender is replying)
         Message::where('sender_id', $receiverId)
@@ -166,18 +182,20 @@ class AdminChats extends Page
         Message::create([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
-            'body' => trim($this->newMessage),
+            'body' => $this->newMessage ? trim($this->newMessage) : null,
+            'image_path' => $imagePath,
             'is_read' => false,
         ]);
 
         $this->newMessage = null;
+        $this->photo = null;
     }
 
     public function getViewData(): array
     {
         return [
             'conversations' => $this->getConversations(),
-            'messages'      => $this->getMessages(),
+            'messages'      => $this->getChatMessages(),
             'userA'         => $this->activeUserA ? User::find($this->activeUserA) : null,
             'userB'         => $this->activeUserB ? User::find($this->activeUserB) : null,
         ];

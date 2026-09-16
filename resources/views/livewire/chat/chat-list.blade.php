@@ -187,7 +187,17 @@
 
                 $lastMsg = $user->last_message;
                 $unread  = $user->unread_count ?? 0;
-                $snippet = $lastMsg ? \Illuminate\Support\Str::limit($lastMsg->body, 35) : 'No messages yet';
+                if ($lastMsg) {
+                    if ($lastMsg->is_deleted) {
+                        $snippet = 'This message was deleted';
+                    } elseif ($lastMsg->image_path) {
+                        $snippet = '📷 Photo' . ($lastMsg->body ? ' - ' . \Illuminate\Support\Str::limit($lastMsg->body, 25) : '');
+                    } else {
+                        $snippet = \Illuminate\Support\Str::limit($lastMsg->body, 35);
+                    }
+                } else {
+                    $snippet = 'No messages yet';
+                }
                 $timeAgo = '';
                 if ($lastMsg) {
                     $msgDate = $lastMsg->created_at;
@@ -207,7 +217,8 @@
                  style="background: {{ $isActive ? 'rgba(255,140,0,0.08)' : 'transparent' }}; border-left: 3px solid {{ $isActive ? '#ff8c00' : 'transparent' }}; transition: background 0.2s;">
                 
                 <a href="{{ route('chat.show', $user->id) }}" class="chat-row text-decoration-none d-block w-100" 
-                   style="padding: 0.55rem 0.75rem; transition: all 0.2s ease;"
+                   style="padding: 0.55rem 0.75rem; transition: all 0.2s ease; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;"
+                   @contextmenu.prevent
                    @touchstart="startPress({{ $user->id }})"
                    @touchend="endPress()"
                    @touchmove="endPress()"

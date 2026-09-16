@@ -1,0 +1,3463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - Baddies Club</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
+    
+    /* DASHBOARD LAYOUT */
+    .dashboard-header { padding:3rem 0 2rem; border-bottom:1px solid rgba(255,140,0,0.12); margin-bottom:2.5rem; }
+    .dashboard-title { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:900; letter-spacing:-0.02em; line-height:1.1; margin-bottom:0.5rem; }
+    .dashboard-title span { background:linear-gradient(135deg,#ff8c00,#ffb347); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .dashboard-sub { font-size:0.9rem; color:rgba(255,255,255,0.5); font-weight:400; }
+    
+    .dash-card {
+      background:rgba(17,17,17,0.85); backdrop-filter:blur(15px);
+      border:1px solid rgba(255,140,0,0.2); border-radius:18px; padding:2rem;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); margin-bottom: 2rem;
+    }
+    .dash-card-title { font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:0.5rem; }
+    .dash-card-text { font-size:0.9rem; color:rgba(255,255,255,0.6); margin-bottom:1.5rem; line-height:1.5; }
+
+    /* FORMS */
+    .form-label { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 0.4rem; }
+    .form-control, .form-select {
+      background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,140,0,0.2);
+      color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem;
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: rgba(0,0,0,0.5); border-color: orange; box-shadow: 0 0 0 3px rgba(255,165,0,0.15); color: #fff;
+    }
+    .form-control option, .form-select option {
+      background-color: #111;
+      color: #fff;
+    }
+    .text-danger { color: #ff4d4d !important; font-size: 0.85rem; margin-top: 0.4rem; }
+
+    /* â”€â”€ UNIFIED BUTTON STYLE (matches "View Statistics") â”€â”€ */
+    /* Base style: outlined orange, transparent bg */
+    .btn-profile-action,
+    .btn-orange,
+    .btn-verify-now,
+    .btn-settings-fund,
+    .btn-save-settings,
+    .btn-outline-warning,
+    .btn.btn-orange,
+    .btn.btn-outline-warning,
+    .btn.btn-outline-secondary {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.45rem !important;
+      background: transparent !important;
+      border: 2px solid orange !important;
+      color: orange !important;
+      padding: 0.6rem 1.4rem !important;
+      border-radius: 8px !important;
+      font-size: 0.88rem !important;
+      font-weight: 700 !important;
+      font-family: "Outfit", sans-serif !important;
+      text-decoration: none !important;
+      transition: all 0.3s ease !important;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: none !important;
+      white-space: nowrap;
+    }
+
+    /* Hover: fill + glow */
+    .btn-profile-action:hover,
+    .btn-orange:hover,
+    .btn-verify-now:hover,
+    .btn-settings-fund:hover,
+    .btn-save-settings:hover,
+    .btn-outline-warning:hover,
+    .btn.btn-orange:hover,
+    .btn.btn-outline-warning:hover,
+    .btn.btn-outline-secondary:hover {
+      background: orange !important;
+      color: #000 !important;
+      border-color: orange !important;
+      box-shadow: 0 0 18px 4px rgba(255, 165, 0, 0.55), 0 0 35px rgba(255, 165, 0, 0.25) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Active / pressed */
+    .btn-profile-action:active,
+    .btn-orange:active,
+    .btn-verify-now:active,
+    .btn-settings-fund:active,
+    .btn-save-settings:active,
+    .btn.btn-orange:active,
+    .btn.btn-outline-warning:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 0 10px 2px rgba(255,165,0,0.4) !important;
+    }
+
+    /* Danger button keeps its own colour but same shape */
+    .btn-danger-custom {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      background: transparent; border: 2px solid #dc3545; color: #dc3545;
+      padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700;
+      font-family: "Outfit", sans-serif; text-decoration: none; transition: all 0.3s ease;
+    }
+    .btn-danger-custom:hover {
+      background: #dc3545; color: #fff;
+      box-shadow: 0 0 18px 4px rgba(220,53,69,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* LIGHT THEME OVERRIDES */
+    [data-bs-theme="light"] body {
+      background: #f4f5f8 !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dashboard-header {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .dashboard-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dashboard-sub {
+      color: rgba(0,0,0,0.6) !important;
+    }
+    [data-bs-theme="light"] .dash-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dash-card-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .dash-card-text {
+      color: rgba(0,0,0,0.65) !important;
+    }
+
+    /* Text utility overrides in light mode */
+    [data-bs-theme="light"] .text-white,
+    [data-bs-theme="light"] .text-light,
+    [data-bs-theme="light"] .text-white-50 {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .text-secondary {
+      color: #666666 !important;
+    }
+
+    /* Sidebar Navigation Card */
+    [data-bs-theme="light"] .side-nav-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .side-nav-title {
+      color: rgba(0,0,0,0.45) !important;
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link {
+      color: rgba(0,0,0,0.7) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link:hover {
+      background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.3) !important;
+      box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
+
+    /* Form Controls & Inputs */
+    [data-bs-theme="light"] .form-label,
+    [data-bs-theme="light"] .settings-field-label {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .form-control,
+    [data-bs-theme="light"] .form-select,
+    [data-bs-theme="light"] .settings-input,
+    [data-bs-theme="light"] .settings-select {
+      background-color: #f9f9fb !important;
+      border: 1px solid rgba(0,0,0,0.15) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .form-control:focus,
+    [data-bs-theme="light"] .form-select:focus,
+    [data-bs-theme="light"] .settings-input:focus,
+    [data-bs-theme="light"] .settings-select:focus {
+      background-color: #ffffff !important;
+      border-color: orange !important;
+      color: #111111 !important;
+      box-shadow: 0 0 0 3px rgba(255,165,0,0.15) !important;
+    }
+    [data-bs-theme="light"] .form-control option,
+    [data-bs-theme="light"] .form-select option,
+    [data-bs-theme="light"] .settings-select option {
+      background-color: #ffffff !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .form-control::placeholder,
+    [data-bs-theme="light"] .settings-input::placeholder {
+      color: #888888 !important;
+    }
+    [data-bs-theme="light"] .form-control[readonly] {
+      background-color: #eef0f3 !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: #666666 !important;
+    }
+
+    /* Settings Tab */
+    [data-bs-theme="light"] .settings-wallet-card,
+    [data-bs-theme="light"] .settings-form-card,
+    [data-bs-theme="light"] .settings-sessions-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .settings-section-label {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-group-label {
+      color: #e67e00 !important;
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .settings-select-current {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-balance-inner {
+      background: rgba(255,140,0,0.06) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .settings-balance-amount,
+    [data-bs-theme="light"] .settings-balance-num {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .settings-balance-sub,
+    [data-bs-theme="light"] .settings-help-text {
+      color: rgba(0,0,0,0.65) !important;
+    }
+    [data-bs-theme="light"] .settings-save-footer {
+      border-top-color: rgba(0,0,0,0.1) !important;
+    }
+    
+    .profile-stats-divider {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .profile-stats-vsep {
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    [data-bs-theme="light"] .profile-stats-divider {
+      border-top: 1px solid rgba(0,0,0,0.1) !important;
+      border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+    }
+    [data-bs-theme="light"] .profile-stats-vsep {
+      background: rgba(0,0,0,0.1) !important;
+    }
+
+    /* MAIN CARD IMAGE BUTTON & BADGE STYLES */
+    .btn-set-main-card {
+      background: rgba(0, 0, 0, 0.85) !important;
+      color: #ff8c00 !important;
+      border: 1.5px solid #ff8c00 !important;
+      font-size: 0.68rem !important;
+      font-weight: 700 !important;
+      padding: 0.35rem 0.65rem !important;
+      border-radius: 4px !important;
+      cursor: pointer !important;
+      transition: all 0.25s ease-in-out !important;
+      letter-spacing: 0.03em !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+    .btn-set-main-card:hover {
+      background: #ff8c00 !important;
+      color: #000000 !important;
+      border-color: #ff8c00 !important;
+      box-shadow: 0 0 14px 2px rgba(255, 140, 0, 0.65) !important;
+      transform: translateY(-1px) !important;
+    }
+    .btn-set-main-card:active {
+      transform: translateY(0) !important;
+    }
+    .btn-main-card-badge {
+      background: linear-gradient(135deg, #ff8c00, #ffb347) !important;
+      color: #000000 !important;
+      border: 1px solid #ff8c00 !important;
+      font-size: 0.68rem !important;
+      font-weight: 800 !important;
+      padding: 0.35rem 0.65rem !important;
+      border-radius: 4px !important;
+      letter-spacing: 0.03em !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+      line-height: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.25rem !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+    [data-bs-theme="light"] .settings-sessions-card .list-group {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .settings-sessions-card .list-group-item {
+      background: #f8f9fa !important;
+      border-color: rgba(0,0,0,0.08) !important;
+      color: #111111 !important;
+    }
+
+    /* Photos & Videos Sidebar Cards */
+    [data-bs-theme="light"] .photos-sidebar-card,
+    [data-bs-theme="light"] .videos-sidebar-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .photos-locked-title {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .photos-locked-sub {
+      color: #666666 !important;
+    }
+    [data-bs-theme="light"] .media-upload-drop {
+      background: rgba(255,140,0,0.03) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .media-upload-drop span {
+      color: #444444 !important;
+    }
+
+    /* Photo Management Overlay Modal */
+    [data-bs-theme="light"] .photo-mgmt-panel {
+      background: #ffffff !important;
+      border: 1px solid rgba(0,0,0,0.12) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header {
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header-title {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-header-sub {
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-close {
+      background: rgba(0,0,0,0.05) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn--upload {
+      background: rgba(255,140,0,0.06) !important;
+      border-color: rgba(255,140,0,0.25) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn-label {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-btn-desc {
+      color: rgba(0,0,0,0.55) !important;
+    }
+    [data-bs-theme="light"] .photo-mgmt-divider {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+
+    /* Delete Account Modal */
+    [data-bs-theme="light"] .del-modal {
+      background: #ffffff !important;
+      border-color: rgba(220,53,69,0.3) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__header {
+      border-bottom-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .del-modal__close {
+      background: rgba(0,0,0,0.05) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      color: rgba(0,0,0,0.5) !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-box {
+      background: rgba(220,53,69,0.05) !important;
+      border-color: rgba(220,53,69,0.2) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-title {
+      color: #c82333 !important;
+    }
+    [data-bs-theme="light"] .del-modal__info-list li {
+      color: #444444 !important;
+    }
+    [data-bs-theme="light"] .del-modal__label {
+      color: #222222 !important;
+    }
+    [data-bs-theme="light"] .del-modal__input {
+      background: #f9f9fb !important;
+      border-color: rgba(0,0,0,0.15) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .del-modal__footer {
+      border-top-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .del-modal__btn-cancel {
+      background: rgba(0,0,0,0.05) !important;
+      color: #444444 !important;
+      border-color: rgba(0,0,0,0.1) !important;
+    }
+
+    /* Tables, Borders & Spans */
+    [data-bs-theme="light"] .table { color: #111111 !important; }
+    [data-bs-theme="light"] .table th,
+    [data-bs-theme="light"] .table td {
+      border-color: rgba(0,0,0,0.08) !important;
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] .input-group-text {
+      background-color: rgba(255,140,0,0.1) !important;
+      border-color: rgba(0,0,0,0.15) !important;
+      color: #e67e00 !important;
+    }
+    [data-bs-theme="light"] div[style*="border-color: rgba(255,255,255"] {
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    [data-bs-theme="light"] div[style*="background: rgba(0,0,0,0.2)"] {
+      background: #f8f9fa !important;
+    }
+    [data-bs-theme="light"] h4[style*="color:#fff"],
+    [data-bs-theme="light"] h4[style*="color: #fff"] {
+      color: #111111 !important;
+    }
+    [data-bs-theme="light"] p[style*="color:rgba(255,255,255"],
+    [data-bs-theme="light"] span[style*="color:rgba(255,255,255"] {
+      color: rgba(0,0,0,0.65) !important;
+    }
+
+    /* PAGINATION STYLING FOR WALLET & TABLES */
+    .pagination { gap: 3px; margin-bottom: 0; }
+    .pagination .page-item .page-link {
+      background: transparent;
+      border: 1px solid rgba(255,140,0,0.25);
+      color: orange;
+      padding: 0.32rem 0.7rem;
+      border-radius: 6px !important;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: "Outfit", sans-serif;
+      transition: all 0.2s ease;
+      box-shadow: none;
+    }
+    .pagination .page-item.active .page-link {
+      background: orange !important;
+      border-color: orange !important;
+      color: #000 !important;
+      font-weight: 800;
+      box-shadow: 0 0 12px rgba(255,165,0,0.4) !important;
+    }
+    .pagination .page-item.disabled .page-link {
+      background: transparent !important;
+      border-color: rgba(255,255,255,0.08) !important;
+      color: rgba(255,255,255,0.25) !important;
+    }
+    .pagination .page-item .page-link:hover:not(.active) {
+      background: rgba(255,140,0,0.15) !important;
+      border-color: orange !important;
+      color: orange !important;
+    }
+    [data-bs-theme="light"] .pagination .page-item.disabled .page-link {
+      border-color: rgba(0,0,0,0.08) !important;
+      color: rgba(0,0,0,0.3) !important;
+    }
+
+    /* Mobile Pagination Spacing (Previous on Left, Next on Right) */
+    @media (max-width: 575.98px) {
+      nav, nav > div, .pagination {
+        width: 100% !important;
+      }
+      .pagination {
+        display: flex !important;
+        justify-content: space-between !important;
+      }
+      .pagination .page-item:first-child,
+      .pagination .page-item:has(a[rel="prev"]) {
+        margin-right: auto !important;
+      }
+      .pagination .page-item:last-child,
+      .pagination .page-item:has(a[rel="next"]) {
+        margin-left: auto !important;
+      }
+    }
+
+    /* Table Transparent Background Overrides for Wallet & Classifieds History */
+    #walletHistoryContainer, #classifiedsHistoryContainer,
+    #walletHistoryContainer table, #classifiedsHistoryContainer table,
+    #walletHistoryContainer tr, #classifiedsHistoryContainer tr,
+    #walletHistoryContainer th, #classifiedsHistoryContainer th,
+    #walletHistoryContainer td, #classifiedsHistoryContainer td {
+      background: transparent !important;
+      background-color: transparent !important;
+      --bs-table-bg: transparent !important;
+      --bs-table-accent-bg: transparent !important;
+      --bs-table-striped-bg: transparent !important;
+      --bs-table-hover-bg: transparent !important;
+    }
+
+    /* ── PROFILE AVATAR CARD ── */
+    .profile-avatar-wrap {
+      position: relative;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 3px solid rgba(255,140,0,0.5);
+      background: rgba(255,140,0,0.07);
+      box-shadow: 0 0 0 5px rgba(255,140,0,0.08), 0 8px 24px rgba(0,0,0,0.4);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .profile-avatar-wrap:hover { border-color: #ff8c00; box-shadow: 0 0 0 6px rgba(255,140,0,0.18), 0 0 30px rgba(255,140,0,0.2); }
+    .profile-avatar-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+    .profile-avatar-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.72) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.28s ease;
+      border-radius: 50%;
+      gap: 4px;
+    }
+    .profile-avatar-wrap:hover .profile-avatar-overlay { opacity: 1; }
+
+    /* ── PHOTO MANAGEMENT PANEL ── */
+    .photo-mgmt-backdrop {
+      display: none;
+      position: fixed; inset: 0; z-index: 1060;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      animation: mgmtFadeIn 0.2s ease both;
+    }
+    .photo-mgmt-backdrop.open { display: flex; }
+    @keyframes mgmtFadeIn { from{opacity:0} to{opacity:1} }
+    .photo-mgmt-panel {
+      background: linear-gradient(160deg, #1a1100 0%, #111 60%, #0d0d0d 100%);
+      border: 1px solid rgba(255,140,0,0.28);
+      border-radius: 20px;
+      padding: 0;
+      width: 320px;
+      max-width: calc(100vw - 2rem);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,140,0,0.1), 0 0 60px rgba(255,140,0,0.06);
+      animation: mgmtSlideUp 0.3s cubic-bezier(0.34,1.4,0.64,1) both;
+      overflow: hidden;
+    }
+    @keyframes mgmtSlideUp { from{opacity:0;transform:translateY(24px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .photo-mgmt-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255,140,0,0.12);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .photo-mgmt-header-icon {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(255,140,0,0.12); border: 1px solid rgba(255,140,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: #ff8c00;
+    }
+    .photo-mgmt-header-title { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2; margin: 0; }
+    .photo-mgmt-header-sub  { font-size: 0.73rem; color: rgba(255,255,255,0.4); margin: 0; }
+    .photo-mgmt-close {
+      margin-left: auto; flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.45); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .photo-mgmt-close:hover { background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.4); color: #ff8c00; }
+    .photo-mgmt-preview {
+      padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .photo-mgmt-avatar {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,140,0,0.4);
+      object-fit: cover;
+      box-shadow: 0 0 16px rgba(255,140,0,0.18);
+    }
+    .photo-mgmt-info { flex: 1; min-width: 0; }
+    .photo-mgmt-name { font-size: 0.9rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0 0 0.2rem; }
+    .photo-mgmt-hint { font-size: 0.72rem; color: rgba(255,255,255,0.38); margin: 0; line-height: 1.4; }
+    .photo-mgmt-actions {
+      padding: 0 1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .photo-mgmt-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      width: 100%; padding: 0.8rem 1rem;
+      border-radius: 12px; border: 1.5px solid transparent;
+      font-family: "Outfit", sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; text-align: left; text-decoration: none;
+      transition: all 0.22s ease;
+    }
+    .photo-mgmt-btn-icon {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.22s;
+    }
+    .photo-mgmt-btn--upload {
+      background: rgba(255,140,0,0.08); border-color: rgba(255,140,0,0.25); color: #fff;
+    }
+    .photo-mgmt-btn--upload .photo-mgmt-btn-icon { background: rgba(255,140,0,0.15); color: #ff8c00; }
+    .photo-mgmt-btn--upload:hover {
+      background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.55); color: #fff;
+      box-shadow: 0 0 20px rgba(255,140,0,0.12);
+    }
+    .photo-mgmt-btn--upload:hover .photo-mgmt-btn-icon { background: rgba(255,140,0,0.28); }
+    .photo-mgmt-btn--remove {
+      background: rgba(220,53,69,0.06); border-color: rgba(220,53,69,0.18); color: rgba(255,255,255,0.65);
+    }
+    .photo-mgmt-btn--remove .photo-mgmt-btn-icon { background: rgba(220,53,69,0.1); color: #dc3545; }
+    .photo-mgmt-btn--remove:hover {
+      background: rgba(220,53,69,0.14); border-color: rgba(220,53,69,0.45); color: #ff6b77;
+      box-shadow: 0 0 20px rgba(220,53,69,0.1);
+    }
+    .photo-mgmt-btn--remove:hover .photo-mgmt-btn-icon { background: rgba(220,53,69,0.22); }
+    .photo-mgmt-btn-text { flex: 1; }
+    .photo-mgmt-btn-label { display: block; font-size: 0.88rem; font-weight: 600; line-height: 1.2; }
+    .photo-mgmt-btn-desc  { display: block; font-size: 0.71rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .photo-mgmt-btn--upload .photo-mgmt-btn-desc { color: rgba(255,200,100,0.5); }
+    .photo-mgmt-btn-arrow { color: rgba(255,255,255,0.2); transition: transform 0.2s; }
+    .photo-mgmt-btn:hover .photo-mgmt-btn-arrow { transform: translateX(3px); color: rgba(255,255,255,0.45); }
+    .photo-mgmt-divider { margin: 0 1rem 0.6rem; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    function openPhotoMgmt() {
+      document.getElementById('photoMgmtBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closePhotoMgmt() {
+      document.getElementById('photoMgmtBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function showDynamicToast(title, message) {
+      const toastHtml = `
+      <div class="success-toast" id="dynamicToast" role="alert" aria-live="assertive" style="z-index: 999999;">
+        <div class="success-toast__icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="success-toast__body">
+          <p class="success-toast__title">${title}</p>
+          <p class="success-toast__msg">${message}</p>
+        </div>
+        <button class="success-toast__close" onclick="this.closest('.success-toast').remove();" aria-label="Dismiss">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <div class="success-toast__bar"></div>
+      </div>`;
+      
+      const existing = document.getElementById('dynamicToast');
+      if (existing) existing.remove();
+      
+      document.body.insertAdjacentHTML('beforeend', toastHtml);
+      setTimeout(() => {
+        const t = document.getElementById('dynamicToast');
+        if (t) t.remove();
+      }, 6000);
+    }
+    function previewAndSubmit(input) {
+      if (!input.files || !input.files[0]) return;
+      closePhotoMgmt();
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var preview = document.getElementById('avatarPreview');
+        var placeholder = document.getElementById('avatarPlaceholder');
+        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
+        if (placeholder) placeholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+      
+      var spinner = document.getElementById('photoUploadStatus');
+      if (spinner) spinner.style.display = 'flex';
+      
+      var formData = new FormData();
+      formData.append('profile_photo', file);
+      formData.append('_token', '<?php echo e(csrf_token()); ?>');
+      
+      fetch('<?php echo e(route("profile.photo")); ?>', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (spinner) spinner.style.display = 'none';
+        if (data.status === 'success') {
+          showDynamicToast('Photo Published', 'Your profile photo has been successfully updated.');
+          var removeBtn = document.getElementById('btnRemovePhoto');
+          if (removeBtn) removeBtn.style.display = 'flex';
+          var divider = document.getElementById('photoMgmtDivider');
+          if (divider) divider.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        if (spinner) spinner.style.display = 'none';
+        alert('Upload failed');
+      });
+      input.value = ''; // reset so same file can be selected again
+    }
+    function confirmRemovePhoto() {
+      closePhotoMgmt();
+      if (confirm('Are you sure you want to remove your profile photo?')) {
+        var spinner = document.getElementById('photoUploadStatus');
+        if (spinner) spinner.style.display = 'flex';
+        
+        var formData = new FormData();
+        formData.append('_token', '<?php echo e(csrf_token()); ?>');
+        formData.append('_method', 'DELETE');
+
+        fetch('<?php echo e(route("profile.photo.delete")); ?>', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (spinner) spinner.style.display = 'none';
+          if (data.status === 'success') {
+            var preview = document.getElementById('avatarPreview');
+            if (preview) preview.src = data.initials_url;
+            showDynamicToast('Photo Removed', 'Your profile photo has been successfully removed.');
+            var removeBtn = document.getElementById('btnRemovePhoto');
+            if (removeBtn) removeBtn.style.display = 'none';
+            var divider = document.getElementById('photoMgmtDivider');
+            if (divider) divider.style.display = 'none';
+          }
+        })
+        .catch(error => {
+          if (spinner) spinner.style.display = 'none';
+          alert('Delete failed');
+        });
+      }
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closePhotoMgmt();
+    });
+  </script>
+</head>
+<body>
+  <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+
+
+
+  <div class="container pb-5 mb-5 mt-5">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-12 col-lg-4 mb-4">
+        
+        <!-- Photo & Stats Card -->
+        <div class="dash-card p-4">
+          <div class="mb-4 text-center">
+
+            
+            <form id="photoUploadForm" action="<?php echo e(route('profile.photo')); ?>" method="POST" enctype="multipart/form-data" style="display:none;">
+              <?php echo csrf_field(); ?>
+              <input type="file" id="profilePhotoInput" name="profile_photo"
+                     accept="image/jpeg,image/png,image/webp,image/gif"
+                     onchange="previewAndSubmit(this)" />
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['profile_photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="text-danger small mt-2"><?php echo e($message); ?></div>
+              <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </form>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->profile_photo): ?>
+            <form id="deletePhotoForm" action="<?php echo e(route('profile.photo.delete')); ?>" method="POST" style="display:none;">
+              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+            </form>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            
+            <div class="profile-avatar-wrap mx-auto mb-3" onclick="openPhotoMgmt()" title="Manage profile photo">
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->profile_photo): ?>
+                <img id="avatarPreview"
+                     src="<?php echo e(asset('storage/' . auth()->user()->profile_photo)); ?>"
+                     alt="Profile Photo" class="profile-avatar-img" />
+              <?php else: ?>
+                <img id="avatarPreview"
+                     src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(auth()->user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=200&bold=true"
+                     alt="Profile Photo" class="profile-avatar-img" />
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              
+              <div class="profile-avatar-overlay">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span style="font-size:0.68rem;font-weight:700;letter-spacing:0.04em;margin-top:4px;">MANAGE</span>
+              </div>
+              
+              <div id="photoUploadStatus" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;border-radius:50%;z-index:10;">
+                <div class="spinner-border text-warning" role="status" style="width:2rem;height:2rem;"></div>
+              </div>
+            </div>
+
+            
+            <div id="photoMgmtBackdrop" class="photo-mgmt-backdrop" onclick="if(event.target===this) closePhotoMgmt();">
+              <div class="photo-mgmt-panel">
+
+                
+                <div class="photo-mgmt-header">
+                  <div class="photo-mgmt-header-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="photo-mgmt-header-title">Profile Photo</p>
+                    <p class="photo-mgmt-header-sub">Manage your profile picture</p>
+                  </div>
+                  <button class="photo-mgmt-close" onclick="closePhotoMgmt()" aria-label="Close">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+
+
+                
+                <div class="photo-mgmt-actions">
+
+                  <button type="button" class="photo-mgmt-btn photo-mgmt-btn--upload"
+                          onclick="document.getElementById('profilePhotoInput').click();">
+                    <span class="photo-mgmt-btn-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                    </span>
+                    <span class="photo-mgmt-btn-text">
+                      <span class="photo-mgmt-btn-label">Upload New Photo</span>
+                      <span class="photo-mgmt-btn-desc">Replace with a new image</span>
+                    </span>
+                    <svg class="photo-mgmt-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+
+                  <hr class="photo-mgmt-divider" id="photoMgmtDivider" style="display: <?php echo e(auth()->user()->profile_photo ? 'block' : 'none'); ?>;">
+                  <button type="button" class="photo-mgmt-btn photo-mgmt-btn--remove" id="btnRemovePhoto"
+                          style="display: <?php echo e(auth()->user()->profile_photo ? 'flex' : 'none'); ?>;"
+                          onclick="confirmRemovePhoto()">
+                    <span class="photo-mgmt-btn-icon">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </span>
+                    <span class="photo-mgmt-btn-text">
+                      <span class="photo-mgmt-btn-label">Remove Photo</span>
+                      <span class="photo-mgmt-btn-desc">Revert to your initials avatar</span>
+                    </span>
+                    <svg class="photo-mgmt-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+
+            
+            <div class="fw-bold text-white d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.3rem; letter-spacing:0.01em;">
+              <?php echo e(auth()->user()->name); ?>
+
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
+                <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:17px; height:17px; box-shadow:0 0 6px rgba(29,161,242,0.4);" title="Verified">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+            <div class="text-secondary mb-2" style="font-size:0.85rem;"><?php echo e(auth()->user()->email); ?></div>
+            <div>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
+                <span class="badge" style="background-color:transparent; color:orange; border:1px solid orange; box-shadow:0 0 10px rgba(255,165,0,0.5); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
+                  <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  Verified User
+                </span>
+              <?php else: ?>
+                <span class="badge" style="background-color:rgba(255,140,0,0.15); color:orange; border:1px solid rgba(255,140,0,0.3); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
+                  <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  Not Verified
+                </span>
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-around mb-3 py-2 profile-stats-divider">
+            <div class="text-center">
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;"><?php echo e(number_format(auth()->user()->profile_views ?? 0)); ?></div>
+              <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Views
+              </div>
+            </div>
+            <div class="profile-stats-vsep"></div>
+            <div class="text-center">
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;"><?php echo e(number_format(auth()->user()->phone_calls ?? 0)); ?></div>
+              <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Calls
+              </div>
+            </div>
+          </div>
+          
+          <a href="<?php echo e(route('profile.statistics')); ?>" class="btn btn-outline-warning w-100 fw-bold" style="border-radius:8px;"><?php echo e(__('View Statistics')); ?></a>
+        </div>
+
+        <div class="side-nav-card">
+          <div class="side-nav-title">My Account</div>
+
+          <ul class="nav flex-column list-unstyled mb-0" role="tablist">
+
+            
+            <li role="presentation">
+              <a href="<?php echo e(route('dashboard')); ?>" class="side-nav-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+              </a>
+            </li>
+
+            
+            <li role="presentation">
+              <a href="<?php echo e(route('chat.index')); ?>" class="side-nav-link d-flex justify-content-between align-items-center">
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  Messages
+                </span>
+                <?php
+                  $unreadCount = auth()->user()->messagesReceived()->where('is_read', false)->count();
+                ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($unreadCount > 0): ?>
+                  <span class="badge bg-danger rounded-pill"><?php echo e($unreadCount); ?></span>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </a>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                My Profile
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                My Wallet
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="membership-tab" data-bs-toggle="tab" data-bs-target="#tab-membership" type="button" role="tab" aria-controls="tab-membership" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2Z"/></svg>
+                My Membership
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="classifieds-tab" data-bs-toggle="tab" data-bs-target="#tab-classifieds" type="button" role="tab" aria-controls="tab-classifieds" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                My Classifieds
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="publish-media-tab" data-bs-toggle="tab" data-bs-target="#tab-publish-media" type="button" role="tab" aria-controls="tab-publish-media" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Publish Photos &amp; Videos
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab" aria-controls="tab-settings" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                My Settings
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="verification-tab" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button" role="tab" aria-controls="tab-verification" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                Photo Verification
+              </button>
+            </li>
+
+            
+            <li role="presentation">
+              <button class="side-nav-link" id="referrals-tab" data-bs-toggle="tab" data-bs-target="#tab-referrals" type="button" role="tab" aria-controls="tab-referrals" aria-selected="false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+                My Referrals
+              </button>
+            </li>
+
+          </ul>
+        </div>
+        
+        <style>
+          /* ── SIDEBAR NAV (matches wallet page) ── */
+          .side-nav-card {
+            background: rgba(17,17,17,0.85); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,140,0,0.2); border-radius: 18px;
+            padding: 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
+          }
+          .side-nav-title {
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.35);
+            padding: 0 0.5rem 0.75rem; margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,140,0,0.12);
+          }
+          .side-nav-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            width: 100%; padding: 0.75rem 0.9rem; border-radius: 12px;
+            color: rgba(255,255,255,0.75); text-decoration: none;
+            font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
+            background: transparent; border: 1px solid transparent; text-align: left;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+            margin-bottom: 3px; cursor: pointer; position: relative;
+          }
+          .side-nav-link:hover {
+            background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
+            color: #ffffff;
+            border-color: rgba(255,140,0,0.25);
+            box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
+          }
+          .side-nav-link svg {
+            flex-shrink: 0; opacity: 0.75;
+            transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
+          }
+          .side-nav-link:hover svg {
+            opacity: 1; color: #ff8c00;
+            transform: scale(1.1);
+          }
+          .side-nav-link.active {
+            background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+            color: #ff8c00 !important;
+            border-color: rgba(255,140,0,0.35) !important;
+            font-weight: 700;
+            box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+          }
+          .side-nav-link.active svg {
+            opacity: 1; color: #ff8c00;
+            filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
+          }
+          [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
+          [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7); }
+          [data-bs-theme="light"] .side-nav-link:hover {
+            background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
+            color: #000000 !important;
+            border-color: rgba(255,140,0,0.3) !important;
+            box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
+          }
+        </style>
+
+        
+        <?php
+          $isVerified = auth()->user()->is_verified ?? false;
+          $hasSub = $hasSubscription ?? false;
+        ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
+        <div class="dash-card p-4 photos-sidebar-card" style="margin-top:0;">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="photos-icon-wrap" style="width:auto; padding: 0 0.5rem; gap: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+            </div>
+            <span class="fw-bold text-white" style="font-size:1rem;">Photos & Videos</span>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isVerified): ?>
+              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;"><?php echo e($photos->count()); ?> uploaded</span>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+          </div>
+
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
+            
+            <div class="photos-locked-state text-center py-2">
+              <div class="lock-icon-wrap mx-auto mb-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <p class="photos-locked-title mb-1">Only Verified Accounts</p>
+              <p class="photos-locked-title mb-1">can Upload Photos and videos</p>
+              <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
+              <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el) el.click(); var hdr=document.getElementById('get-verified-header'); if(hdr) hdr.scrollIntoView({behavior:'smooth', block:'start'}); },300);"
+                 class="btn-verify-now w-100">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Verify Now
+              </a>
+            </div>
+
+          <?php elseif(!$hasSub): ?>
+            
+            <div class="text-center py-2">
+              <div class="mx-auto mb-3" style="width:60px;height:60px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <p class="photos-locked-title mb-1" style="color:rgba(255,200,0,0.9);">Unlock Photo Uploads</p>
+              <p class="photos-locked-sub mb-1">You're verified! Now choose a</p>
+              <p class="photos-locked-sub mb-4">membership plan to start uploading.</p>
+              <a href="<?php echo e(route('profile.edit')); ?>#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 class="btn-verify-now w-100" style="margin-bottom:0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Subscribe Now
+              </a>
+              <a href="<?php echo e(route('profile.edit')); ?>#tab-membership"
+                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                 style="font-size:0.75rem;color:rgba(255,140,0,0.6);text-decoration:none;">View all plans</a>
+            </div>
+
+          <?php else: ?>
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('photo_upload_success')): ?>
+              <div class="alert-photo-success mb-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <?php echo e(session('photo_upload_success')); ?>
+
+              </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit): ?>
+              <form action="<?php echo e(route('user.photos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-3">
+                <?php echo csrf_field(); ?>
+                <label for="photoUploadInput" class="media-upload-drop w-100" id="photoDropLabel">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.8" stroke-linecap="round">
+                    <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span style="font-size:0.82rem;color:rgba(255,255,255,0.6);">Click to upload photos</span>
+                  <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);">JPG, PNG, WEBP â€” max 5MB</span>
+                </label>
+                <input type="file" id="photoUploadInput" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="this.closest('form').submit()">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-1"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </form>
+            <?php else: ?>
+              <div class="alert alert-warning py-2 small mb-3" style="background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3); color: orange;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                You've reached your limit of <?php echo e(auth()->user()->photo_limit); ?> photos for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
+              </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count()): ?>
+              <div class="media-grid">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $photos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $photo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                  <div class="media-thumb-wrap">
+                    <img src="<?php echo e(asset('storage/' . $photo->path)); ?>" alt="Photo" class="media-thumb">
+                    <form action="<?php echo e(route('user.photos.destroy', $photo->id)); ?>" method="POST" class="media-delete-form">
+                      <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                      <button type="submit" class="media-delete-btn" title="Delete" onclick="return confirm('Delete this photo?')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+              </div>
+            <?php else: ?>
+              <p class="text-secondary small text-center mb-0">No photos yet. Upload your first one!</p>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        </div>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+        <style>
+          .photos-sidebar-card, .videos-sidebar-card {
+            background: rgba(17,17,17,0.9);
+            border: 1px solid rgba(255,140,0,0.18);
+            border-radius: 18px;
+          }
+          .photos-icon-wrap, .videos-icon-wrap {
+            width: 34px; height: 34px;
+            background: rgba(255,140,0,0.1);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .lock-icon-wrap {
+            width: 60px; height: 60px;
+            background: rgba(255,140,0,0.07);
+            border: 1.5px solid rgba(255,140,0,0.22);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+          }
+          .photos-locked-title { font-size:0.88rem; font-weight:600; color:rgba(255,255,255,0.85); line-height:1.5; margin:0; }
+          .photos-locked-sub { font-size:0.82rem; color:rgba(255,255,255,0.45); font-weight:400; }
+          /* btn-verify-now styles handled by global button CSS */
+
+          /* Upload drop zone */
+          .media-upload-drop {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.4rem; padding: 1rem 0.5rem;
+            border: 1.5px dashed rgba(255,140,0,0.35);
+            border-radius: 10px; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+          }
+          .media-upload-drop:hover { border-color: orange; background: rgba(255,140,0,0.05); }
+
+          /* Thumbnail grid */
+          .media-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+            margin-top: 0.5rem;
+          }
+          .media-thumb-wrap { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+          .media-thumb { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px; }
+          .media-delete-form { position: absolute; top: 3px; right: 3px; }
+          .media-delete-btn {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: rgba(220,53,69,0.85); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s;
+          }
+          .media-thumb-wrap:hover .media-delete-btn { opacity: 1; }
+
+          /* Video thumb */
+          .video-thumb { width:100%; border-radius:8px; aspect-ratio:16/9; object-fit:cover; display:block; }
+          .media-video-wrap { position: relative; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
+          .media-video-wrap .media-delete-form { top: 4px; right: 4px; }
+          .media-video-wrap .media-delete-btn { opacity: 1; }
+        </style>
+
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-12 col-lg-8">
+        <div class="tab-content">
+          <!-- Profile Tab -->
+          <div class="tab-pane fade show active" id="tab-profile" role="tabpanel" aria-labelledby="profile-tab">
+            <?php echo $__env->make('profile.partials.update-profile-information-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+            
+            <?php echo $__env->make('profile.partials.delete-user-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+          </div>
+
+          
+          <div class="tab-pane fade" id="tab-publish-media" role="tabpanel" aria-labelledby="publish-media-tab">
+            <div class="dash-card">
+              <header class="mb-4">
+                <h2 class="dash-card-title d-flex align-items-center gap-2">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  Publish Photos &amp; Videos
+                </h2>
+                <p class="dash-card-text">Upload and manage the photos and videos displayed on your public profile.</p>
+              </header>
+
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
+                
+                <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
+                  <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,140,0,0.07);border:1.5px solid rgba(255,140,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                  </div>
+                  <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
+                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
+                  <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
+                     onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                     class="btn-verify-now">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Verify My Account
+                  </a>
+                </div>
+
+              <?php elseif(!$hasSub): ?>
+                
+                <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
+                  <div class="mx-auto mb-4" style="width:72px;height:72px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  </div>
+                  <h4 class="fw-bold mb-2" style="color:rgba(255,210,0,0.95);">Choose a Subscription to Unlock</h4>
+                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:420px;margin:0 auto 0.5rem;">Great â€” your account is verified! Select a membership plan to start publishing photos and videos to your public profile.</p>
+                  <p style="font-size:0.8rem;color:rgba(255,140,0,0.6);margin-bottom:1.5rem;">Each plan includes different photo and video upload limits.</p>
+                  <button onclick="document.getElementById('membership-tab').click(); document.getElementById('membership-tab').scrollIntoView({behavior:'smooth'});" class="btn-orange">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="me-1">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    View Subscription Plans
+                  </button>
+                </div>
+
+              <?php else: ?>
+                
+
+                
+                <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.15);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span style="font-size:0.85rem;color:rgba(255,255,255,0.75);">Active Plan: <strong style="color:orange;"><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong></span>
+                  <span class="ms-auto" style="font-size:0.78rem;color:rgba(255,255,255,0.4);">
+                    Photos: <?php echo e(auth()->user()->photosCountForLimit()); ?>/<?php echo e(auth()->user()->photo_limit); ?> &nbsp;·&nbsp;
+                    Videos: <?php echo e(auth()->user()->videosCountForLimit()); ?>/<?php echo e(auth()->user()->video_limit); ?>
+
+                  </span>
+                </div>
+
+                <div class="row g-4">
+
+                  
+                  <div class="col-12 col-lg-6">
+                    <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
+                      <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Publish Photo
+                      </h3>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);"><?php echo e(auth()->user()->photosCountForLimit()); ?> of <?php echo e(auth()->user()->photo_limit); ?> used</p>
+
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit): ?>
+                        <form action="<?php echo e(route('user.photos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-2" id="publishPhotoForm">
+                          <?php echo csrf_field(); ?>
+                          <label for="publishPhotoInput" id="publishPhotoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
+                                 onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
+                                 onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.7" stroke-linecap="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.75);">Click to Select a Photo</span>
+                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">JPG, PNG, WEBP — Max 5MB (1 photo per upload)</span>
+                          </label>
+                          <input type="file" id="publishPhotoInput" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="previewPhoto(this)">
+                          <div id="photoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
+                            <img id="photoPreviewImg" src="#" style="max-width:100%; max-height:200px; border-radius:8px; margin-bottom:1rem; border:1px solid rgba(255,140,0,0.3);">
+                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelPhotoUpload()" style="border-radius:8px;">Remove Selection</button>
+                          </div>
+                          
+                          <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Photo</button>
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-2"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </form>
+                      <?php else: ?>
+                        <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
+                          You've reached the photo limit (<?php echo e(auth()->user()->photo_limit); ?>) for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
+                          <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
+                        </div>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                  </div>
+
+                  
+                  <div class="col-12 col-lg-6">
+                    <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
+                      <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                        Publish Video
+                      </h3>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);"><?php echo e(auth()->user()->videosCountForLimit()); ?> of <?php echo e(auth()->user()->video_limit); ?> used</p>
+
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit): ?>
+                        <form action="<?php echo e(route('user.videos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-2" id="publishVideoForm">
+                          <?php echo csrf_field(); ?>
+                          <label for="publishVideoInput" id="publishVideoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
+                                 onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
+                                 onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.7" stroke-linecap="round">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.75);">Click to Select a Video</span>
+                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">MP4, MOV, WEBM — Max 100MB</span>
+                          </label>
+                          <input type="file" id="publishVideoInput" name="video" accept="video/mp4,video/mov,video/avi,video/webm" style="display:none;" onchange="previewVideo(this)">
+                          <div id="videoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
+                            <p id="videoFileName" class="text-light mb-2 fw-bold" style="font-size:0.9rem; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"></p>
+                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelVideoUpload()" style="border-radius:8px;">Remove Selection</button>
+                          </div>
+                          
+                          <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Video</button>
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['video'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-2"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </form>
+                      <?php else: ?>
+                        <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
+                          You've reached the video limit (<?php echo e(auth()->user()->video_limit); ?>) for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
+                          <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
+                        </div>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                  </div>
+
+                </div>
+
+                
+                <div class="mt-4 p-4 rounded" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;">
+                  <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3" style="border-color:rgba(255,255,255,0.08) !important;">
+                    <div>
+                      <h3 class="fs-5 fw-bold mb-1 text-light d-flex align-items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Published Media (Current Subscription Period)
+                      </h3>
+                      <p class="small mb-0 text-secondary">Active until <?php echo e(auth()->user()->subscription_expires_at ? auth()->user()->subscription_expires_at->format('M d, Y') : 'N/A'); ?>. Click any image to view in full screen.</p>
+                    </div>
+                    <span class="badge bg-outline-warning border border-warning text-warning px-3 py-2" style="border-radius:20px;">
+                      <?php echo e($photos->count() + $videos->count()); ?> Items Live
+                    </span>
+                  </div>
+
+                  <div class="row g-3">
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count()): ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $photos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $photo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                        <div class="col-6 col-sm-4 col-md-3">
+                          <div class="published-photo-card" data-img-url="<?php echo e(asset('storage/' . $photo->path)); ?>" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:<?php echo e($photo->is_main ? '2.5px solid #ff8c00' : '1px solid rgba(255,255,255,0.15)'); ?>;cursor:pointer;" onclick="openMediaModal('<?php echo e(asset('storage/' . $photo->path)); ?>', 'image')">
+                            <img src="<?php echo e(asset('storage/' . $photo->path)); ?>" alt="Published Photo" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" class="d-flex align-items-center justify-content-center">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                            </div>
+                            
+                            
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photo->is_main): ?>
+                              <span class="btn-main-card-badge" style="position:absolute;top:6px;left:6px;z-index:2;">
+                                ★ Main Card
+                              </span>
+                            <?php else: ?>
+                              <form action="<?php echo e(route('user.photos.set-main', $photo->id)); ?>" method="POST" style="position:absolute;top:6px;left:6px;z-index:2;" onclick="event.stopPropagation();">
+                                <?php echo csrf_field(); ?>
+                                <button type="submit" class="btn-set-main-card" title="Set as Main Listing Card Cover">
+                                  Set as Main
+                                </button>
+                              </form>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                            <form action="<?php echo e(route('user.photos.destroy', $photo->id)); ?>" method="POST" style="position:absolute;top:6px;right:6px;z-index:2;" onclick="event.stopPropagation();">
+                              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                              <button type="submit" onclick="return confirm('Delete this photo?')" style="width:26px;height:26px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($videos->count()): ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $videos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vid): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                        <div class="col-12 col-md-6">
+                          <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,0.15);">
+                            <video style="width:100%;display:block;border-radius:10px;aspect-ratio:16/9;object-fit:contain;" controls preload="none">
+                              <source src="<?php echo e(asset('storage/' . $vid->path)); ?>">
+                            </video>
+                            <form action="<?php echo e(route('user.videos.destroy', $vid->id)); ?>" method="POST" style="position:absolute;top:8px;right:8px;z-index:2;">
+                              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                              <button type="submit" onclick="return confirm('Delete this video?')" style="width:28px;height:28px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$photos->count() && !$videos->count()): ?>
+                      <div class="col-12 text-center py-4">
+                        <p style="color:rgba(255,255,255,0.3);font-size:0.9rem;" class="mb-0">No photos or videos published for this period yet. Use the upload boxes above to publish.</p>
+                      </div>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                  </div>
+                </div>
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+          </div>
+
+
+          <!-- Wallet Tab -->
+          <div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="wallet-tab">
+            
+            <div class="dash-card">
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Check your current balance and add funds. Available for premium features & upgrades.')); ?></p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
+                  <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
+                </div>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
+              </div>
+            </div>
+
+            <div class="dash-card">
+              <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 class="dash-card-title mb-1"><?php echo e(__('Wallet History')); ?></h2>
+                  <p class="dash-card-text mb-0"><?php echo e(__('Review your recent wallet transactions.')); ?></p>
+                </div>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$deposits->isEmpty()): ?>
+                  <span style="color:orange; font-weight:700; font-size:0.85rem;">
+                    <?php echo e($deposits->total()); ?> Total <?php echo e($deposits->total() == 1 ? 'Transaction' : 'Transactions'); ?>
+
+                  </span>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </header>
+
+              <div class="mt-3" id="walletHistoryContainer" style="transition: opacity 0.25s ease;">
+                <?php echo $__env->make('profile.partials.wallet-history', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Membership Tab -->
+          <div class="tab-pane fade" id="tab-membership" role="tabpanel" aria-labelledby="membership-tab">
+            
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4">
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Your available funds for membership upgrades and premium features.')); ?></p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
+                </div>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
+              </div>
+            </div>
+
+            <!-- Current Subscription -->
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->hasActiveSubscription()): ?>
+              <div class="dash-card mb-4" style="border-color: orange; background: rgba(255,140,0,0.05);">
+                <header>
+                    <h2 class="dash-card-title text-warning d-flex align-items-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                      <?php echo e(__('Current Subscription')); ?>
+
+                    </h2>
+                </header>
+                <div class="d-flex flex-column gap-2 mt-3">
+                  <div class="fs-5 fw-bold text-light">
+                    Plan: <span class="text-uppercase text-warning"><?php echo e(auth()->user()->subscription_plan); ?></span>
+                  </div>
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->subscription_expires_at): ?>
+                    <div class="text-secondary">Expires: <?php echo e(auth()->user()->subscription_expires_at->format('M d, Y h:i A')); ?></div>
+                  <?php else: ?>
+                    <div class="text-secondary">Expires: Never</div>
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                  
+                  <div class="mt-3 text-light p-3 rounded" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);">
+                    <div class="mb-2 text-warning fw-bold small text-uppercase" style="letter-spacing: 1px;">Upload Limits</div>
+                    <div class="d-flex gap-4">
+                      <div>
+                        <span class="text-secondary small">Photos:</span>
+                        <span class="fw-bold"><?php echo e(auth()->user()->photosCountForLimit()); ?> / <?php echo e(auth()->user()->photo_limit); ?></span>
+                      </div>
+                      <div>
+                        <span class="text-secondary small">Videos:</span>
+                        <span class="fw-bold"><?php echo e(auth()->user()->videosCountForLimit()); ?> / <?php echo e(auth()->user()->video_limit); ?></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            <!-- Available Plans -->
+            <div class="dash-card">
+              <header>
+                  <h2 class="dash-card-title"><?php echo e(__('Available Plans')); ?></h2>
+                  <p class="dash-card-text"><?php echo e(__('Upgrade your membership to unlock more features.')); ?></p>
+              </header>
+              
+              <div class="row">
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $membershipPlans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <?php
+                  $checkoutRoutes = [
+                    'regular'   => 'membership.regular.checkout',
+                    'prime'     => 'membership.prime.checkout',
+                    'prime-vip' => 'membership.prime-vip.checkout',
+                    'vip'       => 'membership.vip.checkout',
+                  ];
+                  $checkoutRoute = $checkoutRoutes[$plan->slug] ?? null;
+                  $isPrimeVip = $plan->slug === 'prime-vip';
+                  $minPrice = $plan->pricing ? min(array_values($plan->pricing)) : 0;
+                ?>
+                <div class="col-12 col-md-6 mb-3">
+                  <div class="p-4 rounded h-100 d-flex flex-column" style="<?php echo e($isPrimeVip ? 'background:linear-gradient(135deg, rgba(255,165,0,0.1), rgba(255,140,0,0.05)); border:1px solid rgba(255,165,0,0.4); box-shadow:0 5px 15px rgba(255,165,0,0.15);' : 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);'); ?> position:relative; overflow:hidden;">
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isPrimeVip): ?>
+                      <div class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 fw-bold small" style="border-bottom-left-radius:8px;"><?php echo e(__('BEST VALUE')); ?></div>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                    <div class="mb-4">
+                      <div class="fs-2 fw-bold text-light mt-1 mb-1"><?php echo e(strtoupper($plan->name)); ?></div>
+                      <div class="fs-5 text-warning fw-bold">From KSh <?php echo e(number_format($minPrice, 2)); ?></div>
+                    </div>
+
+                    <ul class="list-unstyled text-secondary small mb-4 flex-grow-1" style="line-height:1.8;">
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($plan->pricing): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $plan->pricing; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $days => $price): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                          <li class="d-flex align-items-start gap-2 mb-2">
+                            <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span class="fw-medium text-light"><?php echo e($days); ?> <?php echo e((int)$days === 1 ? 'Day' : 'Days'); ?> Listing</span> = <?php echo e(number_format($price)); ?> Ksh
+                          </li>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($plan->features): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $plan->features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $feature): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                          <li class="d-flex align-items-start gap-2 mb-2">
+                            <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <?php echo e($feature); ?>
+
+                          </li>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </ul>
+
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($checkoutRoute): ?>
+                      <a href="<?php echo e(route($checkoutRoute)); ?>" class="btn <?php echo e($isPrimeVip ? 'btn-orange' : 'btn-outline-warning'); ?> w-100 fw-bold mt-auto" style="border-radius:8px;"><?php echo e(__('Sign Up Now')); ?></a>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                  </div>
+                </div>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+              </div>
+
+            </div>
+            
+          </div>
+
+          <!-- Classifieds Tab -->
+          <div class="tab-pane fade" id="tab-classifieds" role="tabpanel" aria-labelledby="classifieds-tab" x-data="{ showCreate: false }">
+            
+            <div x-show="!showCreate">
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4">
+              <header class="mb-3">
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Your available funds for classified listings and features. Available for premium features & upgrades.')); ?></p>
+              </header>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
+                <div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
+                  <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
+                </div>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
+              </div>
+            </div>
+
+            <!-- Classifieds Stats -->
+            <div class="dash-card">
+              <header>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h2 class="dash-card-title mb-0"><?php echo e(__('Classifieds')); ?></h2>
+                    <button @click="showCreate = true" class="btn btn-orange btn-sm" style="font-size:0.8rem; padding:0.4rem 1rem;"><?php echo e(__('Post New')); ?></button>
+                  </div>
+                  <p class="dash-card-text"><?php echo e(__('Manage and track the status of your classified listings.')); ?></p>
+              </header>
+              
+              <div class="row g-2 g-md-3">
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
+                    <div class="fw-bold text-light mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['unpublished'] ?? 0); ?></div>
+                    <div class="text-secondary text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px;">Unpublished</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2);">
+                    <div class="fw-bold text-warning mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['in_moderation'] ?? 0); ?></div>
+                    <div class="text-warning text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">In Moderation</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.2);">
+                    <div class="fw-bold text-success mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['approved'] ?? 0); ?></div>
+                    <div class="text-success text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Approved</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(220,53,69,0.05); border:1px solid rgba(220,53,69,0.2);">
+                    <div class="fw-bold text-danger mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['rejected'] ?? 0); ?></div>
+                    <div class="text-danger text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Rejected</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Classifieds History Table -->
+            <div class="dash-card mt-4">
+              <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 class="dash-card-title mb-1"><?php echo e(__('Classifieds History')); ?></h2>
+                  <p class="dash-card-text mb-0"><?php echo e(__('Review your recent classified listings and their statuses.')); ?></p>
+                </div>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$classifieds->isEmpty()): ?>
+                  <span style="color:orange; font-weight:700; font-size:0.85rem;">
+                    <?php echo e($classifieds->total()); ?> Total <?php echo e($classifieds->total() == 1 ? 'Listing' : 'Listings'); ?>
+
+                  </span>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </header>
+
+              <div class="mt-3" id="classifiedsHistoryContainer" style="transition: opacity 0.25s ease;">
+                <?php echo $__env->make('profile.partials.classifieds-history', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+              </div>
+            </div>
+            </div>
+
+            <!-- Create View -->
+            <div x-show="showCreate" style="display: none;" x-cloak>
+              <div class="dash-card mb-4">
+                <header class="d-flex align-items-center justify-content-between mb-4">
+                    <h2 class="dash-card-title mb-0"><?php echo e(__('Create Classified Post')); ?></h2>
+                    <button @click="showCreate = false" class="btn btn-outline-secondary btn-sm"><?php echo e(__('Back')); ?></button>
+                </header>
+                
+                <form action="<?php echo e(route('membership.process')); ?>" method="POST" enctype="multipart/form-data" id="classified-form">
+                  <?php echo csrf_field(); ?>
+                  <input type="hidden" name="plan_type" value="classified">
+                  <input type="hidden" name="plan" value="0">
+                  <div class="row g-3">
+                    
+                    <div class="col-md-6">
+                      <label class="form-label"><?php echo e(__('Post Title')); ?></label>
+                      <input type="text" name="title" class="form-control" placeholder="Post Title" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <label class="form-label"><?php echo e(__('Category')); ?></label>
+                      <select name="category" class="form-select text-secondary" required>
+                        <option value="">Select Category</option>
+                        <option value="personals">Personals</option>
+                        <option value="jobs">Job</option>
+                        <option value="massage">Massage</option>
+                        <option value="events">Events</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label"><?php echo e(__('City or Neighbourhood')); ?></label>
+                      <input type="text" name="city" class="form-control" placeholder="City Or Neighbourhood">
+                    </div>
+
+                    <div class="col-md-6">
+                      <label class="form-label"><?php echo e(__('Featured Image')); ?></label>
+                      <input type="file" name="image" class="form-control text-secondary" accept="image/*" required>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label"><?php echo e(__('Description')); ?></label>
+                      <textarea name="description" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                      <label class="form-label"><?php echo e(__('Gallery (Add Images)')); ?></label>
+                      <input type="file" name="gallery[]" class="form-control text-secondary" multiple>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-check mb-2 mt-3">
+                        <input class="form-check-input" type="checkbox" id="showPhone" checked>
+                        <label class="form-check-label text-light" for="showPhone"><?php echo e(__('Show my Phone Number')); ?></label>
+                      </div>
+                      <label class="form-label"><?php echo e(__('Phone Number')); ?></label>
+                      <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-check mb-2 mt-3">
+                        <input class="form-check-input" type="checkbox" id="showName" checked>
+                        <label class="form-check-label text-light" for="showName"><?php echo e(__('Show my Name')); ?></label>
+                      </div>
+                      <label class="form-label"><?php echo e(__('Contact Name')); ?></label>
+                      <input type="text" name="contact_name" class="form-control" placeholder="Contact Name">
+                    </div>
+                  </div>
+
+                  <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+                  
+                  <h5 class="text-light fw-bold mb-3"><?php echo e(__('Payment Method')); ?></h5>
+                  
+                  <div class="p-4 rounded mb-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
+                    <div class="mb-4">
+                      <select name="payment_method" class="form-select text-secondary" required>
+                        <option value="mpesa">MPESA [Transaction Fee: 0% + 0]</option>
+                        <option value="wallet">Available Wallet Balance (KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?>)</option>
+                      </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                      <span><?php echo e(__('Post Price:')); ?></span>
+                      <span class="text-light fw-medium">KSh1,000.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small text-secondary">
+                      <span><?php echo e(__('Transaction Fee:')); ?></span>
+                      <span class="text-light fw-medium">KSh0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-3 mt-3 border-top" style="border-color:rgba(255,255,255,0.1) !important;">
+                      <span class="text-light fw-bold"><?php echo e(__('Total:')); ?></span>
+                      <span class="text-warning fw-bold fs-5">KSh1,000.00</span>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-orange w-100 fw-bold py-2" style="border-radius:8px;"><?php echo e(__('Pay & Publish')); ?></button>
+
+                </form>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hookups Tab -->
+          <div class="tab-pane fade" id="tab-hookups" role="tabpanel" aria-labelledby="hookups-tab">
+            <?php echo $__env->make('profile.partials.hookup-listing-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+          </div>
+
+
+          <!-- Settings Tab -->
+          <div class="tab-pane fade" id="tab-settings" role="tabpanel" aria-labelledby="settings-tab">
+
+            <!-- Available Wallet Balance -->
+            <div class="dash-card mb-4 settings-wallet-card">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="settings-section-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                  </svg>
+                </div>
+                <span class="settings-section-label">Available Wallet Balance</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between p-3 rounded settings-balance-inner">
+                <div>
+                  <div class="text-uppercase fw-bold mb-1" style="font-size:0.72rem;letter-spacing:1.5px;color:rgba(255,140,0,0.8);">Current Balance</div>
+                  <div class="fw-bold settings-balance-amount" style="font-size:1.5rem;line-height:1;">
+                    KSh <span class="settings-balance-num"><?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></span>
+                  </div>
+                  <div class="settings-balance-sub" style="font-size:0.8rem;margin-top:0.3rem;">Available for premium features & upgrades</div>
+                </div>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn-settings-fund btn-sm">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Add Funds
+                </a>
+              </div>
+            </div>
+
+            <!-- My Settings Form -->
+            <div class="dash-card settings-form-card">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="settings-section-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+                  </svg>
+                </div>
+                <span class="settings-section-label">My Settings</span>
+              </div>
+              <p class="dash-card-text mb-4">Manage your privacy preferences, notifications, and account security.</p>
+
+              <form class="mt-2" method="POST" action="<?php echo e(route('profile.update')); ?>">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('patch'); ?>
+                
+                <input type="hidden" name="name" value="<?php echo e(auth()->user()->name); ?>">
+                <input type="hidden" name="email" value="<?php echo e(auth()->user()->email); ?>">
+
+                
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Privacy
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">
+                      Favorites are Visible to
+                    </label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="favorites_visibility">
+                        <option value="everybody" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'everybody' ? 'selected' : ''); ?>>Everybody</option>
+                        <option value="favourites" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
+                        <option value="nobody" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
+                      </select>
+                      <div class="settings-select-current"><?php echo e(ucfirst(old('favorites_visibility', auth()->user()->favorites_visibility ?? 'everybody'))); ?></div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">
+                      Photos are Visible to
+                    </label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="photos_visibility">
+                        <option value="everybody" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'everybody' ? 'selected' : ''); ?>>Everybody</option>
+                        <option value="favourites" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
+                        <option value="nobody" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
+                      </select>
+                      <div class="settings-select-current"><?php echo e(ucfirst(old('photos_visibility', auth()->user()->photos_visibility ?? 'everybody'))); ?></div>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  Notifications
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Email Notifications</label>
+                    <div class="settings-select-wrap">
+                      <select class="form-select settings-select" name="email_notifications">
+                        <option value="messages" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'messages' ? 'selected' : ''); ?>>Messages</option>
+                        <option value="none" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'none' ? 'selected' : ''); ?>>None</option>
+                      </select>
+                      <div class="settings-select-current"><?php echo e(ucfirst(old('email_notifications', auth()->user()->email_notifications ?? 'messages'))); ?></div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Receive Phone Calls</label>
+                    <div class="settings-input-wrap d-flex align-items-center justify-content-between px-3" style="height: 48px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08);">
+                      <span class="text-white opacity-75" style="font-size: 0.9rem;">Allow users to view your number and call you</span>
+                      <div class="form-check form-switch m-0">
+                        <input type="hidden" name="calls_enabled" value="0">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="callsEnabledToggle"
+                          name="calls_enabled"
+                          value="1"
+                          <?php echo e(auth()->user()->calls_enabled ? 'checked' : ''); ?>
+
+                          style="border-color: rgba(255,140,0,0.5); cursor:pointer;"
+                          data-toggle-url="<?php echo e(route('profile.toggle-calls')); ?>"
+                          data-csrf="<?php echo e(csrf_token()); ?>"
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  Account
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">
+                      Email Address
+                      <span title="Email cannot be changed" style="margin-left:0.3rem;display:inline-flex;align-items:center;vertical-align:middle;opacity:0.45;cursor:default;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      </span>
+                    </label>
+                    <div class="settings-input-wrap" style="opacity:0.6; cursor:not-allowed;">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                      </svg>
+                      <input type="email" class="form-control settings-input" value="<?php echo e(auth()->user()->email ?? ''); ?>" readonly style="pointer-events:none; user-select:none;" />
+                    </div>
+                  </div>
+                </div>
+
+                
+                <div class="settings-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Change Password
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">New Password</label>
+                    <div class="settings-input-wrap">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="password" placeholder="Enter new password" />
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="settings-field-label">Confirm Password</label>
+                    <div class="settings-input-wrap">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="password_confirmation" placeholder="Repeat new password" />
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label class="settings-field-label">Current Password <span style="color:rgba(255,140,0,0.8);">*</span></label>
+                    <div class="settings-input-wrap" style="max-width:400px;">
+                      <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                      </svg>
+                      <input type="password" class="form-control settings-input" name="current_password" placeholder="Required to save any changes" />
+                    </div>
+                    <div class="settings-help-text" style="font-size:0.78rem;margin-top:0.4rem;">You must enter your current password to apply any changes.</div>
+                  </div>
+                </div>
+
+                
+                <div class="d-flex align-items-center justify-content-between pt-3 mt-2 settings-save-footer">
+                  <span class="settings-help-text" style="font-size:0.8rem;">All changes are saved securely.</span>
+                  <button type="submit" class="btn-save-settings">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Save Changes
+                  </button>
+                </div>
+
+              </form>
+            </div>
+
+            <!-- Active Sessions Card -->
+            <div class="dash-card mt-4 settings-sessions-card">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="settings-section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span class="settings-section-label d-block">Active Sessions</span>
+                    <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);">Manage and sign out of your active sessions on other browsers and devices.</span>
+                  </div>
+                </div>
+                
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($sessions) && count($sessions) > 1): ?>
+                  <form method="POST" action="<?php echo e(route('profile.sessions.terminate-others')); ?>">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit"
+                      style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border-radius:8px;font-size:0.82rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.6);color:#dc3545;"
+                      onmouseover="this.style.background='rgba(220,53,69,0.12)'" onmouseout="this.style.background='transparent'"
+                      onclick="return confirm('Sign out of all other devices? This cannot be undone.')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                      Sign Out Other Devices
+                    </button>
+                  </form>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </div>
+
+
+
+              <div class="list-group list-group-flush rounded border border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($sessions) && count($sessions) > 0): ?>
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $sessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                    <div class="list-group-item d-flex align-items-center justify-content-between p-3 flex-wrap gap-2" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); color: #fff;">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="session-device-icon" style="color: orange; background: rgba(255,140,0,0.1); padding: 0.6rem; border-radius: 8px;">
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($session->device === 'Mobile'): ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                          <?php elseif($session->device === 'Tablet'): ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                          <?php else: ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </div>
+                        <div>
+                          <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <span class="fw-bold text-white"><?php echo e($session->platform); ?> - <?php echo e($session->browser); ?></span>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($session->is_current_device): ?>
+                              <span class="badge bg-success text-white border-0 px-2 py-1" style="font-size: 0.7rem; font-weight: 600; background-color: #28a745 !important;">This device</span>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                          </div>
+                          <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">
+                            <?php echo e($session->ip_address); ?> &bull; Last active <?php echo e($session->last_active); ?>
+
+                          </div>
+                        </div>
+                      </div>
+
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$session->is_current_device): ?>
+                        <form method="POST" action="<?php echo e(route('profile.sessions.terminate', $session->id)); ?>">
+                          <?php echo csrf_field(); ?>
+                          <button type="submit"
+                            style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.35rem 0.85rem;border-radius:7px;font-size:0.78rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.5);color:#dc3545;"
+                            onmouseover="this.style.background='rgba(220,53,69,0.1)'" onmouseout="this.style.background='transparent'"
+                            onclick="return confirm('Sign out this session?')">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Sign Out
+                          </button>
+                        </form>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                <?php else: ?>
+                  <div class="p-4 text-center text-secondary" style="background: rgba(0,0,0,0.2);">
+                    No active sessions found.
+                  </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              </div>
+            </div>
+
+          </div>
+
+          <style>
+            /* Settings Tab Styles */
+            .settings-wallet-card, .settings-form-card {
+              background: rgba(17,17,17,0.9);
+              border: 1px solid rgba(255,140,0,0.18);
+              border-radius: 18px;
+              padding: 1.8rem;
+            }
+            .settings-section-icon {
+              width: 32px; height: 32px;
+              background: rgba(255,140,0,0.1);
+              border-radius: 8px;
+              display: flex; align-items: center; justify-content: center;
+              flex-shrink: 0;
+            }
+            .settings-section-label {
+              font-size: 1.05rem;
+              font-weight: 700;
+              color: #fff;
+            }
+            .settings-balance-inner {
+              background: rgba(255,140,0,0.04);
+              border: 1px solid rgba(255,140,0,0.15);
+              flex-wrap: wrap;
+              gap: 1rem;
+            }
+            /* btn-settings-fund & btn-save-settings handled by global button CSS */
+            .settings-group-label {
+              display: flex; align-items: center; gap: 0.5rem;
+              font-size: 0.75rem; font-weight: 700;
+              text-transform: uppercase; letter-spacing: 1.2px;
+              color: rgba(255,140,0,0.85);
+              margin-bottom: 1rem; margin-top: 0.5rem;
+              padding-bottom: 0.5rem;
+              border-bottom: 1px solid rgba(255,140,0,0.1);
+            }
+            .settings-field-label {
+              display: block;
+              font-size: 0.82rem; font-weight: 600;
+              color: rgba(255,255,255,0.75);
+              margin-bottom: 0.45rem;
+            }
+            .settings-select-wrap { position: relative; }
+            .settings-select {
+              background: rgba(0,0,0,0.35) !important;
+              border: 1px solid rgba(255,140,0,0.18) !important;
+              color: #fff !important;
+              border-radius: 9px !important;
+              padding: 0.7rem 1rem !important;
+              font-size: 0.9rem;
+              transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .settings-select:focus {
+              border-color: orange !important;
+              box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
+            }
+            .settings-select option { background: #111; color: #fff; }
+            .settings-input-wrap { position: relative; }
+            .settings-input-icon {
+              position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+              color: rgba(255,140,0,0.6); pointer-events: none; z-index: 2;
+            }
+            .settings-input {
+              background: rgba(0,0,0,0.35) !important;
+              border: 1px solid rgba(255,140,0,0.18) !important;
+              color: #fff !important;
+              border-radius: 9px !important;
+              padding: 0.7rem 1rem 0.7rem 2.5rem !important;
+              font-size: 0.9rem;
+              transition: border-color 0.2s, box-shadow 0.2s;
+            }
+            .settings-input:focus {
+              border-color: orange !important;
+              box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
+            }
+            .settings-input::placeholder { color: rgba(255,255,255,0.25); }
+
+            /* Active Sessions Styles */
+            .settings-sessions-card {
+              background: rgba(17,17,17,0.9);
+              border: 1px solid rgba(255,140,0,0.18);
+              border-radius: 18px;
+              padding: 1.8rem;
+            }
+            .session-device-icon {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 42px;
+              height: 42px;
+              background: rgba(255,140,0,0.08);
+              border: 1px solid rgba(255,140,0,0.2);
+              border-radius: 10px;
+              color: orange;
+            }
+            .btn-outline-danger {
+              color: #ff4d4d !important;
+              border-color: rgba(255, 77, 77, 0.3) !important;
+              background: transparent !important;
+              transition: all 0.3s ease !important;
+            }
+            .btn-outline-danger:hover {
+              color: #fff !important;
+              background: #ff4d4d !important;
+              border-color: #ff4d4d !important;
+              box-shadow: 0 0 15px rgba(255, 77, 77, 0.4) !important;
+            }
+          </style>
+
+
+
+          <!-- Photo Verification Tab -->
+          <div class="tab-pane fade" id="tab-verification" role="tabpanel" aria-labelledby="verification-tab">
+            
+            <div class="mb-3">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
+                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none"><?php echo e(__('Home')); ?></a></li>
+                  <li class="breadcrumb-item active text-secondary" aria-current="page"><?php echo e(__('Photo Verification')); ?></li>
+                </ol>
+              </nav>
+            </div>
+
+            <!-- Get Verified Hero -->
+            <div id="get-verified-header" class="dash-card mb-3 p-3" style="background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(17,17,17,0.9)); border: 1px solid rgba(255,140,0,0.4);">
+              <header class="d-flex align-items-center gap-2 mb-2">
+                  <div class="bg-orange text-dark rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: orange;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  </div>
+                  <div>
+                    <h2 class="dash-card-title mb-0 text-warning" style="font-size: 1.15rem;"><?php echo e(__('Get Verified')); ?></h2>
+                    <div class="badge bg-success text-dark fw-bold px-2 py-0.5" style="font-size:0.7rem;"><?php echo e(__('"REAL PHOTOS" BADGE')); ?></div>
+                  </div>
+              </header>
+              <p class="dash-card-text text-light mb-0" style="font-size: 0.85rem; line-height:1.5;">
+                <?php echo e(__('If you want to get the "REAL PHOTOS" badge use our totally free photo verification service, you can build trust in your visitors and have much more clients as well.')); ?>
+
+              </p>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-xl-7 mb-3">
+                <!-- Upload Section -->
+                <div class="dash-card h-100 p-3">
+                  <header class="mb-3">
+                      <h3 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Real Photo')); ?></h3>
+                      <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.')); ?></p>
+                  </header>
+                  
+                  <div class="d-flex flex-column align-items-center justify-content-center p-3 mb-3 rounded text-center" style="background: rgba(0,0,0,0.3); border: 1.5px dashed rgba(255,140,0,0.4);">
+                    <div class="mb-1" style="font-size: 1.6rem; line-height: 1;">✋</div>
+                    <h6 class="text-light fw-bold mb-0" style="font-size: 0.9rem;"><?php echo e(__('Show this sign')); ?></h6>
+                    <span class="text-secondary" style="font-size: 0.75rem;"><?php echo e(__('(Palm)')); ?></span>
+                  </div>
+
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('verification_upload_success')): ?>
+                    <div class="alert alert-success text-white border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                        <?php echo e(session('verification_upload_success')); ?>
+
+                    </div>
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
+                      <div class="alert alert-success text-white border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
+                          <strong>Verified!</strong><br>Your account has been verified. You can now upload photos and videos.
+                      </div>
+                  <?php elseif(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
+                      <div class="alert alert-warning text-center border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.3) !important;">
+                          <strong>Pending Review</strong><br>Your photo is currently being reviewed by our team. Please check back later.
+                      </div>
+                  <?php else: ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'rejected'): ?>
+                          <div class="alert alert-danger border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.3) !important;">
+                              <strong>Rejected</strong><br>Your previous submission was rejected. Please carefully review the requirements and try again.
+                          </div>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                      <form method="POST" action="<?php echo e(route('verification.submit')); ?>" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
+                        <div class="mb-3">
+                          <label class="form-label fw-bold" style="font-size: 0.85rem;"><?php echo e(__('Upload Photo')); ?></label>
+                          <input type="file" name="photo" class="form-control form-control-sm py-1.5" accept="image/jpeg,image/png,image/webp" required style="font-size: 0.82rem;" />
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="text-danger small mt-1" style="font-size: 0.78rem;"><?php echo e($message); ?></div>
+                          <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </div>
+                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px; font-size: 0.85rem;"><?php echo e(__('Submit for Verification')); ?></button>
+                      </form>
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                </div>
+              </div>
+
+              <div class="col-12 col-xl-5 mb-3">
+                <!-- Requirements Section -->
+                <div class="dash-card h-100 p-3" style="background: rgba(255,255,255,0.03);">
+                  <header class="mb-3">
+                      <h4 class="dash-card-title text-success d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <?php echo e(__('Accepted Photos')); ?>
+
+                      </h4>
+                  </header>
+                  <ul class="list-unstyled text-secondary mb-3" style="line-height: 1.5; font-size: 0.82rem;">
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div><?php echo e(__('Showing this requested sign with hand.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div><?php echo e(__('We must see your FULL BODY without covering clothes (Lingerie Accepted).')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div><?php echo e(__('Tattoo must be seen on the photo, if you have.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
+                      <div><?php echo e(__('Please use makeup that helps us to compare the photos.')); ?></div>
+                    </li>
+                  </ul>
+                  
+                  <hr class="my-3" style="border-color: rgba(255,255,255,0.1);">
+
+                  <header class="mb-2">
+                      <h4 class="dash-card-title text-danger d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        <?php echo e(__('Rejected Photos')); ?>
+
+                      </h4>
+                  </header>
+                  <ul class="list-unstyled text-secondary mb-0" style="line-height: 1.5; font-size: 0.82rem;">
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div><?php echo e(__('Face not visible or covered.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div><?php echo e(__('Not showing the requested hand sign.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div><?php echo e(__('Heavily filtered or edited photos.')); ?></div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          
+          
+          
+          <?php
+            $authUser        = auth()->user();
+            $refLink         = $authUser->referral_link;
+            $totalReferred   = $authUser->referrals()->count();
+            $totalEarned     = $authUser->total_referral_earnings;
+            $redeemable      = (float) $authUser->referral_balance;
+            $refEarnings     = $authUser->referralEarnings()->with('referee')->latest()->get();
+          ?>
+          <div class="tab-pane fade" id="tab-referrals" role="tabpanel" aria-labelledby="referrals-tab">
+
+            
+            <div class="mb-3">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
+                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">Home</a></li>
+                  <li class="breadcrumb-item active text-secondary" aria-current="page">My Referrals</li>
+                </ol>
+              </nav>
+            </div>
+
+            
+            <div class="dash-card mb-3 p-3" style="background:linear-gradient(135deg,rgba(255,140,0,0.12),rgba(0,0,0,0.04));border:1px solid rgba(255,140,0,0.4);">
+              <header class="d-flex align-items-center gap-2 mb-1">
+                <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:36px;height:36px;background:orange;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <h2 class="dash-card-title mb-0 text-warning" style="font-size:1.15rem;">My Referrals</h2>
+                  <p class="text-muted mb-0" style="font-size:0.8rem;">Invite friends &amp; earn 10% bonus on every wallet top-up they make</p>
+                </div>
+              </header>
+            </div>
+
+            
+
+            
+            <div class="row g-3 mb-3">
+              <div class="col-6 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;"><?php echo e($totalReferred); ?></div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Friends Referred</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh <?php echo e(number_format($totalEarned, 2)); ?></div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Earned</div>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="dash-card p-3 text-center" style="border-color:rgba(40,167,69,0.35);">
+                  <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh <?php echo e(number_format($redeemable, 2)); ?></div>
+                  <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Available to Redeem</div>
+                </div>
+              </div>
+            </div>
+
+            
+            <div class="dash-card mb-3">
+              <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:0.6rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Your Referral Link
+              </h3>
+              <p class="text-muted" style="font-size:0.82rem;margin-bottom:0.85rem;">Share this link. When friends sign up &amp; top up their wallet, you earn 10% bonus!</p>
+              <div class="d-flex gap-2 align-items-center flex-wrap">
+                <input id="referralLinkInput" type="text" value="<?php echo e($refLink); ?>" readonly
+                  class="form-control form-control-sm font-monospace"
+                  style="flex:1;min-width:0;border-color:rgba(255,140,0,0.3);border-radius:8px;padding:0.6rem 1rem;font-size:0.8rem;outline:none;">
+                <button id="copyReferralBtn" type="button" onclick="copyReferralLink()"
+                  style="background:transparent;border:2px solid orange;color:orange;padding:0.58rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;display:inline-flex;align-items:center;gap:0.4rem;font-family:inherit;"
+                  onmouseover="this.style.background='orange';this.style.color='#000'"
+                  onmouseout="this.style.background='transparent';this.style.color='orange'">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy Link
+                </button>
+              </div>
+              <div id="copyReferralSuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">Link copied to clipboard!</div>
+              
+              
+              <div class="mt-4 d-flex align-items-center gap-3 flex-wrap">
+                  <span class="text-muted" style="font-size:0.85rem;font-weight:600;">Share via:</span>
+                  
+                  
+                  <a href="https://api.whatsapp.com/send?text=<?php echo e(urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits! ' . $refLink)); ?>" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#25D366;color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on WhatsApp">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  </a>
+                  
+                  
+                  <a href="https://twitter.com/intent/tweet?text=<?php echo e(urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits!')); ?>&url=<?php echo e(urlencode($refLink)); ?>" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#000;color:#fff;border-radius:50%;border:1px solid rgba(255,255,255,0.2);text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on X">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+
+                  
+                  <a href="https://instagram.com/" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Open Instagram">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                  </a>
+              </div>
+            </div>
+
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($redeemable > 0): ?>
+            <div class="dash-card mb-3" style="border-color:rgba(40,167,69,0.4);background:rgba(40,167,69,0.05);">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                  <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:0.3rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Redeem Bonus to Wallet
+                  </h3>
+                  <p class="text-muted" style="font-size:0.82rem;margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh <?php echo e(number_format($redeemable, 2)); ?></strong> to your main wallet instantly.</p>
+                </div>
+                <form method="POST" action="<?php echo e(route('referrals.redeem')); ?>"
+                  onsubmit="return confirm('Redeem KSh <?php echo e(number_format($redeemable, 2)); ?> to your wallet?')">
+                  <?php echo csrf_field(); ?>
+                  <button type="submit"
+                    style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.62rem 1.4rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;font-family:inherit;"
+                    onmouseover="this.style.background='#28a745';this.style.color='#fff'"
+                    onmouseout="this.style.background='transparent';this.style.color='#28a745'">
+                    Redeem KSh <?php echo e(number_format($redeemable, 2)); ?>
+
+                  </button>
+                </form>
+              </div>
+            </div>
+            <?php else: ?>
+            <div class="dash-card mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:36px;height:36px;border-radius:50%;background:rgba(128,128,128,0.1);border:1px solid rgba(128,128,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted" style="opacity:0.4;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                  <div class="text-muted" style="font-size:0.88rem;font-weight:700;">No bonus available yet</div>
+                  <div class="text-muted" style="font-size:0.78rem;margin-top:0.2rem;opacity:0.7;">Refer friends and have them top up their wallet to earn your bonus.</div>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            
+            <div class="dash-card">
+              <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:1rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Earnings History
+              </h3>
+              <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:1px solid rgba(128,128,128,0.15);">
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Friend</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Date</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Deposit</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Bonus</th>
+                      <th class="text-muted" style="text-align:left;padding:0.5rem 0.75rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $refEarnings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $earning): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                      <tr style="border-bottom:1px solid rgba(128,128,128,0.07);">
+                        <td class="dash-card-title" style="padding:0.65rem 0.75rem;font-size:0.85rem;"><?php echo e($earning->referee?->name ?? 'Unknown'); ?></td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.8rem;"><?php echo e($earning->created_at->format('d M Y')); ?></td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.85rem;">KSh <?php echo e(number_format($earning->deposit_amount, 2)); ?></td>
+                        <td style="padding:0.65rem 0.75rem;color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh <?php echo e(number_format($earning->bonus_amount, 2)); ?></td>
+                        <td style="padding:0.65rem 0.75rem;">
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($earning->status === 'redeemed'): ?>
+                            <span style="background:rgba(40,167,69,0.15);color:#28a745;border:1px solid rgba(40,167,69,0.3);border-radius:4px;padding:0.2rem 0.55rem;font-size:0.72rem;font-weight:700;">Redeemed</span>
+                          <?php else: ?>
+                            <span style="color:rgba(255,140,0,0.7);font-size:0.78rem;font-weight:600;">Awarded</span>
+                          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </td>
+                      </tr>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                      <tr>
+                        <td colspan="5" class="text-muted" style="text-align:center;padding:2.5rem;font-size:0.85rem;">
+                          No referral earnings yet. Share your link to get started!
+                        </td>
+                      </tr>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function copyReferralLink() {
+    var input = document.getElementById('referralLinkInput');
+    var btn   = document.getElementById('copyReferralBtn');
+    var msg   = document.getElementById('copyReferralSuccess');
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(function() {
+      if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 3000); }
+      if (btn) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(function(){
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link';
+        }, 3000);
+      }
+    }).catch(function() {
+      input.select(); document.execCommand('copy');
+      if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
+    });
+  }
+  </script>
+
+  <script>
+  (function() {
+    // Build and inject #tab-referrals pane into .tab-content
+    var tabContent = document.querySelector('.tab-content');
+    if (!tabContent) return;
+
+    var referralLink = <?php echo e(Js::from(auth()->user()->referral_link)); ?>;
+    var totalReferred = <?php echo e(auth()->user()->referrals()->count()); ?>;
+    var totalEarned = <?php echo e(number_format(auth()->user()->total_referral_earnings, 2)); ?>;
+    var redeemable = <?php echo e(number_format(auth()->user()->referral_balance, 2)); ?>;
+    var earnings = <?php echo e(Js::from(auth()->user()->referralEarnings()->with('referee')->latest()->get()->map(fn($e) => [
+      'date'          => $e->created_at->format('d M Y'),
+      'referee_name'  => $e->referee?->name ?? 'Unknown',
+      'deposit_amount'=> number_format($e->deposit_amount, 2),
+      'bonus_amount'  => number_format($e->bonus_amount, 2),
+      'status'        => ucfirst($e->status),
+    ]))); ?>;
+
+    var pane = document.createElement('div');
+    pane.className = 'tab-pane fade';
+    pane.id = 'tab-referrals';
+    pane.setAttribute('role', 'tabpanel');
+    pane.setAttribute('aria-labelledby', 'referrals-tab');
+
+    var earnRows = earnings.length ? earnings.map(function(e) {
+      var badge = e.status === 'Redeemed'
+        ? '<span class="badge" style="background:rgba(40,167,69,0.15);color:#28a745;border:1px solid rgba(40,167,69,0.3);font-size:0.72rem;">Redeemed</span>'
+        : '<span class="badge" style="background:rgba(255,140,0,0.15);color:orange;border:1px solid rgba(255,140,0,0.3);font-size:0.72rem;">Awarded</span>';
+      return '<tr><td style="color:rgba(255,255,255,0.85);font-size:0.85rem;">' + e.referee_name + '</td><td style="color:rgba(255,255,255,0.6);font-size:0.82rem;">' + e.date + '</td><td style="color:rgba(255,255,255,0.75);font-size:0.85rem;">KSh ' + e.deposit_amount + '</td><td style="color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh ' + e.bonus_amount + '</td><td>' + badge + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.35);padding:2rem;font-size:0.85rem;">No referral earnings yet. Share your link to get started!</td></tr>';
+
+    pane.innerHTML = `
+      <div class="mb-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
+            <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item active text-secondary" aria-current="page">My Referrals</li>
+          </ol>
+        </nav>
+      </div>
+
+      <!-- Hero card -->
+      <div class="dash-card mb-3 p-3" style="background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(17,17,17,0.9));border:1px solid rgba(255,140,0,0.4);">
+        <header class="d-flex align-items-center gap-2 mb-2">
+          <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:36px;height:36px;background:orange;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h2 class="dash-card-title mb-0 text-warning" style="font-size:1.15rem;">My Referrals</h2>
+            <p class="text-secondary mb-0" style="font-size:0.8rem;">Invite friends &amp; earn 10% bonus on every deposit they make</p>
+          </div>
+        </header>
+      </div>
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+            <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">${totalReferred}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Friends Referred</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
+            <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh ${totalEarned}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Earned</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="dash-card p-3 text-center" style="border-color:rgba(40,167,69,0.35);">
+            <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh ${redeemable}</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Available to Redeem</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Referral Link Card -->
+      <div class="dash-card mb-3">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.75rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Your Referral Link
+        </h3>
+        <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:1rem;">Share this link with friends. When they sign up and deposit, you earn 10% bonus!</p>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+          <input id="referralLinkInput" type="text" value="${referralLink}" readonly
+            style="flex:1;min-width:0;background:rgba(0,0,0,0.35);border:1px solid rgba(255,140,0,0.3);color:rgba(255,255,255,0.85);border-radius:8px;padding:0.6rem 1rem;font-size:0.82rem;font-family:monospace;">
+          <button id="copyReferralBtn" onclick="copyReferralLink()" type="button"
+            style="background:transparent;border:2px solid orange;color:orange;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;display:inline-flex;align-items:center;gap:0.4rem;"
+            onmouseover="this.style.background='orange';this.style.color='#000'"
+            onmouseout="this.style.background='transparent';this.style.color='orange'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Link
+          </button>
+        </div>
+        <div id="copySuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">
+          ✓ Link copied to clipboard!
+        </div>
+      </div>
+
+      <!-- Redeem Card -->
+      ${parseFloat(redeemable) > 0 ? `
+      <div class="dash-card mb-3" style="border-color:rgba(40,167,69,0.4);background:rgba(40,167,69,0.05);">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.3rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Redeem Bonus to Wallet
+            </h3>
+            <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh ${redeemable}</strong> from your referral balance to your main wallet.</p>
+          </div>
+          <form method="POST" action="<?php echo e(route('referrals.redeem')); ?>" onsubmit="return confirm('Redeem KSh ${redeemable} to your wallet?')">
+            <?php echo csrf_field(); ?>
+            <button type="submit"
+              style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;"
+              onmouseover="this.style.background='#28a745';this.style.color='#fff'"
+              onmouseout="this.style.background='transparent';this.style.color='#28a745'">
+              💰 Redeem KSh ${redeemable}
+            </button>
+          </form>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- Earnings History Table -->
+      <div class="dash-card">
+        <h3 style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:1rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Earnings History
+        </h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Friend</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Date</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Deposit</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Bonus</th>
+                <th style="text-align:left;padding:0.5rem 0.75rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);">Status</th>
+              </tr>
+            </thead>
+            <tbody>${earnRows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    tabContent.appendChild(pane);
+  })();
+
+  function copyReferralLink() {
+    var input = document.getElementById('referralLinkInput');
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(function() {
+      var success = document.getElementById('copySuccess');
+      var btn = document.getElementById('copyReferralBtn');
+      if (success) { success.style.display = 'block'; setTimeout(function(){ success.style.display='none'; }, 3000); }
+      if (btn) {
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+        setTimeout(function(){
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link';
+        }, 3000);
+      }
+    }).catch(function() {
+      input.select(); document.execCommand('copy');
+    });
+  }
+  </script>
+  
+  <?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Restore tab from hash on load
+      if (window.location.hash) {
+        var tabTarget = window.location.hash;
+        var tabButton = document.querySelector('button[data-bs-target="' + tabTarget + '"]');
+        if (tabButton) {
+          // Add a tiny delay to ensure Bootstrap is fully initialized before showing
+          setTimeout(function() {
+            var tab = new bootstrap.Tab(tabButton);
+            tab.show();
+          }, 50);
+        }
+      }
+
+      // 2. Update hash when a new tab is clicked
+      var tabList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'));
+      tabList.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          var target = event.target.getAttribute('data-bs-target');
+          if (target) {
+            // Using window.location.hash ensures the browser explicitly tracks it for reloads
+            if(history.replaceState) {
+                history.replaceState(null, null, target);
+            } else {
+                window.location.hash = target;
+            }
+          }
+        });
+      });
+      
+      // 3. Auto-open Publish Media tab if there are media-related errors or success messages
+      <?php if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success')): ?>
+        var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
+        if (mediaTabBtn) {
+            setTimeout(function() {
+                var tab = new bootstrap.Tab(mediaTabBtn);
+                tab.show();
+                window.location.hash = '#tab-publish-media';
+            }, 60);
+        }
+      <?php endif; ?>
+    });
+
+    // Preview functions for manual upload
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photoPreviewImg').src = e.target.result;
+          document.getElementById('publishPhotoLabel').style.display = 'none';
+          document.getElementById('photoPreviewContainer').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function cancelPhotoUpload() {
+      document.getElementById('publishPhotoInput').value = '';
+      document.getElementById('photoPreviewContainer').style.display = 'none';
+      document.getElementById('photoPreviewImg').src = '#';
+      document.getElementById('publishPhotoLabel').style.display = 'flex';
+    }
+
+    function previewVideo(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('videoFileName').innerText = input.files[0].name;
+        document.getElementById('publishVideoLabel').style.display = 'none';
+        document.getElementById('videoPreviewContainer').style.display = 'block';
+      }
+    }
+    
+    function cancelVideoUpload() {
+      document.getElementById('publishVideoInput').value = '';
+      document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoFileName').innerText = '';
+      document.getElementById('publishVideoLabel').style.display = 'flex';
+    }
+  </script>
+
+  
+  <style>
+    .lb-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lb-overlay.active { display: flex; opacity: 1; }
+    .lb-img {
+      max-width: 90vw; max-height: 82vh;
+      width: auto; height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+      display: block;
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 25px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-close:hover { background: rgba(220,53,69,0.9); border-color: #dc3545; transform: scale(1.08); }
+    .lb-arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(20,20,25,0.88);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-arrow:hover { background: orange; border-color: orange; color: #000; }
+    .lb-arrow.prev { left: 20px; }
+    .lb-arrow.next { right: 20px; }
+    .lb-meta {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 18px;
+      background: rgba(15,15,20,0.9);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 20px; color: #fff; font-size: 0.87rem;
+      z-index: 1000001; white-space: nowrap;
+    }
+  </style>
+
+  <div id="lbOverlay" class="lb-overlay" onclick="lbClose(event)">
+    <button class="lb-close" onclick="lbForceClose()" title="Close (Esc)">&times;</button>
+    <button class="lb-arrow prev" onclick="lbNav(-1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lbImg" class="lb-img" src="" alt="Photo">
+    <button class="lb-arrow next" onclick="lbNav(1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lb-meta">
+      <span id="lbCounter">1 / 1</span>
+      <span style="opacity:0.35">|</span>
+      <span class="fw-bold" style="color:orange;">Published Photo</span>
+    </div>
+  </div>
+
+  <script>
+    var lbPhotos = [], lbIdx = 0;
+
+    function openMediaModal(url, type) {
+      if (type !== 'image') return;
+      var cards = document.querySelectorAll('.published-photo-card');
+      lbPhotos = Array.from(cards).map(function(c){ return c.getAttribute('data-img-url'); }).filter(Boolean);
+      if (!lbPhotos.length) lbPhotos = [url];
+      lbIdx = lbPhotos.indexOf(url);
+      if (lbIdx < 0) lbIdx = 0;
+      lbShow();
+      var ov = document.getElementById('lbOverlay');
+      ov.style.display = 'flex';
+      setTimeout(function(){ ov.classList.add('active'); }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function lbShow() {
+      document.getElementById('lbImg').src = lbPhotos[lbIdx] || '';
+      document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
+      var prev = document.querySelector('.lb-arrow.prev');
+      var next = document.querySelector('.lb-arrow.next');
+                      <div><?php echo e(__('Face not visible or covered.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div><?php echo e(__('Not showing the requested hand sign.')); ?></div>
+                    </li>
+                    <li class="d-flex gap-2 mb-2">
+                      <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                      <div><?php echo e(__('Heavily filtered or edited photos.')); ?></div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Restore tab from hash on load
+      if (window.location.hash) {
+        var tabTarget = window.location.hash;
+        var tabButton = document.querySelector('button[data-bs-target="' + tabTarget + '"]');
+        if (tabButton) {
+          // Add a tiny delay to ensure Bootstrap is fully initialized before showing
+          setTimeout(function() {
+            var tab = new bootstrap.Tab(tabButton);
+            tab.show();
+          }, 50);
+        }
+      }
+
+      // 2. Update hash when a new tab is clicked
+      var tabList = [].slice.call(document.querySelectorAll('button[data-bs-toggle="tab"]'));
+      tabList.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          var target = event.target.getAttribute('data-bs-target');
+          if (target) {
+            // Using window.location.hash ensures the browser explicitly tracks it for reloads
+            if(history.replaceState) {
+                history.replaceState(null, null, target);
+            } else {
+                window.location.hash = target;
+            }
+          }
+        });
+      });
+      
+      // 3. Auto-open Publish Media tab if there are media-related errors or success messages
+      <?php if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success')): ?>
+        var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
+        if (mediaTabBtn) {
+            setTimeout(function() {
+                var tab = new bootstrap.Tab(mediaTabBtn);
+                tab.show();
+                window.location.hash = '#tab-publish-media';
+            }, 60);
+        }
+      <?php endif; ?>
+    });
+
+    // Preview functions for manual upload
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photoPreviewImg').src = e.target.result;
+          document.getElementById('publishPhotoLabel').style.display = 'none';
+          document.getElementById('photoPreviewContainer').style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function cancelPhotoUpload() {
+      document.getElementById('publishPhotoInput').value = '';
+      document.getElementById('photoPreviewContainer').style.display = 'none';
+      document.getElementById('photoPreviewImg').src = '#';
+      document.getElementById('publishPhotoLabel').style.display = 'flex';
+    }
+
+    function previewVideo(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('videoFileName').innerText = input.files[0].name;
+        document.getElementById('publishVideoLabel').style.display = 'none';
+        document.getElementById('videoPreviewContainer').style.display = 'block';
+      }
+    }
+    
+    function cancelVideoUpload() {
+      document.getElementById('publishVideoInput').value = '';
+      document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoFileName').innerText = '';
+      document.getElementById('publishVideoLabel').style.display = 'flex';
+    }
+  </script>
+
+  
+  <style>
+    .lb-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.93);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lb-overlay.active { display: flex; opacity: 1; }
+    .lb-img {
+      max-width: 90vw; max-height: 82vh;
+      width: auto; height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+      display: block;
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 25px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-close:hover { background: rgba(220,53,69,0.9); border-color: #dc3545; transform: scale(1.08); }
+    .lb-arrow {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(20,20,25,0.88);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s ease; z-index: 1000001;
+    }
+    .lb-arrow:hover { background: orange; border-color: orange; color: #000; }
+    .lb-arrow.prev { left: 20px; }
+    .lb-arrow.next { right: 20px; }
+    .lb-meta {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 18px;
+      background: rgba(15,15,20,0.9);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 20px; color: #fff; font-size: 0.87rem;
+      z-index: 1000001; white-space: nowrap;
+    }
+  </style>
+
+  <div id="lbOverlay" class="lb-overlay" onclick="lbClose(event)">
+    <button class="lb-close" onclick="lbForceClose()" title="Close (Esc)">&times;</button>
+    <button class="lb-arrow prev" onclick="lbNav(-1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <img id="lbImg" class="lb-img" src="" alt="Photo">
+    <button class="lb-arrow next" onclick="lbNav(1,event)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lb-meta">
+      <span id="lbCounter">1 / 1</span>
+      <span style="opacity:0.35">|</span>
+      <span class="fw-bold" style="color:orange;">Published Photo</span>
+    </div>
+  </div>
+
+  <script>
+    var lbPhotos = [], lbIdx = 0;
+
+    function openMediaModal(url, type) {
+      if (type !== 'image') return;
+      var cards = document.querySelectorAll('.published-photo-card');
+      lbPhotos = Array.from(cards).map(function(c){ return c.getAttribute('data-img-url'); }).filter(Boolean);
+      if (!lbPhotos.length) lbPhotos = [url];
+      lbIdx = lbPhotos.indexOf(url);
+      if (lbIdx < 0) lbIdx = 0;
+      lbShow();
+      var ov = document.getElementById('lbOverlay');
+      ov.style.display = 'flex';
+      setTimeout(function(){ ov.classList.add('active'); }, 10);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function lbShow() {
+      document.getElementById('lbImg').src = lbPhotos[lbIdx] || '';
+      document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
+      var prev = document.querySelector('.lb-arrow.prev');
+      var next = document.querySelector('.lb-arrow.next');
+      var show = lbPhotos.length > 1 ? 'flex' : 'none';
+      if (prev) prev.style.display = show;
+      if (next) next.style.display = show;
+    }
+
+    function lbNav(dir, e) {
+      if (e) e.stopPropagation();
+      if (lbPhotos.length <= 1) return;
+      lbIdx = (lbIdx + dir + lbPhotos.length) % lbPhotos.length;
+      lbShow();
+    }
+
+    function lbForceClose() {
+      var ov = document.getElementById('lbOverlay');
+      ov.classList.remove('active');
+      setTimeout(function(){ ov.style.display = 'none'; document.body.style.overflow = ''; }, 200);
+    }
+
+    function lbClose(e) {
+      if (e.target.id === 'lbOverlay') lbForceClose();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      var ov = document.getElementById('lbOverlay');
+      if (!ov || !ov.classList.contains('active')) return;
+      if (e.key === 'Escape') lbForceClose();
+      else if (e.key === 'ArrowLeft') lbNav(-1, e);
+      else if (e.key === 'ArrowRight') lbNav(1, e);
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var tabEls = document.querySelectorAll('button[data-bs-toggle="tab"].side-nav-link');
+      var tabContentContainer = document.querySelector('.tab-content');
+      
+      tabEls.forEach(function(tabEl) {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          if (window.innerWidth < 992 && tabContentContainer) {
+            // Scroll to the top of the tab content container with an offset for the navbar
+            var offset = 80;
+            var topPos = tabContentContainer.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top: topPos, behavior: 'smooth' });
+          }
+        });
+      });
+
+      // Auto-activate tab if URL hash or pagination query parameter is present
+      var searchParams = new URLSearchParams(window.location.search);
+      var currentHash = window.location.hash;
+      if (searchParams.has('classifieds_page') || currentHash === '#tab-classifieds') {
+        var classifiedsTabBtn = document.getElementById('classifieds-tab');
+        if (classifiedsTabBtn) {
+          var bsTab = new bootstrap.Tab(classifiedsTabBtn);
+          bsTab.show();
+        }
+      } else if (searchParams.has('deposits_page') || currentHash === '#tab-wallet') {
+        var walletTabBtn = document.getElementById('wallet-tab');
+        if (walletTabBtn) {
+          var bsTab = new bootstrap.Tab(walletTabBtn);
+          bsTab.show();
+        }
+      } else if (currentHash) {
+        var targetTab = document.querySelector('button[data-bs-target="' + currentHash + '"]');
+        if (targetTab) {
+          var bsTab = new bootstrap.Tab(targetTab);
+          bsTab.show();
+        }
+      }
+
+      // Seamless AJAX Pagination for Wallet & Classifieds History
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('#walletHistoryContainer .pagination a, #classifiedsHistoryContainer .pagination a');
+        if (!link) return;
+        e.preventDefault();
+
+        var href = link.getAttribute('href');
+        if (!href) return;
+
+        var container = link.closest('#classifiedsHistoryContainer') || link.closest('#walletHistoryContainer');
+        if (container) {
+          container.style.opacity = '0.4';
+          container.style.pointerEvents = 'none';
+        }
+
+        fetch(href, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (container && data.html) {
+            container.innerHTML = data.html;
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+          }
+        })
+        .catch(function(err) {
+          console.error('AJAX Pagination error:', err);
+          if (container) {
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+          }
+        });
+      });
+
+      // Disallow Emojis on Inputs Real-time
+      function stripEmojis(val) {
+        if (!val) return val;
+        try {
+          return val.replace(/\p{Extended_Pictographic}/gu, '');
+        } catch (e) {
+          return val.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}]/gu, '');
+        }
+      }
+
+      document.addEventListener('input', function(e) {
+        var target = e.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+          if (target.type === 'file' || target.type === 'checkbox' || target.type === 'radio') return;
+          var cur = target.value;
+          var clean = stripEmojis(cur);
+          if (cur !== clean) {
+            target.value = clean;
+          }
+        }
+      }, true);
+
+
+      // Auto-activate classifieds tab if success from classified payment
+      <?php if(session('success')): ?>
+      var classifiedsTabBtn = document.getElementById('classifieds-tab');
+      if (classifiedsTabBtn) {
+        var bsTab = new bootstrap.Tab(classifiedsTabBtn);
+        bsTab.show();
+      }
+      <?php endif; ?>
+
+      // Auto-activate tab from URL hash (e.g. #tab-wallet)
+      function activateTabFromHash() {
+        var hash = window.location.hash;
+        if (hash) {
+          var targetId = hash.replace('#', '');
+          var tabBtn = document.querySelector('[data-bs-target="' + hash + '"]') || document.getElementById(targetId.replace('tab-', '') + '-tab');
+          if (tabBtn && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            var bsTab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+            bsTab.show();
+          }
+        }
+      }
+      activateTabFromHash();
+      window.addEventListener('hashchange', activateTabFromHash);
+    });
+  </script>
+
+  <style>
+    @keyframes slideInToast {
+      from { transform: translateX(100px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  (function () {
+    var toggle = document.getElementById('callsEnabledToggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('change', function () {
+      var enabled = this.checked ? 1 : 0;
+      var url     = this.dataset.toggleUrl;
+      var csrf    = this.dataset.csrf;
+
+      // Optimistically update hidden sibling so the form also submits the new value
+      var hidden = this.previousElementSibling;
+      if (hidden && hidden.type === 'hidden') hidden.value = enabled ? '0' : '0'; // hidden always 0; checkbox carries 1
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ calls_enabled: enabled }),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          if (data.calls_enabled) {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Calls Enabled', 'Users can now call you.');
+            }
+          } else {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Calls Disabled', 'Your number is now hidden.');
+            }
+          }
+        } else {
+          // Revert toggle on error
+          toggle.checked = !toggle.checked;
+          if (typeof showDynamicToast === 'function') {
+            showDynamicToast('Update Failed', 'Failed to update. Please try again.');
+          }
+        }
+      })
+      .catch(function () {
+        toggle.checked = !toggle.checked;
+        if (typeof showDynamicToast === 'function') {
+          showDynamicToast('Update Failed', 'Failed to update. Please try again.');
+        }
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
+
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/profile/edit.blade.php ENDPATH**/ ?>

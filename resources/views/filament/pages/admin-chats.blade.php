@@ -51,7 +51,15 @@
                 </div>
                 <div class="snip">
                     <strong>{{ $conv->last_message->sender_id===$conv->user_a->id ? $conv->user_a->name : $conv->user_b->name }}:</strong>
-                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">{{ $conv->last_message->body }}</span>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">
+                        @if($conv->last_message->is_deleted || $conv->last_message->deleted_by_sender || $conv->last_message->deleted_by_receiver)
+                            <span style="font-style: italic; opacity: 0.7;">This message was deleted</span>
+                        @elseif($conv->last_message->image_path)
+                            📷 Photo @if($conv->last_message->body) - {{ $conv->last_message->body }} @endif
+                        @else
+                            {{ $conv->last_message->body }}
+                        @endif
+                    </span>
                     <span class="ts">{{ $conv->last_message->created_at->diffForHumans() }}</span>
                 </div>
             </div>
@@ -148,11 +156,19 @@
                     <div>
                         <div class="bubble {{ $isA ? 'left' : 'right' }}">
                             @if($msg->is_deleted || $msg->deleted_by_sender || $msg->deleted_by_receiver)
-                                <span style="background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);font-size:9px;padding:2px 6px;margin-right:6px;border-radius:4px;font-weight:bold;display:inline-flex;align-items:center;gap:3px;">
+                                <span style="background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.4);font-size:9px;padding:2px 6px;margin-right:6px;border-radius:4px;font-weight:bold;display:inline-flex;align-items:center;gap:3px;margin-bottom:4px;">
                                     🗑️ Deleted
-                                </span>
+                                </span><br>
+                            @else
+                                @if($msg->image_path)
+                                    <div style="margin-bottom: 5px;">
+                                        <a href="{{ asset('storage/' . $msg->image_path) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $msg->image_path) }}" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); object-fit: cover;">
+                                        </a>
+                                    </div>
+                                @endif
+                                {{ $msg->body }}
                             @endif
-                            {{ $msg->body }}
                         </div>
                         <div class="msg-meta" style="justify-content: {{ $isA ? 'flex-start' : 'flex-end' }}">
                             <span>{{ $isA ? $userA->name : $userB->name }}</span>
@@ -172,12 +188,38 @@
 
         {{-- Admin Reply Box --}}
         <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: #1e293b; border-top: 1px solid #334155; border-radius: 0 0 12px 12px; display: flex; gap: 10px; align-items: center;">
-            <input type="text" wire:model="newMessage" wire:keydown.enter="sendMessageAs({{ $userA->id }})" placeholder="Type a message to send..." style="flex: 1; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px;">
+            {{-- Attach Photo Area --}}
+            <div style="position: relative; flex-shrink: 0; width: 34px; height: 34px;">
+                <label style="display: flex; align-items: center; justify-content: center; margin: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: #0f172a; border: 1px solid #334155; color: #94a3b8; cursor: pointer; overflow: hidden; transition: all 0.2s;" title="Attach Photo">
+                    
+                    @if($photo)
+                        <img src="{{ $photo->temporaryUrl() }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    @else
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                        </svg>
+                    @endif
+
+                    <div wire:loading.flex wire:target="photo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); z-index: 10;">
+                        <span style="color: #fff; font-size: 10px; font-weight: bold;">...</span>
+                    </div>
+                    <input type="file" wire:model="photo" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" style="display: none;">
+                </label>
+                
+                @if($photo)
+                    <button type="button" wire:click="removePhoto" style="position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: #ef4444; color: #fff; border: none; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 15; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                @endif
+            </div>
+
+            <input type="text" wire:model="newMessage" wire:keydown.enter="sendMessageAs({{ $userA->id }})" placeholder="{{ $photo ? 'Add a caption...' : 'Type a message to send...' }}" style="flex: 1; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 12px;">
+            
             <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button wire:click="sendMessageAs({{ $userA->id }})" style="background: #1d4ed8; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1d4ed8'">
+                <button wire:click="sendMessageAs({{ $userA->id }})" wire:loading.attr="disabled" wire:target="photo" style="background: #1d4ed8; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#1d4ed8'">
                     Send as {{ explode(' ', $userA->name)[0] }}
                 </button>
-                <button wire:click="sendMessageAs({{ $userB->id }})" style="background: #ea580c; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f97316'" onmouseout="this.style.background='#ea580c'">
+                <button wire:click="sendMessageAs({{ $userB->id }})" wire:loading.attr="disabled" wire:target="photo" style="background: #ea580c; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#f97316'" onmouseout="this.style.background='#ea580c'">
                     Send as {{ explode(' ', $userB->name)[0] }}
                 </button>
             </div>

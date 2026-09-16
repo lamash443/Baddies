@@ -10,6 +10,7 @@ class Message extends Model
         'sender_id', 
         'receiver_id', 
         'body', 
+        'image_path',
         'is_read', 
         'reply_to_id', 
         'deleted_by_sender', 
