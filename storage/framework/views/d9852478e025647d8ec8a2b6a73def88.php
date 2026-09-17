@@ -1334,22 +1334,35 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
               </header>
 
               <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
-                
-                <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
-                  <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,140,0,0.07);border:1.5px solid rgba(255,140,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
+                  
+                  <div class="text-center py-5 rounded" style="background:rgba(255,193,7,0.02);border:1.5px dashed rgba(255,193,7,0.22);">
+                    <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,193,7,0.07);border:1.5px solid rgba(255,193,7,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,193,7,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    </div>
+                    <h4 class="fw-bold mb-2" style="color:#fff;">Verification Pending</h4>
+                    <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Your verification photo has been submitted and is currently pending review. You will be able to publish media once approved.</p>
                   </div>
-                  <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
-                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
-                  <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
-                     onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
-                     class="btn-verify-now">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    Verify My Account
-                  </a>
-                </div>
+                <?php else: ?>
+                  
+                  <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
+                    <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,140,0,0.07);border:1.5px solid rgba(255,140,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                      </svg>
+                    </div>
+                    <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
+                    <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
+                    <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
+                       onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                       class="btn-verify-now">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      Verify My Account
+                    </a>
+                  </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
               <?php elseif(!$hasSub): ?>
                 
@@ -1974,7 +1987,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <option value="favourites" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
                         <option value="nobody" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
                       </select>
-                      <div class="settings-select-current"><?php echo e(ucfirst(old('favorites_visibility', auth()->user()->favorites_visibility ?? 'everybody'))); ?></div>
+                      <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
                   </div>
                   <div class="col-12 col-md-6">
@@ -1987,7 +2000,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <option value="favourites" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
                         <option value="nobody" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
                       </select>
-                      <div class="settings-select-current"><?php echo e(ucfirst(old('photos_visibility', auth()->user()->photos_visibility ?? 'everybody'))); ?></div>
+                      <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
                   </div>
                 </div>
@@ -2006,7 +2019,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <option value="messages" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'messages' ? 'selected' : ''); ?>>Messages</option>
                         <option value="none" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'none' ? 'selected' : ''); ?>>None</option>
                       </select>
-                      <div class="settings-select-current"><?php echo e(ucfirst(old('email_notifications', auth()->user()->email_notifications ?? 'messages'))); ?></div>
+                      <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
                   </div>
                   
@@ -2239,15 +2252,31 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
               border: 1px solid rgba(255,140,0,0.18) !important;
               color: #fff !important;
               border-radius: 9px !important;
-              padding: 0.7rem 1rem !important;
+              padding: 0.7rem 2.5rem 0.7rem 1rem !important;
               font-size: 0.9rem;
               transition: border-color 0.2s, box-shadow 0.2s;
+              appearance: none;
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              cursor: pointer;
+              width: 100%;
             }
             .settings-select:focus {
               border-color: orange !important;
               box-shadow: 0 0 0 3px rgba(255,165,0,0.12) !important;
+              outline: none;
             }
             .settings-select option { background: #111; color: #fff; }
+            .settings-select-arrow {
+              position: absolute;
+              right: 0.85rem;
+              top: 50%;
+              transform: translateY(-50%);
+              color: rgba(255,140,0,0.7);
+              pointer-events: none;
+              display: flex;
+              align-items: center;
+            }
             .settings-input-wrap { position: relative; }
             .settings-input-icon {
               position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
@@ -2877,6 +2906,16 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                 history.replaceState(null, null, target);
             } else {
                 window.location.hash = target;
+            }
+            
+            // Scroll to the content on mobile screens so user doesn't have to manually scroll down
+            if (window.innerWidth < 992) {
+              var tabContent = document.querySelector('.tab-content');
+              if (tabContent) {
+                var yOffset = -20; // Slight top offset for better UX
+                var y = tabContent.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+              }
             }
           }
         });

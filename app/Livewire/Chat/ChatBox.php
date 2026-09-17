@@ -21,6 +21,14 @@ class ChatBox extends Component
         $this->activeUserId = $activeUserId;
         if ($this->activeUserId && $this->activeUserId !== 'announcement') {
             $this->markMessagesAsRead();
+        } elseif ($this->activeUserId === 'announcement') {
+            $admin = \App\Models\User::where('is_admin', true)->first();
+            if ($admin) {
+                Message::where('sender_id', $admin->id)
+                    ->where('receiver_id', auth()->id())
+                    ->where('is_read', false)
+                    ->update(['is_read' => true]);
+            }
         }
     }
 
@@ -161,6 +169,16 @@ class ChatBox extends Component
             })->orderBy('created_at', 'asc')->get();
 
             $this->markMessagesAsRead();
+        } elseif ($this->activeUserId === 'announcement') {
+            $admin = \App\Models\User::where('is_admin', true)->first();
+            if ($admin) {
+                $messages = Message::with('replyTo')
+                    ->where('sender_id', $admin->id)
+                    ->where('receiver_id', auth()->id())
+                    ->where('deleted_by_receiver', false)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+            }
         }
 
         return view('livewire.chat.chat-box', [

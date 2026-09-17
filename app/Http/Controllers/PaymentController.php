@@ -259,8 +259,9 @@ class PaymentController extends Controller
                     $user->decrement('wallet_balance', $deposit->amount);
 
                     if ($planType === 'chat') {
+                        $planName = $planDays == 1 ? '1 Day Chat Plan' : ($planDays == 3 ? '3 Day Chat Plan' : $planDays . ' Days Chat Plan');
                         $user->update([
-                            'chat_plan' => 'active',
+                            'chat_plan' => $planName,
                             'chat_expires_at' => now()->addDays($planDays),
                         ]);
                         Log::info("PayHero Deposit: Chat subscription activated for user {$user->id}");

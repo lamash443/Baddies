@@ -454,7 +454,7 @@
               if (s.status === 'completed') {
                 clearInterval(window._rcPoll);
                 rcShowPanel('success');
-                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-wallet", 2000);
+                setTimeout(() => window.location.href = "{{ route('profile.edit') }}#tab-publish-media", 2000);
               } else if (s.status === 'failed') {
                 clearInterval(window._rcPoll);
                 if (s.is_cancelled) {

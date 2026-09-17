@@ -417,7 +417,9 @@
               clearInterval(window._mpesaPoll); window._mpesaPoll = null;
               showPanel('success');
               setTimeout(() => {
-                window.location.href = "{{ route('profile.edit') }}#tab-wallet";
+                window.location.href = checkoutPlanType === 'chat'
+                  ? "{{ route('chat.memberships') }}"
+                  : "{{ route('profile.edit') }}#tab-publish-media";
               }, 2000);
 
             } else if (s.status === 'failed') {

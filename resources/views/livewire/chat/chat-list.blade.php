@@ -97,48 +97,73 @@
     </div>
 
     {{-- Global Announcement --}}
-    @php
-        $announcementActive = \App\Models\SiteSetting::get('chat_announcement_active');
-        $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
-        $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
-        $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-    @endphp
-    @if($announcementActive && !empty($announcementMessage))
-        <a href="{{ route('chat.show', 'announcement') }}" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
-            <div class="d-flex align-items-start gap-3">
-                {{-- Avatar --}}
-                <div class="position-relative flex-shrink-0">
-                    @if($announcementLogo)
-                        <div class="d-flex align-items-center justify-content-center bg-dark" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 10px rgba(255,140,0,0.4);">
-                            <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+    @if(!auth()->user()->is_admin)
+        @php
+            $adminUser = \App\Models\User::where('is_admin', true)->first();
+            $announcementActive = \App\Models\SiteSetting::get('chat_announcement_active');
+            $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
+            $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+            
+            $latestAnnouncement = null;
+            $unreadCount = 0;
+            if ($adminUser) {
+                $latestAnnouncement = \App\Models\Message::where('sender_id', $adminUser->id)
+                                        ->where('receiver_id', auth()->id())
+                                        ->where('deleted_by_receiver', false)
+                                        ->latest()->first();
+                $unreadCount = \App\Models\Message::where('sender_id', $adminUser->id)
+                                        ->where('receiver_id', auth()->id())
+                                        ->where('deleted_by_receiver', false)
+                                        ->where('is_read', false)
+                                        ->count();
+            }
+        @endphp
+        @if($announcementActive && $latestAnnouncement)
+            <a href="{{ route('chat.show', 'announcement') }}" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
+                <div class="d-flex align-items-start gap-3">
+                    {{-- Avatar --}}
+                    <div class="position-relative flex-shrink-0">
+                        @if($announcementLogo)
+                            <div class="d-flex align-items-center justify-content-center bg-dark" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 10px rgba(255,140,0,0.4);">
+                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                            </div>
+                        @else
+                            <div class="d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; box-shadow: 0 0 10px rgba(255,140,0,0.4); background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
+                                <span class="fw-bold text-white">KB</span>
+                            </div>
+                        @endif
+                        {{-- Pinned Badge Overlay --}}
+                        <div class="position-absolute align-items-center justify-content-center bg-primary rounded-circle d-flex" 
+                             style="width: 20px; height: 20px; bottom: -2px; right: -2px; border: 2px solid #1a1a1a;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                         </div>
-                    @else
-                        <div class="d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; box-shadow: 0 0 10px rgba(255,140,0,0.4); background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
-                            <span class="fw-bold text-white">KB</span>
-                        </div>
-                    @endif
-                    {{-- Pinned Badge Overlay --}}
-                    <div class="position-absolute align-items-center justify-content-center bg-primary rounded-circle d-flex" 
-                         style="width: 20px; height: 20px; bottom: -2px; right: -2px; border: 2px solid #1a1a1a;">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
                     </div>
-                </div>
 
-                {{-- Name + Message --}}
-                <div class="flex-grow-1" style="min-width: 0;">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="d-flex align-items-center gap-1" style="font-size: 0.95rem; font-weight: 800; color: #ff8c00;">
-                            Kenyan Baddies
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
-                        </span>
-                        <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
-                    </div>
-                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5;">
-                        {!! nl2br(e($announcementMessage)) !!}
+                    {{-- Name + Message --}}
+                    <div class="flex-grow-1" style="min-width: 0;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="d-flex align-items-center gap-1" style="font-size: 0.95rem; font-weight: 800; color: #ff8c00;">
+                                Kenyan Baddies
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                            </span>
+                            <span class="d-flex align-items-center gap-2">
+                                <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
+                            </span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="d-flex justify-content-between align-items-center">
+                            <div class="text-truncate" style="max-width: 80%;">
+                                {!! nl2br(e($latestAnnouncement->body)) !!}
+                            </div>
+                            @if($unreadCount > 0)
+                                <span class="badge rounded-pill ms-2" style="background: #ff8c00; color: #000; font-size: 0.65rem; font-weight: 800;">
+                                    {{ $unreadCount }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
-        </a>
+            </a>
+        @endif
     @endif
 
     {{-- Conversation Rows --}}
@@ -179,6 +204,9 @@
         @endphp
 
         @forelse($displayConversations as $user)
+            @if(!auth()->user()->is_admin && $user->is_admin)
+                @continue
+            @endif
             @php
                 $hasPhoto   = $user->profile_photo || $user->photos->first();
                 $cover      = $user->profile_photo ? asset('storage/'.$user->profile_photo) : ($hasPhoto ? asset('storage/'.$user->photos->first()->path) : null);

@@ -86,7 +86,13 @@ Route::get('/classifieds/{id}', function ($id) {
 })->name('classifieds.show');
 
 Route::get('/videos', function () {
-    $videos = \App\Models\UserVideo::with('user')->latest()->get();
+    $videos = \App\Models\UserVideo::with('user')
+        ->whereHas('user', function($q) {
+            $q->where('is_verified', true)
+              ->activeSubscription();
+        })
+        ->latest()
+        ->get();
     return view('videos', compact('videos'));
 })->name('videos');
 
@@ -531,8 +537,9 @@ Route::middleware('auth')->group(function () {
             $user->decrement('wallet_balance', $cost);
 
             if ($planType === 'chat') {
+                $planName = $planDays == 1 ? '1 Day Chat Plan' : ($planDays == 3 ? '3 Day Chat Plan' : $planDays . ' Days Chat Plan');
                 $user->update([
-                    'chat_plan'        => 'active',
+                    'chat_plan'        => $planName,
                     'chat_expires_at'  => now()->addDays($planDays),
                 ]);
             } else {
@@ -559,8 +566,11 @@ Route::middleware('auth')->group(function () {
                 ->withProperties(['plan' => $planType, 'days' => $planDays, 'cost' => $cost, 'method' => 'wallet'])
                 ->log("Subscribed to {$planLabel} plan via wallet");
 
-            // Redirect to profile wallet tab with success toast
-            return redirect()->route('profile.edit', ['#tab-wallet'])->with('success', "You're now subscribed to the {$planLabel} plan!");
+            // Redirect: chat plan goes to chat-memberships, others go to profile publish-media tab
+            if ($planType === 'chat') {
+                return redirect()->route('chat.memberships')->with('success', "You're now subscribed to the {$planLabel} plan!");
+            }
+            return redirect()->to(route('profile.edit') . '#tab-publish-media')->with('success', "You're now subscribed to the {$planLabel} plan!");
         }
         
         // Save to session or database to process later for MPESA

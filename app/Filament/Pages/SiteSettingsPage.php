@@ -7,11 +7,14 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
+use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Storage;
@@ -135,7 +138,7 @@ class SiteSettingsPage extends Page implements HasForms
             // ── Global Chat Announcement ──────────────────────────────────────
             'chat_announcement_active'  => (bool) SiteSetting::get('chat_announcement_active', false),
             'chat_announcement_logo'    => $this->getValidFileSetting('chat_announcement_logo'),
-            'chat_announcement_message' => SiteSetting::get('chat_announcement_message', ''),
+            'chat_announcements'        => json_decode(SiteSetting::get('chat_announcements', '[]'), true) ?: [],
         ]);
     }
 
@@ -513,7 +516,7 @@ class SiteSettingsPage extends Page implements HasForms
 
                 // ── GLOBAL CHAT ANNOUNCEMENT ──────────────────────────────────────
                 Section::make('Global Chat Announcement')
-                    ->description('Display a global announcement message at the top of the chat list for all users.')
+                    ->description('Manage global announcement messages displayed at the top of the chat list for all users.')
                     ->schema([
                         \Filament\Forms\Components\Toggle::make('chat_announcement_active')
                             ->label('Enable Global Announcement')
@@ -524,11 +527,19 @@ class SiteSettingsPage extends Page implements HasForms
                             ->directory('site')
                             ->image()
                             ->helperText('Optional: Upload a logo/avatar for the announcement. If left blank, the site logo is used.'),
-                        Textarea::make('chat_announcement_message')
-                            ->label('Announcement Message')
-                            ->rows(3)
-                            ->placeholder('e.g. Maintenance scheduled for tonight...')
-                            ->helperText('This message will be visible to all users at the top of their chat inbox.'),
+                        Repeater::make('chat_announcements')
+                            ->label('Announcements')
+                            ->schema([
+                                Hidden::make('id')->default(fn () => (string) Str::uuid()),
+                                Textarea::make('message')
+                                    ->required()
+                                    ->rows(3)
+                                    ->placeholder('e.g. Maintenance scheduled for tonight...'),
+                            ])
+                            ->itemLabel(fn (array $state): ?string => Str::limit($state['message'] ?? 'New Announcement', 40))
+                            ->addActionLabel('Add New Announcement')
+                            ->reorderable(false)
+                            ->helperText('Each announcement you add here will be broadcasted as a distinct message to every user.'),
                     ]),
             ]);
     }
@@ -581,8 +592,12 @@ class SiteSettingsPage extends Page implements HasForms
             'welcome_email_step3_title', 'welcome_email_step3_desc',
             'welcome_email_security_note',
             // Chat Announcement
-            'chat_announcement_active', 'chat_announcement_message', 'chat_announcement_logo',
+            'chat_announcement_active', 'chat_announcement_logo',
         ];
+
+        $announcementsData = $data['chat_announcements'] ?? [];
+        $oldAnnouncementsJson = SiteSetting::get('chat_announcements', '[]');
+        $oldAnnouncements = json_decode($oldAnnouncementsJson, true) ?: [];
 
         foreach ($allKeys as $key) {
             $newValue = $data[$key] ?? null;
@@ -601,7 +616,60 @@ class SiteSettingsPage extends Page implements HasForms
             SiteSetting::set($key, $newValue);
         }
 
+        SiteSetting::set('chat_announcements', json_encode($announcementsData));
         \Illuminate\Support\Facades\Cache::forget('site_settings');
+
+        // Broadcast, Update, or Delete actual messages
+        $admin = \App\Models\User::where('is_admin', true)->first();
+        if ($admin) {
+            $oldMap = collect($oldAnnouncements)->keyBy('id');
+            $newMap = collect($announcementsData)->keyBy('id');
+
+            // 1. Delete removed announcements
+            $deletedIds = $oldMap->keys()->diff($newMap->keys());
+            if ($deletedIds->isNotEmpty()) {
+                \App\Models\Message::whereIn('announcement_id', $deletedIds)->delete();
+            }
+
+            // 2. Add new announcements
+            $addedIds = $newMap->keys()->diff($oldMap->keys());
+            if ($addedIds->isNotEmpty()) {
+                $userIds = \App\Models\User::where('id', '!=', $admin->id)->pluck('id');
+                foreach ($addedIds as $id) {
+                    $msgText = $newMap[$id]['message'];
+                    $messages = [];
+                    $now = now();
+                    foreach ($userIds as $userId) {
+                        $messages[] = [
+                            'sender_id' => $admin->id,
+                            'receiver_id' => $userId,
+                            'body' => $msgText,
+                            'announcement_id' => $id,
+                            'is_read' => false,
+                            'is_deleted' => false,
+                            'deleted_by_sender' => false,
+                            'deleted_by_receiver' => false,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    }
+                    foreach (array_chunk($messages, 500) as $chunk) {
+                        \App\Models\Message::insert($chunk);
+                    }
+                }
+            }
+
+            // 3. Update modified announcements
+            $commonIds = $newMap->keys()->intersect($oldMap->keys());
+            foreach ($commonIds as $id) {
+                if ($newMap[$id]['message'] !== $oldMap[$id]['message']) {
+                    \App\Models\Message::where('announcement_id', $id)->update([
+                        'body' => $newMap[$id]['message'],
+                        // We intentionally leave is_read as is, or we could mark as unread again. Let's keep it as is.
+                    ]);
+                }
+            }
+        }
 
         Notification::make()
             ->title('Site settings saved successfully!')

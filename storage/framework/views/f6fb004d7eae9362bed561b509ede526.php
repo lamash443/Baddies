@@ -417,43 +417,7 @@
 
             <?php $lastDate = null; ?>
 
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId === 'announcement'): ?>
-                
-                <?php
-                    $announcementMessage = \App\Models\SiteSetting::get('chat_announcement_message');
-                    $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
-                    $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-                ?>
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($announcementMessage)): ?>
-                    <div class="d-flex w-100 mb-4 mt-2 justify-content-start align-items-end gap-2 position-relative">
-                        
-                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($announcementLogo): ?>
-                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-dark" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; padding:1px; box-shadow: 0 0 6px rgba(255,140,0,0.3);">
-                                <img src="<?php echo e($announcementLogo); ?>" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
-                            </div>
-                        <?php else: ?>
-                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:32px; height:32px; border-radius:50%; border: 1.5px solid #ff8c00; background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
-                                <span class="fw-bold text-white" style="font-size: 0.7rem;">KB</span>
-                            </div>
-                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                        
-                        
-                        <div class="px-3 py-2 shadow-sm position-relative" 
-                             style="max-width: 85%; border-radius: 12px; border-bottom-left-radius: 2px; background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.25);">
-                            <div class="d-flex align-items-center gap-1 mb-1" style="font-size: 0.8rem; font-weight: 800; color: #ff8c00;">
-                                Kenyan Baddies
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
-                                <span class="ms-1" style="font-size: 0.55rem; color: #fff; background: rgba(255,140,0,0.25); padding: 2px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Pinned</span>
-                            </div>
-                            <div class="msg-body-text" style="font-size: 0.95rem; color: var(--bubble-text); line-height: 1.5;"><?php echo nl2br(e($announcementMessage)); ?></div>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="text-center text-muted mt-5">
-                        No active announcements.
-                    </div>
-                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
 
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                 <?php
@@ -749,8 +713,26 @@
     </div>
 
     <?php else: ?>
-        <div class="d-flex h-100 justify-content-center align-items-center text-muted">
-            Select a conversation to start chatting.
+        <div class="d-flex flex-column h-100 justify-content-center align-items-center text-center p-4 position-relative" style="background: linear-gradient(135deg, rgba(255,140,0,0.05) 0%, rgba(0,0,0,0) 100%);">
+            <div class="position-absolute w-100 h-100" style="top:0; left:0; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-repeat: repeat; background-size: 350px; opacity: 0.03; filter: invert(1); pointer-events: none;"></div>
+            <div class="position-relative" style="z-index: 10;">
+                <?php
+                    $siteLogo = \App\Models\SiteSetting::get('logo');
+                ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($siteLogo): ?>
+                    <img src="<?php echo e(asset('storage/'.$siteLogo)); ?>" alt="Kenyan Baddies" class="mb-4" style="max-height: 80px; opacity: 0.9; filter: drop-shadow(0 0 15px rgba(255,140,0,0.25));">
+                <?php else: ?>
+                    <div class="mb-4 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,140,0,0.2), rgba(255,140,0,0.05)); border: 2px solid rgba(255,140,0,0.3); box-shadow: 0 0 20px rgba(255,140,0,0.15);">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <h4 class="text-white fw-bold mb-2" style="letter-spacing: 0.02em;">Welcome to Your Messages</h4>
+                <p class="text-muted mx-auto" style="max-width: 320px; font-size: 0.95rem; line-height: 1.5;">Select a conversation from the sidebar to start chatting, or browse profiles to find new connections.</p>
+                <a href="<?php echo e(route('home')); ?>" class="btn mt-4 d-inline-flex align-items-center gap-2" style="background: rgba(255,140,0,0.15); color: #ff8c00; border: 1px solid rgba(255,140,0,0.3); border-radius: 6px; padding: 0.6rem 1.75rem; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,140,0,0.25)'" onmouseout="this.style.background='rgba(255,140,0,0.15)'">
+                    Browse Profiles
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+            </div>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 

@@ -72,14 +72,14 @@ class UsersTable
                 TextColumn::make('subscription_plan')
                     ->label('Plan')
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
+                    ->color(fn ($state, \App\Models\User $record): string => !$record->hasActiveSubscription() ? 'gray' : match ($state) {
                         'prime_vip' => 'success',
                         'prime'     => 'warning',
                         'vip'       => 'info',
                         'regular'   => 'gray',
                         default     => 'gray',
                     })
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                    ->formatStateUsing(fn ($state, \App\Models\User $record): string => !$record->hasActiveSubscription() ? 'No Plan' : match ($state) {
                         'prime_vip' => 'Prime VIP',
                         'prime'     => 'Prime',
                         'vip'       => 'VIP',
@@ -96,7 +96,8 @@ class UsersTable
                 TextColumn::make('chat_plan')
                     ->label('Chat Plan')
                     ->badge()
-                    ->color('secondary')
+                    ->color(fn ($record) => $record->hasActiveChatSubscription() ? 'primary' : 'gray')
+                    ->formatStateUsing(fn ($state, \App\Models\User $record): string => $record->hasActiveChatSubscription() && $state ? ucfirst($state) : 'No Plan')
                     ->sortable(),
                 TextColumn::make('chat_expires_at')
                     ->label('Chat Plan Expires')
@@ -115,13 +116,15 @@ class UsersTable
                     ->label('Photos')
                     ->counts('photos')
                     ->badge()
-                    ->color('warning')
+                    ->color(fn ($record) => $record->hasActiveSubscription() ? 'warning' : 'gray')
+                    ->formatStateUsing(fn (string $state, \App\Models\User $record) => $record->hasActiveSubscription() ? $state : '0')
                     ->sortable(),
                 TextColumn::make('videos_count')
                     ->label('Videos')
                     ->counts('videos')
                     ->badge()
-                    ->color('info')
+                    ->color(fn ($record) => $record->hasActiveSubscription() ? 'info' : 'gray')
+                    ->formatStateUsing(fn (string $state, \App\Models\User $record) => $record->hasActiveSubscription() ? $state : '0')
                     ->sortable(),
                  IconColumn::make('is_admin')
                     ->boolean()
