@@ -166,3 +166,4 @@
 
 <x-age-verification-modal />
 
+<x-auto-logout />

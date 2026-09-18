@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\TrackVisitor::class);
         $middleware->append(\App\Http\Middleware\UpdateLastSeen::class);
+        $middleware->append(\App\Http\Middleware\AutoLogoutInactive::class);
         $middleware->validateCsrfTokens(except: [
             'webhook/payhero',
         ]);

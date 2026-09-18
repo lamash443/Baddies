@@ -1967,6 +1967,8 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                 <?php echo csrf_field(); ?>
                 <?php echo method_field('patch'); ?>
                 
+                <input type="hidden" name="_redirect_tab" value="tab-settings">
+                
                 <input type="hidden" name="name" value="<?php echo e(auth()->user()->name); ?>">
                 <input type="hidden" name="email" value="<?php echo e(auth()->user()->email); ?>">
 

@@ -187,4 +187,26 @@
 <?php unset($__componentOriginala46b2bd28f407f0ee3b0bdaf82cf8c2d); ?>
 <?php endif; ?>
 
+<?php if (isset($component)) { $__componentOriginal33d049eca430fef13e6ebe34642305a3 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal33d049eca430fef13e6ebe34642305a3 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auto-logout','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('auto-logout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal33d049eca430fef13e6ebe34642305a3)): ?>
+<?php $attributes = $__attributesOriginal33d049eca430fef13e6ebe34642305a3; ?>
+<?php unset($__attributesOriginal33d049eca430fef13e6ebe34642305a3); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal33d049eca430fef13e6ebe34642305a3)): ?>
+<?php $component = $__componentOriginal33d049eca430fef13e6ebe34642305a3; ?>
+<?php unset($__componentOriginal33d049eca430fef13e6ebe34642305a3); ?>
+<?php endif; ?>
 <?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/components/footer.blade.php ENDPATH**/ ?>

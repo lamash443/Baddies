@@ -44,9 +44,23 @@
                     $sender  = $msgs->first()->sender;
                     $count   = $msgs->count();
                     $latest  = $msgs->first();
-                    $cover   = $sender->profile_photo
-                                ? asset('storage/'.$sender->profile_photo)
-                                : ($sender->photos->first() ? asset('storage/'.$sender->photos->first()->path) : asset('callboy-1.png'));
+
+                    // If sender is admin, show as "Kenyan Baddies" with the site logo
+                    $isAdmin = $sender->is_admin ?? false;
+                    if ($isAdmin) {
+                        $displayName = 'Kenyan Baddies';
+                        $logoPath = \App\Models\SiteSetting::get('chat_announcement_logo')
+                                 ?: \App\Models\SiteSetting::get('logo');
+                        $cover = $logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)
+                                 ? asset('storage/' . $logoPath)
+                                 : 'https://ui-avatars.com/api/?name=KB&background=ff8c00&color=000&size=200&bold=true';
+                    } else {
+                        $displayName = $sender->name;
+                        $cover = $sender->profile_photo
+                                    ? asset('storage/'.$sender->profile_photo)
+                                    : ($sender->photos->first() ? asset('storage/'.$sender->photos->first()->path) : asset('callboy-1.png'));
+                    }
+
                     $snippet = \Illuminate\Support\Str::limit($latest->body, 55);
                     $timeAgo = $latest->created_at->diffForHumans(null, true);
                 @endphp
@@ -54,13 +68,13 @@
                    class="msg-row d-flex align-items-center gap-3 text-decoration-none bg-body-tertiary"
                    style="border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
                     <div class="position-relative flex-shrink-0">
-                        <img src="{{ $cover }}" alt="{{ $sender->name }}"
-                             style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,140,0,0.3);">
+                        <img src="{{ $cover }}" alt="{{ $displayName }}"
+                             style="width:46px; height:46px; border-radius:50%; object-fit:{{ $isAdmin ? 'contain' : 'cover' }}; border:2px solid rgba(255,140,0,0.3); background:#111;">
                         <span style="position:absolute; bottom:1px; right:1px; width:11px; height:11px; background:#4ade80; border-radius:50%; border:2px solid #111;"></span>
                     </div>
                     <div class="flex-grow-1" style="min-width:0;">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span class="text-body" style="font-size:0.9rem; font-weight:700;">{{ $sender->name }}</span>
+                            <span class="text-body" style="font-size:0.9rem; font-weight:700;">{{ $displayName }}</span>
                             <span class="text-muted" style="font-size:0.7rem; white-space:nowrap; margin-left:0.5rem;">{{ $timeAgo }}</span>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-2">

@@ -1910,6 +1910,8 @@
               <form class="mt-2" method="POST" action="{{ route('profile.update') }}">
                 @csrf
                 @method('patch')
+                {{-- Tell the controller to redirect back to the Settings tab --}}
+                <input type="hidden" name="_redirect_tab" value="tab-settings">
                 {{-- Hidden fields required by ProfileUpdateRequest validation --}}
                 <input type="hidden" name="name" value="{{ auth()->user()->name }}">
                 <input type="hidden" name="email" value="{{ auth()->user()->email }}">

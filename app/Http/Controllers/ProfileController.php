@@ -93,7 +93,11 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::to(route('profile.edit') . '#tab-settings')->with('status', 'profile-updated');
+        $tab = in_array($request->input('_redirect_tab'), ['tab-profile', 'tab-settings'])
+            ? $request->input('_redirect_tab')
+            : 'tab-profile';
+
+        return Redirect::to(route('profile.edit') . '#' . $tab)->with('status', 'profile-updated');
     }
 
     /**
