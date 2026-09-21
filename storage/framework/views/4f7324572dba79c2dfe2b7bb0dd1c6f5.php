@@ -484,74 +484,82 @@
 </header>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const htmlEl = document.documentElement;
-  
-  // Theme Toggle Elements
-  const btnDesktop = document.getElementById('themeToggleBtn');
-  const sunDesktop = document.getElementById('themeIconSun');
-  const moonDesktop = document.getElementById('themeIconMoon');
-  
-  const btnMobile = document.getElementById('themeToggleBtnMobile');
-  const sunMobile = document.getElementById('themeIconSunMobile');
-  const moonMobile = document.getElementById('themeIconMoonMobile');
+// --- Theme and Navbar Global Logic ---
+// We use Event Delegation so these listeners survive Livewire DOM replacements.
+if (!window._navbarLogicInitialized) {
+  window._navbarLogicInitialized = true;
 
-  // Load saved theme
+  // Apply saved theme immediately on load
   const savedTheme = localStorage.getItem('theme') || 'dark';
-  applyTheme(savedTheme);
+  document.documentElement.setAttribute('data-bs-theme', savedTheme);
 
-  function applyTheme(theme) {
-    if (theme === 'light') {
-      htmlEl.setAttribute('data-bs-theme', 'light');
-      if (sunDesktop) { sunDesktop.style.display = 'none'; moonDesktop.style.display = 'block'; }
-      if (sunMobile) { sunMobile.style.display = 'none'; moonMobile.style.display = 'block'; }
-    } else {
-      htmlEl.setAttribute('data-bs-theme', 'dark');
-      if (sunDesktop) { sunDesktop.style.display = 'block'; moonDesktop.style.display = 'none'; }
-      if (sunMobile) { sunMobile.style.display = 'block'; moonMobile.style.display = 'none'; }
+  // Sync icons on DOM load or Livewire navigate
+  function syncThemeIcons() {
+    const theme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+    const suns = document.querySelectorAll('#themeIconSun, #themeIconSunMobile');
+    const moons = document.querySelectorAll('#themeIconMoon, #themeIconMoonMobile');
+    suns.forEach(el => el.style.display = theme === 'light' ? 'none' : 'block');
+    moons.forEach(el => el.style.display = theme === 'light' ? 'block' : 'none');
+  }
+
+  document.addEventListener('DOMContentLoaded', syncThemeIcons);
+  document.addEventListener('livewire:navigated', syncThemeIcons);
+
+  // Handle Theme Toggle Clicks
+  document.addEventListener('click', function(e) {
+    const themeBtn = e.target.closest('#themeToggleBtn') || e.target.closest('#themeToggleBtnMobile');
+    if (themeBtn) {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-bs-theme') || 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      htmlEl.setAttribute('data-bs-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      syncThemeIcons();
     }
-    localStorage.setItem('theme', theme);
-  }
+  });
 
-  function toggleTheme() {
-    const currentTheme = htmlEl.getAttribute('data-bs-theme');
-    applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-  }
-
-  if (btnDesktop) btnDesktop.addEventListener('click', toggleTheme);
-  if (btnMobile) btnMobile.addEventListener('click', toggleTheme);
-
-  // ── Search dropdown panels ──
-  function initSearchToggle(toggleId, panelId, inputId) {
-    const btn   = document.getElementById(toggleId);
-    const panel = document.getElementById(panelId);
-    const input = document.getElementById(inputId);
-    if (!btn || !panel) return;
-
-    btn.addEventListener('click', function(e) {
+  // Handle Search Dropdown Toggles
+  document.addEventListener('click', function(e) {
+    // Desktop Search
+    const desktopBtn = e.target.closest('#desktopSearchToggle');
+    const desktopPanel = document.getElementById('desktopSearchPanel');
+    if (desktopBtn && desktopPanel) {
       e.stopPropagation();
-      const open = panel.classList.toggle('is-open');
-      if (open && input) {
-        setTimeout(() => input.focus(), 50);
+      const open = desktopPanel.classList.toggle('is-open');
+      if (open) {
+        const input = document.getElementById('desktopSearchInput');
+        if (input) setTimeout(() => input.focus(), 50);
       }
-    });
+    } else if (desktopPanel && !desktopPanel.contains(e.target)) {
+      desktopPanel.classList.remove('is-open');
+    }
 
-    // Close on outside click
-    document.addEventListener('click', function(e) {
-      if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-        panel.classList.remove('is-open');
+    // Mobile Search
+    const mobileBtn = e.target.closest('#mobileSearchToggle');
+    const mobilePanel = document.getElementById('mobileSearchPanel');
+    if (mobileBtn && mobilePanel) {
+      e.stopPropagation();
+      const open = mobilePanel.classList.toggle('is-open');
+      if (open) {
+        const input = document.getElementById('mobileSearchInput');
+        if (input) setTimeout(() => input.focus(), 50);
       }
-    });
+    } else if (mobilePanel && !mobilePanel.contains(e.target)) {
+      mobilePanel.classList.remove('is-open');
+    }
+  });
 
-    // Close on Escape
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') panel.classList.remove('is-open');
-    });
-  }
-
-  initSearchToggle('desktopSearchToggle', 'desktopSearchPanel', 'desktopSearchInput');
-  initSearchToggle('mobileSearchToggle',  'mobileSearchPanel',  'mobileSearchInput');
-});
+  // Escape key closes search panels
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const dp = document.getElementById('desktopSearchPanel');
+      if(dp) dp.classList.remove('is-open');
+      const mp = document.getElementById('mobileSearchPanel');
+      if(mp) mp.classList.remove('is-open');
+    }
+  });
+}
 </script>
 
 <?php
@@ -582,6 +590,9 @@ document.addEventListener('DOMContentLoaded', function() {
   } elseif (session('status') === 'profile-updated') {
     $toastTitle = 'Profile Updated';
     $toastMsg = 'Your profile information has been saved successfully.';
+  } elseif (session('verification_upload_success')) {
+    $toastTitle = 'Verification Submitted';
+    $toastMsg = session('verification_upload_success');
   } elseif (session('success')) {
     $toastTitle = 'Success';
     $toastMsg = session('success');

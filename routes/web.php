@@ -265,10 +265,12 @@ Route::get('/profile/{id}', function ($id) {
     $viewedPlan = $user->subscription_plan ?? 'regular';
 
     // Pass 1: same gender + same plan (up to 6)
+    // Pass 1: same gender + same plan (up to 6)
     $samePlanProfiles = \App\Models\User::with('photos')
         ->where('is_verified', true)
         ->activeSubscription()
         ->where('id', '!=', $user->id)
+        ->when(auth()->check(), fn($q) => $q->where('id', '!=', auth()->id()))
         ->when($user->gender, fn($q) => $q->where('gender', $user->gender))
         ->where('subscription_plan', $viewedPlan)
         ->inRandomOrder()
@@ -281,6 +283,9 @@ Route::get('/profile/{id}', function ($id) {
     $otherProfiles = collect();
     if ($remaining > 0) {
         $excludeIds = $samePlanProfiles->pluck('id')->push($user->id);
+        if (auth()->check()) {
+            $excludeIds->push(auth()->id());
+        }
         $otherProfiles = \App\Models\User::with('photos')
             ->where('is_verified', true)
             ->activeSubscription()

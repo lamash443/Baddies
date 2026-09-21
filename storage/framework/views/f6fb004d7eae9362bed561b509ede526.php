@@ -1,4 +1,4 @@
-<div class="chat-box d-flex flex-column bg-dark position-relative" style="height: 75vh;"
+<div class="chat-box d-flex flex-column position-relative" style="height: 75vh;"
      @keydown.window.escape="clear()"
      x-data="{ 
         selectedIds: [],
@@ -175,6 +175,7 @@
             transform: scale(1.02);
         }
         .chat-box {
+            background-color: var(--chat-bg) !important;
             --chat-bg: #efeae2;
             --bubble-sent-bg: #e2ffc7;
             --bubble-received-bg: #ffffff;
@@ -187,16 +188,18 @@
             --doodle-opacity: 0.08;
             --doodle-filter: none;
             --reply-bg: rgba(0,0,0,0.04);
-            --header-text: #111111;
-            --header-subtext: rgba(0,0,0,0.6);
-            --input-bg-color: #ffffff;
-            --input-text-color: #111111;
-            --input-placeholder-color: rgba(0,0,0,0.55);
-            --btn-cancel-bg: rgba(0,0,0,0.06);
+            --header-text: #ffffff;
+            --header-subtext: rgba(255,255,255,0.4);
+            --input-bg-color: rgba(255,255,255,0.07);
+            --input-text-color: #ffffff;
+            --input-placeholder-color: rgba(255,255,255,0.5);
+            --btn-cancel-bg: rgba(255,255,255,0.12);
+            --header-bg: #0d0d0d;
+            --input-area-bg: #0d0d0d;
         }
 
         [data-bs-theme="dark"] .chat-box, .dark .chat-box {
-            --chat-bg: #0b141a;
+            --chat-bg: #0d0d0d;
             --bubble-sent-bg: #005c4b;
             --bubble-received-bg: #202c33;
             --bubble-text: #e9edef;
@@ -214,6 +217,8 @@
             --input-text-color: #ffffff;
             --input-placeholder-color: rgba(255,255,255,0.5);
             --btn-cancel-bg: rgba(255,255,255,0.12);
+            --header-bg: #0d0d0d;
+            --input-area-bg: #0d0d0d;
         }
 
         @media (max-width: 767.98px) {
@@ -226,6 +231,13 @@
                 z-index: 9999 !important;
                 border-radius: 0 !important;
                 margin: 0 !important;
+            }
+            /* Lock the chat header to the top so keyboard never pushes it away */
+            .chat-header-row {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 100 !important;
+                flex-shrink: 0 !important;
             }
             body {
                 overflow: hidden !important;
@@ -273,13 +285,13 @@
 
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser || $activeUserId === 'announcement'): ?>
         <!-- Header -->
-        <div class="position-relative flex-shrink-0" style="height: 62px; min-height: 62px; max-height: 62px; overflow: hidden; border-bottom: 1px solid rgba(255,140,0,0.25); background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
+        <div id="chat-header-row" class="chat-header-row position-relative flex-shrink-0" style="height: 62px; min-height: 62px; max-height: 62px; overflow: hidden; border-bottom: 1px solid rgba(255,140,0,0.25); background-color: var(--header-bg); background-image: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
             
             
             <div id="chat-std-header" :class="selectedIds.length === 0 ? 'd-flex' : 'd-none'" class="d-flex align-items-center px-3 py-2 h-100 w-100">
                 
                 
-                <a href="<?php echo e(route('chat.index')); ?>" class="text-decoration-none me-2 d-flex align-items-center justify-content-center flex-shrink-0" title="Back"
+                <a href="<?php echo e(route('chat.index')); ?>" wire:navigate class="text-decoration-none me-2 d-flex align-items-center justify-content-center flex-shrink-0" title="Back"
                    style="width: 34px; height: 34px; border-radius: 50%; color: #ff8c00;">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 </a>
@@ -330,14 +342,14 @@
                 
                 <div class="ms-3 flex-grow-1" style="min-width: 0;">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUserId === 'announcement'): ?>
-                        <div class="fw-bold text-white d-flex align-items-center gap-1" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div class="fw-bold d-flex align-items-center gap-1" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             Kenyan Baddies
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
                         </div>
                         <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Message</small>
                     <?php else: ?>
                         <a href="<?php echo e(route('profile.view', $activeUser->id)); ?>" class="text-decoration-none">
-                            <div class="fw-bold text-white" style="font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo e($activeUser->name); ?></div>
+                            <div class="fw-bold" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo e($activeUser->name); ?></div>
                         </a>
                         <?php
                             $chatSettings = \App\Models\Setting::getSettings();
@@ -347,9 +359,9 @@
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($activeUser->isOnline()): ?>
                                 <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">Online</small>
                             <?php elseif($activeUser->last_seen_at): ?>
-                                <small style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">Last seen <?php echo e($activeUser->last_seen_at->diffForHumans()); ?></small>
+                                <small style="color: var(--header-subtext); font-size: 0.7rem;">Last seen <?php echo e($activeUser->last_seen_at->diffForHumans()); ?></small>
                             <?php else: ?>
-                                <small style="color: rgba(255,255,255,0.4); font-size: 0.7rem;">Offline</small>
+                                <small style="color: var(--header-subtext); font-size: 0.7rem;">Offline</small>
                             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -379,7 +391,7 @@
             
             <div id="chat-sel-header" x-cloak x-show="selectedIds.length > 0" :class="selectedIds.length > 0 ? 'd-flex' : 'd-none'"
                  class="align-items-center justify-content-between position-absolute top-0 start-0 w-100 h-100 px-3"
-                 style="z-index: 50; background: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
+                 style="z-index: 50; background-color: var(--header-bg); background-image: linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.05) 100%);">
                 <div class="d-flex align-items-center gap-3">
                     <button type="button" @touchstart.prevent.stop="clear()" @click.prevent.stop="clear()" id="sel-cancel-btn" class="btn p-0 d-flex align-items-center justify-content-center text-white" style="width:36px;height:36px;border-radius:50%;background:var(--btn-cancel-bg);touch-action:manipulation;cursor:pointer;" title="Cancel">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -563,7 +575,7 @@
         </div>
 
         <!-- Instant Alpine Reply Preview -->
-        <div x-cloak x-show="replyData" class="px-3 py-2 position-relative flex-shrink-0" style="background: var(--reply-preview-bg); border-top: 1px solid rgba(255,140,0,0.2); z-index: 10; margin-bottom: -1px;">
+        <div x-cloak x-show="replyData" class="px-3 py-2 position-relative flex-shrink-0" style="background: var(--input-area-bg); border-top: 1px solid rgba(255,140,0,0.2); z-index: 10; margin-bottom: -1px;">
             <div class="p-2 rounded-3 d-flex justify-content-between align-items-center" style="background-color: var(--input-bg-color); border-left: 5px solid #ff8c00; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                 <div class="flex-grow-1" style="min-width: 0;">
                     <div class="fw-bold text-truncate" style="color: #ff8c00; font-size: 0.85rem; margin-bottom: 2px;" x-text="replyData ? replyData.name : ''"></div>
@@ -587,7 +599,7 @@
 
 
             <!-- Input Area -->
-            <div class="px-3 py-2 flex-shrink-0" style="background: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
+            <div class="px-3 py-2 flex-shrink-0" style="background-color: var(--input-area-bg); background-image: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
                 <form wire:submit.prevent="sendMessage" class="d-flex align-items-center gap-2">
                     <!-- Attach Photo Area -->
                     <div class="position-relative flex-shrink-0" style="width: 42px; height: 42px;">
@@ -726,7 +738,7 @@
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                     </div>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                <h4 class="text-white fw-bold mb-2" style="letter-spacing: 0.02em;">Welcome to Your Messages</h4>
+                <h4 class="fw-bold mb-2" style="color: var(--header-text); letter-spacing: 0.02em;">Welcome to Your Messages</h4>
                 <p class="text-muted mx-auto" style="max-width: 320px; font-size: 0.95rem; line-height: 1.5;">Select a conversation from the sidebar to start chatting, or browse profiles to find new connections.</p>
                 <a href="<?php echo e(route('home')); ?>" class="btn mt-4 d-inline-flex align-items-center gap-2" style="background: rgba(255,140,0,0.15); color: #ff8c00; border: 1px solid rgba(255,140,0,0.3); border-radius: 6px; padding: 0.6rem 1.75rem; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,140,0,0.25)'" onmouseout="this.style.background='rgba(255,140,0,0.15)'">
                     Browse Profiles
@@ -762,5 +774,24 @@
 
         <img :src="lightboxImage" class="img-fluid" style="max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
     </div>
+
+    <script>
+    (function() {
+        // Fix: keep chat-box height = visible viewport height so header stays pinned
+        // when the mobile virtual keyboard appears
+        if (window.innerWidth <= 767 && window.visualViewport) {
+            var chatBox = document.querySelector('.chat-box');
+            function updateChatHeight() {
+                if (chatBox) {
+                    chatBox.style.height = window.visualViewport.height + 'px';
+                    chatBox.style.top    = window.visualViewport.offsetTop + 'px';
+                }
+            }
+            window.visualViewport.addEventListener('resize', updateChatHeight);
+            window.visualViewport.addEventListener('scroll', updateChatHeight);
+            updateChatHeight();
+        }
+    })();
+    </script>
 </div>
 <?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/livewire/chat/chat-box.blade.php ENDPATH**/ ?>

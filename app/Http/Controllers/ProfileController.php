@@ -45,16 +45,17 @@ class ProfileController extends Controller
 
         $membershipPlans = MembershipPlan::whereNotIn('slug', ['chat'])->get();
 
-        $sessions = [];
+        $sessions = collect();
         if (config('session.driver') === 'database') {
-            $rawSessions = \Illuminate\Support\Facades\DB::table('sessions')
+            $paginator = \Illuminate\Support\Facades\DB::table('sessions')
                 ->where('user_id', $user->id)
                 ->orderBy('last_activity', 'desc')
-                ->get();
+                ->paginate(4, ['*'], 'sessions_page')
+                ->withQueryString();
 
-            foreach ($rawSessions as $session) {
+            $transformed = collect($paginator->items())->map(function ($session) use ($request) {
                 $ua = $this->parseUserAgent($session->user_agent);
-                $sessions[] = (object) [
+                return (object) [
                     'id'                => $session->id,
                     'ip_address'        => $session->ip_address,
                     'is_current_device' => $session->id === $request->session()->getId(),
@@ -63,7 +64,10 @@ class ProfileController extends Controller
                     'device'            => $ua->device,
                     'last_active'       => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
                 ];
-            }
+            });
+
+            $paginator->setCollection($transformed);
+            $sessions = $paginator;
         }
 
         return view('profile.edit', [

@@ -167,12 +167,34 @@
     }
     [data-bs-theme="light"] .side-nav-link {
       color: rgba(0,0,0,0.7) !important;
+      -webkit-tap-highlight-color: transparent;
     }
-    [data-bs-theme="light"] .side-nav-link:hover {
-      background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+    [data-bs-theme="light"] .side-nav-link:focus,
+    [data-bs-theme="light"] .side-nav-link:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      color: rgba(0,0,0,0.7) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active:focus,
+    [data-bs-theme="light"] .side-nav-link.active:focus-visible {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
       color: #e67e00 !important;
-      border-color: rgba(255,140,0,0.3) !important;
-      box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      [data-bs-theme="light"] .side-nav-link:hover {
+        background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+        color: #e67e00 !important;
+        border-color: rgba(255,140,0,0.3) !important;
+        box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+      }
+      [data-bs-theme="light"] .side-nav-link:hover svg {
+        opacity: 1; color: #e67e00;
+        transform: scale(1.1);
+      }
     }
     [data-bs-theme="light"] .side-nav-link.active {
       background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
@@ -1065,19 +1087,43 @@
             transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
             margin-bottom: 3px; cursor: pointer; position: relative;
           }
-          .side-nav-link:hover {
-            background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
-            color: #ffffff;
-            border-color: rgba(255,140,0,0.25);
-            box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
+          /* Only apply hover styles on true pointer devices (not touch) */
+          @media (hover: hover) and (pointer: fine) {
+            .side-nav-link:hover {
+              background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
+              color: #ffffff;
+              border-color: rgba(255,140,0,0.25);
+              box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
+            }
+            .side-nav-link:hover svg {
+              opacity: 1; color: #ff8c00;
+              transform: scale(1.1);
+            }
+          }
+          /* Remove focus outlines/rings - blur() called via JS on click */
+          .side-nav-link:focus,
+          .side-nav-link:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            border-color: transparent !important;
+            color: rgba(255,255,255,0.75) !important;
+          }
+          .side-nav-link.active:focus,
+          .side-nav-link.active:focus-visible {
+            outline: none !important;
+            background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+            color: #ff8c00 !important;
+            border-color: rgba(255,140,0,0.35) !important;
+            box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+          }
+          .side-nav-link:active:not(.active) {
+            background: rgba(255,140,0,0.1) !important;
+            transform: scale(0.98);
           }
           .side-nav-link svg {
             flex-shrink: 0; opacity: 0.75;
             transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
-          }
-          .side-nav-link:hover svg {
-            opacity: 1; color: #ff8c00;
-            transform: scale(1.1);
           }
           .side-nav-link.active {
             background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
@@ -1086,17 +1132,41 @@
             font-weight: 700;
             box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
           }
+          .side-nav-link.active:focus,
+          .side-nav-link.active:focus-visible {
+            outline: none !important;
+          }
           .side-nav-link.active svg {
             opacity: 1; color: #ff8c00;
             filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
           }
           [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
-          [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7); }
-          [data-bs-theme="light"] .side-nav-link:hover {
-            background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
-            color: #000000 !important;
-            border-color: rgba(255,140,0,0.3) !important;
-            box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
+          [data-bs-theme="light"] .side-nav-link {
+            color:rgba(0,0,0,0.7);
+            -webkit-tap-highlight-color: transparent;
+          }
+          [data-bs-theme="light"] .side-nav-link:focus,
+          [data-bs-theme="light"] .side-nav-link:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            border-color: transparent !important;
+            color: rgba(0,0,0,0.7) !important;
+          }
+          [data-bs-theme="light"] .side-nav-link.active:focus,
+          [data-bs-theme="light"] .side-nav-link.active:focus-visible {
+            background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+            color: #e67e00 !important;
+            border-color: rgba(255,140,0,0.35) !important;
+            box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+          }
+          @media (hover: hover) and (pointer: fine) {
+            [data-bs-theme="light"] .side-nav-link:hover {
+              background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
+              color: #000000 !important;
+              border-color: rgba(255,140,0,0.3) !important;
+              box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
+            }
           }
         </style>
 
@@ -1133,13 +1203,17 @@
               </div>
               <p class="photos-locked-title mb-1">Only Verified Accounts</p>
               <p class="photos-locked-title mb-1">can Upload Photos and videos</p>
-              <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
-              <a href="{{ route('profile.edit') }}#tab-verification"
-                 onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el) el.click(); var hdr=document.getElementById('get-verified-header'); if(hdr) hdr.scrollIntoView({behavior:'smooth', block:'start'}); },300);"
-                 class="btn-verify-now w-100">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                Verify Now
-              </a>
+              @if(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+                <p class="photos-locked-sub mb-4" style="color:#ffc107; font-weight: 500;">Image uploaded, waiting for admin approval.</p>
+              @else
+                <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
+                <a href="{{ route('profile.edit') }}#tab-verification"
+                   onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el) el.click(); var hdr=document.getElementById('get-verified-header'); if(hdr) hdr.scrollIntoView({behavior:'smooth', block:'start'}); },300);"
+                   class="btn-verify-now w-100">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Verify Now
+                </a>
+              @endif
             </div>
 
           @elseif(!$hasSub)
@@ -1316,14 +1390,19 @@
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                       </svg>
                     </div>
-                    <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
-                    <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
-                    <a href="{{ route('profile.edit') }}#tab-verification"
-                       onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
-                       class="btn-verify-now">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                      Verify My Account
-                    </a>
+                    @if(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+                      <h4 class="fw-bold mb-2" style="color:#ffc107;">Verification Pending</h4>
+                      <p style="font-size:0.9rem;color:rgba(255,255,255,0.7);max-width:380px;margin:0 auto 1.5rem;">Image uploaded, waiting for admin approval. Please check back later.</p>
+                    @else
+                      <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
+                      <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
+                      <a href="{{ route('profile.edit') }}#tab-verification"
+                         onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
+                         class="btn-verify-now">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        Verify My Account
+                      </a>
+                    @endif
                   </div>
                 @endif
 
@@ -1419,9 +1498,9 @@
                               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                             </svg>
                             <span style="font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.75);">Click to Select a Video</span>
-                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">MP4, MOV, WEBM — Max 100MB</span>
+                            <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">Any video format (MP4, MOV, AVI, MKV, WEBM…) — Max 100MB</span>
                           </label>
-                          <input type="file" id="publishVideoInput" name="video" accept="video/mp4,video/mov,video/avi,video/webm" style="display:none;" onchange="previewVideo(this)">
+                          <input type="file" id="publishVideoInput" name="video" accept="video/*" style="display:none;" onchange="previewVideo(this)">
                           <div id="videoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
                             <p id="videoFileName" class="text-light mb-2 fw-bold" style="font-size:0.9rem; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"></p>
                             <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelVideoUpload()" style="border-radius:8px;">Remove Selection</button>
@@ -2144,6 +2223,12 @@
                   </div>
                 @endif
               </div>
+
+              @if(isset($sessions) && $sessions instanceof \Illuminate\Pagination\LengthAwarePaginator && $sessions->hasPages())
+                <div class="d-flex justify-content-center pt-2 mt-3">
+                  {{ $sessions->fragment('tab-settings')->links('pagination::bootstrap-5') }}
+                </div>
+              @endif
             </div>
 
           </div>
@@ -2867,7 +2952,14 @@
 
     function previewVideo(input) {
       if (input.files && input.files[0]) {
-        document.getElementById('videoFileName').innerText = input.files[0].name;
+        var file = input.files[0];
+        var maxBytes = 100 * 1024 * 1024; // 100MB
+        if (file.size > maxBytes) {
+          alert('Video file is too large. Maximum allowed size is 100MB. Your file is ' + (file.size / (1024*1024)).toFixed(1) + 'MB.');
+          input.value = '';
+          return;
+        }
+        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + 'MB)';
         document.getElementById('publishVideoLabel').style.display = 'none';
         document.getElementById('videoPreviewContainer').style.display = 'block';
       }
@@ -3062,7 +3154,14 @@
 
     function previewVideo(input) {
       if (input.files && input.files[0]) {
-        document.getElementById('videoFileName').innerText = input.files[0].name;
+        var file = input.files[0];
+        var maxBytes = 100 * 1024 * 1024; // 100MB
+        if (file.size > maxBytes) {
+          alert('Video file is too large. Maximum allowed size is 100MB. Your file is ' + (file.size / (1024*1024)).toFixed(1) + 'MB.');
+          input.value = '';
+          return;
+        }
+        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + 'MB)';
         document.getElementById('publishVideoLabel').style.display = 'none';
         document.getElementById('videoPreviewContainer').style.display = 'block';
       }
@@ -3201,6 +3300,19 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // ── Blur sidebar links immediately after click so hover doesn't stick ──
+      document.querySelectorAll('.side-nav-link').forEach(function(el) {
+        el.addEventListener('mouseup', function() {
+          var self = this;
+          // Small timeout lets Bootstrap finish its tab activation before blur
+          setTimeout(function() { self.blur(); }, 0);
+        });
+        el.addEventListener('touchend', function() {
+          var self = this;
+          setTimeout(function() { self.blur(); }, 150);
+        });
+      });
+
       var tabEls = document.querySelectorAll('button[data-bs-toggle="tab"].side-nav-link');
       var tabContentContainer = document.querySelector('.tab-content');
       

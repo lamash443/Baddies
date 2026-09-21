@@ -22,6 +22,12 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('email')
                     ->searchable(),
+                IconColumn::make('email_verified_at')
+                    ->label('Email Verified')
+                    ->boolean()
+                    ->getStateUsing(fn (\App\Models\User $record): bool => !is_null($record->email_verified_at))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('phone_number')
                     ->searchable(),
                 TextColumn::make('county')

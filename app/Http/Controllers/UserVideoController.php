@@ -12,7 +12,7 @@ class UserVideoController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'video' => ['required', 'file', 'mimes:mp4,webm,ogg', 'max:102400'], // 100MB
+            'video' => ['required', 'file', 'mimetypes:video/*', 'max:102400'], // 100MB — any video format
         ]);
 
         $user = auth()->user();

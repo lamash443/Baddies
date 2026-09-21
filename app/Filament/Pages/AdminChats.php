@@ -117,12 +117,18 @@ class AdminChats extends Page
 
     public function getConversations(): array
     {
+        // Get IDs of all admin users so we can exclude their announcement conversations
+        $adminIds = User::where('is_admin', true)->pluck('id')->toArray();
+
         $rows = Message::select(
                 DB::raw('LEAST(sender_id, receiver_id) as user_a'),
                 DB::raw('GREATEST(sender_id, receiver_id) as user_b'),
                 DB::raw('MAX(id) as last_message_id'),
                 DB::raw('COUNT(id) as total_messages')
             )
+            // Exclude conversations where either participant is an admin
+            ->whereNotIn('sender_id', $adminIds)
+            ->whereNotIn('receiver_id', $adminIds)
             ->groupBy('user_a', 'user_b')
             ->get();
 

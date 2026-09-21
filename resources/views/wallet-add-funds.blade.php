@@ -127,6 +127,23 @@
       border-color: rgba(255,140,0,0.25);
       box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
     }
+    /* Prevent hover from sticking after click */
+    .side-nav-link:focus,
+    .side-nav-link:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .side-nav-link:not(.active):focus:not(:hover),
+    .side-nav-link:not(.active):focus-visible:not(:hover) {
+      background: transparent !important;
+      color: rgba(255,255,255,0.75) !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    .side-nav-link:active:not(.active) {
+      background: rgba(255,140,0,0.12) !important;
+      transform: scale(0.98);
+    }
     .side-nav-link svg {
       flex-shrink: 0; opacity: 0.75;
       transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
@@ -141,6 +158,10 @@
       border-color: rgba(255,140,0,0.35) !important;
       font-weight: 700;
       box-shadow: inset 3px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+    }
+    .side-nav-link.active:focus,
+    .side-nav-link.active:focus-visible {
+      outline: none !important;
     }
     .side-nav-link.active svg {
       opacity: 1; color: #ff8c00;
@@ -193,12 +214,36 @@
 
     [data-bs-theme="light"] .side-nav-card { background:#fff !important; border-color:rgba(0,0,0,0.08) !important; box-shadow:0 4px 20px rgba(0,0,0,0.04) !important; }
     [data-bs-theme="light"] .side-nav-title { color:rgba(0,0,0,0.45) !important; border-bottom-color:rgba(0,0,0,0.08) !important; }
-    [data-bs-theme="light"] .side-nav-link { color:rgba(0,0,0,0.7) !important; }
-    [data-bs-theme="light"] .side-nav-link:hover {
-      background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+    [data-bs-theme="light"] .side-nav-link {
+      color:rgba(0,0,0,0.7) !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    [data-bs-theme="light"] .side-nav-link:focus,
+    [data-bs-theme="light"] .side-nav-link:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      color: rgba(0,0,0,0.7) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active:focus,
+    [data-bs-theme="light"] .side-nav-link.active:focus-visible {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
       color: #e67e00 !important;
-      border-color: rgba(255,140,0,0.3) !important;
-      box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      [data-bs-theme="light"] .side-nav-link:hover {
+        background: linear-gradient(90deg, rgba(255,140,0,0.14) 0%, rgba(255,140,0,0.03) 100%) !important;
+        color: #e67e00 !important;
+        border-color: rgba(255,140,0,0.3) !important;
+        box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 3px 0 0 #ff8c00 !important;
+      }
+      [data-bs-theme="light"] .side-nav-link:hover svg {
+        opacity: 1; color: #e67e00;
+        transform: scale(1.1);
+      }
     }
     [data-bs-theme="light"] .side-nav-link.active {
       background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
@@ -458,6 +503,16 @@
 
     amountInput.addEventListener('input', updateSummary);
     updateSummary();
+
+    // Blur sidebar links after click so hover state doesn't stick
+    document.querySelectorAll('.side-nav-link').forEach(function(el) {
+      el.addEventListener('mouseup', function() {
+        var self = this; setTimeout(function() { self.blur(); }, 0);
+      });
+      el.addEventListener('touchend', function() {
+        var self = this; setTimeout(function() { self.blur(); }, 150);
+      });
+    });
   </script>
 </body>
 </html>

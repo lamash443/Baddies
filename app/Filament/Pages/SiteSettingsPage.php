@@ -531,6 +531,12 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Announcements')
                             ->schema([
                                 Hidden::make('id')->default(fn () => (string) Str::uuid()),
+                                \Filament\Forms\Components\Select::make('target_users')
+                                    ->label('Target Users (Optional)')
+                                    ->multiple()
+                                    ->options(fn () => \App\Models\User::where('is_admin', false)->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->placeholder('Select users to send directly, or leave blank to broadcast to EVERYONE'),
                                 Textarea::make('message')
                                     ->required()
                                     ->rows(3)
@@ -634,9 +640,16 @@ class SiteSettingsPage extends Page implements HasForms
             // 2. Add new announcements
             $addedIds = $newMap->keys()->diff($oldMap->keys());
             if ($addedIds->isNotEmpty()) {
-                $userIds = \App\Models\User::where('id', '!=', $admin->id)->pluck('id');
                 foreach ($addedIds as $id) {
                     $msgText = $newMap[$id]['message'];
+                    $targetUserIds = $newMap[$id]['target_users'] ?? [];
+
+                    if (empty($targetUserIds)) {
+                        $userIds = \App\Models\User::where('id', '!=', $admin->id)->pluck('id');
+                    } else {
+                        $userIds = \App\Models\User::whereIn('id', (array) $targetUserIds)->pluck('id');
+                    }
+
                     $messages = [];
                     $now = now();
                     foreach ($userIds as $userId) {
@@ -665,8 +678,54 @@ class SiteSettingsPage extends Page implements HasForms
                 if ($newMap[$id]['message'] !== $oldMap[$id]['message']) {
                     \App\Models\Message::where('announcement_id', $id)->update([
                         'body' => $newMap[$id]['message'],
-                        // We intentionally leave is_read as is, or we could mark as unread again. Let's keep it as is.
                     ]);
+                }
+
+                // Sync Target Users if changed
+                $oldTargets = $oldMap[$id]['target_users'] ?? [];
+                $newTargets = $newMap[$id]['target_users'] ?? [];
+                
+                // Sort to compare arrays safely
+                $oldTargetsSorted = (array) $oldTargets; sort($oldTargetsSorted);
+                $newTargetsSorted = (array) $newTargets; sort($newTargetsSorted);
+
+                if ($oldTargetsSorted !== $newTargetsSorted) {
+                    if (empty($newTargets)) {
+                        $desiredIds = \App\Models\User::where('id', '!=', $admin->id)->pluck('id')->toArray();
+                    } else {
+                        $desiredIds = \App\Models\User::whereIn('id', (array) $newTargets)->pluck('id')->toArray();
+                    }
+
+                    $existingIds = \App\Models\Message::where('announcement_id', $id)->pluck('receiver_id')->toArray();
+                    
+                    $toAdd = array_diff($desiredIds, $existingIds);
+                    $toRemove = array_diff($existingIds, $desiredIds);
+
+                    if (!empty($toRemove)) {
+                        \App\Models\Message::where('announcement_id', $id)->whereIn('receiver_id', $toRemove)->delete();
+                    }
+
+                    if (!empty($toAdd)) {
+                        $messages = [];
+                        $now = now();
+                        foreach ($toAdd as $userId) {
+                            $messages[] = [
+                                'sender_id' => $admin->id,
+                                'receiver_id' => $userId,
+                                'body' => $newMap[$id]['message'],
+                                'announcement_id' => $id,
+                                'is_read' => false,
+                                'is_deleted' => false,
+                                'deleted_by_sender' => false,
+                                'deleted_by_receiver' => false,
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ];
+                        }
+                        foreach (array_chunk($messages, 500) as $chunk) {
+                            \App\Models\Message::insert($chunk);
+                        }
+                    }
                 }
             }
         }

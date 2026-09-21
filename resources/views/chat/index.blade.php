@@ -3,20 +3,26 @@
 <head>
     <script>
         (function() {
-            var theme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-bs-theme', theme);
+            function applyTheme() {
+                var theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            }
+            applyTheme();
+            document.addEventListener('livewire:navigated', applyTheme);
         })();
     </script>
     <meta charset="utf-8">
     <x-site-favicon />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
     <title>Messages - Baddies Club</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     @livewireStyles
     <style>
         *, *::before, *::after { box-sizing:border-box; }
-        html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; overflow-x: hidden; }
+        html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; min-height:100vh; overflow-x: hidden; }
+        [data-bs-theme="dark"] body, .dark body { background: #0d0d0d; color: #fff; }
+        [data-bs-theme="light"] body, .light body { background: #f4f6f9; color: #111; }
         .nr-navbar { background:linear-gradient(160deg,#0d0d0d 0%,#1a0f00 50%,#0d0d0d 100%) !important; border-bottom:2px solid rgba(255,140,0,0.6); box-shadow:inset 0 -2px 30px rgba(255,140,0,0.06); padding-top:1.25rem !important; padding-bottom:1.25rem !important; }
         .nr-navbar .nav-link { font-weight:500; font-size:0.82rem; color:rgba(255,140,0,0.92) !important; text-decoration:none !important; display:inline-block !important; position:relative !important; padding-bottom:3px !important; box-shadow:none !important; transition:color 0.3s ease !important; }
         .nr-navbar .nav-link::after { content:"" !important; position:absolute !important; left:0 !important; bottom:0 !important; width:100% !important; height:1.5px !important; background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 50%,rgba(255,255,255,0) 100%) !important; border-radius:2px !important; transform:scaleX(0) !important; transform-origin:center !important; transition:transform 0.35s cubic-bezier(0.4,0,0.2,1) !important; }
@@ -27,11 +33,30 @@
         .chat-list, .chat-box { height: 100% !important; overflow-x: hidden; }
         
         @media (max-width: 767px) {
-            html, body { height: 100%; overflow: hidden; padding-top: 0 !important; margin: 0 !important; } /* Prevent body scrolling when full screen and remove navbar padding */
+            html, body {
+                height: 100dvh !important;
+                overflow: hidden !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
             .nr-topbar, .nr-navbar, x-footer, footer, .site-footer, .nr-footer { display: none !important; }
-            .container { padding: 0 !important; max-width: 100% !important; height: 100% !important; }
+            .container { padding: 0 !important; max-width: 100% !important; height: 100dvh !important; }
             .pb-5 { padding-bottom: 0 !important; }
-            .chat-container { margin: 0 !important; border-radius: 0 !important; border: none !important; height: 100% !important; width: 100vw !important; }
+            .chat-container {
+                margin: 0 !important;
+                border-radius: 0 !important;
+                border: none !important;
+                height: 100dvh !important;
+                width: 100vw !important;
+            }
+            /* The chat-box inner component fills the full container */
+            .chat-box {
+                height: 100dvh !important;
+                position: fixed !important;
+                top: 0 !important; left: 0 !important;
+                width: 100vw !important;
+                z-index: 9999 !important;
+            }
         }
     </style>
 </head>
@@ -80,6 +105,25 @@
         const t = document.getElementById('callsDisabledToast');
         if (t) t.remove();
       }, 6000);
+    }
+
+    // ── Mobile keyboard: keep chat-box pinned to the visible viewport ──
+    // This runs at page level so it's never wiped by Livewire re-renders.
+    if (window.innerWidth <= 767 && window.visualViewport) {
+      function syncChatToViewport() {
+        var chatBox = document.querySelector('.chat-box');
+        if (chatBox) {
+          chatBox.style.height = window.visualViewport.height + 'px';
+          chatBox.style.top    = window.visualViewport.offsetTop + 'px';
+        }
+      }
+      window.visualViewport.addEventListener('resize', syncChatToViewport);
+      window.visualViewport.addEventListener('scroll', syncChatToViewport);
+      // Also re-sync after every Livewire update in case DOM re-renders
+      document.addEventListener('livewire:update', function() {
+        requestAnimationFrame(syncChatToViewport);
+      });
+      syncChatToViewport();
     }
     </script>
 

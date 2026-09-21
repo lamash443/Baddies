@@ -1,4 +1,18 @@
-<div class="chat-list border-end border-secondary bg-dark position-relative" style="height: 75vh; overflow-y: auto;">
+<style>
+.chat-list {
+    --chat-list-text: #111111;
+    --chat-list-muted: rgba(0,0,0,0.6);
+    --chat-list-muted-light: rgba(0,0,0,0.4);
+    --chat-list-unread: #000000;
+}
+[data-bs-theme="dark"] .chat-list, .dark .chat-list {
+    --chat-list-text: rgba(255,255,255,0.85);
+    --chat-list-muted: rgba(255,255,255,0.4);
+    --chat-list-muted-light: rgba(255,255,255,0.3);
+    --chat-list-unread: #ffffff;
+}
+</style>
+<div class="chat-list border-end border-secondary position-relative" style="height: 75vh; overflow-y: auto;">
     <div x-data="{ 
         selectedChats: [],
         longPressTimer: null,
@@ -50,8 +64,8 @@
     {{-- Action Bar Overlay (Appears when chats are selected) --}}
     <div x-transition.opacity 
          :class="selectedChats.length > 0 ? 'd-flex' : 'd-none'"
-         class="position-absolute top-0 start-0 w-100 p-3 bg-dark align-items-center justify-content-between" 
-         style="display: none; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); height: 60px;">
+         class="position-absolute top-0 start-0 w-100 p-3 align-items-center justify-content-between" 
+         style="display: none; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); height: 60px; background: #0d0d0d;">
          
          <div class="d-flex align-items-center gap-3">
              <button @click="selectedChats = []" class="btn text-white p-0 d-flex align-items-center justify-content-center">
@@ -80,9 +94,9 @@
         <div class="d-flex align-items-center gap-2 flex-grow-1">
             <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
                 @if(!empty($siteSettings['logo']))
-                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:48px;width:auto;object-fit:contain;margin-left:0.2rem;">
+                    <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:48px;width:auto;object-fit:contain;margin-left:-0.5rem;">
                 @else
-                    <h4 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: 0.2rem;">Baddies Club</h4>
+                    <h4 class="mb-0 fw-bold" style="color: #ff8c00; letter-spacing: 0.5px; margin-left: -0.5rem;">Baddies Club</h4>
                 @endif
             </a>
             @php
@@ -119,7 +133,7 @@
             }
         @endphp
         @if($announcementActive && $latestAnnouncement)
-            <a href="{{ route('chat.show', 'announcement') }}" class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
+            <a href="{{ route('chat.show', 'announcement') }}" wire:navigate class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
                 <div class="d-flex align-items-start gap-3">
                     {{-- Avatar --}}
                     <div class="position-relative flex-shrink-0">
@@ -150,7 +164,7 @@
                                 <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
                             </span>
                         </div>
-                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5;" class="d-flex justify-content-between align-items-center">
+                        <div style="font-size: 0.85rem; color: var(--chat-list-text); line-height: 1.5;" class="d-flex justify-content-between align-items-center">
                             <div class="text-truncate" style="max-width: 80%;">
                                 {!! nl2br(e($latestAnnouncement->body)) !!}
                             </div>
@@ -176,7 +190,7 @@
                             <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
                             </div>
-                            <div class="fw-bold text-white" style="font-size: 0.9rem;">Archived</div>
+                            <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.9rem;">Archived</div>
                         </div>
                         <div class="text-muted fw-bold pe-2" style="font-size: 0.8rem;">
                             {{ count($archivedConversations) }}
@@ -192,7 +206,7 @@
                             <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                             </div>
-                            <div class="fw-bold text-white" style="font-size: 0.9rem;">Back to Active Chats</div>
+                            <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.9rem;">Back to Active Chats</div>
                         </div>
                     </div>
                 </div>
@@ -244,7 +258,7 @@
                  :class="{ 'bg-secondary bg-opacity-25': selectedChats.includes({{ $user->id }}) }"
                  style="background: {{ $isActive ? 'rgba(255,140,0,0.08)' : 'transparent' }}; border-left: 3px solid {{ $isActive ? '#ff8c00' : 'transparent' }}; transition: background 0.2s;">
                 
-                <a href="{{ route('chat.show', $user->id) }}" class="chat-row text-decoration-none d-block w-100" 
+                <a href="{{ route('chat.show', $user->id) }}" wire:navigate class="chat-row text-decoration-none d-block w-100" 
                    style="padding: 0.55rem 0.75rem; transition: all 0.2s ease; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;"
                    @contextmenu.prevent
                    @touchstart="startPress({{ $user->id }})"
@@ -282,19 +296,35 @@
                         <div class="flex-grow-1" style="min-width: 0;">
                             {{-- Top row: Name + Time --}}
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span style="font-size: 0.92rem; font-weight: 700; color: {{ $unread > 0 ? '#fff' : 'rgba(255,255,255,0.85)' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <span style="font-size: 0.92rem; font-weight: 700; color: {{ $unread > 0 ? 'var(--chat-list-unread)' : 'var(--chat-list-text)' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     {{ $user->name }}
                                 </span>
-                                <span style="font-size: 0.62rem; color: {{ $unread > 0 ? '#ff8c00' : 'rgba(255,255,255,0.3)' }}; white-space: nowrap; margin-left: 0.5rem; font-weight: 600;">
+                                <span style="font-size: 0.62rem; color: {{ $unread > 0 ? '#ff8c00' : 'var(--chat-list-muted-light)' }}; white-space: nowrap; margin-left: 0.5rem; font-weight: 600;">
                                     {{ $timeAgo }}
                                 </span>
                             </div>
 
                             {{-- Bottom row: Snippet + Status/Badge --}}
                             <div class="d-flex justify-content-between align-items-center">
-                                <span style="font-size: 0.78rem; color: {{ $unread > 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)' }}; font-weight: {{ $unread > 0 ? '600' : '400' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 0.5rem;">
+                                <span style="font-size: 0.78rem; color: {{ $unread > 0 ? 'var(--chat-list-text)' : 'var(--chat-list-muted)' }}; font-weight: {{ $unread > 0 ? '600' : '400' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 0.5rem;">
                                     @if($lastMsg && $lastMsg->sender_id === auth()->id())
-                                        <span style="color: rgba(255,255,255,0.3);">You: </span>
+                                        @if($lastMsg->is_read)
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 2px; margin-top: -2px;">
+                                              <polyline points="22 7 12 17 8 13"></polyline>
+                                              <polyline points="16 7 12 11"></polyline>
+                                              <polyline points="6 15 2 11"></polyline>
+                                            </svg>
+                                        @elseif($user->isOnline())
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50" style="margin-right: 2px; margin-top: -2px;">
+                                              <polyline points="22 7 12 17 8 13"></polyline>
+                                              <polyline points="16 7 12 11"></polyline>
+                                              <polyline points="6 15 2 11"></polyline>
+                                            </svg>
+                                        @else
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50" style="margin-right: 2px; margin-top: -2px;">
+                                              <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        @endif
                                     @endif
                                     {{ $snippet }}
                                 </span>

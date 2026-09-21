@@ -37,10 +37,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->flash('login_success', 'Welcome back, ' . $request->user()->name . '! You have successfully logged in.');
 
-        // Determine the intended destination — skip it if it points back to login
+        // Determine the intended destination — skip it if it points back to login or the landing page
         $intended = $request->session()->pull('url.intended');
         $loginUrl = route('login');
-        if ($intended && $intended !== $loginUrl && !str_contains($intended, '/login')) {
+        $homeUrl = url('/');
+        
+        if ($intended && $intended !== $loginUrl && rtrim($intended, '/') !== rtrim($homeUrl, '/') && !str_contains($intended, '/login')) {
             return redirect($intended);
         }
 

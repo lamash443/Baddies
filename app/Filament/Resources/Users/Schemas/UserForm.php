@@ -48,6 +48,10 @@ class UserForm
                         Toggle::make('calls_enabled')
                             ->label('Calls Enabled')
                             ->helperText('Allows users to call this profile.'),
+                        DateTimePicker::make('email_verified_at')
+                            ->label('Email Verified At')
+                            ->placeholder('Unverified')
+                            ->nullable(),
                         DateTimePicker::make('deletion_requested_at')
                             ->label('Deletion Requested At')
                             ->disabled()
