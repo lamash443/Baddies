@@ -54,11 +54,17 @@
     /* BUTTONS */
     .btn-orange {
       display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
-      background:orange; border:2px solid orange; color:#000;
-      padding:0.75rem 1.5rem; border-radius:8px; font-size:1rem; font-weight:700; font-family:"Outfit",sans-serif;
-      text-decoration:none; transition:all 0.3s ease; border: none;
+      background:#ff8c00; border:2px solid #ff8c00; color:#000;
+      padding:0.75rem 1.5rem; border-radius:0.75rem; font-size:1rem; font-weight:700; font-family:"Outfit",sans-serif;
+      text-decoration:none; transition:all 0.3s ease;
     }
-    .btn-orange:hover { background:#fff; color:orange; box-shadow:0 0 15px rgba(255,165,0,0.5); }
+    .btn-orange:hover {
+      background-color:#000000 !important;
+      border-color:#ff8c00 !important;
+      color:#ffffff !important;
+      box-shadow:0 4px 15px rgba(255,140,0,0.4) !important;
+      transform:translateY(-1px);
+    }
 
     /* LIGHT THEME */
     [data-bs-theme="light"] body { background:#f9f9f9; color:#111; }

@@ -13,12 +13,12 @@
   <meta name="description" content="Browse verified call boys in Kenya on Baddies Club. Find your perfect companion in Nairobi, Mombasa, Kisumu and more.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
-@php
+  <link rel="stylesheet" href="<?php echo e(asset('css/listing-card.css')); ?>">
+<?php
   $callBoysBg = !empty($siteSettings['call_boys_header_background']) 
     ? asset('storage/' . $siteSettings['call_boys_header_background']) 
     : asset('images/couples-header.jpg');
-@endphp
+?>
 <style>
     *, *::before, *::after { box-sizing:border-box; }
     html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
@@ -40,7 +40,7 @@
     .cb-breadcrumb .current { color:rgba(255,255,255,0.6); }
 
     /* PAGE HEADER */
-    .cb-page-header { position:relative; overflow:hidden; padding:4.5rem 0 3.5rem; background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,rgba(13,13,13,0.92) 100%), url('{{ $callBoysBg }}') center/cover no-repeat; border-bottom:1px solid rgba(255,140,0,0.25); margin-bottom:0; }
+    .cb-page-header { position:relative; overflow:hidden; padding:4.5rem 0 3.5rem; background:linear-gradient(180deg,rgba(0,0,0,0.72) 0%,rgba(13,13,13,0.92) 100%), url('<?php echo e($callBoysBg); ?>') center/cover no-repeat; border-bottom:1px solid rgba(255,140,0,0.25); margin-bottom:0; }
     .cb-page-header::before { content:""; position:absolute; top:-80px; right:-80px; width:400px; height:400px; background:radial-gradient(circle,rgba(255,140,0,0.07) 0%,transparent 65%); pointer-events:none; }
     .cb-header-label { font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,140,0,0.75); font-weight:600; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem; }
     .cb-header-label::before { content:""; display:block; width:28px; height:1.5px; background:rgba(255,140,0,0.5); border-radius:2px; }
@@ -254,7 +254,7 @@
     .nr-listing-card__ribbon { background: #ff8c00 !important; color: #000 !important; }
     /* LIGHT THEME OVERRIDES */
     [data-bs-theme="light"] body { background:#fdfdfd; color:#111; }
-    [data-bs-theme="light"] .cb-page-header { background:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(244,246,249,0.95) 100%), url('{{ $callBoysBg }}') center/cover no-repeat !important; border-bottom-color:rgba(0,0,0,0.1) !important; }
+    [data-bs-theme="light"] .cb-page-header { background:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(244,246,249,0.95) 100%), url('<?php echo e($callBoysBg); ?>') center/cover no-repeat !important; border-bottom-color:rgba(0,0,0,0.1) !important; }
     [data-bs-theme="light"] .cb-page-desc { color:rgba(0,0,0,0.65); }
     [data-bs-theme="light"] .cb-filter-bar { background:rgba(0,0,0,0.02); border-bottom-color:rgba(0,0,0,0.05); }
     [data-bs-theme="light"] .cb-filter-select { background:#fff; color:#000; border-color:rgba(255,140,0,0.5); }
@@ -322,9 +322,51 @@
   </style>
 </head>
 <body>
-<x-site-preloader />
+<?php if (isset($component)) { $__componentOriginalfc3c7128ad5039337c318ebdcd975711 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc3c7128ad5039337c318ebdcd975711 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.site-preloader','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('site-preloader'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
 
-<x-navbar :hideSearch="true" />
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $attributes = $__attributesOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $component = $__componentOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__componentOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
+
+<?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
 
 
 
@@ -347,7 +389,7 @@
       </h2>
       <div id="locCollapse" class="accordion-collapse collapse" aria-labelledby="locHeading">
         <div class="accordion-body">
-          @php
+          <?php
             $predefinedRoads = ['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road'];
             $predefinedAreas = ['Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'];
             $predefinedCounties = ['Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua','Murang\'a','Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'];
@@ -373,35 +415,35 @@
                 }
                 if (!$exists) $mergedAreas[] = $dbLocation;
             }
-          @endphp
+          ?>
 
-          {{-- Nairobi Major Roads --}}
+          
           <div class="loc-section-card">
             <div class="loc-section-title">Major Roads in Nairobi</div>
             <div class="loc-tags-wrap">
-              @foreach($mergedRoads as $road)
-                <a href="{{ route('location.show', ['name' => $road]) }}" class="loc-tag">{{ $road }}</a>
-              @endforeach
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $mergedRoads; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $road): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <a href="<?php echo e(route('location.show', ['name' => $road])); ?>" class="loc-tag"><?php echo e($road); ?></a>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             </div>
           </div>
 
-          {{-- Nairobi County Areas --}}
+          
           <div class="loc-section-card">
             <div class="loc-section-title">Nairobi County Areas</div>
             <div class="loc-tags-wrap">
-              @foreach($mergedAreas as $area)
-                <a href="{{ route('location.show', ['name' => $area]) }}" class="loc-tag">{{ $area }}</a>
-              @endforeach
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $mergedAreas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $area): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <a href="<?php echo e(route('location.show', ['name' => $area])); ?>" class="loc-tag"><?php echo e($area); ?></a>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             </div>
           </div>
 
-          {{-- Other Counties --}}
+          
           <div class="loc-section-card mb-0">
             <div class="loc-section-title">Other Counties</div>
             <div class="loc-tags-wrap">
-              @foreach($mergedCounties as $county)
-                <a href="{{ route('location.show', ['name' => $county]) }}" class="loc-tag">{{ $county }}</a>
-              @endforeach
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $mergedCounties; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $county): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <a href="<?php echo e(route('location.show', ['name' => $county])); ?>" class="loc-tag"><?php echo e($county); ?></a>
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             </div>
           </div>
 
@@ -423,13 +465,13 @@
       </div>
     </div>
     <div class="home-listing-grid">
-      @forelse($vipUsers as $user)
-        @include('partials.user-card', ['user' => $user])
-      @empty
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $vipUsers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+        <?php echo $__env->make('partials.user-card', ['user' => $user], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
           No VIP members listed yet. <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register" style="color:#ff8c00;">Subscribe to VIP</a> to appear here.
         </div>
-      @endforelse
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
   </div>
 </section>
@@ -444,13 +486,13 @@
       </div>
     </div>
     <div class="home-listing-grid">
-      @forelse($regularUsers as $user)
-        @include('partials.user-card', ['user' => $user])
-      @empty
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $regularUsers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+        <?php echo $__env->make('partials.user-card', ['user' => $user], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         <div class="col-12 text-center py-4" style="color:rgba(255,255,255,0.35); font-size:.9rem;">
           No verified call boys available at the moment.
         </div>
-      @endforelse
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
   </div>
 </section>
@@ -459,7 +501,28 @@
 
 
 
-<x-footer />
+<?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -472,7 +535,29 @@ function setFilter(el) { document.querySelectorAll('.cb-filter-btn').forEach(fun
 </script>
 
 <!-- -- AUTH MODAL -- -->
-<x-auth-modal />
+<?php if (isset($component)) { $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auth-modal','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('auth-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $attributes = $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $component = $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
 </body>
 </html>
 
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/call-boys.blade.php ENDPATH**/ ?>

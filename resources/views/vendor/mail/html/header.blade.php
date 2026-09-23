@@ -1,9 +1,8 @@
 @props(['url'])
 @php
   $appName    = config('app.name', 'Kenyan Baddies Club');
-  $setting    = \App\Models\Setting::getSettings();
-  $logoPath   = $setting->logo ?? null;
-  $logoUrl    = $logoPath ? url('storage/' . $logoPath) : null;
+  $logoPath   = \App\Models\SiteSetting::get('logo');
+  $logoUrl    = $logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath) ? url('storage/' . $logoPath) : null;
 @endphp
 <tr>
 <td class="header" style="padding: 0;">

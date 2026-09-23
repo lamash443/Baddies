@@ -9,11 +9,11 @@
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Escorts and Call Girls in {{ ucwords($searchLocation) }} - Baddies Club</title>
-  <meta name="description" content="Browse verified escorts, call girls, and companions in {{ ucwords($searchLocation) }} on Baddies Club. Find your perfect companion near you.">
+  <title>Escorts and Call Girls in <?php echo e(ucwords($searchLocation)); ?> - Baddies Club</title>
+  <meta name="description" content="Browse verified escorts, call girls, and companions in <?php echo e(ucwords($searchLocation)); ?> on Baddies Club. Find your perfect companion near you.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
+  <link rel="stylesheet" href="<?php echo e(asset('css/listing-card.css')); ?>">
   <style>
     *, *::before, *::after { box-sizing:border-box; }
     html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
@@ -260,55 +260,76 @@
 </head>
 <body>
 
-<x-navbar :hideSearch="true" />
+<?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
 
 
 
 <!-- BREADCRUMB -->
 <div class="container mt-4 mb-2">
   <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 500;">
-    <a href="/" style="color: #ff8c00; text-decoration: none;">Home</a> &raquo; Nairobi &raquo; <span style="color: #fff;">{{ ucwords($searchLocation) }} Escorts</span>
+    <a href="/" style="color: #ff8c00; text-decoration: none;">Home</a> &raquo; Nairobi &raquo; <span style="color: #fff;"><?php echo e(ucwords($searchLocation)); ?> Escorts</span>
   </div>
 </div>
 
 <!-- PAGE HEADER -->
 <div class="cb-page-header" style="padding-top: 2rem;">
   <div class="container">
-    <h1 class="cb-page-title" style="font-size: clamp(1.8rem,3vw,2.5rem);">Hook up with <span>{{ ucwords($searchLocation) }} Escorts</span></h1>
-    <p class="cb-page-desc mb-2">Welcome to {{ ucwords($searchLocation) }} in Nairobi, Kenya escorts and call girls page.</p>
-    <p class="cb-page-desc mb-2">Are you an escort in {{ ucwords($searchLocation) }} in Nairobi, Kenya? Create your escort profile today and get listed.</p>
-    <p class="cb-page-desc" style="color: rgba(255,140,0,0.8); font-weight: 500;">VIP Listing Guarantees you a spot in {{ ucwords($searchLocation) }} in Nairobi, Kenya listing page and A VIP Tag on your profile for Best Visibility MAXIMUM EXPOSURE as an escort in {{ ucwords($searchLocation) }} in Nairobi, Kenya.</p>
+    <h1 class="cb-page-title" style="font-size: clamp(1.8rem,3vw,2.5rem);">Hook up with <span><?php echo e(ucwords($searchLocation)); ?> Escorts</span></h1>
+    <p class="cb-page-desc mb-2">Welcome to <?php echo e(ucwords($searchLocation)); ?> in Nairobi, Kenya escorts and call girls page.</p>
+    <p class="cb-page-desc mb-2">Are you an escort in <?php echo e(ucwords($searchLocation)); ?> in Nairobi, Kenya? Create your escort profile today and get listed.</p>
+    <p class="cb-page-desc" style="color: rgba(255,140,0,0.8); font-weight: 500;">VIP Listing Guarantees you a spot in <?php echo e(ucwords($searchLocation)); ?> in Nairobi, Kenya listing page and A VIP Tag on your profile for Best Visibility MAXIMUM EXPOSURE as an escort in <?php echo e(ucwords($searchLocation)); ?> in Nairobi, Kenya.</p>
   </div>
 </div>
 
 <!-- FILTER BAR -->
 <div class="cb-filter-bar">
   <div class="container">
-    <form method="GET" action="{{ route('location.show', $searchLocation) }}" id="locationFilterForm">
+    <form method="GET" action="<?php echo e(route('location.show', $searchLocation)); ?>" id="locationFilterForm">
       <div class="cb-filters">
         <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; flex-shrink:0;">Filter By</span>
 
         <select name="gender" class="cb-filter-select" aria-label="Select Gender" onchange="document.getElementById('locationFilterForm').submit()">
           <option value="">Select Gender</option>
-          <option value="Female" {{ ($gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
-          <option value="Male"   {{ ($gender ?? '') === 'Male'   ? 'selected' : '' }}>Male</option>
-          <option value="Other"  {{ ($gender ?? '') === 'Other'  ? 'selected' : '' }}>Other</option>
+          <option value="Female" <?php echo e(($gender ?? '') === 'Female' ? 'selected' : ''); ?>>Female</option>
+          <option value="Male"   <?php echo e(($gender ?? '') === 'Male'   ? 'selected' : ''); ?>>Male</option>
+          <option value="Other"  <?php echo e(($gender ?? '') === 'Other'  ? 'selected' : ''); ?>>Other</option>
         </select>
 
         <select name="orientation" class="cb-filter-select" aria-label="Select Sexual Orientation" onchange="document.getElementById('locationFilterForm').submit()">
           <option value="">Select Sexual Orientation</option>
-          <option value="Straight"  {{ ($orientation ?? '') === 'Straight'  ? 'selected' : '' }}>Straight</option>
-          <option value="Bisexual"  {{ ($orientation ?? '') === 'Bisexual'  ? 'selected' : '' }}>Bisexual</option>
-          <option value="Gay"       {{ ($orientation ?? '') === 'Gay'       ? 'selected' : '' }}>Gay</option>
-          <option value="Lesbian"   {{ ($orientation ?? '') === 'Lesbian'   ? 'selected' : '' }}>Lesbian</option>
+          <option value="Straight"  <?php echo e(($orientation ?? '') === 'Straight'  ? 'selected' : ''); ?>>Straight</option>
+          <option value="Bisexual"  <?php echo e(($orientation ?? '') === 'Bisexual'  ? 'selected' : ''); ?>>Bisexual</option>
+          <option value="Gay"       <?php echo e(($orientation ?? '') === 'Gay'       ? 'selected' : ''); ?>>Gay</option>
+          <option value="Lesbian"   <?php echo e(($orientation ?? '') === 'Lesbian'   ? 'selected' : ''); ?>>Lesbian</option>
         </select>
 
         <div class="ms-auto">
           <select name="sort" class="cb-filter-select" aria-label="Sort by" onchange="document.getElementById('locationFilterForm').submit()">
-            <option value="featured" {{ ($sort ?? 'featured') === 'featured' ? 'selected' : '' }}>Sort: Featured</option>
-            <option value="newest"   {{ ($sort ?? '') === 'newest'   ? 'selected' : '' }}>Sort: Newest</option>
-            <option value="oldest"   {{ ($sort ?? '') === 'oldest'   ? 'selected' : '' }}>Sort: Oldest</option>
-            <option value="name_asc" {{ ($sort ?? '') === 'name_asc' ? 'selected' : '' }}>Sort: Name A–Z</option>
+            <option value="featured" <?php echo e(($sort ?? 'featured') === 'featured' ? 'selected' : ''); ?>>Sort: Featured</option>
+            <option value="newest"   <?php echo e(($sort ?? '') === 'newest'   ? 'selected' : ''); ?>>Sort: Newest</option>
+            <option value="oldest"   <?php echo e(($sort ?? '') === 'oldest'   ? 'selected' : ''); ?>>Sort: Oldest</option>
+            <option value="name_asc" <?php echo e(($sort ?? '') === 'name_asc' ? 'selected' : ''); ?>>Sort: Name A–Z</option>
           </select>
         </div>
       </div>
@@ -319,15 +340,15 @@
 <!-- GRID -->
 <main class="container">
 
-  @if($users->isNotEmpty())
+  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($users->isNotEmpty()): ?>
   <div class="mb-5">
     <div class="nr-card-grid">
-      @foreach($users as $user)
-        @include('partials.user-card', ['user' => $user])
-      @endforeach
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+        <?php echo $__env->make('partials.user-card', ['user' => $user], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </div>
   </div>
-  @else
+  <?php else: ?>
     <div class="text-center py-5">
       <div style="max-width: 540px; margin: 0 auto; background: linear-gradient(145deg, rgba(26,15,0,0.8), rgba(13,13,13,0.9)); border: 1px solid rgba(255, 140, 0, 0.25); border-radius: 20px; padding: 3.5rem 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);">
         <div style="width: 72px; height: 72px; background: rgba(255, 140, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; border: 1px solid rgba(255, 140, 0, 0.2);">
@@ -338,7 +359,7 @@
             <line x1="23" y1="11" x2="17" y2="11"></line>
           </svg>
         </div>
-        <h3 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.75rem;">Be the first in {{ ucwords($searchLocation) }}!</h3>
+        <h3 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.75rem;">Be the first in <?php echo e(ucwords($searchLocation)); ?>!</h3>
         <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6;">
           There are currently no verified profiles in this location. Create your escort profile today and instantly claim exclusive visibility.
         </p>
@@ -348,45 +369,66 @@
         </a>
       </div>
     </div>
-  @endif
+  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
   <!-- PAGINATION -->
-  @if($users->hasPages())
+  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($users->hasPages()): ?>
   <div class="cb-pagination">
 
-    {{-- Previous --}}
-    @if($users->onFirstPage())
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($users->onFirstPage()): ?>
       <span class="cb-page-btn" style="opacity:0.3; cursor:default;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </span>
-    @else
-      <a class="cb-page-btn" href="{{ $users->previousPageUrl() }}">
+    <?php else: ?>
+      <a class="cb-page-btn" href="<?php echo e($users->previousPageUrl()); ?>">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </a>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-    {{-- Page numbers --}}
-    @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-      <a class="cb-page-btn {{ $page === $users->currentPage() ? 'active' : '' }}"
-         href="{{ $url }}">{{ $page }}</a>
-    @endforeach
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $users->getUrlRange(1, $users->lastPage()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page => $url): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+      <a class="cb-page-btn <?php echo e($page === $users->currentPage() ? 'active' : ''); ?>"
+         href="<?php echo e($url); ?>"><?php echo e($page); ?></a>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
 
-    {{-- Next --}}
-    @if($users->hasMorePages())
-      <a class="cb-page-btn" href="{{ $users->nextPageUrl() }}">
+    
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($users->hasMorePages()): ?>
+      <a class="cb-page-btn" href="<?php echo e($users->nextPageUrl()); ?>">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </a>
-    @else
+    <?php else: ?>
       <span class="cb-page-btn" style="opacity:0.3; cursor:default;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </span>
-    @endif
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
   </div>
-  @endif
+  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </main>
 
-<x-footer />
+<?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -399,7 +441,29 @@ function setFilter(el) { document.querySelectorAll('.cb-filter-btn').forEach(fun
 </script>
 
 <!-- -- AUTH MODAL -- -->
-<x-auth-modal />
+<?php if (isset($component)) { $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auth-modal','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('auth-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $attributes = $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $component = $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
 </body>
 </html>
 
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/location.blade.php ENDPATH**/ ?>

@@ -284,14 +284,7 @@
     @keyframes fadeInUp   { from{opacity:0;transform:translateY(30px);}  to{opacity:1;transform:translateY(0);} }
     @keyframes fadeIn     { from{opacity:0;} to{opacity:1;} }
 
-    /* AUTH MODAL */
-    .auth-input { background-color:#1a1a1a; border:1px solid #444; color:white; padding:12px; border-radius:8px; width:100%; }
-    .auth-input:focus { background-color:#1a1a1a; border-color:orange; color:white; box-shadow:0 0 0 0.25rem rgba(255,165,0,0.25); outline:none; }
-    .auth-btn { background-color:orange; color:black; font-weight:bold; padding:12px; border-radius:8px; border:1px solid orange; transition:0.3s; text-transform:uppercase; letter-spacing:1px; width:100%; }
-    .auth-btn:hover { background-color:#e69500; color:black; box-shadow:0 4px 15px rgba(255,165,0,0.4); }
-    #authTabs .nav-link.active { background-color:orange !important; color:black !important; }
-    #authTabs .nav-link:hover:not(.active) { background-color:rgba(255,165,0,0.2); }
-    .form-label { margin-bottom:0.3rem; }
+
 
 
     /* LIGHT THEME OVERRIDES */
@@ -435,229 +428,10 @@
   </div>
 </section>
 
-<!-- AUTH MODAL -->
-<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true" style="backdrop-filter:blur(5px);">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="background-color:#000;border:1px solid #333;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-      <div class="modal-header border-bottom-0 pb-0 mt-2 mx-2">
-        <div class="w-100 d-flex justify-content-between align-items-center">
-          <h5 class="modal-title fw-bold fs-3" id="authModalLabel" style="color:orange;text-transform:uppercase;letter-spacing:1px;">Kenyan Baddies Club</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body pt-0 px-4 pb-4">
-        <ul class="nav nav-pills nav-justified mb-4 mt-4" id="authTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active rounded-pill fw-bold" id="tab-login"
-              data-bs-toggle="pill" data-bs-target="#content-login"
-              type="button" role="tab" style="color:white;border:1px solid orange;">Login</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link rounded-pill fw-bold ms-2" id="tab-register"
-              data-bs-toggle="pill" data-bs-target="#content-register"
-              type="button" role="tab" style="color:white;border:1px solid orange;">Sign Up</button>
-          </li>
-        </ul>
-
-        <div class="tab-content" id="authTabsContent">
-
-          <!-- LOGIN TAB -->
-          <div class="tab-pane fade show active" id="content-login" role="tabpanel">
-            <div class="text-center mb-4">
-              <h4 class="text-light fw-bold">Member Log In</h4>
-              <p class="text-secondary small fw-bold">Access your Baddies Club account</p>
-            </div>
-            <!-- Step 1 -->
-            <div id="login-step-1">
-              <a href="#" class="btn btn-outline-light w-100 mb-3 d-flex align-items-center justify-content-center" style="border-radius:8px;border-color:orange;">
-                <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
-                </svg>
-                Log in with Google SSO
-              </a>
-              <div class="d-flex align-items-center mb-3">
-                <hr class="flex-grow-1" style="border-color:#444;">
-                <span class="mx-3 text-secondary small">Or</span>
-                <hr class="flex-grow-1" style="border-color:#444;">
-              </div>
-              <button type="button" class="btn btn-outline-light w-100 mb-4 fw-bold" style="border-radius:8px;border-color:orange;"
-                onclick="document.getElementById('login-step-1').classList.add('d-none');document.getElementById('login-step-2').classList.remove('d-none');">
-                Log in with email and password
-              </button>
-              <div class="text-center mb-3">
-                <a href="#" class="text-decoration-none small fw-bold" style="color:orange;"
-                  onclick="document.getElementById('tab-register').click();return false;">
-                  Don&rsquo;t have an account yet? Sign Up here
-                </a>
-              </div>
-            </div>
-            <!-- Step 2 -->
-            <div id="login-step-2" class="d-none">
-              <button type="button" class="btn btn-link text-secondary p-0 mb-3 text-decoration-none d-flex align-items-center"
-                onclick="document.getElementById('login-step-2').classList.add('d-none');document.getElementById('login-step-1').classList.remove('d-none');">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                </svg>
-                Back
-              </button>
-              <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="mb-3">
-                  <label for="login-email" class="form-label text-light small fw-bold">Email Address</label>
-                  <input type="email" class="form-control auth-input" id="login-email" name="email" value="{{ old('email') }}" required>
-                </div>
-                <div class="mb-3">
-                  <label for="login-password" class="form-label text-light small fw-bold">Password</label>
-                  <input type="password" class="form-control auth-input" id="login-password" name="password" required>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="remember" id="hh-remember-me" style="border-color:orange;accent-color:orange;cursor:pointer;">
-                    <label class="form-check-label text-light small user-select-none" for="hh-remember-me" style="cursor:pointer;">Remember me</label>
-                  </div>
-                  @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-decoration-none small" style="color:orange;">Forgot Password?</a>
-                  @endif
-                </div>
-                <button type="submit" class="auth-btn">Login</button>
-              </form>
-            </div>
-          </div>
-
-          <!-- REGISTER TAB -->
-          <div class="tab-pane fade" id="content-register" role="tabpanel">
-            <div class="text-center mb-4">
-              <h4 class="text-light fw-bold">Sign Up for Free</h4>
-            </div>
-            <!-- Step 1 -->
-            <div id="register-step-1">
-              <a href="#" class="btn btn-outline-light w-100 mb-3 d-flex align-items-center justify-content-center" style="border-radius:8px;border-color:orange;">
-                <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
-                </svg>
-                Sign up with Google SSO
-              </a>
-              <div class="d-flex align-items-center mb-3">
-                <hr class="flex-grow-1" style="border-color:#444;">
-                <span class="mx-3 text-secondary small">or</span>
-                <hr class="flex-grow-1" style="border-color:#444;">
-              </div>
-              <button type="button" class="btn btn-outline-light w-100 mb-4 fw-bold" style="border-radius:8px;border-color:orange;"
-                onclick="document.getElementById('register-step-1').classList.add('d-none');document.getElementById('register-step-2').classList.remove('d-none');">
-                Sign up with email and password
-              </button>
-              <div class="text-center mb-3">
-                <a href="#" class="text-decoration-none small fw-bold" style="color:orange;"
-                  onclick="document.getElementById('tab-login').click();return false;">
-                  Already have an account? Login here
-                </a>
-              </div>
-              <div class="text-center mt-4">
-                <p class="text-secondary mb-0" style="font-size:0.70rem;line-height:1.4;">
-                  By signing up, you agree to the Terms and Conditions and Privacy Notice, including Cookie Use.
-                </p>
-              </div>
-            </div>
-            <!-- Step 2 -->
-            <div id="register-step-2" class="d-none">
-              <button type="button" class="btn btn-link text-secondary p-0 mb-3 text-decoration-none d-flex align-items-center"
-                onclick="document.getElementById('register-step-2').classList.add('d-none');document.getElementById('register-step-1').classList.remove('d-none');">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                </svg>
-                Back
-              </button>
-              <form method="POST" action="{{ route('register') }}">
-                @csrf
-                <div class="mb-3">
-                  <label for="reg-name" class="form-label text-light small fw-bold">Full Name</label>
-                  <input type="text" class="form-control auth-input" id="reg-name" name="name" value="{{ old('name') }}" required>
-                </div>
-                <div class="mb-3">
-                  <label for="reg-email" class="form-label text-light small fw-bold">Email Address</label>
-                  <input type="email" class="form-control auth-input" id="reg-email" name="email" value="{{ old('email') }}" required>
-                </div>
-                <div class="mb-3">
-                  <label for="reg-password" class="form-label text-light small fw-bold">Password</label>
-                  <input type="password" class="form-control auth-input" id="reg-password" name="password" required>
-                </div>
-                <div class="mb-4">
-                  <label for="reg-password-confirm" class="form-label text-light small fw-bold">Confirm Password</label>
-                  <input type="password" class="form-control auth-input" id="reg-password-confirm" name="password_confirmation" required>
-                </div>
-                @if($errors->any() && old('name'))
-                  <div class="alert alert-danger p-2 mb-3" style="background-color:rgba(220,53,69,0.1);border-left:4px solid #dc3545;color:#ff8a93;border-radius:4px;">
-                    <ul class="mb-0 ps-3">
-                      @foreach($errors->all() as $error)
-                        <li><small>{{ $error }}</small></li>
-                      @endforeach
-                    </ul>
-                  </div>
-                @endif
-                <button type="submit" class="auth-btn mb-3">Create Account</button>
-              </form>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <x-footer />
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Open correct tab based on data-auth-tab attribute
-  document.addEventListener('DOMContentLoaded', function () {
-    var authModalEl = document.getElementById('authModal');
-    if (!authModalEl) return;
-
-    authModalEl.addEventListener('show.bs.modal', function (event) {
-      var btn = event.relatedTarget;
-      var tab = btn ? btn.getAttribute('data-auth-tab') : null;
-
-      if (tab === 'register') {
-        var el = document.getElementById('tab-register');
-        if (el) new bootstrap.Tab(el).show();
-      } else {
-        var el = document.getElementById('tab-login');
-        if (el) new bootstrap.Tab(el).show();
-      }
-
-      // Reset step views on open
-      ['login-step-1','login-step-2','register-step-1','register-step-2'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (!el) return;
-        if (id === 'login-step-1' || id === 'register-step-1') {
-          el.classList.remove('d-none');
-        } else {
-          el.classList.add('d-none');
-        }
-      });
-    });
-
-    // Show errors: re-open on validation failure
-    @if($errors->any())
-      var modal = new bootstrap.Modal(authModalEl);
-      modal.show();
-      @if(old('name') || $errors->has('name'))
-        var regTab = document.getElementById('tab-register');
-        if (regTab) new bootstrap.Tab(regTab).show();
-        var s1 = document.getElementById('register-step-1');
-        var s2 = document.getElementById('register-step-2');
-        if (s1) s1.classList.add('d-none');
-        if (s2) s2.classList.remove('d-none');
-      @else
-        var s1 = document.getElementById('login-step-1');
-        var s2 = document.getElementById('login-step-2');
-        if (s1) s1.classList.add('d-none');
-        if (s2) s2.classList.remove('d-none');
-      @endif
-    @endif
-  });
-
   // Finder form: age validation + open register modal
   function hhFinderSearch(e) {
     e.preventDefault();
@@ -671,10 +445,11 @@
     // Prompt user to register/login then search
     var modalEl = document.getElementById('authModal');
     if (modalEl) {
-      var regTab = document.getElementById('tab-register');
-      var modal  = new bootstrap.Modal(modalEl);
+      var modal  = bootstrap.Modal.getOrCreateInstance(modalEl);
       modal.show();
-      if (regTab) setTimeout(function(){ new bootstrap.Tab(regTab).show(); }, 150);
+      if (typeof switchAuthTab === 'function') {
+        switchAuthTab('register');
+      }
     }
   }
 </script>

@@ -9,8 +9,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class WelcomeEmail extends Mailable
+class WelcomeEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -31,7 +32,7 @@ class WelcomeEmail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'emails.welcome');
+        return new Content(markdown: 'emails.welcome');
     }
 
     public function attachments(): array

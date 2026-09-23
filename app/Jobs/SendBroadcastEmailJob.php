@@ -49,6 +49,9 @@ class SendBroadcastEmailJob implements ShouldQueue
             'mail.from.name'                  => $fromName,
         ]);
 
+        // Purge cached mailer so the new SMTP config is picked up
+        app('mail.manager')->purge('smtp');
+
         try {
             Mail::to($this->user->email, $this->user->name)
                 ->send(new AdminBroadcastMail(

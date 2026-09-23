@@ -186,10 +186,52 @@
   </style>
 </head>
 <body>
-<x-site-preloader />
+<?php if (isset($component)) { $__componentOriginalfc3c7128ad5039337c318ebdcd975711 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc3c7128ad5039337c318ebdcd975711 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.site-preloader','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('site-preloader'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $attributes = $__attributesOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__attributesOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc3c7128ad5039337c318ebdcd975711)): ?>
+<?php $component = $__componentOriginalfc3c7128ad5039337c318ebdcd975711; ?>
+<?php unset($__componentOriginalfc3c7128ad5039337c318ebdcd975711); ?>
+<?php endif; ?>
 
 <!-- NAVBAR -->
-<x-navbar :hideSearch="true" />
+<?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
 
 
 
@@ -207,14 +249,14 @@
 <main class="container pb-5">
   <div class="vd-grid" id="vd-grid">
 
-    @foreach($videos as $index => $video)
-    <div class="vd-card fade-in" style="animation-delay:{{ min($index * 0.09, 1) }}s;"
-      onclick="openLightbox('{{ $video->id }}','{{ asset('storage/' . $video->path) }}','{{ addslashes($video->user->name) }}','{{ $video->views }} views','{{ $video->created_at->diffForHumans() }}', this)"
-      role="button" tabindex="0" aria-label="Play {{ $video->user->name }} video"
-      onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox('{{ $video->id }}','{{ asset('storage/' . $video->path) }}','{{ addslashes($video->user->name) }}','{{ $video->views }} views','{{ $video->created_at->diffForHumans() }}', this)">
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $videos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $video): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+    <div class="vd-card fade-in" style="animation-delay:<?php echo e(min($index * 0.09, 1)); ?>s;"
+      onclick="openLightbox('<?php echo e($video->id); ?>','<?php echo e(asset('storage/' . $video->path)); ?>','<?php echo e(addslashes($video->user->name)); ?>','<?php echo e($video->views); ?> views','<?php echo e($video->created_at->diffForHumans()); ?>', this)"
+      role="button" tabindex="0" aria-label="Play <?php echo e($video->user->name); ?> video"
+      onkeydown="if(event.key==='Enter'||event.key===' ')openLightbox('<?php echo e($video->id); ?>','<?php echo e(asset('storage/' . $video->path)); ?>','<?php echo e(addslashes($video->user->name)); ?>','<?php echo e($video->views); ?> views','<?php echo e($video->created_at->diffForHumans()); ?>', this)">
       <div class="vd-card__thumb">
         <div class="vd-card__thumb-inner" style="background:#0d0d0d;">
-          <video src="{{ asset('storage/' . $video->path) }}#t=0.1" preload="metadata" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+          <video src="<?php echo e(asset('storage/' . $video->path)); ?>#t=0.1" preload="metadata" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
         </div>
         <div class="vd-card__play">
           <div class="vd-card__play-icon">
@@ -224,25 +266,26 @@
         <span class="vd-card__duration">Video</span>
       </div>
       <div class="vd-card__info">
-        <div class="vd-card__name">{{ $video->user->name }}</div>
+        <div class="vd-card__name"><?php echo e($video->user->name); ?></div>
         <div class="vd-card__meta">
           <span class="vd-views-count">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{{ number_format($video->views) }} views
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><?php echo e(number_format($video->views)); ?> views
           </span>
           <span>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            {{ $video->created_at->diffForHumans() }}
+            <?php echo e($video->created_at->diffForHumans()); ?>
+
           </span>
         </div>
         <div class="mt-2 mb-1">
-          <span class="vd-card__tag mt-0">{{ $video->user->county ?? 'Kenya' }}</span>
+          <span class="vd-card__tag mt-0"><?php echo e($video->user->county ?? 'Kenya'); ?></span>
         </div>
         <div class="mt-auto pt-3">
-          <a href="{{ route('profile.view', $video->user->id) }}" class="btn vd-btn-primary w-100" style="font-size:0.9rem;" onclick="event.stopPropagation()">View Profile</a>
+          <a href="<?php echo e(route('profile.view', $video->user->id)); ?>" class="btn vd-btn-primary w-100" style="font-size:0.9rem;" onclick="event.stopPropagation()">View Profile</a>
         </div>
       </div>
     </div>
-    @endforeach
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
 
   </div>
 </main>
@@ -272,7 +315,28 @@
 
 
 
-<x-footer />
+<?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -291,7 +355,7 @@
     fetch('/videos/' + id + '/view', {
       method: 'POST',
       headers: {
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
         'Accept': 'application/json'
       }
     })
@@ -321,7 +385,29 @@
 </script>
 
 <!-- -- AUTH MODAL -- -->
-<x-auth-modal />
+<?php if (isset($component)) { $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.auth-modal','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('auth-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $attributes = $__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__attributesOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b)): ?>
+<?php $component = $__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b; ?>
+<?php unset($__componentOriginale8a80adaa2cc6b8e6cd2379cf6b5d64b); ?>
+<?php endif; ?>
 </body>
 </html>
 
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/videos.blade.php ENDPATH**/ ?>

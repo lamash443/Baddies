@@ -26,7 +26,7 @@ class AdminBroadcastMail extends Mailable
 
     public function content(): Content
     {
-        return new Content(view: 'emails.admin-broadcast');
+        return new Content(markdown: 'emails.admin-broadcast');
     }
 
     public function attachments(): array
