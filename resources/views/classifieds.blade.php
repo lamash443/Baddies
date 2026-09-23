@@ -184,9 +184,20 @@
   </section>
 
   <div class="container">
+    @php $reqCat = request('category'); @endphp
+    
+    @if($reqCat)
+      <div class="mb-3 d-lg-none">
+        <a href="{{ route('classifieds') }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-2" style="border-radius: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Categories
+        </a>
+      </div>
+    @endif
+
     <div class="class-grid">
       <!-- Personals -->
-      <a href="{{ route('classifieds', ['category' => 'personals']) }}" class="class-card">
+      <a href="{{ route('classifieds', ['category' => 'personals']) }}" class="class-card {{ $reqCat && $reqCat !== 'personals' ? 'd-none d-lg-flex' : '' }}">
         <div class="class-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>
         </div>
@@ -195,7 +206,7 @@
       </a>
 
       <!-- Massage -->
-      <a href="{{ route('classifieds', ['category' => 'massage']) }}" class="class-card">
+      <a href="{{ route('classifieds', ['category' => 'massage']) }}" class="class-card {{ $reqCat && $reqCat !== 'massage' ? 'd-none d-lg-flex' : '' }}">
         <div class="class-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
@@ -204,7 +215,7 @@
       </a>
 
       <!-- Jobs -->
-      <a href="{{ route('classifieds', ['category' => 'jobs']) }}" class="class-card">
+      <a href="{{ route('classifieds', ['category' => 'jobs']) }}" class="class-card {{ $reqCat && $reqCat !== 'jobs' ? 'd-none d-lg-flex' : '' }}">
         <div class="class-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         </div>
@@ -213,7 +224,7 @@
       </a>
 
       <!-- Events -->
-      <a href="{{ route('classifieds', ['category' => 'events']) }}" class="class-card">
+      <a href="{{ route('classifieds', ['category' => 'events']) }}" class="class-card {{ $reqCat && $reqCat !== 'events' ? 'd-none d-lg-flex' : '' }}">
         <div class="class-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         </div>

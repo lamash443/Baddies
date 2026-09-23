@@ -47,16 +47,153 @@
     @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(1.6);} }
 
     /* FILTER BAR */
-    .cb-filter-bar { background:rgba(255,140,0,0.03); border-bottom:1px solid rgba(255,140,0,0.1); padding:1rem 0; margin-bottom:2.5rem; }
-    .cb-filters { display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center; }
-    .cb-filter-btn { padding:0.4rem 1rem; border-radius:50px; cursor:pointer; font-family:"Outfit",sans-serif; font-size:0.78rem; font-weight:700; border:2px solid orange; background:transparent; color:orange; transition:color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; letter-spacing:0.02em; }
-    .cb-filter-btn:hover { background:#000; border-color:orange; color:orange; box-shadow:0 0 18px rgba(255,165,0,0.55), 0 4px 14px rgba(0,0,0,0.3); transform:translateY(-2px); }
-    .cb-filter-btn:active { transform:scale(0.97); }
-    .cb-filter-btn.active { background:orange; border-color:orange; color:#000; }
-    .cb-filter-btn.active:hover { background:#000; color:orange; box-shadow:0 0 18px rgba(255,165,0,0.55), 0 4px 14px rgba(0,0,0,0.3); transform:translateY(-2px); }
-    .cb-filter-select { background:#111; border:1.5px solid rgba(255,140,0,0.28); border-radius:50px; color:#fff; padding:0.4rem 2.2rem 0.4rem 1rem; font-family:"Outfit",sans-serif; font-size:0.78rem; font-weight:500; appearance:none; -webkit-appearance:none; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ff8c00' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 0.75rem center; transition:border-color 0.22s ease; }
-    .cb-filter-select:focus { outline:none; border-color:rgba(255,140,0,0.7); }
-    .cb-filter-select option { background:#1a1a1a; }
+    .cb-filter-bar {
+      background: linear-gradient(180deg, rgba(255,140,0,0.05) 0%, rgba(13,13,13,0.85) 100%);
+      border-top: 1px solid rgba(255,140,0,0.12);
+      border-bottom: 1px solid rgba(255,140,0,0.18);
+      padding: 0.9rem 0;
+      margin-bottom: 2.2rem;
+    }
+    .cb-filters-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .cb-filter-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+    .cb-filter-label {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .cb-filter-label svg {
+      color: #ff8c00;
+    }
+    .cb-filter-reset {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #ff8c00;
+      background: rgba(255,140,0,0.12);
+      border: 1px solid rgba(255,140,0,0.3);
+      border-radius: 50px;
+      padding: 0.2rem 0.65rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+    }
+    .cb-filter-reset:hover {
+      background: #ff8c00;
+      color: #000;
+    }
+    .cb-filter-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+    .cb-filter-item {
+      position: relative;
+    }
+    .cb-filter-sort {
+      margin-left: auto;
+    }
+    .cb-filter-select {
+      background: #141414;
+      border: 1.5px solid rgba(255,140,0,0.28);
+      border-radius: 12px;
+      color: #fff;
+      padding: 0.55rem 2.2rem 0.55rem 1rem;
+      font-family: "Outfit", sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ff8c00' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      transition: all 0.25s ease;
+      min-height: 42px;
+    }
+    .cb-filter-select:hover {
+      border-color: rgba(255,140,0,0.6);
+      background-color: #1a1a1a;
+    }
+    .cb-filter-select:focus {
+      outline: none;
+      border-color: #ff8c00;
+      box-shadow: 0 0 0 3px rgba(255,140,0,0.2);
+    }
+    .cb-filter-select.is-active {
+      border-color: #ff8c00;
+      background-color: rgba(255,140,0,0.12);
+      color: #ff8c00;
+      font-weight: 700;
+    }
+    .cb-filter-select option {
+      background: #161616;
+      color: #fff;
+    }
+
+    /* Mobile / Phone arrangement */
+    @media (max-width: 767.98px) {
+      .cb-filter-bar {
+        padding: 0.75rem 0 0.9rem;
+        margin-bottom: 1.8rem;
+      }
+      .cb-filters-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+      }
+      .cb-filter-header {
+        justify-content: space-between;
+        padding: 0 0.15rem;
+        margin-bottom: 0.15rem;
+      }
+      .cb-filter-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.55rem;
+        width: 100%;
+      }
+      .cb-filter-item {
+        width: 100%;
+      }
+      .cb-filter-sort {
+        grid-column: 1 / -1;
+        margin-left: 0;
+        width: 100%;
+      }
+      .cb-filter-select {
+        width: 100%;
+        font-size: 0.82rem;
+        padding: 0.55rem 2rem 0.55rem 0.85rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .cb-filter-controls {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      .cb-filter-sort {
+        grid-column: auto;
+      }
+    }
 
     /* GRID */
     .cb-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.6rem; padding-bottom:5rem; }
@@ -285,31 +422,50 @@
 <div class="cb-filter-bar">
   <div class="container">
     <form method="GET" action="{{ route('location.show', $searchLocation) }}" id="locationFilterForm">
-      <div class="cb-filters">
-        <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; flex-shrink:0;">Filter By</span>
+      <div class="cb-filters-wrapper">
+        <div class="cb-filter-header">
+          <div class="cb-filter-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span>Filter By</span>
+          </div>
+          @if(!empty($gender) || !empty($orientation) || (!empty($sort) && $sort !== 'featured'))
+            <a href="{{ route('location.show', $searchLocation) }}" class="cb-filter-reset">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>Reset</span>
+            </a>
+          @endif
+        </div>
 
-        <select name="gender" class="cb-filter-select" aria-label="Select Gender" onchange="document.getElementById('locationFilterForm').submit()">
-          <option value="">Select Gender</option>
-          <option value="Female" {{ ($gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
-          <option value="Male"   {{ ($gender ?? '') === 'Male'   ? 'selected' : '' }}>Male</option>
-          <option value="Other"  {{ ($gender ?? '') === 'Other'  ? 'selected' : '' }}>Other</option>
-        </select>
+        <div class="cb-filter-controls">
+          <div class="cb-filter-item">
+            <select name="gender" class="cb-filter-select {{ !empty($gender) ? 'is-active' : '' }}" aria-label="Select Gender" onchange="document.getElementById('locationFilterForm').submit()">
+              <option value="">Select Gender</option>
+              <option value="Female" {{ ($gender ?? '') === 'Female' ? 'selected' : '' }}>Female</option>
+              <option value="Male"   {{ ($gender ?? '') === 'Male'   ? 'selected' : '' }}>Male</option>
+              <option value="Other"  {{ ($gender ?? '') === 'Other'  ? 'selected' : '' }}>Other</option>
+            </select>
+          </div>
 
-        <select name="orientation" class="cb-filter-select" aria-label="Select Sexual Orientation" onchange="document.getElementById('locationFilterForm').submit()">
-          <option value="">Select Sexual Orientation</option>
-          <option value="Straight"  {{ ($orientation ?? '') === 'Straight'  ? 'selected' : '' }}>Straight</option>
-          <option value="Bisexual"  {{ ($orientation ?? '') === 'Bisexual'  ? 'selected' : '' }}>Bisexual</option>
-          <option value="Gay"       {{ ($orientation ?? '') === 'Gay'       ? 'selected' : '' }}>Gay</option>
-          <option value="Lesbian"   {{ ($orientation ?? '') === 'Lesbian'   ? 'selected' : '' }}>Lesbian</option>
-        </select>
+          <div class="cb-filter-item">
+            <select name="orientation" class="cb-filter-select {{ !empty($orientation) ? 'is-active' : '' }}" aria-label="Select Sexual Orientation" onchange="document.getElementById('locationFilterForm').submit()">
+              <option value="">Select Sexual Orientation</option>
+              <option value="Straight"  {{ ($orientation ?? '') === 'Straight'  ? 'selected' : '' }}>Straight</option>
+              <option value="Bisexual"  {{ ($orientation ?? '') === 'Bisexual'  ? 'selected' : '' }}>Bisexual</option>
+              <option value="Gay"       {{ ($orientation ?? '') === 'Gay'       ? 'selected' : '' }}>Gay</option>
+              <option value="Lesbian"   {{ ($orientation ?? '') === 'Lesbian'   ? 'selected' : '' }}>Lesbian</option>
+            </select>
+          </div>
 
-        <div class="ms-auto">
-          <select name="sort" class="cb-filter-select" aria-label="Sort by" onchange="document.getElementById('locationFilterForm').submit()">
-            <option value="featured" {{ ($sort ?? 'featured') === 'featured' ? 'selected' : '' }}>Sort: Featured</option>
-            <option value="newest"   {{ ($sort ?? '') === 'newest'   ? 'selected' : '' }}>Sort: Newest</option>
-            <option value="oldest"   {{ ($sort ?? '') === 'oldest'   ? 'selected' : '' }}>Sort: Oldest</option>
-            <option value="name_asc" {{ ($sort ?? '') === 'name_asc' ? 'selected' : '' }}>Sort: Name A–Z</option>
-          </select>
+          <div class="cb-filter-item cb-filter-sort">
+            <select name="sort" class="cb-filter-select {{ (!empty($sort) && $sort !== 'featured') ? 'is-active' : '' }}" aria-label="Sort by" onchange="document.getElementById('locationFilterForm').submit()">
+              <option value="featured" {{ ($sort ?? 'featured') === 'featured' ? 'selected' : '' }}>Sort: Featured</option>
+              <option value="newest"   {{ ($sort ?? '') === 'newest'   ? 'selected' : '' }}>Sort: Newest</option>
+              <option value="oldest"   {{ ($sort ?? '') === 'oldest'   ? 'selected' : '' }}>Sort: Oldest</option>
+              <option value="name_asc" {{ ($sort ?? '') === 'name_asc' ? 'selected' : '' }}>Sort: Name A–Z</option>
+            </select>
+          </div>
         </div>
       </div>
     </form>

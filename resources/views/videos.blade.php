@@ -90,8 +90,8 @@
     .vd-card:hover { transform:translateY(-6px) scale(1.015); box-shadow:0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,140,0,0.35); border-color:rgba(255,140,0,0.4); }
     .vd-card:focus-visible { outline:2px solid rgba(255,140,0,0.7); outline-offset:2px; }
 
-    /* Thumbnail */
-    .vd-card__thumb { position:relative; width:100%; padding-top:56.25%; background:#1a1a1a; overflow:hidden; }
+    /* Thumbnail (changed to vertical aspect ratio 4:5 to better fit phone videos) */
+    .vd-card__thumb { position:relative; width:100%; padding-top:125%; background:#1a1a1a; overflow:hidden; }
     .vd-card__thumb-inner { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
 
     /* Play overlay */
@@ -142,10 +142,11 @@
     .vd-lightbox { display:none; position:fixed; inset:0; z-index:1060; background:rgba(0,0,0,0.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:1rem; }
     .vd-lightbox.open { display:flex; animation:lbFadeIn 0.2s ease both; }
     @keyframes lbFadeIn { from{opacity:0;} to{opacity:1;} }
-    .vd-lightbox__inner { position:relative; width:100%; max-width:900px; background:#0d0d0d; border:1px solid rgba(255,140,0,0.25); border-radius:18px; overflow:hidden; box-shadow:0 24px 80px rgba(0,0,0,0.8); animation:lbIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both; }
+    .vd-lightbox__inner { position:relative; width:100%; max-width:500px; background:#0d0d0d; border:1px solid rgba(255,140,0,0.25); border-radius:18px; overflow:hidden; box-shadow:0 24px 80px rgba(0,0,0,0.8); animation:lbIn 0.3s cubic-bezier(0.34,1.2,0.64,1) both; }
     @keyframes lbIn { from{opacity:0;transform:scale(0.88);} to{opacity:1;transform:scale(1);} }
-    .vd-lightbox__video-wrap { position:relative; padding-top:56.25%; background:#000; }
-    .vd-lightbox__video-wrap video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    /* Lightbox video player - adaptable height with contain to show full video */
+    .vd-lightbox__video-wrap { position:relative; width:100%; height: 75vh; max-height: 800px; background:#000; }
+    .vd-lightbox__video-wrap video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
     .vd-lightbox__bar { padding:1rem 1.25rem; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; border-top:1px solid rgba(255,140,0,0.1); }
     .vd-lightbox__title { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:0.25rem; }
     .vd-lightbox__meta { font-size:0.75rem; color:rgba(255,255,255,0.4); display:flex; gap:0.8rem; }
@@ -233,9 +234,6 @@
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             {{ $video->created_at->diffForHumans() }}
           </span>
-        </div>
-        <div class="mt-2 mb-1">
-          <span class="vd-card__tag mt-0">{{ $video->user->county ?? 'Kenya' }}</span>
         </div>
         <div class="mt-auto pt-3">
           <a href="{{ route('profile.view', $video->user->id) }}" class="btn vd-btn-primary w-100" style="font-size:0.9rem;" onclick="event.stopPropagation()">View Profile</a>

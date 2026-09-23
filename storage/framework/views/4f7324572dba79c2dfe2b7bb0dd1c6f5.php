@@ -116,6 +116,31 @@
     color: orange !important;
     background-color: transparent !important;
   }
+  /* Light theme: dropdown card link colors */
+  [data-bs-theme="light"] .nr-auth-dropdown-card .sidebar-icon-link {
+    color: #111111 !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .sidebar-icon-link:hover {
+    color: #ff8c00 !important;
+    background: rgba(255,140,0,0.08) !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .card-title-text,
+  [data-bs-theme="light"] .nr-auth-dropdown-card [style*="color:#fff"],
+  [data-bs-theme="light"] .nr-auth-dropdown-card [style*="color: #fff"] {
+    color: #111111 !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .card-sub-text,
+  [data-bs-theme="light"] .nr-auth-dropdown-card [style*="color: rgba(255,255,255"] {
+    color: rgba(0,0,0,0.55) !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card {
+    background: #ffffff !important;
+    border-color: rgba(255,140,0,0.45) !important;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.12), 0 0 20px rgba(255,140,0,0.15) !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .border-secondary {
+    border-color: rgba(0,0,0,0.1) !important;
+  }
 
   /* Original Link Styles */
   .custom-orange-link {
@@ -199,6 +224,133 @@
       color: white !important;
     }
   }
+
+  /* ── User Icon Button with Glowing Border ── */
+  .nr-user-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50% !important;
+    border: 2px solid #ff8c00 !important;
+    background-color: transparent !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 0 !important;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(255, 140, 0, 0.35);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  }
+  .nr-user-btn.is-logged-in {
+    background-color: #ff8c00 !important;
+  }
+  .nr-user-btn::after {
+    display: none !important;
+  }
+  .nr-user-btn:hover,
+  .nr-user-btn:focus,
+  .nr-user-btn[aria-expanded="true"] {
+    border-color: #ffaa33 !important;
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.8), 0 0 35px rgba(255, 140, 0, 0.35) !important;
+    transform: translateY(-1px) scale(1.06);
+  }
+  .nr-user-btn svg {
+    color: #ff8c00;
+    transition: transform 0.25s ease, stroke 0.25s ease;
+  }
+  .nr-user-btn:hover svg {
+    stroke: #ffffff;
+    transform: scale(1.08);
+  }
+
+  /* ── Professional Auth Dropdown Card with Glowing Borders ── */
+  .nr-auth-dropdown-card {
+    min-width: 220px;
+    max-width: 240px;
+    background: #0d0d0d !important;
+    border: 1.5px solid rgba(255, 140, 0, 0.6) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.9), 0 0 25px rgba(255, 140, 0, 0.28), inset 0 0 10px rgba(255, 140, 0, 0.04) !important;
+    overflow: hidden;
+    animation: authDropdownCardIn 0.22s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+    margin-top: 0.5rem !important;
+  }
+  @keyframes authDropdownCardIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .nr-auth-glow-line {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,140,0,0.4) 15%, #ff8c00 50%, rgba(255,140,0,0.4) 85%, transparent 100%);
+    box-shadow: 0 0 8px #ff8c00;
+  }
+  .nr-btn-card-primary {
+    background: #ff8c00;
+    border: 1.5px solid #ff8c00;
+    color: #000;
+    font-weight: 700;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+  .nr-btn-card-primary:hover {
+    background: #000000;
+    border-color: #ff8c00;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 140, 0, 0.6);
+    transform: translateY(-1px);
+  }
+  .nr-btn-card-secondary {
+    background: transparent;
+    border: 1.5px solid rgba(255, 140, 0, 0.45);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    padding: 0.38rem 0.75rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+  .nr-btn-card-secondary:hover {
+    background: rgba(255, 140, 0, 0.12);
+    border-color: #ff8c00;
+    color: #ff8c00;
+    transform: translateY(-1px);
+  }
+
+  /* Light Theme overrides */
+  [data-bs-theme="light"] .nr-auth-dropdown-card {
+    background: #ffffff !important;
+    border-color: rgba(255, 140, 0, 0.55) !important;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.12), 0 0 25px rgba(255,140,0,0.2) !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .card-title-text {
+    color: #111 !important;
+  }
+  [data-bs-theme="light"] .nr-auth-dropdown-card .card-sub-text {
+    color: rgba(0,0,0,0.6) !important;
+  }
+  [data-bs-theme="light"] .nr-btn-card-secondary {
+    color: #111;
+    border-color: rgba(255, 140, 0, 0.5);
+  }
+  [data-bs-theme="light"] .nr-btn-card-secondary:hover {
+    background: rgba(255, 140, 0, 0.1);
+    color: #ff8c00;
+  }
 </style>
 
 <!-- ======================= MAIN TOP NAVBAR ======================= -->
@@ -208,11 +360,8 @@
       <div class="d-flex align-items-center gap-1 flex-grow-1 flex-xl-grow-0">
         
         <!-- Mobile Profile Dropdown -->
-        <style>
-          .mobile-profile-dropdown-toggle::after { display: none !important; }
-        </style>
         <div class="dropdown d-xl-none" style="flex-shrink:0; z-index:2;">
-          <button class="btn p-0 mobile-icon-hover dropdown-toggle mobile-profile-dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false" style="width:42px;height:42px;border-radius:50%;border:2px solid orange;background-color:<?php echo e(Auth::check() ? 'orange' : 'transparent'); ?>;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;">
+          <button class="btn nr-user-btn <?php echo e(Auth::check() ? 'is-logged-in' : ''); ?> dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
               <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()->profile_photo): ?>
                 <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo)); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
@@ -220,54 +369,54 @@
                 <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(Auth::user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
               <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <?php else: ?>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </button>
           
-          <ul class="dropdown-menu dropdown-menu-dark shadow border-secondary mt-2" style="min-width: 200px; background-color: black;">
+          <div class="dropdown-menu dropdown-menu-dark dropdown-menu-start nr-auth-dropdown-card p-0">
+            <div class="nr-auth-glow-line"></div>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
-            <li>
-              <div class="px-3 py-2">
-                <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
-                <div class="small" style="color: rgba(255,255,255,0.6); line-height:1.4;">Manage your profile &amp; settings.</div>
+              <div class="px-3 pt-3 pb-2 border-bottom border-secondary border-opacity-25">
+                <div class="fw-bold fs-6 card-title-text mb-1" style="color:#fff;">Welcome, <span style="color:#ff8c00;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
+                <div class="small card-sub-text" style="color: rgba(255,255,255,0.6); line-height:1.4; font-size:0.8rem;">Manage your profile &amp; settings.</div>
               </div>
-            </li>
-            <li><hr class="dropdown-divider border-secondary"></li>
-            <li>
-              <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('profile.edit')); ?>">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
-                My Profile
-              </a>
-            </li>
-            <li><hr class="dropdown-divider border-secondary"></li>
-            <li>
-              <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
-                <?php echo csrf_field(); ?>
-                <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
-                  Logout
+              <div class="p-2">
+                <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2 rounded-3" href="<?php echo e(route('profile.edit')); ?>">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
+                  My Profile
                 </a>
-              </form>
-            </li>
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
+                  <?php echo csrf_field(); ?>
+                  <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2 rounded-3 text-danger" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
+                    Logout
+                  </a>
+                </form>
+              </div>
             <?php else: ?>
-            <li>
-              <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg> 
-                Login
-              </a>
-            </li>
-            <li><hr class="dropdown-divider border-secondary"></li>
-            <li>
-              <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg> 
-                Sign Up
-              </a>
-            </li>
+              <div class="p-3 text-center">
+                <h6 class="fw-bold card-title-text text-white mb-1" style="font-size: 0.92rem; letter-spacing: -0.01em;">
+                  Welcome to <span style="color:#ff8c00;">Baddies Club</span>
+                </h6>
+                <p class="small card-sub-text mb-3" style="color: rgba(255,255,255,0.6); font-size: 0.74rem; line-height: 1.35;">
+                  Join Kenya's #1 verified escort &amp; companionship network.
+                </p>
+                <div class="d-grid gap-2">
+                  <a href="#" class="nr-btn-card-primary" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Sign Up Free</span>
+                  </a>
+                  <a href="#" class="nr-btn-card-secondary" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                    <span>Member Log In</span>
+                  </a>
+                </div>
+              </div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-          </ul>
+          </div>
         </div>
 
         <!-- Mobile Centered Logo -->
@@ -418,7 +567,7 @@
 
               <!-- Desktop Profile Dropdown -->
               <div class="dropdown d-none d-xl-block">
-                <button class="btn p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 42px; height: 42px; border-radius: 50%; border: 2px solid orange; background-color: <?php echo e(Auth::check() ? 'orange' : 'transparent'); ?>; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; padding: 0;">
+                <button class="btn nr-user-btn <?php echo e(Auth::check() ? 'is-logged-in' : ''); ?> dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()->profile_photo): ?>
                       <img src="<?php echo e(asset('storage/' . Auth::user()->profile_photo)); ?>" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
@@ -426,54 +575,54 @@
                       <img src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(Auth::user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=100&bold=true" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   <?php else: ?>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                   <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </button>
                 
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-secondary mt-2" style="min-width: 200px; background-color: black;">
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark nr-auth-dropdown-card p-0">
+                  <div class="nr-auth-glow-line"></div>
                   <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::check()): ?>
-                  <li>
-                    <div class="px-3 py-2">
-                      <div class="fw-bold fs-6 text-white mb-1">Welcome, <span style="color:orange;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
-                      <div class="small" style="color: rgba(255,255,255,0.6); line-height:1.4;">Manage your profile &amp; settings.</div>
+                    <div class="px-3 pt-3 pb-2 border-bottom border-secondary border-opacity-25">
+                      <div class="fw-bold fs-6 card-title-text mb-1" style="color:#fff;">Welcome, <span style="color:#ff8c00;"><?php echo e(Auth::user()->name ?? 'User'); ?></span></div>
+                      <div class="small card-sub-text" style="color: rgba(255,255,255,0.6); line-height:1.4; font-size:0.8rem;">Manage your profile &amp; settings.</div>
                     </div>
-                  </li>
-                  <li><hr class="dropdown-divider border-secondary"></li>
-                  <li>
-                    <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('profile.edit')); ?>">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
-                      My Profile
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider border-secondary"></li>
-                  <li>
-                    <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
-                      <?php echo csrf_field(); ?>
-                      <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
-                        Logout
+                    <div class="p-2">
+                      <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2 rounded-3" href="<?php echo e(route('profile.edit')); ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> 
+                        My Profile
                       </a>
-                    </form>
-                  </li>
+                      <form method="POST" action="<?php echo e(route('logout')); ?>" class="m-0">
+                        <?php echo csrf_field(); ?>
+                        <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2 rounded-3 text-danger" href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); this.closest('form').submit();">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> 
+                          Logout
+                        </a>
+                      </form>
+                    </div>
                   <?php else: ?>
-                  <li>
-                    <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg> 
-                      Login
-                    </a>
-                  </li>
-                  <li><hr class="dropdown-divider border-secondary"></li>
-                  <li>
-                    <a class="dropdown-item sidebar-icon-link d-flex align-items-center gap-3 py-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg> 
-                      Sign Up
-                    </a>
-                  </li>
+                    <div class="p-3 text-center">
+                      <h6 class="fw-bold card-title-text text-white mb-1" style="font-size: 0.92rem; letter-spacing: -0.01em;">
+                        Welcome to <span style="color:#ff8c00;">Baddies Club</span>
+                      </h6>
+                      <p class="small card-sub-text mb-3" style="color: rgba(255,255,255,0.6); font-size: 0.74rem; line-height: 1.35;">
+                        Join Kenya's #1 verified escort &amp; companionship network.
+                      </p>
+                      <div class="d-grid gap-2">
+                        <a href="#" class="nr-btn-card-primary" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="register">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                          <span>Sign Up Free</span>
+                        </a>
+                        <a href="#" class="nr-btn-card-secondary" data-bs-toggle="modal" data-bs-target="#authModal" data-auth-tab="login">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                          <span>Member Log In</span>
+                        </a>
+                      </div>
+                    </div>
                   <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                </ul>
+                </div>
               </div>
             </div>
           </div>

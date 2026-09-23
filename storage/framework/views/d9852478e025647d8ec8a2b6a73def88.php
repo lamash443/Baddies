@@ -781,9 +781,9 @@
       
       var formData = new FormData();
       formData.append('profile_photo', file);
-      formData.append('_token', '{{ csrf_token() }}');
+      formData.append('_token', '<?php echo e(csrf_token()); ?>');
       
-      fetch('{{ route("profile.photo") }}', {
+      fetch('<?php echo e(route("profile.photo")); ?>', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -815,10 +815,10 @@
         if (spinner) spinner.style.display = 'flex';
         
         var formData = new FormData();
-        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('_token', '<?php echo e(csrf_token()); ?>');
         formData.append('_method', 'DELETE');
 
-        fetch('{{ route("profile.photo.delete") }}', {
+        fetch('<?php echo e(route("profile.photo.delete")); ?>', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -851,7 +851,28 @@
   </script>
 </head>
 <body>
-  <x-navbar :hideSearch="true" />
+  <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
 
 
 
@@ -864,39 +885,46 @@
         <div class="dash-card p-4">
           <div class="mb-4 text-center">
 
-            {{-- ── Hidden forms ── --}}
-            <form id="photoUploadForm" action="{{ route('profile.photo') }}" method="POST" enctype="multipart/form-data" style="display:none;">
-              @csrf
+            
+            <form id="photoUploadForm" action="<?php echo e(route('profile.photo')); ?>" method="POST" enctype="multipart/form-data" style="display:none;">
+              <?php echo csrf_field(); ?>
               <input type="file" id="profilePhotoInput" name="profile_photo"
                      accept="image/jpeg,image/png,image/webp,image/gif"
                      onchange="previewAndSubmit(this)" />
-              @error('profile_photo')
-                <div class="text-danger small mt-2">{{ $message }}</div>
-              @enderror
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['profile_photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <div class="text-danger small mt-2"><?php echo e($message); ?></div>
+              <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </form>
 
-            @if(auth()->user()->profile_photo)
-            <form id="deletePhotoForm" action="{{ route('profile.photo.delete') }}" method="POST" style="display:none;">
-              @csrf @method('DELETE')
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->profile_photo): ?>
+            <form id="deletePhotoForm" action="<?php echo e(route('profile.photo.delete')); ?>" method="POST" style="display:none;">
+              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
             </form>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-            {{-- ── Avatar ── --}}
+            
             <div class="profile-avatar-wrap mx-auto mb-3" onclick="openPhotoMgmt()" title="Manage profile photo">
-              @if(auth()->user()->profile_photo)
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->profile_photo): ?>
                 <img id="avatarPreview"
-                     src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                     src="<?php echo e(asset('storage/' . auth()->user()->profile_photo)); ?>"
                      alt="Profile Photo" class="profile-avatar-img"
                      width="120" height="120"
                      style="opacity:1;display:block;" />
-              @else
+              <?php else: ?>
                 <img id="avatarPreview"
-                     src="https://ui-avatars.com/api/?name={{ urlencode(substr(auth()->user()->name, 0, 2)) }}&background=ff8c00&color=000&size=200&bold=true"
+                     src="https://ui-avatars.com/api/?name=<?php echo e(urlencode(substr(auth()->user()->name, 0, 2))); ?>&background=ff8c00&color=000&size=200&bold=true"
                      alt="Profile Photo" class="profile-avatar-img"
                      width="120" height="120"
                      style="opacity:1;display:block;" />
-              @endif
-              {{-- Hover overlay --}}
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+              
               <div class="profile-avatar-overlay">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
@@ -904,17 +932,17 @@
                 </svg>
                 <span style="font-size:0.68rem;font-weight:700;letter-spacing:0.04em;margin-top:4px;">MANAGE</span>
               </div>
-              {{-- Upload spinner overlay --}}
+              
               <div id="photoUploadStatus" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;border-radius:50%;z-index:10;">
                 <div class="spinner-border text-warning" role="status" style="width:2rem;height:2rem;"></div>
               </div>
             </div>
 
-            {{-- ── Photo Management Modal Backdrop ── --}}
+            
             <div id="photoMgmtBackdrop" class="photo-mgmt-backdrop" onclick="if(event.target===this) closePhotoMgmt();">
               <div class="photo-mgmt-panel">
 
-                {{-- Header --}}
+                
                 <div class="photo-mgmt-header">
                   <div class="photo-mgmt-header-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -932,7 +960,7 @@
                 </div>
 
 
-                {{-- Actions --}}
+                
                 <div class="photo-mgmt-actions">
 
                   <button type="button" class="photo-mgmt-btn photo-mgmt-btn--upload"
@@ -951,9 +979,9 @@
                     <svg class="photo-mgmt-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
                   </button>
 
-                  <hr class="photo-mgmt-divider" id="photoMgmtDivider" style="display: {{ auth()->user()->profile_photo ? 'block' : 'none' }};">
+                  <hr class="photo-mgmt-divider" id="photoMgmtDivider" style="display: <?php echo e(auth()->user()->profile_photo ? 'block' : 'none'); ?>;">
                   <button type="button" class="photo-mgmt-btn photo-mgmt-btn--remove" id="btnRemovePhoto"
-                          style="display: {{ auth()->user()->profile_photo ? 'flex' : 'none' }};"
+                          style="display: <?php echo e(auth()->user()->profile_photo ? 'flex' : 'none'); ?>;"
                           onclick="confirmRemovePhoto()">
                     <span class="photo-mgmt-btn-icon">
                       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
@@ -974,36 +1002,37 @@
               </div>
             </div>
 
-            {{-- User name below avatar --}}
+            
             <div class="fw-bold profile-name-text d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.3rem; letter-spacing:0.01em;">
-              {{ auth()->user()->name }}
-              @if(auth()->user()->is_verified)
+              <?php echo e(auth()->user()->name); ?>
+
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
                 <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:17px; height:17px; box-shadow:0 0 6px rgba(29,161,242,0.4);" title="Verified">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </div>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
-            <div class="text-secondary mb-2" style="font-size:0.85rem;">{{ auth()->user()->email }}</div>
+            <div class="text-secondary mb-2" style="font-size:0.85rem;"><?php echo e(auth()->user()->email); ?></div>
             <div>
-              @if(auth()->user()->is_verified)
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
                 <span class="badge" style="background-color:transparent; color:orange; border:1px solid orange; box-shadow:0 0 10px rgba(255,165,0,0.5); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
                   <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                   Verified User
                 </span>
-              @else
+              <?php else: ?>
                 <span class="badge" style="background-color:rgba(255,140,0,0.15); color:orange; border:1px solid rgba(255,140,0,0.3); font-weight:600; padding:0.4em 0.8em; letter-spacing:0.5px;">
                   <svg width="14" height="14" class="me-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                   Not Verified
                 </span>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
           </div>
           
           <div class="d-flex justify-content-around mb-3 py-2 profile-stats-divider">
             <div class="text-center">
-              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;">{{ number_format(auth()->user()->profile_views ?? 0) }}</div>
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;"><?php echo e(number_format(auth()->user()->profile_views ?? 0)); ?></div>
               <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 Views
@@ -1011,7 +1040,7 @@
             </div>
             <div class="profile-stats-vsep"></div>
             <div class="text-center">
-              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;">{{ number_format(auth()->user()->phone_calls ?? 0) }}</div>
+              <div class="fw-bold text-light" style="font-size:1.05rem; line-height:1.2;"><?php echo e(number_format(auth()->user()->phone_calls ?? 0)); ?></div>
               <div class="text-secondary d-flex align-items-center justify-content-center gap-1" style="font-size:0.72rem;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 Calls
@@ -1019,7 +1048,7 @@
             </div>
           </div>
           
-          <a href="{{ route('profile.statistics') }}" class="btn btn-outline-warning w-100 fw-bold" style="border-radius:8px;">{{ __('View Statistics') }}</a>
+          <a href="<?php echo e(route('profile.statistics')); ?>" class="btn btn-outline-warning w-100 fw-bold" style="border-radius:8px;"><?php echo e(__('View Statistics')); ?></a>
         </div>
 
         <div class="side-nav-card">
@@ -1027,31 +1056,31 @@
 
           <ul class="nav flex-column list-unstyled mb-0" role="tablist">
 
-            {{-- Dashboard --}}
+            
             <li role="presentation">
-              <a href="{{ route('dashboard') }}" class="side-nav-link">
+              <a href="<?php echo e(route('dashboard')); ?>" class="side-nav-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Dashboard
               </a>
             </li>
 
-            {{-- Messages --}}
+            
             <li role="presentation">
-              <a href="{{ route('chat.index') }}" class="side-nav-link d-flex justify-content-between align-items-center">
+              <a href="<?php echo e(route('chat.index')); ?>" class="side-nav-link d-flex justify-content-between align-items-center">
                 <span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                   Messages
                 </span>
-                @php
+                <?php
                   $unreadCount = auth()->user()->messagesReceived()->where('is_read', false)->count();
-                @endphp
-                @if($unreadCount > 0)
-                  <span class="badge bg-danger rounded-pill">{{ $unreadCount }}</span>
-                @endif
+                ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($unreadCount > 0): ?>
+                  <span class="badge bg-danger rounded-pill"><?php echo e($unreadCount); ?></span>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </a>
             </li>
 
-            {{-- My Profile --}}
+            
             <li role="presentation">
               <button class="side-nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="tab-profile" aria-selected="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -1059,7 +1088,7 @@
               </button>
             </li>
 
-            {{-- My Wallet --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="wallet-tab" data-bs-toggle="tab" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -1067,7 +1096,7 @@
               </button>
             </li>
 
-            {{-- My Membership --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="membership-tab" data-bs-toggle="tab" data-bs-target="#tab-membership" type="button" role="tab" aria-controls="tab-membership" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2Z"/></svg>
@@ -1075,7 +1104,7 @@
               </button>
             </li>
 
-            {{-- My Classifieds --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="classifieds-tab" data-bs-toggle="tab" data-bs-target="#tab-classifieds" type="button" role="tab" aria-controls="tab-classifieds" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -1083,7 +1112,7 @@
               </button>
             </li>
 
-            {{-- Publish Photos & Videos --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="publish-media-tab" data-bs-toggle="tab" data-bs-target="#tab-publish-media" type="button" role="tab" aria-controls="tab-publish-media" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -1091,7 +1120,7 @@
               </button>
             </li>
 
-            {{-- My Settings --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#tab-settings" type="button" role="tab" aria-controls="tab-settings" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1099,7 +1128,7 @@
               </button>
             </li>
 
-            {{-- Photo Verification --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="verification-tab" data-bs-toggle="tab" data-bs-target="#tab-verification" type="button" role="tab" aria-controls="tab-verification" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
@@ -1107,7 +1136,7 @@
               </button>
             </li>
 
-            {{-- My Referrals --}}
+            
             <li role="presentation">
               <button class="side-nav-link" id="referrals-tab" data-bs-toggle="tab" data-bs-target="#tab-referrals" type="button" role="tab" aria-controls="tab-referrals" aria-selected="false">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
@@ -1235,12 +1264,12 @@
           }
         </style>
 
-        {{-- --- PHOTOS CARD --- --}}
-        @php
+        
+        <?php
           $isVerified = auth()->user()->is_verified ?? false;
           $hasSub = $hasSubscription ?? false;
-        @endphp
-        @if(!$isVerified)
+        ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
         <div class="dash-card p-4 photos-sidebar-card" style="margin-top:0;">
           <div class="d-flex align-items-center gap-2 mb-3">
             <div class="photos-icon-wrap" style="width:auto; padding: 0 0.5rem; gap: 4px;">
@@ -1253,13 +1282,13 @@
               </svg>
             </div>
             <span class="fw-bold text-white" style="font-size:1rem;">Photos & Videos</span>
-            @if($isVerified)
-              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;">{{ $photos->count() }} uploaded</span>
-            @endif
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isVerified): ?>
+              <span class="ms-auto" style="font-size:0.7rem;color:rgba(255,140,0,0.8);font-weight:600;"><?php echo e($photos->count()); ?> uploaded</span>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </div>
 
-          @if(!$isVerified)
-            {{-- LOCKED STATE --}}
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
+            
             <div class="photos-locked-state text-center py-2">
               <div class="lock-icon-wrap mx-auto mb-3">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1268,21 +1297,21 @@
               </div>
               <p class="photos-locked-title mb-1">Only Verified Accounts</p>
               <p class="photos-locked-title mb-1">can Upload Photos and videos</p>
-              @if(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
                 <p class="photos-locked-sub mb-4" style="color:#ffc107; font-weight: 500;">Image uploaded, waiting for admin approval.</p>
-              @else
+              <?php else: ?>
                 <p class="photos-locked-sub mb-4">Kindly Verify Your Account.</p>
-                <a href="{{ route('profile.edit') }}#tab-verification"
+                <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
                    onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el) el.click(); var hdr=document.getElementById('get-verified-header'); if(hdr) hdr.scrollIntoView({behavior:'smooth', block:'start'}); },300);"
                    class="btn-verify-now w-100">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                   Verify Now
                 </a>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-          @elseif(!$hasSub)
-            {{-- PLAN GATE STATE --}}
+          <?php elseif(!$hasSub): ?>
+            
             <div class="text-center py-2">
               <div class="mx-auto mb-3" style="width:60px;height:60px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1290,30 +1319,31 @@
               <p class="photos-locked-title mb-1" style="color:rgba(255,200,0,0.9);">Unlock Photo Uploads</p>
               <p class="photos-locked-sub mb-1">You're verified! Now choose a</p>
               <p class="photos-locked-sub mb-4">membership plan to start uploading.</p>
-              <a href="{{ route('profile.edit') }}#tab-membership"
+              <a href="<?php echo e(route('profile.edit')); ?>#tab-membership"
                  onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
                  class="btn-verify-now w-100" style="margin-bottom:0.5rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 Subscribe Now
               </a>
-              <a href="{{ route('profile.edit') }}#tab-membership"
+              <a href="<?php echo e(route('profile.edit')); ?>#tab-membership"
                  onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('membership-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
                  style="font-size:0.75rem;color:rgba(255,140,0,0.6);text-decoration:none;">View all plans</a>
             </div>
 
-          @else
-            {{-- UPLOAD STATE --}}
-            @if(session('photo_upload_success'))
+          <?php else: ?>
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('photo_upload_success')): ?>
               <div class="alert-photo-success mb-3">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {{ session('photo_upload_success') }}
-              </div>
-            @endif
+                <?php echo e(session('photo_upload_success')); ?>
 
-            {{-- Upload form --}}
-            @if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit)
-              <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-3">
-                @csrf
+              </div>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit): ?>
+              <form action="<?php echo e(route('user.photos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-3">
+                <?php echo csrf_field(); ?>
                 <label for="photoUploadInput" class="media-upload-drop w-100" id="photoDropLabel">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.7)" stroke-width="1.8" stroke-linecap="round">
                     <rect x="3" y="3" width="18" height="18" rx="3" ry="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
@@ -1322,36 +1352,43 @@
                   <span style="font-size:0.72rem;color:rgba(255,255,255,0.35);">JPG, PNG, WEBP &mdash; max 5MB</span>
                 </label>
                 <input type="file" id="photoUploadInput" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="this.closest('form').submit()">
-                @error('photo')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-1"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </form>
-            @else
+            <?php else: ?>
               <div class="alert alert-warning py-2 small mb-3" style="background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.3); color: orange;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                You've reached your limit of {{ auth()->user()->photo_limit }} photos for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+                You've reached your limit of <?php echo e(auth()->user()->photo_limit); ?> photos for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
               </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-            {{-- Photo grid --}}
-            @if($photos->count())
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count()): ?>
               <div class="media-grid">
-                @foreach($photos as $photo)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $photos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $photo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                   <div class="media-thumb-wrap">
-                    <img src="{{ asset('storage/' . $photo->path) }}" alt="Photo" class="media-thumb">
-                    <form action="{{ route('user.photos.destroy', $photo->id) }}" method="POST" class="media-delete-form">
-                      @csrf @method('DELETE')
+                    <img src="<?php echo e(asset('storage/' . $photo->path)); ?>" alt="Photo" class="media-thumb">
+                    <form action="<?php echo e(route('user.photos.destroy', $photo->id)); ?>" method="POST" class="media-delete-form">
+                      <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                       <button type="submit" class="media-delete-btn" title="Delete" onclick="return confirm('Delete this photo?')">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                       </button>
                     </form>
                   </div>
-                @endforeach
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
               </div>
-            @else
+            <?php else: ?>
               <p class="text-secondary small text-center mb-0">No photos yet. Upload your first one!</p>
-            @endif
-          @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
-        @endif
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
         <style>
           .photos-sidebar-card, .videos-sidebar-card {
@@ -1416,13 +1453,13 @@
         <div class="tab-content">
           <!-- Profile Tab -->
           <div class="tab-pane fade show active" id="tab-profile" role="tabpanel" aria-labelledby="profile-tab">
-            @include('profile.partials.update-profile-information-form')
+            <?php echo $__env->make('profile.partials.update-profile-information-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-            {{-- My Photos & Videos has been moved to the Publish Photos & Videos tab --}}
-            @include('profile.partials.delete-user-form')
+            
+            <?php echo $__env->make('profile.partials.delete-user-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
           </div>
 
-          {{-- --- PUBLISH PHOTOS & VIDEOS TAB --- --}}
+          
           <div class="tab-pane fade" id="tab-publish-media" role="tabpanel" aria-labelledby="publish-media-tab">
             <div class="dash-card">
               <header class="mb-4">
@@ -1435,9 +1472,9 @@
                 <p class="dash-card-text">Upload and manage the photos and videos displayed on your public profile.</p>
               </header>
 
-              @if(!$isVerified)
-                @if(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
-                  {{-- STEP 1b: Account verification pending --}}
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$isVerified): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
+                  
                   <div class="text-center py-5 rounded" style="background:rgba(255,193,7,0.02);border:1.5px dashed rgba(255,193,7,0.22);">
                     <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,193,7,0.07);border:1.5px solid rgba(255,193,7,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,193,7,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1447,32 +1484,32 @@
                     <h4 class="fw-bold mb-2" style="color:#fff;">Verification Pending</h4>
                     <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Your verification photo has been submitted and is currently pending review. You will be able to publish media once approved.</p>
                   </div>
-                @else
-                  {{-- STEP 1a: Account not verified --}}
+                <?php else: ?>
+                  
                   <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
                     <div class="mx-auto mb-4" style="width:72px;height:72px;background:rgba(255,140,0,0.07);border:1.5px solid rgba(255,140,0,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                       <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,140,0,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                       </svg>
                     </div>
-                    @if(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
                       <h4 class="fw-bold mb-2" style="color:#ffc107;">Verification Pending</h4>
                       <p style="font-size:0.9rem;color:rgba(255,255,255,0.7);max-width:380px;margin:0 auto 1.5rem;">Image uploaded, waiting for admin approval. Please check back later.</p>
-                    @else
+                    <?php else: ?>
                       <h4 class="fw-bold mb-2" style="color:#fff;">Verification Required</h4>
                       <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:380px;margin:0 auto 1.5rem;">Only verified accounts can publish photos and videos. Complete your photo verification to unlock this section.</p>
-                      <a href="{{ route('profile.edit') }}#tab-verification"
+                      <a href="<?php echo e(route('profile.edit')); ?>#tab-verification"
                          onclick="event.preventDefault(); window.location.href=this.href; setTimeout(()=>{ var el=document.getElementById('verification-tab'); if(el){ el.click(); el.scrollIntoView({behavior:'smooth'}); } },300);"
                          class="btn-verify-now">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                         Verify My Account
                       </a>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-              @elseif(!$hasSub)
-                {{-- STEP 2: Verified but no subscription --}}
+              <?php elseif(!$hasSub): ?>
+                
                 <div class="text-center py-5 rounded" style="background:rgba(255,140,0,0.02);border:1.5px dashed rgba(255,140,0,0.22);">
                   <div class="mx-auto mb-4" style="width:72px;height:72px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,200,0,0.05));border:1.5px solid rgba(255,140,0,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -1480,7 +1517,7 @@
                     </svg>
                   </div>
                   <h4 class="fw-bold mb-2" style="color:rgba(255,210,0,0.95);">Choose a Subscription to Unlock</h4>
-                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:420px;margin:0 auto 0.5rem;">Great <span style="color:#ff8c00;font-weight:600;">{{ auth()->user()->name ?? 'User' }}</span>, your account is verified! Select a membership plan to start publishing photos and videos to your public profile.</p>
+                  <p style="font-size:0.9rem;color:rgba(255,255,255,0.5);max-width:420px;margin:0 auto 0.5rem;">Great <span style="color:#ff8c00;font-weight:600;"><?php echo e(auth()->user()->name ?? 'User'); ?></span>, your account is verified! Select a membership plan to start publishing photos and videos to your public profile.</p>
                   <p style="font-size:0.8rem;color:rgba(255,140,0,0.6);margin-bottom:1.5rem;">Each plan includes different photo and video upload limits.</p>
                   <button onclick="document.getElementById('membership-tab').click(); document.getElementById('membership-tab').scrollIntoView({behavior:'smooth'});" class="btn-orange">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="me-1">
@@ -1490,33 +1527,34 @@
                   </button>
                 </div>
 
-              @else
-                {{-- STEP 3: Verified + subscribed — show upload zones and galleries --}}
+              <?php else: ?>
+                
 
-                {{-- Plan badge --}}
+                
                 <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.15);">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  <span style="font-size:0.85rem;color:rgba(255,255,255,0.75);">Active Plan: <strong style="color:orange;">{{ ucfirst(auth()->user()->subscription_plan) }}</strong></span>
+                  <span style="font-size:0.85rem;color:rgba(255,255,255,0.75);">Active Plan: <strong style="color:orange;"><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong></span>
                   <span class="ms-auto" style="font-size:0.78rem;color:rgba(255,255,255,0.4);">
-                    Photos: {{ auth()->user()->photosCountForLimit() }}/{{ auth()->user()->photo_limit }} &nbsp;·&nbsp;
-                    Videos: {{ auth()->user()->videosCountForLimit() }}/{{ auth()->user()->video_limit }}
+                    Photos: <?php echo e(auth()->user()->photosCountForLimit()); ?>/<?php echo e(auth()->user()->photo_limit); ?> &nbsp;·&nbsp;
+                    Videos: <?php echo e(auth()->user()->videosCountForLimit()); ?>/<?php echo e(auth()->user()->video_limit); ?>
+
                   </span>
                 </div>
 
                 <div class="row g-4">
 
-                  {{-- ── PHOTOS COLUMN ── --}}
+                  
                   <div class="col-12 col-lg-6">
                     <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
                       <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         Publish Photo
                       </h3>
-                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ auth()->user()->photosCountForLimit() }} of {{ auth()->user()->photo_limit }} used</p>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);"><?php echo e(auth()->user()->photosCountForLimit()); ?> of <?php echo e(auth()->user()->photo_limit); ?> used</p>
 
-                      @if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit)
-                        <form action="{{ route('user.photos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishPhotoForm">
-                          @csrf
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->photosCountForLimit() < auth()->user()->photo_limit): ?>
+                        <form action="<?php echo e(route('user.photos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-2" id="publishPhotoForm">
+                          <?php echo csrf_field(); ?>
                           <label for="publishPhotoInput" id="publishPhotoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
                                  onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
                                  onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
@@ -1533,29 +1571,36 @@
                           </div>
                           
                           <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Photo</button>
-                          @error('photo')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-2"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </form>
-                      @else
+                      <?php else: ?>
                         <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
-                          You've reached the photo limit ({{ auth()->user()->photo_limit }}) for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+                          You've reached the photo limit (<?php echo e(auth()->user()->photo_limit); ?>) for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
                           <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
                         </div>
-                      @endif
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                   </div>
 
-                  {{-- ── VIDEOS COLUMN ── --}}
+                  
                   <div class="col-12 col-lg-6">
                     <div class="h-100 p-4 rounded" style="background:rgba(255,140,0,0.03);border:1px solid rgba(255,140,0,0.14);border-radius:16px;">
                       <h3 class="fs-5 fw-bold mb-1 d-flex align-items-center gap-2">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                         Publish Video
                       </h3>
-                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);">{{ auth()->user()->videosCountForLimit() }} of {{ auth()->user()->video_limit }} used</p>
+                      <p class="small mb-4" style="color:rgba(255,255,255,0.4);"><?php echo e(auth()->user()->videosCountForLimit()); ?> of <?php echo e(auth()->user()->video_limit); ?> used</p>
 
-                      @if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit)
-                        <form action="{{ route('user.videos.store') }}" method="POST" enctype="multipart/form-data" class="mb-2" id="publishVideoForm">
-                          @csrf
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->videosCountForLimit() < auth()->user()->video_limit): ?>
+                        <form action="<?php echo e(route('user.videos.store')); ?>" method="POST" enctype="multipart/form-data" class="mb-2" id="publishVideoForm">
+                          <?php echo csrf_field(); ?>
                           <label for="publishVideoInput" id="publishVideoLabel" class="w-100" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;padding:2.2rem 1rem;border:2px dashed rgba(255,140,0,0.35);border-radius:12px;cursor:pointer;background:rgba(255,140,0,0.01);transition:border-color 0.2s,background 0.2s;"
                                  onmouseover="this.style.borderColor='orange';this.style.background='rgba(255,140,0,0.05)'"
                                  onmouseout="this.style.borderColor='rgba(255,140,0,0.35)';this.style.background='rgba(255,140,0,0.01)'">
@@ -1572,20 +1617,27 @@
                           </div>
                           
                           <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Video</button>
-                          @error('video')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['video'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="text-danger small mt-2"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </form>
-                      @else
+                      <?php else: ?>
                         <div class="mb-2 py-2 px-3 rounded small" style="background:rgba(255,140,0,0.05);border:1px solid rgba(255,140,0,0.2);color:orange;">
-                          You've reached the video limit ({{ auth()->user()->video_limit }}) for your <strong>{{ ucfirst(auth()->user()->subscription_plan) }}</strong> plan.
+                          You've reached the video limit (<?php echo e(auth()->user()->video_limit); ?>) for your <strong><?php echo e(ucfirst(auth()->user()->subscription_plan)); ?></strong> plan.
                           <a href="#" onclick="document.getElementById('membership-tab').click();" class="ms-2" style="color:rgba(255,200,0,0.8);text-decoration:underline;">Upgrade</a>
                         </div>
-                      @endif
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
                   </div>
 
-                </div>{{-- /row --}}
+                </div>
 
-                {{-- ── NEW CARD: PUBLISHED MEDIA (Current Active Subscription Period) ── --}}
+                
                 <div class="mt-4 p-4 rounded" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;">
                   <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3" style="border-color:rgba(255,255,255,0.08) !important;">
                     <div>
@@ -1593,76 +1645,76 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Published Media (Current Subscription Period)
                       </h3>
-                      <p class="small mb-0 text-secondary">Active until {{ auth()->user()->subscription_expires_at ? auth()->user()->subscription_expires_at->format('M d, Y') : 'N/A' }}. Click any image to view in full screen.</p>
+                      <p class="small mb-0 text-secondary">Active until <?php echo e(auth()->user()->subscription_expires_at ? auth()->user()->subscription_expires_at->format('M d, Y') : 'N/A'); ?>. Click any image to view in full screen.</p>
                     </div>
                     <span class="badge bg-outline-warning border border-warning text-warning px-3 py-2" style="border-radius:20px;">
-                      {{ $photos->count() + $videos->count() }} Items Live
+                      <?php echo e($photos->count() + $videos->count()); ?> Items Live
                     </span>
                   </div>
 
                   <div class="row g-3">
-                    {{-- Published Photos --}}
-                    @if($photos->count())
-                      @foreach($photos as $photo)
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photos->count()): ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $photos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $photo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                         <div class="col-6 col-sm-4 col-md-3">
-                          <div class="published-photo-card" data-img-url="{{ asset('storage/' . $photo->path) }}" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:{{ $photo->is_main ? '2.5px solid #ff8c00' : '1px solid rgba(255,255,255,0.15)' }};cursor:pointer;" onclick="openMediaModal('{{ asset('storage/' . $photo->path) }}', 'image')">
-                            <img src="{{ asset('storage/' . $photo->path) }}" alt="Published Photo" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                          <div class="published-photo-card" data-img-url="<?php echo e(asset('storage/' . $photo->path)); ?>" style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:<?php echo e($photo->is_main ? '2.5px solid #ff8c00' : '1px solid rgba(255,255,255,0.15)'); ?>;cursor:pointer;" onclick="openMediaModal('<?php echo e(asset('storage/' . $photo->path)); ?>', 'image')">
+                            <img src="<?php echo e(asset('storage/' . $photo->path)); ?>" alt="Published Photo" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);opacity:0;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" class="d-flex align-items-center justify-content-center">
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                             </div>
                             
-                            {{-- Main Card Cover Badge / Button --}}
-                            @if($photo->is_main)
+                            
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($photo->is_main): ?>
                               <span class="btn-main-card-badge" style="position:absolute;top:6px;left:6px;z-index:2;">
                                 ★ Main Card
                               </span>
-                            @else
-                              <form action="{{ route('user.photos.set-main', $photo->id) }}" method="POST" style="position:absolute;top:6px;left:6px;z-index:2;" onclick="event.stopPropagation();">
-                                @csrf
+                            <?php else: ?>
+                              <form action="<?php echo e(route('user.photos.set-main', $photo->id)); ?>" method="POST" style="position:absolute;top:6px;left:6px;z-index:2;" onclick="event.stopPropagation();">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" class="btn-set-main-card" title="Set as Main Listing Card Cover">
                                   Set as Main
                                 </button>
                               </form>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                            <form action="{{ route('user.photos.destroy', $photo->id) }}" method="POST" style="position:absolute;top:6px;right:6px;z-index:2;" onclick="event.stopPropagation();">
-                              @csrf @method('DELETE')
+                            <form action="<?php echo e(route('user.photos.destroy', $photo->id)); ?>" method="POST" style="position:absolute;top:6px;right:6px;z-index:2;" onclick="event.stopPropagation();">
+                              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                               <button type="submit" onclick="return confirm('Delete this photo?')" style="width:26px;height:26px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                               </button>
                             </form>
                           </div>
                         </div>
-                      @endforeach
-                    @endif
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                    {{-- Published Videos --}}
-                    @if($videos->count())
-                      @foreach($videos as $vid)
+                    
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($videos->count()): ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $videos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vid): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                         <div class="col-12 col-md-6">
                           <div style="position:relative;border-radius:10px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,0.15);">
                             <video style="width:100%;display:block;border-radius:10px;aspect-ratio:16/9;object-fit:contain;" controls preload="none">
-                              <source src="{{ asset('storage/' . $vid->path) }}">
+                              <source src="<?php echo e(asset('storage/' . $vid->path)); ?>">
                             </video>
-                            <form action="{{ route('user.videos.destroy', $vid->id) }}" method="POST" style="position:absolute;top:8px;right:8px;z-index:2;">
-                              @csrf @method('DELETE')
+                            <form action="<?php echo e(route('user.videos.destroy', $vid->id)); ?>" method="POST" style="position:absolute;top:8px;right:8px;z-index:2;">
+                              <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
                               <button type="submit" onclick="return confirm('Delete this video?')" style="width:28px;height:28px;border-radius:50%;background:rgba(220,53,69,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Delete">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                               </button>
                             </form>
                           </div>
                         </div>
-                      @endforeach
-                    @endif
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                    @if(!$photos->count() && !$videos->count())
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$photos->count() && !$videos->count()): ?>
                       <div class="col-12 text-center py-4">
                         <p style="color:rgba(255,255,255,0.3);font-size:0.9rem;" class="mb-0">No photos or videos published for this period yet. Use the upload boxes above to publish.</p>
                       </div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   </div>
                 </div>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
           </div>
 
@@ -1672,34 +1724,35 @@
             
             <div class="dash-card">
               <header class="mb-3">
-                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Check your current balance and add funds. Available for premium features & upgrades.') }}</p>
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Check your current balance and add funds. Available for premium features & upgrades.')); ?></p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
                   <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
               </div>
             </div>
 
             <div class="dash-card">
               <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <div>
-                  <h2 class="dash-card-title mb-1">{{ __('Wallet History') }}</h2>
-                  <p class="dash-card-text mb-0">{{ __('Review your recent wallet transactions.') }}</p>
+                  <h2 class="dash-card-title mb-1"><?php echo e(__('Wallet History')); ?></h2>
+                  <p class="dash-card-text mb-0"><?php echo e(__('Review your recent wallet transactions.')); ?></p>
                 </div>
-                @if(!$deposits->isEmpty())
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$deposits->isEmpty()): ?>
                   <span style="color:orange; font-weight:700; font-size:0.85rem;">
-                    {{ $deposits->total() }} Total {{ $deposits->total() == 1 ? 'Transaction' : 'Transactions' }}
+                    <?php echo e($deposits->total()); ?> Total <?php echo e($deposits->total() == 1 ? 'Transaction' : 'Transactions'); ?>
+
                   </span>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </header>
 
               <div class="mt-3" id="walletHistoryContainer" style="transition: opacity 0.25s ease;">
-                @include('profile.partials.wallet-history')
+                <?php echo $__env->make('profile.partials.wallet-history', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
               </div>
             </div>
 
@@ -1711,64 +1764,65 @@
             <!-- Available Wallet Balance -->
             <div class="dash-card mb-4">
               <header class="mb-3">
-                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Your available funds for membership upgrades and premium features.') }}</p>
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Your available funds for membership upgrades and premium features.')); ?></p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
               </div>
             </div>
 
             <!-- Current Subscription -->
-            @if(auth()->user()->hasActiveSubscription())
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->hasActiveSubscription()): ?>
               <div class="dash-card mb-4" style="border-color: orange; background: rgba(255,140,0,0.05);">
                 <header>
                     <h2 class="dash-card-title text-warning d-flex align-items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                      {{ __('Current Subscription') }}
+                      <?php echo e(__('Current Subscription')); ?>
+
                     </h2>
                 </header>
                 <div class="d-flex flex-column gap-2 mt-3">
                   <div class="fs-5 fw-bold text-light">
-                    Plan: <span class="text-uppercase text-warning">{{ auth()->user()->subscription_plan }}</span>
+                    Plan: <span class="text-uppercase text-warning"><?php echo e(auth()->user()->subscription_plan); ?></span>
                   </div>
-                  @if(auth()->user()->subscription_expires_at)
-                    <div class="text-secondary">Expires: {{ auth()->user()->subscription_expires_at->format('M d, Y h:i A') }}</div>
-                  @else
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->subscription_expires_at): ?>
+                    <div class="text-secondary">Expires: <?php echo e(auth()->user()->subscription_expires_at->format('M d, Y h:i A')); ?></div>
+                  <?php else: ?>
                     <div class="text-secondary">Expires: Never</div>
-                  @endif
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   
                   <div class="mt-3 text-light p-3 rounded" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);">
                     <div class="mb-2 text-warning fw-bold small text-uppercase" style="letter-spacing: 1px;">Upload Limits</div>
                     <div class="d-flex gap-4">
                       <div>
                         <span class="text-secondary small">Photos:</span>
-                        <span class="fw-bold">{{ auth()->user()->photosCountForLimit() }} / {{ auth()->user()->photo_limit }}</span>
+                        <span class="fw-bold"><?php echo e(auth()->user()->photosCountForLimit()); ?> / <?php echo e(auth()->user()->photo_limit); ?></span>
                       </div>
                       <div>
                         <span class="text-secondary small">Videos:</span>
-                        <span class="fw-bold">{{ auth()->user()->videosCountForLimit() }} / {{ auth()->user()->video_limit }}</span>
+                        <span class="fw-bold"><?php echo e(auth()->user()->videosCountForLimit()); ?> / <?php echo e(auth()->user()->video_limit); ?></span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
             <!-- Available Plans -->
             <div class="dash-card">
               <header>
-                  <h2 class="dash-card-title">{{ __('Available Plans') }}</h2>
-                  <p class="dash-card-text">{{ __('Upgrade your membership to unlock more features.') }}</p>
+                  <h2 class="dash-card-title"><?php echo e(__('Available Plans')); ?></h2>
+                  <p class="dash-card-text"><?php echo e(__('Upgrade your membership to unlock more features.')); ?></p>
               </header>
               
               <div class="row">
-              @foreach($membershipPlans as $plan)
-                @php
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $membershipPlans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+                <?php
                   $checkoutRoutes = [
                     'regular'   => 'membership.regular.checkout',
                     'prime'     => 'membership.prime.checkout',
@@ -1778,44 +1832,45 @@
                   $checkoutRoute = $checkoutRoutes[$plan->slug] ?? null;
                   $isPrimeVip = $plan->slug === 'prime-vip';
                   $minPrice = $plan->pricing ? min(array_values($plan->pricing)) : 0;
-                @endphp
+                ?>
                 <div class="col-12 col-md-6 mb-3">
-                  <div class="p-4 rounded h-100 d-flex flex-column" style="{{ $isPrimeVip ? 'background:linear-gradient(135deg, rgba(255,165,0,0.1), rgba(255,140,0,0.05)); border:1px solid rgba(255,165,0,0.4); box-shadow:0 5px 15px rgba(255,165,0,0.15);' : 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);' }} position:relative; overflow:hidden;">
+                  <div class="p-4 rounded h-100 d-flex flex-column" style="<?php echo e($isPrimeVip ? 'background:linear-gradient(135deg, rgba(255,165,0,0.1), rgba(255,140,0,0.05)); border:1px solid rgba(255,165,0,0.4); box-shadow:0 5px 15px rgba(255,165,0,0.15);' : 'background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);'); ?> position:relative; overflow:hidden;">
                     
-                    @if($isPrimeVip)
-                      <div class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 fw-bold small" style="border-bottom-left-radius:8px;">{{ __('BEST VALUE') }}</div>
-                    @endif
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($isPrimeVip): ?>
+                      <div class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 fw-bold small" style="border-bottom-left-radius:8px;"><?php echo e(__('BEST VALUE')); ?></div>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                     <div class="mb-4">
-                      <div class="fs-2 fw-bold text-light mt-1 mb-1">{{ strtoupper($plan->name) }}</div>
-                      <div class="fs-5 text-warning fw-bold">From KSh {{ number_format($minPrice, 2) }}</div>
+                      <div class="fs-2 fw-bold text-light mt-1 mb-1"><?php echo e(strtoupper($plan->name)); ?></div>
+                      <div class="fs-5 text-warning fw-bold">From KSh <?php echo e(number_format($minPrice, 2)); ?></div>
                     </div>
 
                     <ul class="list-unstyled text-secondary small mb-4 flex-grow-1" style="line-height:1.8;">
-                      @if($plan->pricing)
-                        @foreach($plan->pricing as $days => $price)
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($plan->pricing): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $plan->pricing; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $days => $price): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                           <li class="d-flex align-items-start gap-2 mb-2">
                             <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span class="fw-medium text-light">{{ $days }} {{ (int)$days === 1 ? 'Day' : 'Days' }} Listing</span> = {{ number_format($price) }} Ksh
+                            <span class="fw-medium text-light"><?php echo e($days); ?> <?php echo e((int)$days === 1 ? 'Day' : 'Days'); ?> Listing</span> = <?php echo e(number_format($price)); ?> Ksh
                           </li>
-                        @endforeach
-                      @endif
-                      @if($plan->features)
-                        @foreach($plan->features as $feature)
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($plan->features): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $plan->features; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $feature): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                           <li class="d-flex align-items-start gap-2 mb-2">
                             <svg class="mt-1 flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            {{ $feature }}
+                            <?php echo e($feature); ?>
+
                           </li>
-                        @endforeach
-                      @endif
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </ul>
 
-                    @if($checkoutRoute)
-                      <a href="{{ route($checkoutRoute) }}" class="btn {{ $isPrimeVip ? 'btn-orange' : 'btn-outline-warning' }} w-100 fw-bold mt-auto" style="border-radius:8px;">{{ __('Sign Up Now') }}</a>
-                    @endif
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($checkoutRoute): ?>
+                      <a href="<?php echo e(route($checkoutRoute)); ?>" class="btn <?php echo e($isPrimeVip ? 'btn-orange' : 'btn-outline-warning'); ?> w-100 fw-bold mt-auto" style="border-radius:8px;"><?php echo e(__('Sign Up Now')); ?></a>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   </div>
                 </div>
-              @endforeach
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
               </div>
 
             </div>
@@ -1829,16 +1884,16 @@
             <!-- Available Wallet Balance -->
             <div class="dash-card mb-4">
               <header class="mb-3">
-                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Available Wallet Balance') }}</h2>
-                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Your available funds for classified listings and features. Available for premium features & upgrades.') }}</p>
+                  <h2 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Available Wallet Balance')); ?></h2>
+                  <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Your available funds for classified listings and features. Available for premium features & upgrades.')); ?></p>
               </header>
               <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background:rgba(255,140,0,0.05); border:1px solid rgba(255,140,0,0.2);">
                 <div>
-                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;">{{ __('Balance') }}</div>
-                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</div>
+                  <div class="text-secondary fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing:1px;"><?php echo e(__('Balance')); ?></div>
+                  <div class="fw-bold text-light mt-1" style="font-size: 1.35rem;">KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></div>
                   <div class="text-secondary" style="font-size: 0.78rem; margin-top: 0.25rem;">Available for premium features & upgrades</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;">{{ __('Add Funds') }}</a>
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn btn-sm btn-orange py-1.5 px-3" style="font-size: 0.82rem;"><?php echo e(__('Add Funds')); ?></a>
               </div>
             </div>
 
@@ -1846,34 +1901,34 @@
             <div class="dash-card">
               <header>
                   <div class="d-flex align-items-center justify-content-between mb-2">
-                    <h2 class="dash-card-title mb-0">{{ __('Classifieds') }}</h2>
-                    <button @click="showCreate = true" class="btn btn-orange btn-sm" style="font-size:0.8rem; padding:0.4rem 1rem;">{{ __('Post New') }}</button>
+                    <h2 class="dash-card-title mb-0"><?php echo e(__('Classifieds')); ?></h2>
+                    <button @click="showCreate = true" class="btn btn-orange btn-sm" style="font-size:0.8rem; padding:0.4rem 1rem;"><?php echo e(__('Post New')); ?></button>
                   </div>
-                  <p class="dash-card-text">{{ __('Manage and track the status of your classified listings.') }}</p>
+                  <p class="dash-card-text"><?php echo e(__('Manage and track the status of your classified listings.')); ?></p>
               </header>
               
               <div class="row g-2 g-md-3">
                 <div class="col-6 col-md-3">
                   <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
-                    <div class="fw-bold text-light mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['unpublished'] ?? 0 }}</div>
+                    <div class="fw-bold text-light mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['unpublished'] ?? 0); ?></div>
                     <div class="text-secondary text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px;">Unpublished</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(255,193,7,0.05); border:1px solid rgba(255,193,7,0.2);">
-                    <div class="fw-bold text-warning mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['in_moderation'] ?? 0 }}</div>
+                    <div class="fw-bold text-warning mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['in_moderation'] ?? 0); ?></div>
                     <div class="text-warning text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">In Moderation</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.2);">
-                    <div class="fw-bold text-success mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['approved'] ?? 0 }}</div>
+                    <div class="fw-bold text-success mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['approved'] ?? 0); ?></div>
                     <div class="text-success text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Approved</div>
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
                   <div class="p-2.5 py-3 rounded text-center h-100" style="background:rgba(220,53,69,0.05); border:1px solid rgba(220,53,69,0.2);">
-                    <div class="fw-bold text-danger mb-1" style="font-size:1.4rem; line-height:1;">{{ $classifiedsStats['rejected'] ?? 0 }}</div>
+                    <div class="fw-bold text-danger mb-1" style="font-size:1.4rem; line-height:1;"><?php echo e($classifiedsStats['rejected'] ?? 0); ?></div>
                     <div class="text-danger text-uppercase fw-bold" style="font-size:0.7rem; letter-spacing:0.5px; opacity:0.85;">Rejected</div>
                   </div>
                 </div>
@@ -1884,18 +1939,19 @@
             <div class="dash-card mt-4">
               <header class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                 <div>
-                  <h2 class="dash-card-title mb-1">{{ __('Classifieds History') }}</h2>
-                  <p class="dash-card-text mb-0">{{ __('Review your recent classified listings and their statuses.') }}</p>
+                  <h2 class="dash-card-title mb-1"><?php echo e(__('Classifieds History')); ?></h2>
+                  <p class="dash-card-text mb-0"><?php echo e(__('Review your recent classified listings and their statuses.')); ?></p>
                 </div>
-                @if(!$classifieds->isEmpty())
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$classifieds->isEmpty()): ?>
                   <span style="color:orange; font-weight:700; font-size:0.85rem;">
-                    {{ $classifieds->total() }} Total {{ $classifieds->total() == 1 ? 'Listing' : 'Listings' }}
+                    <?php echo e($classifieds->total()); ?> Total <?php echo e($classifieds->total() == 1 ? 'Listing' : 'Listings'); ?>
+
                   </span>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </header>
 
               <div class="mt-3" id="classifiedsHistoryContainer" style="transition: opacity 0.25s ease;">
-                @include('profile.partials.classifieds-history')
+                <?php echo $__env->make('profile.partials.classifieds-history', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
               </div>
             </div>
             </div>
@@ -1904,23 +1960,23 @@
             <div x-show="showCreate" style="display: none;" x-cloak>
               <div class="dash-card mb-4">
                 <header class="d-flex align-items-center justify-content-between mb-4">
-                    <h2 class="dash-card-title mb-0">{{ __('Create Classified Post') }}</h2>
-                    <button @click="showCreate = false" class="btn btn-outline-secondary btn-sm">{{ __('Back') }}</button>
+                    <h2 class="dash-card-title mb-0"><?php echo e(__('Create Classified Post')); ?></h2>
+                    <button @click="showCreate = false" class="btn btn-outline-secondary btn-sm"><?php echo e(__('Back')); ?></button>
                 </header>
                 
-                <form action="{{ route('membership.process') }}" method="POST" enctype="multipart/form-data" id="classified-form">
-                  @csrf
+                <form action="<?php echo e(route('membership.process')); ?>" method="POST" enctype="multipart/form-data" id="classified-form">
+                  <?php echo csrf_field(); ?>
                   <input type="hidden" name="plan_type" value="classified">
                   <input type="hidden" name="plan" value="0">
                   <div class="row g-3">
                     
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('Post Title') }}</label>
+                      <label class="form-label"><?php echo e(__('Post Title')); ?></label>
                       <input type="text" name="title" class="form-control" placeholder="Post Title" required>
                     </div>
                     
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('Category') }}</label>
+                      <label class="form-label"><?php echo e(__('Category')); ?></label>
                       <select name="category" class="form-select text-secondary" required>
                         <option value="">Select Category</option>
                         <option value="personals">Personals</option>
@@ -1931,71 +1987,71 @@
                     </div>
 
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('City or Neighbourhood') }}</label>
+                      <label class="form-label"><?php echo e(__('City or Neighbourhood')); ?></label>
                       <input type="text" name="city" class="form-control" placeholder="City Or Neighbourhood">
                     </div>
 
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('Featured Image') }}</label>
+                      <label class="form-label"><?php echo e(__('Featured Image')); ?></label>
                       <input type="file" name="image" class="form-control text-secondary" accept="image/*" required>
                     </div>
 
                     <div class="col-12">
-                      <label class="form-label">{{ __('Description') }}</label>
+                      <label class="form-label"><?php echo e(__('Description')); ?></label>
                       <textarea name="description" class="form-control" rows="4"></textarea>
                     </div>
 
                     <div class="col-12">
-                      <label class="form-label">{{ __('Gallery (Add Images)') }}</label>
+                      <label class="form-label"><?php echo e(__('Gallery (Add Images)')); ?></label>
                       <input type="file" name="gallery[]" class="form-control text-secondary" multiple>
                     </div>
 
                     <div class="col-md-6">
                       <div class="form-check mb-2 mt-3">
                         <input class="form-check-input" type="checkbox" id="showPhone" checked>
-                        <label class="form-check-label text-light" for="showPhone">{{ __('Show my Phone Number') }}</label>
+                        <label class="form-check-label text-light" for="showPhone"><?php echo e(__('Show my Phone Number')); ?></label>
                       </div>
-                      <label class="form-label">{{ __('Phone Number') }}</label>
+                      <label class="form-label"><?php echo e(__('Phone Number')); ?></label>
                       <input type="text" name="phone" class="form-control" placeholder="Phone Number">
                     </div>
 
                     <div class="col-md-6">
                       <div class="form-check mb-2 mt-3">
                         <input class="form-check-input" type="checkbox" id="showName" checked>
-                        <label class="form-check-label text-light" for="showName">{{ __('Show my Name') }}</label>
+                        <label class="form-check-label text-light" for="showName"><?php echo e(__('Show my Name')); ?></label>
                       </div>
-                      <label class="form-label">{{ __('Contact Name') }}</label>
+                      <label class="form-label"><?php echo e(__('Contact Name')); ?></label>
                       <input type="text" name="contact_name" class="form-control" placeholder="Contact Name">
                     </div>
                   </div>
 
                   <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
                   
-                  <h5 class="text-light fw-bold mb-3">{{ __('Payment Method') }}</h5>
+                  <h5 class="text-light fw-bold mb-3"><?php echo e(__('Payment Method')); ?></h5>
                   
                   <div class="p-4 rounded mb-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1);">
                     <div class="mb-4">
                       <select name="payment_method" class="form-select text-secondary" required>
                         <option value="mpesa">MPESA [Transaction Fee: 0% + 0]</option>
-                        <option value="wallet">Available Wallet Balance (KSh {{ number_format(auth()->user()->wallet_balance ?? 0, 2) }})</option>
+                        <option value="wallet">Available Wallet Balance (KSh <?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?>)</option>
                       </select>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-2 small text-secondary">
-                      <span>{{ __('Post Price:') }}</span>
+                      <span><?php echo e(__('Post Price:')); ?></span>
                       <span class="text-light fw-medium">KSh1,000.00</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2 small text-secondary">
-                      <span>{{ __('Transaction Fee:') }}</span>
+                      <span><?php echo e(__('Transaction Fee:')); ?></span>
                       <span class="text-light fw-medium">KSh0.00</span>
                     </div>
                     <div class="d-flex justify-content-between pt-3 mt-3 border-top" style="border-color:rgba(255,255,255,0.1) !important;">
-                      <span class="text-light fw-bold">{{ __('Total:') }}</span>
+                      <span class="text-light fw-bold"><?php echo e(__('Total:')); ?></span>
                       <span class="text-warning fw-bold fs-5">KSh1,000.00</span>
                     </div>
                   </div>
 
-                  <button type="submit" class="btn btn-orange w-100 fw-bold py-2" style="border-radius:8px;">{{ __('Pay & Publish') }}</button>
+                  <button type="submit" class="btn btn-orange w-100 fw-bold py-2" style="border-radius:8px;"><?php echo e(__('Pay & Publish')); ?></button>
 
                 </form>
               </div>
@@ -2005,7 +2061,7 @@
 
           <!-- Hookups Tab -->
           <div class="tab-pane fade" id="tab-hookups" role="tabpanel" aria-labelledby="hookups-tab">
-            @include('profile.partials.hookup-listing-form')
+            <?php echo $__env->make('profile.partials.hookup-listing-form', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
           </div>
 
 
@@ -2026,11 +2082,11 @@
                 <div>
                   <div class="text-uppercase fw-bold mb-1" style="font-size:0.72rem;letter-spacing:1.5px;color:rgba(255,140,0,0.8);">Current Balance</div>
                   <div class="fw-bold settings-balance-amount" style="font-size:1.5rem;line-height:1;">
-                    KSh <span class="settings-balance-num">{{ number_format(auth()->user()->wallet_balance ?? 0, 2) }}</span>
+                    KSh <span class="settings-balance-num"><?php echo e(number_format(auth()->user()->wallet_balance ?? 0, 2)); ?></span>
                   </div>
                   <div class="settings-balance-sub" style="font-size:0.8rem;margin-top:0.3rem;">Available for premium features & upgrades</div>
                 </div>
-                <a href="{{ route('wallet.add') }}" class="btn-settings-fund btn-sm">
+                <a href="<?php echo e(route('wallet.add')); ?>" class="btn-settings-fund btn-sm">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                   </svg>
@@ -2051,16 +2107,16 @@
               </div>
               <p class="dash-card-text mb-4">Manage your privacy preferences, notifications, and account security.</p>
 
-              <form class="mt-2" method="POST" action="{{ route('profile.update') }}">
-                @csrf
-                @method('patch')
-                {{-- Tell the controller to redirect back to the Settings tab --}}
+              <form class="mt-2" method="POST" action="<?php echo e(route('profile.update')); ?>">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('patch'); ?>
+                
                 <input type="hidden" name="_redirect_tab" value="tab-settings">
-                {{-- Hidden fields required by ProfileUpdateRequest validation --}}
-                <input type="hidden" name="name" value="{{ auth()->user()->name }}">
-                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                
+                <input type="hidden" name="name" value="<?php echo e(auth()->user()->name); ?>">
+                <input type="hidden" name="email" value="<?php echo e(auth()->user()->email); ?>">
 
-                {{-- Privacy Settings --}}
+                
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   Privacy
@@ -2073,9 +2129,9 @@
                     </label>
                     <div class="settings-select-wrap">
                       <select class="form-select settings-select" name="favorites_visibility">
-                        <option value="everybody" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'everybody' ? 'selected' : '' }}>Everybody</option>
-                        <option value="favourites" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'favourites' ? 'selected' : '' }}>Favourites Only</option>
-                        <option value="nobody" {{ old('favorites_visibility', auth()->user()->favorites_visibility) == 'nobody' ? 'selected' : '' }}>Nobody</option>
+                        <option value="everybody" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'everybody' ? 'selected' : ''); ?>>Everybody</option>
+                        <option value="favourites" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
+                        <option value="nobody" <?php echo e(old('favorites_visibility', auth()->user()->favorites_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
                       </select>
                       <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
@@ -2086,16 +2142,16 @@
                     </label>
                     <div class="settings-select-wrap">
                       <select class="form-select settings-select" name="photos_visibility">
-                        <option value="everybody" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'everybody' ? 'selected' : '' }}>Everybody</option>
-                        <option value="favourites" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'favourites' ? 'selected' : '' }}>Favourites Only</option>
-                        <option value="nobody" {{ old('photos_visibility', auth()->user()->photos_visibility) == 'nobody' ? 'selected' : '' }}>Nobody</option>
+                        <option value="everybody" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'everybody' ? 'selected' : ''); ?>>Everybody</option>
+                        <option value="favourites" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'favourites' ? 'selected' : ''); ?>>Favourites Only</option>
+                        <option value="nobody" <?php echo e(old('photos_visibility', auth()->user()->photos_visibility) == 'nobody' ? 'selected' : ''); ?>>Nobody</option>
                       </select>
                       <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
                   </div>
                 </div>
 
-                {{-- Notifications --}}
+                
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                   Notifications
@@ -2106,8 +2162,8 @@
                     <label class="settings-field-label">Email Notifications</label>
                     <div class="settings-select-wrap">
                       <select class="form-select settings-select" name="email_notifications">
-                        <option value="messages" {{ old('email_notifications', auth()->user()->email_notifications) == 'messages' ? 'selected' : '' }}>Messages</option>
-                        <option value="none" {{ old('email_notifications', auth()->user()->email_notifications) == 'none' ? 'selected' : '' }}>None</option>
+                        <option value="messages" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'messages' ? 'selected' : ''); ?>>Messages</option>
+                        <option value="none" <?php echo e(old('email_notifications', auth()->user()->email_notifications) == 'none' ? 'selected' : ''); ?>>None</option>
                       </select>
                       <span class="settings-select-arrow"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                     </div>
@@ -2126,17 +2182,18 @@
                           id="callsEnabledToggle"
                           name="calls_enabled"
                           value="1"
-                          {{ auth()->user()->calls_enabled ? 'checked' : '' }}
+                          <?php echo e(auth()->user()->calls_enabled ? 'checked' : ''); ?>
+
                           style="border-color: rgba(255,140,0,0.5); cursor:pointer;"
-                          data-toggle-url="{{ route('profile.toggle-calls') }}"
-                          data-csrf="{{ csrf_token() }}"
+                          data-toggle-url="<?php echo e(route('profile.toggle-calls')); ?>"
+                          data-csrf="<?php echo e(csrf_token()); ?>"
                         >
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {{-- Account --}}
+                
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                   Account
@@ -2154,12 +2211,12 @@
                       <svg class="settings-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
                       </svg>
-                      <input type="email" class="form-control settings-input" value="{{ auth()->user()->email ?? '' }}" readonly style="pointer-events:none; user-select:none;" />
+                      <input type="email" class="form-control settings-input" value="<?php echo e(auth()->user()->email ?? ''); ?>" readonly style="pointer-events:none; user-select:none;" />
                     </div>
                   </div>
                 </div>
 
-                {{-- Security --}}
+                
                 <div class="settings-group-label">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                   Change Password
@@ -2196,7 +2253,7 @@
                   </div>
                 </div>
 
-                {{-- Save --}}
+                
                 <div class="d-flex align-items-center justify-content-between pt-3 mt-2 settings-save-footer">
                   <span class="settings-help-text" style="font-size:0.8rem;">All changes are saved securely.</span>
                   <button type="submit" class="btn-save-settings">
@@ -2225,9 +2282,9 @@
                   </div>
                 </div>
                 
-                @if(isset($sessions) && count($sessions) > 1)
-                  <form method="POST" action="{{ route('profile.sessions.terminate-others') }}">
-                    @csrf
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($sessions) && count($sessions) > 1): ?>
+                  <form method="POST" action="<?php echo e(route('profile.sessions.terminate-others')); ?>">
+                    <?php echo csrf_field(); ?>
                     <button type="submit"
                       style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 1rem;border-radius:8px;font-size:0.82rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.6);color:#dc3545;"
                       onmouseover="this.style.background='rgba(220,53,69,0.12)'" onmouseout="this.style.background='transparent'"
@@ -2236,41 +2293,42 @@
                       Sign Out Other Devices
                     </button>
                   </form>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </div>
 
 
 
               <div class="list-group list-group-flush rounded border border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
-                @if(isset($sessions) && count($sessions) > 0)
-                  @foreach($sessions as $session)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($sessions) && count($sessions) > 0): ?>
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $sessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                     <div class="list-group-item d-flex align-items-center justify-content-between p-3 flex-wrap gap-2" style="background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); color: #fff;">
                       <div class="d-flex align-items-center gap-3">
                         <div class="session-device-icon" style="color: orange; background: rgba(255,140,0,0.1); padding: 0.6rem; border-radius: 8px;">
-                          @if($session->device === 'Mobile')
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($session->device === 'Mobile'): ?>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                          @elseif($session->device === 'Tablet')
+                          <?php elseif($session->device === 'Tablet'): ?>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                          @else
+                          <?php else: ?>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                          @endif
+                          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
                         <div>
                           <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <span class="fw-bold text-white">{{ $session->platform }} - {{ $session->browser }}</span>
-                            @if($session->is_current_device)
+                            <span class="fw-bold text-white"><?php echo e($session->platform); ?> - <?php echo e($session->browser); ?></span>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($session->is_current_device): ?>
                               <span class="badge bg-success text-white border-0 px-2 py-1" style="font-size: 0.7rem; font-weight: 600; background-color: #28a745 !important;">This device</span>
-                            @endif
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                           </div>
                           <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">
-                            {{ $session->ip_address }} &bull; Last active {{ $session->last_active }}
+                            <?php echo e($session->ip_address); ?> &bull; Last active <?php echo e($session->last_active); ?>
+
                           </div>
                         </div>
                       </div>
 
-                      @if(!$session->is_current_device)
-                        <form method="POST" action="{{ route('profile.sessions.terminate', $session->id) }}">
-                          @csrf
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!$session->is_current_device): ?>
+                        <form method="POST" action="<?php echo e(route('profile.sessions.terminate', $session->id)); ?>">
+                          <?php echo csrf_field(); ?>
                           <button type="submit"
                             style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.35rem 0.85rem;border-radius:7px;font-size:0.78rem;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;background:transparent;border:1.5px solid rgba(220,53,69,0.5);color:#dc3545;"
                             onmouseover="this.style.background='rgba(220,53,69,0.1)'" onmouseout="this.style.background='transparent'"
@@ -2279,21 +2337,22 @@
                             Sign Out
                           </button>
                         </form>
-                      @endif
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
-                  @endforeach
-                @else
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                <?php else: ?>
                   <div class="p-4 text-center text-secondary" style="background: rgba(0,0,0,0.2);">
                     No active sessions found.
                   </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
               </div>
 
-              @if(isset($sessions) && $sessions instanceof \Illuminate\Pagination\LengthAwarePaginator && $sessions->hasPages())
+              <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($sessions) && $sessions instanceof \Illuminate\Pagination\LengthAwarePaginator && $sessions->hasPages()): ?>
                 <div class="d-flex justify-content-center pt-2 mt-3">
-                  {{ $sessions->fragment('tab-settings')->links('pagination::bootstrap-5') }}
+                  <?php echo e($sessions->fragment('tab-settings')->links('pagination::bootstrap-5')); ?>
+
                 </div>
-              @endif
+              <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
           </div>
@@ -2431,8 +2490,8 @@
             <div class="mb-3">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
-                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none">{{ __('Home') }}</a></li>
-                  <li class="breadcrumb-item active text-secondary" aria-current="page">{{ __('Photo Verification') }}</li>
+                  <li class="breadcrumb-item"><a href="#" class="text-warning text-decoration-none"><?php echo e(__('Home')); ?></a></li>
+                  <li class="breadcrumb-item active text-secondary" aria-current="page"><?php echo e(__('Photo Verification')); ?></li>
                 </ol>
               </nav>
             </div>
@@ -2444,12 +2503,13 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                   </div>
                   <div>
-                    <h2 class="dash-card-title mb-0 text-warning" style="font-size: 1.15rem;">{{ __('Get Verified') }}</h2>
-                    <div class="badge bg-success text-dark fw-bold px-2 py-0.5" style="font-size:0.7rem;">{{ __('"REAL PHOTOS" BADGE') }}</div>
+                    <h2 class="dash-card-title mb-0 text-warning" style="font-size: 1.15rem;"><?php echo e(__('Get Verified')); ?></h2>
+                    <div class="badge bg-success text-dark fw-bold px-2 py-0.5" style="font-size:0.7rem;"><?php echo e(__('"REAL PHOTOS" BADGE')); ?></div>
                   </div>
               </header>
               <p class="dash-card-text text-light mb-0" style="font-size: 0.85rem; line-height:1.5;">
-                {{ __('If you want to get the "REAL PHOTOS" badge use our totally free photo verification service, you can build trust in your visitors and have much more clients as well.') }}
+                <?php echo e(__('If you want to get the "REAL PHOTOS" badge use our totally free photo verification service, you can build trust in your visitors and have much more clients as well.')); ?>
+
               </p>
             </div>
 
@@ -2458,49 +2518,57 @@
                 <!-- Upload Section -->
                 <div class="dash-card h-100 p-3">
                   <header class="mb-3">
-                      <h3 class="dash-card-title mb-1" style="font-size: 1.05rem;">{{ __('Real Photo') }}</h3>
-                      <p class="dash-card-text mb-0" style="font-size: 0.82rem;">{{ __('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.') }}</p>
+                      <h3 class="dash-card-title mb-1" style="font-size: 1.05rem;"><?php echo e(__('Real Photo')); ?></h3>
+                      <p class="dash-card-text mb-0" style="font-size: 0.82rem;"><?php echo e(__('Make a FULL BODY photo of yourself while showing this sign with your hand and upload it.')); ?></p>
                   </header>
                   
                   <div class="d-flex flex-column align-items-center justify-content-center p-3 mb-3 rounded text-center" style="background: rgba(0,0,0,0.3); border: 1.5px dashed rgba(255,140,0,0.4);">
                     <div class="mb-1" style="font-size: 1.6rem; line-height: 1;">✋</div>
-                    <h6 class="text-light fw-bold mb-0" style="font-size: 0.9rem;">{{ __('Show this sign') }}</h6>
-                    <span class="text-secondary" style="font-size: 0.75rem;">{{ __('(Palm)') }}</span>
+                    <h6 class="text-light fw-bold mb-0" style="font-size: 0.9rem;"><?php echo e(__('Show this sign')); ?></h6>
+                    <span class="text-secondary" style="font-size: 0.75rem;"><?php echo e(__('(Palm)')); ?></span>
                   </div>
 
-                  @if(session('verification_upload_success'))
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('verification_upload_success')): ?>
                     <div class="alert alert-success text-white border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
-                        {{ session('verification_upload_success') }}
-                    </div>
-                  @endif
+                        <?php echo e(session('verification_upload_success')); ?>
 
-                  @if(auth()->user()->is_verified)
+                    </div>
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                  <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->is_verified): ?>
                       <div class="alert alert-success text-white border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40,167,69,0.5) !important;">
                           <strong>Verified!</strong><br>Your account has been verified. You can now upload photos and videos.
                       </div>
-                  @elseif(isset($verificationSubmission) && $verificationSubmission->status === 'pending')
+                  <?php elseif(isset($verificationSubmission) && $verificationSubmission->status === 'pending'): ?>
                       <div class="alert alert-warning text-center border-0 mb-3 p-2.5 px-3" style="font-size: 0.85rem; background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.3) !important;">
                           <strong>Pending Review</strong><br>Your photo is currently being reviewed by our team. Please check back later.
                       </div>
-                  @else
-                      @if(isset($verificationSubmission) && $verificationSubmission->status === 'rejected')
+                  <?php else: ?>
+                      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($verificationSubmission) && $verificationSubmission->status === 'rejected'): ?>
                           <div class="alert alert-danger border-0 mb-3 text-center p-2.5 px-3" style="font-size: 0.85rem; background: rgba(220, 53, 69, 0.1); color: #ff6b6b; border: 1px solid rgba(220,53,69,0.3) !important;">
                               <strong>Rejected</strong><br>Your previous submission was rejected. Please carefully review the requirements and try again.
                           </div>
-                      @endif
+                      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                      <form method="POST" action="{{ route('verification.submit') }}" enctype="multipart/form-data">
-                        @csrf
+                      <form method="POST" action="<?php echo e(route('verification.submit')); ?>" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
                         <div class="mb-3">
-                          <label class="form-label fw-bold" style="font-size: 0.85rem;">{{ __('Upload Photo') }}</label>
+                          <label class="form-label fw-bold" style="font-size: 0.85rem;"><?php echo e(__('Upload Photo')); ?></label>
                           <input type="file" name="photo" class="form-control form-control-sm py-1.5" accept="image/jpeg,image/png,image/webp" required style="font-size: 0.82rem;" />
-                          @error('photo')
-                            <div class="text-danger small mt-1" style="font-size: 0.78rem;">{{ $message }}</div>
-                          @enderror
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['photo'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <div class="text-danger small mt-1" style="font-size: 0.78rem;"><?php echo e($message); ?></div>
+                          <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
-                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px; font-size: 0.85rem;">{{ __('Submit for Verification') }}</button>
+                        <button type="submit" class="btn-orange w-100 fw-bold py-2" style="border-radius: 8px; font-size: 0.85rem;"><?php echo e(__('Submit for Verification')); ?></button>
                       </form>
-                  @endif
+                  <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
               </div>
 
@@ -2510,25 +2578,26 @@
                   <header class="mb-3">
                       <h4 class="dash-card-title text-success d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        {{ __('Accepted Photos') }}
+                        <?php echo e(__('Accepted Photos')); ?>
+
                       </h4>
                   </header>
                   <ul class="list-unstyled text-secondary mb-3" style="line-height: 1.5; font-size: 0.82rem;">
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
-                      <div>{{ __('Showing this requested sign with hand.') }}</div>
+                      <div><?php echo e(__('Showing this requested sign with hand.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
-                      <div>{{ __('We must see your FULL BODY without covering clothes (Lingerie Accepted).') }}</div>
+                      <div><?php echo e(__('We must see your FULL BODY without covering clothes (Lingerie Accepted).')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
-                      <div>{{ __('Tattoo must be seen on the photo, if you have.') }}</div>
+                      <div><?php echo e(__('Tattoo must be seen on the photo, if you have.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-success mt-1"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg></div>
-                      <div>{{ __('Please use makeup that helps us to compare the photos.') }}</div>
+                      <div><?php echo e(__('Please use makeup that helps us to compare the photos.')); ?></div>
                     </li>
                   </ul>
                   
@@ -2537,21 +2606,22 @@
                   <header class="mb-2">
                       <h4 class="dash-card-title text-danger d-flex align-items-center gap-2 mb-0" style="font-size: 0.95rem;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                        {{ __('Rejected Photos') }}
+                        <?php echo e(__('Rejected Photos')); ?>
+
                       </h4>
                   </header>
                   <ul class="list-unstyled text-secondary mb-0" style="line-height: 1.5; font-size: 0.82rem;">
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-                      <div>{{ __('Face not visible or covered.') }}</div>
+                      <div><?php echo e(__('Face not visible or covered.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-                      <div>{{ __('Not showing the requested hand sign.') }}</div>
+                      <div><?php echo e(__('Not showing the requested hand sign.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-danger mt-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-                      <div>{{ __('Heavily filtered or edited photos.') }}</div>
+                      <div><?php echo e(__('Heavily filtered or edited photos.')); ?></div>
                     </li>
                   </ul>
                 </div>
@@ -2560,20 +2630,20 @@
 
           </div>
 
-          {{-- ─────────────────────────────────────────────────────────────── --}}
-          {{-- TAB: MY REFERRALS (proper Blade pane inside .tab-content) --}}
-          {{-- ─────────────────────────────────────────────────────────────── --}}
-          @php
+          
+          
+          
+          <?php
             $authUser        = auth()->user();
             $refLink         = $authUser->referral_link;
             $totalReferred   = $authUser->referrals()->count();
             $totalEarned     = $authUser->total_referral_earnings;
             $redeemable      = (float) $authUser->referral_balance;
             $refEarnings     = $authUser->referralEarnings()->with('referee')->latest()->get();
-          @endphp
+          ?>
           <div class="tab-pane fade" id="tab-referrals" role="tabpanel" aria-labelledby="referrals-tab">
 
-            {{-- Breadcrumb --}}
+            
             <div class="mb-3">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0" style="font-size:0.8rem;">
@@ -2583,7 +2653,7 @@
               </nav>
             </div>
 
-            {{-- Hero card --}}
+            
             <div class="dash-card mb-3 p-3" style="background:linear-gradient(135deg,rgba(255,140,0,0.12),rgba(0,0,0,0.04));border:1px solid rgba(255,140,0,0.4);">
               <header class="d-flex align-items-center gap-2 mb-1">
                 <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width:36px;height:36px;background:orange;">
@@ -2596,31 +2666,31 @@
               </header>
             </div>
 
-            {{-- Global navbar handles success toast. Form errors are handled below input fields (none here) --}}
+            
 
-            {{-- Stats row --}}
+            
             <div class="row g-3 mb-3">
               <div class="col-6 col-md-4">
                 <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
-                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">{{ $totalReferred }}</div>
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;"><?php echo e($totalReferred); ?></div>
                   <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Friends Referred</div>
                 </div>
               </div>
               <div class="col-6 col-md-4">
                 <div class="dash-card p-3 text-center" style="border-color:rgba(255,140,0,0.25);">
-                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh {{ number_format($totalEarned, 2) }}</div>
+                  <div style="font-size:1.6rem;font-weight:800;color:orange;line-height:1;">KSh <?php echo e(number_format($totalEarned, 2)); ?></div>
                   <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Total Earned</div>
                 </div>
               </div>
               <div class="col-12 col-md-4">
                 <div class="dash-card p-3 text-center" style="border-color:rgba(40,167,69,0.35);">
-                  <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh {{ number_format($redeemable, 2) }}</div>
+                  <div style="font-size:1.6rem;font-weight:800;color:#28a745;line-height:1;">KSh <?php echo e(number_format($redeemable, 2)); ?></div>
                   <div class="text-muted" style="font-size:0.72rem;margin-top:0.3rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Available to Redeem</div>
                 </div>
               </div>
             </div>
 
-            {{-- Referral Link Card --}}
+            
             <div class="dash-card mb-3">
               <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:0.6rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -2628,7 +2698,7 @@
               </h3>
               <p class="text-muted" style="font-size:0.82rem;margin-bottom:0.85rem;">Share this link. When friends sign up &amp; top up their wallet, you earn 10% bonus!</p>
               <div class="d-flex gap-2 align-items-center flex-wrap">
-                <input id="referralLinkInput" type="text" value="{{ $refLink }}" readonly
+                <input id="referralLinkInput" type="text" value="<?php echo e($refLink); ?>" readonly
                   class="form-control form-control-sm font-monospace"
                   style="flex:1;min-width:0;border-color:rgba(255,140,0,0.3);border-radius:8px;padding:0.6rem 1rem;font-size:0.8rem;outline:none;">
                 <button id="copyReferralBtn" type="button" onclick="copyReferralLink()"
@@ -2641,29 +2711,29 @@
               </div>
               <div id="copyReferralSuccess" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:#28a745;">Link copied to clipboard!</div>
               
-              {{-- Social Share Links --}}
+              
               <div class="mt-4 d-flex align-items-center gap-3 flex-wrap">
                   <span class="text-muted" style="font-size:0.85rem;font-weight:600;">Share via:</span>
                   
-                  {{-- WhatsApp --}}
-                  <a href="https://api.whatsapp.com/send?text={{ urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits! ' . $refLink) }}" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#25D366;color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on WhatsApp">
+                  
+                  <a href="https://api.whatsapp.com/send?text=<?php echo e(urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits! ' . $refLink)); ?>" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#25D366;color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on WhatsApp">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                   </a>
                   
-                  {{-- X (Twitter) --}}
-                  <a href="https://twitter.com/intent/tweet?text={{ urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits!') }}&url={{ urlencode($refLink) }}" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#000;color:#fff;border-radius:50%;border:1px solid rgba(255,255,255,0.2);text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on X">
+                  
+                  <a href="https://twitter.com/intent/tweet?text=<?php echo e(urlencode('Join Kenyan Baddies Club using my referral link and get exclusive benefits!')); ?>&url=<?php echo e(urlencode($refLink)); ?>" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:#000;color:#fff;border-radius:50%;border:1px solid rgba(255,255,255,0.2);text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Share on X">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                   </a>
 
-                  {{-- Instagram --}}
+                  
                   <a href="https://instagram.com/" target="_blank" class="d-flex align-items-center justify-content-center shadow-sm" style="width:40px;height:40px;background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);color:#fff;border-radius:50%;text-decoration:none;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Open Instagram">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                   </a>
               </div>
             </div>
 
-            {{-- Redeem Card (only when balance > 0) --}}
-            @if($redeemable > 0)
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($redeemable > 0): ?>
             <div class="dash-card mb-3" style="border-color:rgba(40,167,69,0.4);background:rgba(40,167,69,0.05);">
               <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div>
@@ -2671,21 +2741,22 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                     Redeem Bonus to Wallet
                   </h3>
-                  <p class="text-muted" style="font-size:0.82rem;margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh {{ number_format($redeemable, 2) }}</strong> to your main wallet instantly.</p>
+                  <p class="text-muted" style="font-size:0.82rem;margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh <?php echo e(number_format($redeemable, 2)); ?></strong> to your main wallet instantly.</p>
                 </div>
-                <form method="POST" action="{{ route('referrals.redeem') }}"
-                  onsubmit="return confirm('Redeem KSh {{ number_format($redeemable, 2) }} to your wallet?')">
-                  @csrf
+                <form method="POST" action="<?php echo e(route('referrals.redeem')); ?>"
+                  onsubmit="return confirm('Redeem KSh <?php echo e(number_format($redeemable, 2)); ?> to your wallet?')">
+                  <?php echo csrf_field(); ?>
                   <button type="submit"
                     style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.62rem 1.4rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;font-family:inherit;"
                     onmouseover="this.style.background='#28a745';this.style.color='#fff'"
                     onmouseout="this.style.background='transparent';this.style.color='#28a745'">
-                    Redeem KSh {{ number_format($redeemable, 2) }}
+                    Redeem KSh <?php echo e(number_format($redeemable, 2)); ?>
+
                   </button>
                 </form>
               </div>
             </div>
-            @else
+            <?php else: ?>
             <div class="dash-card mb-3">
               <div class="d-flex align-items-center gap-3">
                 <div style="width:36px;height:36px;border-radius:50%;background:rgba(128,128,128,0.1);border:1px solid rgba(128,128,128,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -2697,9 +2768,9 @@
                 </div>
               </div>
             </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-            {{-- Earnings History --}}
+            
             <div class="dash-card">
               <h3 class="dash-card-title" style="font-size:0.95rem;font-weight:700;margin-bottom:1rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -2717,35 +2788,35 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @forelse($refEarnings as $earning)
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $refEarnings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $earning): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                       <tr style="border-bottom:1px solid rgba(128,128,128,0.07);">
-                        <td class="dash-card-title" style="padding:0.65rem 0.75rem;font-size:0.85rem;">{{ $earning->referee?->name ?? 'Unknown' }}</td>
-                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.8rem;">{{ $earning->created_at->format('d M Y') }}</td>
-                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.85rem;">KSh {{ number_format($earning->deposit_amount, 2) }}</td>
-                        <td style="padding:0.65rem 0.75rem;color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh {{ number_format($earning->bonus_amount, 2) }}</td>
+                        <td class="dash-card-title" style="padding:0.65rem 0.75rem;font-size:0.85rem;"><?php echo e($earning->referee?->name ?? 'Unknown'); ?></td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.8rem;"><?php echo e($earning->created_at->format('d M Y')); ?></td>
+                        <td class="text-muted" style="padding:0.65rem 0.75rem;font-size:0.85rem;">KSh <?php echo e(number_format($earning->deposit_amount, 2)); ?></td>
+                        <td style="padding:0.65rem 0.75rem;color:#ff8c00;font-weight:700;font-size:0.88rem;">+ KSh <?php echo e(number_format($earning->bonus_amount, 2)); ?></td>
                         <td style="padding:0.65rem 0.75rem;">
-                          @if($earning->status === 'redeemed')
+                          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($earning->status === 'redeemed'): ?>
                             <span style="background:rgba(40,167,69,0.15);color:#28a745;border:1px solid rgba(40,167,69,0.3);border-radius:4px;padding:0.2rem 0.55rem;font-size:0.72rem;font-weight:700;">Redeemed</span>
-                          @else
+                          <?php else: ?>
                             <span style="color:rgba(255,140,0,0.7);font-size:0.78rem;font-weight:600;">Awarded</span>
-                          @endif
+                          <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </td>
                       </tr>
-                    @empty
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
                       <tr>
                         <td colspan="5" class="text-muted" style="text-align:center;padding:2.5rem;font-size:0.85rem;">
                           No referral earnings yet. Share your link to get started!
                         </td>
                       </tr>
-                    @endforelse
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                   </tbody>
                 </table>
               </div>
             </div>
 
-          </div>{{-- end #tab-referrals --}}
+          </div>
 
-        </div>{{-- end .tab-content --}}
+        </div>
       </div>
     </div>
   </div>
@@ -2777,17 +2848,17 @@
     var tabContent = document.querySelector('.tab-content');
     if (!tabContent) return;
 
-    var referralLink = {{ Js::from(auth()->user()->referral_link) }};
-    var totalReferred = {{ auth()->user()->referrals()->count() }};
-    var totalEarned = {{ number_format(auth()->user()->total_referral_earnings, 2) }};
-    var redeemable = {{ number_format(auth()->user()->referral_balance, 2) }};
-    var earnings = {{ Js::from(auth()->user()->referralEarnings()->with('referee')->latest()->get()->map(fn($e) => [
+    var referralLink = <?php echo e(Js::from(auth()->user()->referral_link)); ?>;
+    var totalReferred = <?php echo e(auth()->user()->referrals()->count()); ?>;
+    var totalEarned = <?php echo e(number_format(auth()->user()->total_referral_earnings, 2)); ?>;
+    var redeemable = <?php echo e(number_format(auth()->user()->referral_balance, 2)); ?>;
+    var earnings = <?php echo e(Js::from(auth()->user()->referralEarnings()->with('referee')->latest()->get()->map(fn($e) => [
       'date'          => $e->created_at->format('d M Y'),
       'referee_name'  => $e->referee?->name ?? 'Unknown',
       'deposit_amount'=> number_format($e->deposit_amount, 2),
       'bonus_amount'  => number_format($e->bonus_amount, 2),
       'status'        => ucfirst($e->status),
-    ])) }};
+    ]))); ?>;
 
     var pane = document.createElement('div');
     pane.className = 'tab-pane fade';
@@ -2881,8 +2952,8 @@
             </h3>
             <p style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:0;">Transfer <strong style="color:#28a745;">KSh ${redeemable}</strong> from your referral balance to your main wallet.</p>
           </div>
-          <form method="POST" action="{{ route('referrals.redeem') }}" onsubmit="return confirm('Redeem KSh ${redeemable} to your wallet?')">
-            @csrf
+          <form method="POST" action="<?php echo e(route('referrals.redeem')); ?>" onsubmit="return confirm('Redeem KSh ${redeemable} to your wallet?')">
+            <?php echo csrf_field(); ?>
             <button type="submit"
               style="background:transparent;border:2px solid #28a745;color:#28a745;padding:0.6rem 1.4rem;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;"
               onmouseover="this.style.background='#28a745';this.style.color='#fff'"
@@ -2939,7 +3010,28 @@
   }
   </script>
   
-  <x-footer />
+  <?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -2983,7 +3075,7 @@
       });
       
       // 3. Auto-open Publish Media tab if there are media-related errors or success messages
-      @if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success'))
+      <?php if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success')): ?>
         var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
         if (mediaTabBtn) {
             setTimeout(function() {
@@ -2992,7 +3084,7 @@
                 window.location.hash = '#tab-publish-media';
             }, 60);
         }
-      @endif
+      <?php endif; ?>
     });
 
     // Preview functions for manual upload
@@ -3038,7 +3130,7 @@
     }
   </script>
 
-  {{-- ── LIGHTBOX POPUP OVERLAY (global, outside all tab panes) ── --}}
+  
   <style>
     .lb-overlay {
       position: fixed; inset: 0;
@@ -3130,15 +3222,15 @@
       document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
       var prev = document.querySelector('.lb-arrow.prev');
       var next = document.querySelector('.lb-arrow.next');
-                      <div>{{ __('Face not visible or covered.') }}</div>
+                      <div><?php echo e(__('Face not visible or covered.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-                      <div>{{ __('Not showing the requested hand sign.') }}</div>
+                      <div><?php echo e(__('Not showing the requested hand sign.')); ?></div>
                     </li>
                     <li class="d-flex gap-2 mb-2">
                       <div class="text-danger mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-                      <div>{{ __('Heavily filtered or edited photos.') }}</div>
+                      <div><?php echo e(__('Heavily filtered or edited photos.')); ?></div>
                     </li>
                   </ul>
                 </div>
@@ -3151,7 +3243,28 @@
     </div>
   </div>
   
-  <x-footer />
+  <?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -3185,7 +3298,7 @@
       });
       
       // 3. Auto-open Publish Media tab if there are media-related errors or success messages
-      @if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success'))
+      <?php if($errors->has('photo') || $errors->has('video') || session('photo_upload_success') || session('video_upload_success') || session('photo_delete_success') || session('video_delete_success')): ?>
         var mediaTabBtn = document.querySelector('button[data-bs-target="#tab-publish-media"]');
         if (mediaTabBtn) {
             setTimeout(function() {
@@ -3194,7 +3307,7 @@
                 window.location.hash = '#tab-publish-media';
             }, 60);
         }
-      @endif
+      <?php endif; ?>
     });
 
     // Preview functions for manual upload
@@ -3240,7 +3353,7 @@
     }
   </script>
 
-  {{-- ── LIGHTBOX POPUP OVERLAY (global, outside all tab panes) ── --}}
+  
   <style>
     .lb-overlay {
       position: fixed; inset: 0;
@@ -3477,13 +3590,13 @@
 
 
       // Auto-activate classifieds tab if success from classified payment
-      @if(session('success'))
+      <?php if(session('success')): ?>
       var classifiedsTabBtn = document.getElementById('classifieds-tab');
       if (classifiedsTabBtn) {
         var bsTab = new bootstrap.Tab(classifiedsTabBtn);
         bsTab.show();
       }
-      @endif
+      <?php endif; ?>
 
       // Auto-activate tab from URL hash (e.g. #tab-wallet)
       function activateTabFromHash() {
@@ -3566,3 +3679,4 @@
 </body>
 </html>
 
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/profile/edit.blade.php ENDPATH**/ ?>
