@@ -39,7 +39,7 @@
         </div>
     @else
         <div class="d-flex flex-column" style="gap:0.6rem;">
-            @foreach($unreadMessages as $senderId => $msgs)
+            @foreach($unreadMessages->take(3) as $senderId => $msgs)
                 @php
                     $sender  = $msgs->first()->sender;
                     $count   = $msgs->count();
@@ -65,7 +65,7 @@
                     $timeAgo = $latest->created_at->diffForHumans(null, true);
                 @endphp
                 <a href="{{ route('chat.show', $senderId) }}" wire:navigate
-                   class="msg-row d-flex align-items-center gap-3 text-decoration-none bg-body-tertiary"
+                   class="msg-row d-flex align-items-center gap-3 text-decoration-none"
                    style="border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
                     <div class="position-relative flex-shrink-0">
                         <img src="{{ $cover }}" alt="{{ $displayName }}"
@@ -84,6 +84,12 @@
                     </div>
                 </a>
             @endforeach
+            
+            @if($unreadMessages->count() > 3)
+                <a href="{{ route('chat.index') }}" wire:navigate class="text-center text-muted text-decoration-none py-1" style="font-size:0.85rem; font-weight:500;">
+                    +{{ $unreadMessages->count() - 3 }} more unread conversations
+                </a>
+            @endif
         </div>
     @endif
 </div>

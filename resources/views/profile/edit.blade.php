@@ -1566,12 +1566,32 @@
                             <span style="font-size:0.72rem;color:rgba(255,255,255,0.3);">Any video format (MP4, MOV, AVI, MKV, WEBM…) — Max 100MB</span>
                           </label>
                           <input type="file" id="publishVideoInput" name="video" accept="video/*" style="display:none;" onchange="previewVideo(this)">
+
                           <div id="videoPreviewContainer" style="display:none; margin-top:1rem; text-align:center;">
                             <p id="videoFileName" class="text-light mb-2 fw-bold" style="font-size:0.9rem; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"></p>
-                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" onclick="cancelVideoUpload()" style="border-radius:8px;">Remove Selection</button>
+                            <button type="button" class="btn btn-outline-secondary w-100 mb-3" id="videoCancelBtn" onclick="cancelVideoUpload()" style="border-radius:8px;">Remove Selection</button>
                           </div>
-                          
-                          <button type="submit" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">Publish Video</button>
+
+                          {{-- Upload progress bar (hidden until upload starts) --}}
+                          <div id="videoUploadProgress" style="display:none; margin-top:0.75rem;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                              <div style="display:flex;align-items:center;gap:8px;">
+                                <svg id="videoUploadSpinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2.5" stroke-linecap="round" style="animation:spinLoader 0.9s linear infinite;flex-shrink:0;">
+                                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                                </svg>
+                                <span id="videoUploadStatus" style="font-size:0.82rem;color:rgba(255,255,255,0.7);font-weight:600;">Uploading…</span>
+                              </div>
+                              <span id="videoUploadPct" style="font-size:0.82rem;font-weight:700;color:orange;">0%</span>
+                            </div>
+                            <div style="width:100%;height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;">
+                              <div id="videoProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,orange,#ffcc00);border-radius:99px;transition:width 0.2s ease;"></div>
+                            </div>
+                            <div id="videoUploadBytes" style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:4px;text-align:right;"></div>
+                          </div>
+
+                          <button type="submit" id="publishVideoBtn" class="btn btn-orange w-100 py-2 fw-bold mt-2" style="font-size:1.1rem; text-transform:uppercase; letter-spacing:1px; background:orange; color:#000; border:none; border-radius:8px; box-shadow:0 4px 15px rgba(255,165,0,0.3);">
+                            <span id="publishVideoBtnText">Publish Video</span>
+                          </button>
                           @error('video')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
                         </form>
                       @else
@@ -2995,19 +3015,59 @@
       @endif
     });
 
-    // Preview functions for manual upload
+    // ── Upload toast notification ────────────────────────────────────────────
+    function showUploadToast(message, type) {
+      var existing = document.getElementById('uploadSizeToast');
+      if (existing) existing.remove();
+
+      var isError   = (type === 'error');
+      var cls       = isError ? 'warning-toast' : 'success-toast';
+      var iconColor = isError ? '#ff8c00' : '#28a745';
+      var icon      = isError
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+      var title = isError ? 'File Too Large' : 'Upload Successful';
+
+      var html =
+        '<div class="' + cls + '" id="uploadSizeToast" role="alert" aria-live="assertive" style="z-index:999999;">' +
+          '<div class="' + cls + '__icon">' + icon + '</div>' +
+          '<div class="' + cls + '__body">' +
+            '<p class="' + cls + '__title">' + title + '</p>' +
+            '<p class="' + cls + '__msg">' + message + '</p>' +
+          '</div>' +
+          '<button class="' + cls + '__close" onclick="this.closest(\'.' + cls + '\').remove();" aria-label="Dismiss">' +
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+          '</button>' +
+          '<div class="' + cls + '__bar"></div>' +
+        '</div>';
+
+      document.body.insertAdjacentHTML('beforeend', html);
+      setTimeout(function () {
+        var t = document.getElementById('uploadSizeToast');
+        if (t) t.remove();
+      }, 6000);
+    }
+
+    // ── Preview functions for manual upload ──────────────────────────────────
     function previewPhoto(input) {
       if (input.files && input.files[0]) {
+        var file     = input.files[0];
+        var maxBytes = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxBytes) {
+          showUploadToast('File too large! Photos must be under <strong>5 MB</strong>. Your file is ' + (file.size / (1024*1024)).toFixed(1) + ' MB.', 'error');
+          input.value = '';
+          return;
+        }
         var reader = new FileReader();
         reader.onload = function(e) {
           document.getElementById('photoPreviewImg').src = e.target.result;
           document.getElementById('publishPhotoLabel').style.display = 'none';
           document.getElementById('photoPreviewContainer').style.display = 'block';
-        }
-        reader.readAsDataURL(input.files[0]);
+        };
+        reader.readAsDataURL(file);
       }
     }
-    
+
     function cancelPhotoUpload() {
       document.getElementById('publishPhotoInput').value = '';
       document.getElementById('photoPreviewContainer').style.display = 'none';
@@ -3017,25 +3077,115 @@
 
     function previewVideo(input) {
       if (input.files && input.files[0]) {
-        var file = input.files[0];
+        var file     = input.files[0];
         var maxBytes = 100 * 1024 * 1024; // 100MB
         if (file.size > maxBytes) {
-          alert('Video file is too large. Maximum allowed size is 100MB. Your file is ' + (file.size / (1024*1024)).toFixed(1) + 'MB.');
+          showUploadToast('File too large! Videos must be under <strong>100 MB</strong>. Your file is ' + (file.size / (1024*1024)).toFixed(1) + ' MB.', 'error');
           input.value = '';
           return;
         }
-        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + 'MB)';
+        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)';
         document.getElementById('publishVideoLabel').style.display = 'none';
         document.getElementById('videoPreviewContainer').style.display = 'block';
       }
     }
-    
+
     function cancelVideoUpload() {
       document.getElementById('publishVideoInput').value = '';
       document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoUploadProgress').style.display = 'none';
       document.getElementById('videoFileName').innerText = '';
       document.getElementById('publishVideoLabel').style.display = 'flex';
+      var btn = document.getElementById('publishVideoBtn');
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.background = 'orange'; }
+      var txt = document.getElementById('publishVideoBtnText');
+      if (txt) txt.innerText = 'Publish Video';
+      var cancelBtn = document.getElementById('videoCancelBtn');
+      if (cancelBtn) cancelBtn.disabled = false;
     }
+
+    // XHR upload with real-time progress bar
+    (function () {
+      var form = document.getElementById('publishVideoForm');
+      if (!form) return;
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var fileInput = document.getElementById('publishVideoInput');
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+
+        var btn        = document.getElementById('publishVideoBtn');
+        var btnText    = document.getElementById('publishVideoBtnText');
+        var progressEl = document.getElementById('videoUploadProgress');
+        var bar        = document.getElementById('videoProgressBar');
+        var pctEl      = document.getElementById('videoUploadPct');
+        var bytesEl    = document.getElementById('videoUploadBytes');
+        var statusEl   = document.getElementById('videoUploadStatus');
+        var cancelBtn  = document.getElementById('videoCancelBtn');
+
+        // Lock UI
+        btn.disabled       = true;
+        btn.style.opacity  = '0.7';
+        btnText.innerText  = 'Uploading…';
+        if (cancelBtn) cancelBtn.disabled = true;
+        progressEl.style.display = 'block';
+        bar.style.width   = '0%';
+        bar.style.background = 'linear-gradient(90deg,orange,#ffcc00)';
+        pctEl.innerText   = '0%';
+        bytesEl.innerText = '';
+        statusEl.innerText = 'Uploading…';
+
+        var data = new FormData(form);
+        var xhr  = new XMLHttpRequest();
+
+        // Live progress events
+        xhr.upload.addEventListener('progress', function (ev) {
+          if (!ev.lengthComputable) return;
+          var percent = Math.round((ev.loaded / ev.total) * 100);
+          bar.style.width  = percent + '%';
+          pctEl.innerText  = percent + '%';
+          var loadedMB = (ev.loaded / (1024 * 1024)).toFixed(1);
+          var totalMB  = (ev.total  / (1024 * 1024)).toFixed(1);
+          bytesEl.innerText = loadedMB + ' MB / ' + totalMB + ' MB';
+          if (percent >= 100) {
+            statusEl.innerText   = 'Processing…';
+            btnText.innerText    = 'Processing…';
+            bar.style.background = 'linear-gradient(90deg,#28a745,#00e676)';
+          }
+        });
+
+        // Completed
+        xhr.addEventListener('load', function () {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            bar.style.width      = '100%';
+            pctEl.innerText      = '100%';
+            statusEl.innerText   = 'Published! Refreshing…';
+            btnText.innerText    = '✓ Published!';
+            btn.style.background = '#28a745';
+            btn.style.opacity    = '1';
+            showUploadToast('Video published successfully!', 'success');
+            setTimeout(function () {
+              window.location.href = window.location.pathname + '#tab-publish-media';
+              window.location.reload();
+            }, 900);
+          } else {
+            showUploadToast('Upload failed (server error ' + xhr.status + '). Please try again.', 'error');
+            cancelVideoUpload();
+          }
+        });
+
+        // Network error
+        xhr.addEventListener('error', function () {
+          showUploadToast('Upload failed. Check your connection and try again.', 'error');
+          cancelVideoUpload();
+        });
+
+        xhr.open('POST', form.action);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(data);
+      });
+    })();
   </script>
 
   {{-- ── LIGHTBOX POPUP OVERLAY (global, outside all tab panes) ── --}}
@@ -3197,19 +3347,26 @@
       @endif
     });
 
-    // Preview functions for manual upload
+    // ── Preview functions for manual upload (uses shared showUploadToast) ────
     function previewPhoto(input) {
       if (input.files && input.files[0]) {
+        var file     = input.files[0];
+        var maxBytes = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxBytes) {
+          showUploadToast('File too large! Photos must be under <strong>5 MB</strong>. Your file is ' + (file.size / (1024*1024)).toFixed(1) + ' MB.', 'error');
+          input.value = '';
+          return;
+        }
         var reader = new FileReader();
         reader.onload = function(e) {
           document.getElementById('photoPreviewImg').src = e.target.result;
           document.getElementById('publishPhotoLabel').style.display = 'none';
           document.getElementById('photoPreviewContainer').style.display = 'block';
-        }
-        reader.readAsDataURL(input.files[0]);
+        };
+        reader.readAsDataURL(file);
       }
     }
-    
+
     function cancelPhotoUpload() {
       document.getElementById('publishPhotoInput').value = '';
       document.getElementById('photoPreviewContainer').style.display = 'none';
@@ -3219,24 +3376,30 @@
 
     function previewVideo(input) {
       if (input.files && input.files[0]) {
-        var file = input.files[0];
+        var file     = input.files[0];
         var maxBytes = 100 * 1024 * 1024; // 100MB
         if (file.size > maxBytes) {
-          alert('Video file is too large. Maximum allowed size is 100MB. Your file is ' + (file.size / (1024*1024)).toFixed(1) + 'MB.');
+          showUploadToast('File too large! Videos must be under <strong>100 MB</strong>. Your file is ' + (file.size / (1024*1024)).toFixed(1) + ' MB.', 'error');
           input.value = '';
           return;
         }
-        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + 'MB)';
+        document.getElementById('videoFileName').innerText = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + ' MB)';
         document.getElementById('publishVideoLabel').style.display = 'none';
         document.getElementById('videoPreviewContainer').style.display = 'block';
       }
     }
-    
+
+    // cancelVideoUpload & XHR wiring defined in first script block above
     function cancelVideoUpload() {
       document.getElementById('publishVideoInput').value = '';
       document.getElementById('videoPreviewContainer').style.display = 'none';
+      document.getElementById('videoUploadProgress').style.display = 'none';
       document.getElementById('videoFileName').innerText = '';
       document.getElementById('publishVideoLabel').style.display = 'flex';
+      var btn = document.getElementById('publishVideoBtn');
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.background = 'orange'; }
+      var txt = document.getElementById('publishVideoBtnText');
+      if (txt) txt.innerText = 'Publish Video';
     }
   </script>
 
@@ -3506,6 +3669,18 @@
     @keyframes slideInToast {
       from { transform: translateX(100px); opacity: 0; }
       to   { transform: translateX(0);    opacity: 1; }
+    }
+    @keyframes toastIn {
+      from { transform: translateX(120px); opacity: 0; }
+      to   { transform: translateX(0);     opacity: 1; }
+    }
+    @keyframes toastOut {
+      from { transform: translateX(0);     opacity: 1; }
+      to   { transform: translateX(120px); opacity: 0; }
+    }
+    @keyframes spinLoader {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
   </style>
 

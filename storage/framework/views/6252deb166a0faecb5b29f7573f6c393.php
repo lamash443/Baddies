@@ -548,6 +548,8 @@
 
 
       <!-- MESSAGES CARD -->
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="dash-card">
           <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -574,8 +576,8 @@ unset($__params);
 unset($__componentSlots);
 unset($__split);
 ?>
-
         </div>
+      </div>
       </div>
     </div>
   </div>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Statistics - Baddies Club</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
+    
+    /* DASHBOARD LAYOUT */
+    .dashboard-header { padding:3rem 0 2rem; border-bottom:1px solid rgba(255,140,0,0.12); margin-bottom:2.5rem; }
+    .dashboard-title { font-size:clamp(1.8rem,4vw,2.5rem); font-weight:900; letter-spacing:-0.02em; line-height:1.1; margin-bottom:0.5rem; }
+    .dashboard-title span { background:linear-gradient(135deg,#ff8c00,#ffb347); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    
+    .dash-card {
+      background:rgba(17,17,17,0.85); backdrop-filter:blur(15px);
+      border:1px solid rgba(255,140,0,0.2); border-radius:18px; padding:2rem;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background:linear-gradient(145deg, rgba(255,140,0,0.1) 0%, rgba(17,17,17,0.6) 100%);
+      border:1px solid rgba(255,140,0,0.2);
+      border-radius:12px;
+      padding:1.5rem;
+      transition:transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: left;
+    }
+    .stat-card:hover {
+      transform:translateY(-3px);
+      box-shadow:0 8px 24px rgba(255,140,0,0.15);
+    }
+    .stat-icon {
+      width: 52px; height: 52px; flex-shrink: 0;
+      background: rgba(255,140,0,0.15);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: orange;
+      margin: 0;
+    }
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .btn-orange {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+      background: transparent; border: 2px solid orange; color: orange;
+      padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700;
+      text-decoration: none; transition: all 0.3s ease;
+    }
+    .btn-orange:hover {
+      background: orange; color: #000; box-shadow: 0 0 18px 4px rgba(255, 165, 0, 0.55);
+    }
+
+    /* LIGHT THEME */
+    [data-bs-theme="light"] body { background:#f4f5f8 !important; color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header { border-color:rgba(0,0,0,0.08) !important; }
+    [data-bs-theme="light"] .dashboard-title { color:#111 !important; }
+    [data-bs-theme="light"] .dashboard-header p { color:#444444 !important; }
+    [data-bs-theme="light"] .dash-card {
+      background:#ffffff !important;
+      border:1px solid rgba(255,140,0,0.3) !important;
+      box-shadow:0 6px 25px rgba(0,0,0,0.05) !important;
+      color:#111 !important;
+    }
+    [data-bs-theme="light"] .stat-card {
+      background:#ffffff !important;
+      border:1.5px solid rgba(255,140,0,0.35) !important;
+      box-shadow:0 4px 15px rgba(255,140,0,0.08) !important;
+    }
+    [data-bs-theme="light"] .stat-icon {
+      background:rgba(255,140,0,0.12) !important;
+      border:1px solid rgba(255,140,0,0.3) !important;
+    }
+    [data-bs-theme="light"] .stat-value { color:#111111 !important; }
+    [data-bs-theme="light"] .stat-label { color:#444444 !important; }
+    [data-bs-theme="light"] .activity-overview-title { color:#111111 !important; }
+    [data-bs-theme="light"] .stats-period-select {
+      background-color:#ffffff !important;
+      color:#111111 !important;
+      border:1px solid rgba(0,0,0,0.2) !important;
+      box-shadow:0 2px 8px rgba(0,0,0,0.04) !important;
+    }
+    [data-bs-theme="light"] .border-top { border-top-color:rgba(0,0,0,0.12) !important; }
+  </style>
+</head>
+<body>
+  <?php if (isset($component)) { $__componentOriginala591787d01fe92c5706972626cdf7231 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginala591787d01fe92c5706972626cdf7231 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.navbar','data' => ['hideSearch' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('navbar'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['hideSearch' => true]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $attributes = $__attributesOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__attributesOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginala591787d01fe92c5706972626cdf7231)): ?>
+<?php $component = $__componentOriginala591787d01fe92c5706972626cdf7231; ?>
+<?php unset($__componentOriginala591787d01fe92c5706972626cdf7231); ?>
+<?php endif; ?>
+
+  <div class="dashboard-header">
+    <div class="container text-center">
+      <h1 class="dashboard-title">Profile <span>Statistics</span></h1>
+      <p style="max-width:600px; margin:0 auto;">
+        Track the engagement on your public profile. See how many people are checking you out and trying to reach you.
+      </p>
+    </div>
+  </div>
+
+  <div class="container pb-5 mb-5">
+    <div class="dash-card">
+      <div class="row g-4">
+        <!-- Views Stat -->
+        <div class="col-12 col-md-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div>
+              <div class="stat-value"><?php echo e(number_format(auth()->user()->profile_views ?? 0)); ?></div>
+              <div class="stat-label">Profile Views</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Calls Stat -->
+        <div class="col-12 col-md-6">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div>
+              <div class="stat-value"><?php echo e(number_format(auth()->user()->phone_calls ?? 0)); ?></div>
+              <div class="stat-label">Phone Calls</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Chart Section -->
+      <div class="mt-5 pt-4 border-top">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold mb-0 activity-overview-title" style="font-size:1.5rem;">Activity Overview</h3>
+          <select id="periodSelect" name="period" class="form-select form-select-sm stats-period-select" style="width: auto; cursor:pointer;">
+            <option value="today" <?php echo e(request('period') == 'today' ? 'selected' : ''); ?>>Today</option>
+            <option value="7" <?php echo e(request('period') == '7' ? 'selected' : ''); ?>>Last 7 Days</option>
+            <option value="30" <?php echo e(request('period', '30') == '30' ? 'selected' : ''); ?>>Last 30 Days</option>
+            <option value="all" <?php echo e(request('period') == 'all' ? 'selected' : ''); ?>>All Time</option>
+          </select>
+        </div>
+        
+        <div style="position: relative; height:400px; width:100%;">
+          <canvas id="statsChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="text-center mt-5">
+        <a href="<?php echo e(route('profile.edit')); ?>" class="btn-orange">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <?php if (isset($component)) { $__componentOriginal8a8716efb3c62a45938aca52e78e0322 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8a8716efb3c62a45938aca52e78e0322 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.footer','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('footer'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $attributes = $__attributesOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__attributesOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8a8716efb3c62a45938aca52e78e0322)): ?>
+<?php $component = $__componentOriginal8a8716efb3c62a45938aca52e78e0322; ?>
+<?php unset($__componentOriginal8a8716efb3c62a45938aca52e78e0322); ?>
+<?php endif; ?>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    
+    function getThemeColors() {
+      const currentTheme = document.documentElement.getAttribute('data-bs-theme') || localStorage.getItem('theme') || 'dark';
+      const isLight = currentTheme === 'light';
+      return {
+        isLight: isLight,
+        textColor: isLight ? '#111111' : 'rgba(255, 255, 255, 0.85)',
+        subTextColor: isLight ? '#222222' : 'rgba(255, 255, 255, 0.65)',
+        gridColor: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.07)',
+        tooltipBg: isLight ? '#ffffff' : 'rgba(17, 17, 17, 0.95)',
+        tooltipTitle: isLight ? '#111111' : '#ffffff',
+        tooltipBody: isLight ? '#333333' : 'rgba(255, 255, 255, 0.85)',
+        tooltipBorder: isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 140, 0, 0.3)'
+      };
+    }
+
+    let colors = getThemeColors();
+
+    // Gradients
+    const viewsGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    viewsGradient.addColorStop(0, 'rgba(255, 140, 0, 0.5)');
+    viewsGradient.addColorStop(1, 'rgba(255, 140, 0, 0.0)');
+    
+    const callsGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    callsGradient.addColorStop(0, 'rgba(0, 200, 255, 0.5)');
+    callsGradient.addColorStop(1, 'rgba(0, 200, 255, 0.0)');
+
+    const statsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <?php echo json_encode($labels); ?>,
+        datasets: [
+          {
+            label: 'Profile Views',
+            data: <?php echo json_encode($viewsData); ?>,
+            borderColor: '#ff8c00',
+            backgroundColor: viewsGradient,
+            borderWidth: 3,
+            pointBackgroundColor: '#ff8c00',
+            pointBorderColor: colors.isLight ? '#ffffff' : '#111111',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.4
+          },
+          {
+            label: 'Phone Calls',
+            data: <?php echo json_encode($callsData); ?>,
+            borderColor: '#00c8ff',
+            backgroundColor: callsGradient,
+            borderWidth: 3,
+            pointBackgroundColor: '#00c8ff',
+            pointBorderColor: colors.isLight ? '#ffffff' : '#111111',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
+        plugins: {
+          legend: {
+            labels: { color: colors.textColor, font: { family: 'Outfit', size: 14, weight: '600' } }
+          },
+          tooltip: {
+            backgroundColor: colors.tooltipBg,
+            titleColor: colors.tooltipTitle,
+            bodyColor: colors.tooltipBody,
+            borderColor: colors.tooltipBorder,
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            titleFont: { family: 'Outfit', size: 14, weight: 'bold' },
+            bodyFont: { family: 'Outfit', size: 13 }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: colors.gridColor, drawBorder: false },
+            ticks: { color: colors.subTextColor, font: { family: 'Outfit', size: 12, weight: '600' } }
+          },
+          y: {
+            grid: { color: colors.gridColor, drawBorder: false },
+            ticks: { color: colors.subTextColor, font: { family: 'Outfit', size: 12, weight: '600' }, stepSize: 1, beginAtZero: true }
+          }
+        }
+      }
+    });
+
+    // Observe theme toggle dynamically
+    const themeObserver = new MutationObserver(function() {
+      const c = getThemeColors();
+      statsChart.options.plugins.legend.labels.color = c.textColor;
+      statsChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+      statsChart.options.plugins.tooltip.titleColor = c.tooltipTitle;
+      statsChart.options.plugins.tooltip.bodyColor = c.tooltipBody;
+      statsChart.options.plugins.tooltip.borderColor = c.tooltipBorder;
+      statsChart.options.scales.x.grid.color = c.gridColor;
+      statsChart.options.scales.x.ticks.color = c.subTextColor;
+      statsChart.options.scales.y.grid.color = c.gridColor;
+      statsChart.options.scales.y.ticks.color = c.subTextColor;
+      statsChart.data.datasets[0].pointBorderColor = c.isLight ? '#ffffff' : '#111111';
+      statsChart.data.datasets[1].pointBorderColor = c.isLight ? '#ffffff' : '#111111';
+      statsChart.update();
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+
+    document.getElementById('periodSelect').addEventListener('change', function() {
+      const period = this.value;
+      fetch(`<?php echo e(route('profile.statistics')); ?>?period=${period}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        statsChart.data.labels = data.labels;
+        statsChart.data.datasets[0].data = data.viewsData;
+        statsChart.data.datasets[1].data = data.callsData;
+        statsChart.update();
+      })
+      .catch(console.error);
+    });
+  </script>
+</body>
+</html>
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views\profile\statistics.blade.php ENDPATH**/ ?>

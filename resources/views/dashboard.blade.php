@@ -482,9 +482,11 @@
 
 
       <!-- MESSAGES CARD -->
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="dash-card">
           @livewire('dashboard-messages')
-
         </div>
+      </div>
       </div>
     </div>
   </div>

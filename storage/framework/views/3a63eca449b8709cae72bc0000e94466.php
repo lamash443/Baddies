@@ -264,4 +264,4 @@
 </body>
 </html>
 
-<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views/classifieds-show.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\Users\willi\Desktop\Kenyan Baddies Club\resources\views\classifieds-show.blade.php ENDPATH**/ ?>

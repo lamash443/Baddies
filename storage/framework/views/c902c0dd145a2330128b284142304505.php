@@ -40,7 +40,7 @@
         </div>
     <?php else: ?>
         <div class="d-flex flex-column" style="gap:0.6rem;">
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $unreadMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $senderId => $msgs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $unreadMessages->take(3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $senderId => $msgs): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                 <?php
                     $sender  = $msgs->first()->sender;
                     $count   = $msgs->count();
@@ -66,7 +66,7 @@
                     $timeAgo = $latest->created_at->diffForHumans(null, true);
                 ?>
                 <a href="<?php echo e(route('chat.show', $senderId)); ?>" wire:navigate
-                   class="msg-row d-flex align-items-center gap-3 text-decoration-none bg-body-tertiary"
+                   class="msg-row d-flex align-items-center gap-3 text-decoration-none"
                    style="border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
                     <div class="position-relative flex-shrink-0">
                         <img src="<?php echo e($cover); ?>" alt="<?php echo e($displayName); ?>"
@@ -85,6 +85,12 @@
                     </div>
                 </a>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+            
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($unreadMessages->count() > 3): ?>
+                <a href="<?php echo e(route('chat.index')); ?>" wire:navigate class="text-center text-muted text-decoration-none py-1" style="font-size:0.85rem; font-weight:500;">
+                    +<?php echo e($unreadMessages->count() - 3); ?> more unread conversations
+                </a>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
