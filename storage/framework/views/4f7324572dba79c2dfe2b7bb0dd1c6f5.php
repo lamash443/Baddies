@@ -1,4 +1,22 @@
 <style>
+  /* Global anti-FOUC link color overrides */
+  :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
+    --bs-link-color: rgba(255, 255, 255, 0.8) !important;
+    --bs-link-hover-color: #ff8c00 !important;
+    --bs-link-color-rgb: 255, 255, 255 !important;
+    --bs-link-hover-color-rgb: 255, 140, 0 !important;
+  }
+  [data-bs-theme="light"] {
+    --bs-link-color: rgba(0, 0, 0, 0.8) !important;
+    --bs-link-hover-color: #ff8c00 !important;
+    --bs-link-color-rgb: 0, 0, 0 !important;
+  }
+  a, a:link, a:visited, a:hover, a:active, a:focus {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   /* Prevent scroll when modal is open on phone */
   body.modal-open {
     overflow: hidden !important;

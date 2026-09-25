@@ -1,7 +1,7 @@
 <section class="dash-card">
     <header>
-        <h2 class="dash-card-title"><?php echo e(__('Profile Information')); ?></h2>
-        <p class="dash-card-text"><?php echo e(__("Update your account's profile information and email address.")); ?></p>
+        <h2 class="dash-card-title" style="font-size:1rem;"><?php echo e(__('Profile Information')); ?></h2>
+        <p class="dash-card-text" style="font-size:0.8rem;"><?php echo e(__("Update your account's profile information and email address.")); ?></p>
     </header>
 
     <form id="send-verification" method="post" action="<?php echo e(route('verification.send')); ?>">
@@ -206,7 +206,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="services[]" value="<?php echo e($service); ?>" id="service_<?php echo e(Str::slug($service)); ?>"
                                 <?php echo e(in_array($service, $selectedServices) ? 'checked' : ''); ?>>
-                            <label class="form-check-label text-white-50" for="service_<?php echo e(Str::slug($service)); ?>">
+                            <label class="form-check-label text-white-50" for="service_<?php echo e(Str::slug($service)); ?>" style="font-size:0.78rem;">
                                 <?php echo e($service); ?>
 
                             </label>

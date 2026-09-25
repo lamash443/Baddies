@@ -21,7 +21,7 @@
     .nr-footer a:hover,.nr-footer a:focus{color:#fff;text-decoration:none;}
     .nr-footer a:hover::after,.nr-footer a:focus::after{transform:scaleX(1);}
     .nr-footer__logo-text {
-      font-size:1.25rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
+      font-size:1.05rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
       background:linear-gradient(135deg,#ff8c00,#ffb347);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
       display:inline-block;
@@ -43,11 +43,11 @@
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
           </a>
         </div>
-        <p class="mb-3">Browse trusted local listings, discover providers, and connect faster.</p>
+        <p class="mb-3" style="font-size:0.78rem;">Browse trusted local listings, discover providers, and connect faster.</p>
       </div>
       <div class="col-6 col-lg-2">
-        <h3 class="nr-footer__title h6">Explore</h3>
-        <ul class="list-unstyled mb-0">
+        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Explore</h3>
+        <ul class="list-unstyled mb-0" style="font-size:0.78rem;">
           <li class="mb-2"><a href="/">Home</a></li>
           <li class="mb-2"><a href="<?php echo e(route('escort-girls')); ?>">Escort Girls</a></li>
           <li class="mb-2"><a href="/category/call-boys">Call Boys</a></li>
@@ -56,15 +56,15 @@
         </ul>
       </div>
       <div class="col-6 col-lg-2">
-        <h3 class="nr-footer__title h6">Pages</h3>
-        <ul class="list-unstyled mb-0">
+        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Pages</h3>
+        <ul class="list-unstyled mb-0" style="font-size:0.78rem;">
           <li class="mb-2"><a href="/terms">Terms</a></li>
           <li class="mb-2"><a href="/privacy">Privacy Policy</a></li>
         </ul>
       </div>
       <div class="col-12 col-lg-4">
-        <h3 class="nr-footer__title h6">Contact</h3>
-        <ul class="list-unstyled mb-3">
+        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Contact</h3>
+        <ul class="list-unstyled mb-3" style="font-size:0.78rem;">
           <?php $contactPage = \App\Models\Page::where('slug','contact')->first(); ?>
           <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($contactPage?->phone)): ?>
             <li class="mb-2"><a href="tel:<?php echo e($contactPage->phone); ?>"><?php echo e($contactPage->phone); ?></a></li>

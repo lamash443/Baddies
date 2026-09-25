@@ -1,7 +1,7 @@
 <section class="dash-card">
     <header>
-        <h2 class="dash-card-title">{{ __('Profile Information') }}</h2>
-        <p class="dash-card-text">{{ __("Update your account's profile information and email address.") }}</p>
+        <h2 class="dash-card-title" style="font-size:1rem;">{{ __('Profile Information') }}</h2>
+        <p class="dash-card-text" style="font-size:0.8rem;">{{ __("Update your account's profile information and email address.") }}</p>
     </header>
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
@@ -122,7 +122,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="services[]" value="{{ $service }}" id="service_{{ Str::slug($service) }}"
                                 {{ in_array($service, $selectedServices) ? 'checked' : '' }}>
-                            <label class="form-check-label text-white-50" for="service_{{ Str::slug($service) }}">
+                            <label class="form-check-label text-white-50" for="service_{{ Str::slug($service) }}" style="font-size:0.78rem;">
                                 {{ $service }}
                             </label>
                         </div>

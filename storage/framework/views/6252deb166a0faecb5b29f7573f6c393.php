@@ -32,6 +32,36 @@
 <?php endif; ?>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard - Baddies Club</title>
+  <!-- Preconnect to Google Fonts to eliminate font-swap layout shift -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- CRITICAL ANTI-FOUC & ANTI-BLUE-LINK STYLES (Parsed BEFORE Bootstrap CSS) -->
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d !important; color:#fff !important; min-height:100vh; }
+
+    /* Override Bootstrap 5 link colors globally before Bootstrap loads */
+    :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
+      --bs-link-color: rgba(255, 255, 255, 0.8) !important;
+      --bs-link-hover-color: #ff8c00 !important;
+      --bs-link-color-rgb: 255, 255, 255 !important;
+      --bs-link-hover-color-rgb: 255, 140, 0 !important;
+    }
+    [data-bs-theme="light"] {
+      --bs-link-color: rgba(0, 0, 0, 0.8) !important;
+      --bs-link-hover-color: #ff8c00 !important;
+      --bs-link-color-rgb: 0, 0, 0 !important;
+    }
+
+    /* Suppress browser-default blue/purple link color on ALL anchor tags */
+    a, a:link, a:visited, a:hover, a:active, a:focus {
+      color: inherit;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -548,8 +578,8 @@
 
 
       <!-- MESSAGES CARD -->
-      <div class="col-12 col-md-6 col-xl-4">
-        <div class="dash-card">
+      <div class="col-12">
+        <div class="dash-card" style="padding: 1.5rem;">
           <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
@@ -578,7 +608,7 @@ unset($__split);
 ?>
         </div>
       </div>
-      </div>
+
     </div>
   </div>
 

@@ -1,12 +1,12 @@
 <section class="dash-card" style="border-color: rgba(220,53,69,0.2);">
     <header>
-        <h2 class="dash-card-title" style="color: #ff4d4d !important;">
-            <svg style="display:inline; width:20px; height:20px; margin-right:0.4rem; vertical-align:-3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <h2 class="dash-card-title" style="color: #ff4d4d !important; font-size:1rem;">
+            <svg style="display:inline; width:18px; height:18px; margin-right:0.4rem; vertical-align:-3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
             </svg>
             {{ __('Delete Account') }}
         </h2>
-        <p class="dash-card-text">{{ __('Once your account is deleted, all of its resources and data will be permanently deleted. This action cannot be undone.') }}</p>
+        <p class="dash-card-text" style="font-size:0.8rem;">{{ __('Once your account is deleted, all of its resources and data will be permanently deleted. This action cannot be undone.') }}</p>
     </header>
 
     <button type="button" class="btn-danger-custom mt-2" data-bs-toggle="modal" data-bs-target="#confirmUserDeletionModal">

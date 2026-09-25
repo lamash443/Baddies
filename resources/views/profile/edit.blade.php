@@ -10,11 +10,66 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profile - Baddies Club</title>
+  <!-- Preconnect to Google Fonts to eliminate font-swap layout shift -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- CRITICAL ANTI-FOUC & ANTI-BLUE-LINK STYLES (Parsed BEFORE Bootstrap CSS) -->
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d !important; color:#fff !important; min-height:100vh; }
+
+    /* Override Bootstrap 5 link colors globally before Bootstrap loads */
+    :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
+      --bs-link-color: rgba(255, 255, 255, 0.8) !important;
+      --bs-link-hover-color: #ff8c00 !important;
+      --bs-link-color-rgb: 255, 255, 255 !important;
+      --bs-link-hover-color-rgb: 255, 140, 0 !important;
+    }
+    [data-bs-theme="light"] {
+      --bs-link-color: rgba(0, 0, 0, 0.8) !important;
+      --bs-link-hover-color: #ff8c00 !important;
+      --bs-link-color-rgb: 0, 0, 0 !important;
+    }
+
+    /* Suppress browser-default blue/purple link color on ALL anchor tags */
+    a, a:link, a:visited, a:hover, a:active, a:focus {
+      color: inherit;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Preset sidebar nav link colors */
+    .side-nav-link,
+    .side-nav-link:link,
+    .side-nav-link:visited,
+    .side-nav-link:hover,
+    .side-nav-link:focus,
+    .side-nav-link:active {
+      color: rgba(255,255,255,0.75) !important;
+      text-decoration: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    .side-nav-link.active,
+    .side-nav-link.active:link,
+    .side-nav-link.active:visited {
+      color: #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .side-nav-link,
+    [data-bs-theme="light"] .side-nav-link:link,
+    [data-bs-theme="light"] .side-nav-link:visited {
+      color: rgba(0,0,0,0.75) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active,
+    [data-bs-theme="light"] .side-nav-link.active:link,
+    [data-bs-theme="light"] .side-nav-link.active:visited {
+      color: #ff8c00 !important;
+    }
+  </style>
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing:border-box; }
-    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
 
     /* ── Prevent Bootstrap tab fade from hiding content on fast scroll ── */
     .tab-content > .tab-pane {
@@ -44,22 +99,164 @@
     .dashboard-sub { font-size:0.9rem; color:rgba(255,255,255,0.5); font-weight:400; }
     
     .dash-card {
-      background: #111111;
+      background: rgba(17,17,17,0.85);
+      backdrop-filter: blur(15px);
       border:1px solid rgba(255,140,0,0.2); border-radius:18px; padding:2rem;
       box-shadow:0 8px 32px rgba(0,0,0,0.5); margin-bottom: 2rem;
-      transform: translateZ(0); /* force GPU layer to prevent scroll disappear */
+      /* GPU compositing — prevents content disappearing on fast mobile scroll */
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      will-change: transform;
     }
-    .dash-card-title { font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:0.5rem; }
-    .dash-card-text { font-size:0.9rem; color:rgba(255,255,255,0.6); margin-bottom:1.5rem; line-height:1.5; }
+    .dash-card-title { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:0.4rem; }
+    .dash-card-text { font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:1.25rem; line-height:1.5; }
+
+    /* ── MOBILE: disable costly backdrop-filter to stop scroll flicker ── */
+    @media (max-width: 991.98px) {
+      .dash-card, .side-nav-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: #111111 !important;
+      }
+    }
     /* Profile name displayed under avatar */
     .profile-name-text { color: #ffffff; }
     [data-bs-theme="light"] .profile-name-text { color: #111111 !important; }
 
+    /* ── SIDEBAR NAV: defined here in <head> so it applies on FIRST PAINT
+       (prevents the blue-link FOUC that happened when this CSS was in <body>) ── */
+    .side-nav-card {
+      background: rgba(17,17,17,0.85);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,140,0,0.2); border-radius: 18px;
+      padding: 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      margin-bottom: 1.5rem;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      will-change: transform;
+    }
+    .side-nav-title {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+      padding: 0 0.5rem 0.75rem; margin-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,140,0,0.12);
+    }
+    .side-nav-link {
+      display: flex; align-items: center; gap: 0.75rem;
+      width: 100%; padding: 0.75rem 0.9rem; border-radius: 12px;
+      color: rgba(255,255,255,0.75) !important; text-decoration: none !important;
+      font-size: 0.85rem; font-weight: 500; font-family: "Outfit", sans-serif;
+      background: transparent; border: 1px solid transparent; text-align: left;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+      margin-bottom: 3px; cursor: pointer; position: relative;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+    /* Only apply hover styles on true pointer devices (not touch) */
+    @media (hover: hover) and (pointer: fine) {
+      .side-nav-link:hover {
+        background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
+        color: #ffffff !important;
+        border-color: rgba(255,140,0,0.25);
+        box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
+      }
+      .side-nav-link:hover svg {
+        opacity: 1; color: #ff8c00;
+        transform: scale(1.1);
+      }
+    }
+    /* Remove focus outlines/rings */
+    .side-nav-link:focus,
+    .side-nav-link:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      color: rgba(255,255,255,0.75) !important;
+    }
+    /* Suppress blue/purple browser tap colour on mobile */
+    .side-nav-link:active:not(.active),
+    .side-nav-link:visited {
+      color: rgba(255,255,255,0.75) !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    .side-nav-link.active:focus,
+    .side-nav-link.active:focus-visible {
+      outline: none !important;
+      background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+      color: #ff8c00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+    }
+    .side-nav-link:active:not(.active) {
+      background: rgba(255,140,0,0.1) !important;
+      transform: scale(0.98);
+    }
+    .side-nav-link svg {
+      flex-shrink: 0; opacity: 0.75;
+      transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
+    }
+    .side-nav-link.active {
+      background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
+      color: #ff8c00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      font-weight: 700;
+      box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
+    }
+    .side-nav-link.active:focus,
+    .side-nav-link.active:focus-visible {
+      outline: none !important;
+    }
+    .side-nav-link.active svg {
+      opacity: 1; color: #ff8c00;
+      filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
+    }
+    [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
+    [data-bs-theme="light"] .side-nav-link {
+      color: rgba(0,0,0,0.7) !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    [data-bs-theme="light"] .side-nav-link:focus,
+    [data-bs-theme="light"] .side-nav-link:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      border-color: transparent !important;
+      color: rgba(0,0,0,0.7) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active:focus,
+    [data-bs-theme="light"] .side-nav-link.active:focus-visible {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
+    [data-bs-theme="light"] .side-nav-link:active:not(.active),
+    [data-bs-theme="light"] .side-nav-link:visited {
+      color: rgba(0,0,0,0.7) !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    [data-bs-theme="light"] .side-nav-link.active {
+      background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
+      color: #e67e00 !important;
+      border-color: rgba(255,140,0,0.35) !important;
+      box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      [data-bs-theme="light"] .side-nav-link:hover {
+        background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
+        color: #000000 !important;
+        border-color: rgba(255,140,0,0.3) !important;
+        box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
+      }
+    }
+
     /* FORMS */
-    .form-label { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 0.4rem; }
+    .form-label { font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.8); margin-bottom: 0.35rem; }
     .form-control, .form-select {
       background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,140,0,0.2);
-      color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.95rem;
+      color: #fff; padding: 0.6rem 0.9rem; border-radius: 8px; font-size: 0.88rem;
     }
     .form-control:focus, .form-select:focus {
       background-color: rgba(0,0,0,0.5); border-color: orange; box-shadow: 0 0 0 3px rgba(255,165,0,0.15); color: #fff;
@@ -581,34 +778,39 @@
     /* ── PROFILE AVATAR CARD ── */
     .profile-avatar-wrap {
       position: relative;
-      width: 120px; height: 120px;
+      /* Fixed dimensions with aspect-ratio reserve space BEFORE image paints ─
+         this is the single biggest CLS fix on navigation                        */
+      width: 120px;
+      height: 120px;
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
       cursor: pointer;
       margin: 0 auto;
       overflow: hidden;
       border: 3px solid rgba(255,140,0,0.5);
-      background: #1a1a1a; /* neutral dark — no yellow flash while image loads */
+      background: #1a1a1a;
       box-shadow: 0 0 0 5px rgba(255,140,0,0.08), 0 8px 24px rgba(0,0,0,0.4);
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
       min-width: 120px;
       min-height: 120px;
       flex-shrink: 0;
+      /* Stable GPU layer prevents disappearing during SPA navigation */
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .profile-avatar-wrap:hover { border-color: #ff8c00; box-shadow: 0 0 0 6px rgba(255,140,0,0.18), 0 0 30px rgba(255,140,0,0.2); }
     .profile-avatar-img {
-      width: 100%; height: 100%;
+      width: 120px;
+      height: 120px;
       object-fit: cover;
       border-radius: 50%;
       display: block;
       opacity: 1 !important;
       min-width: 120px;
       min-height: 120px;
-      /* Fade in smoothly once loaded instead of popping in */
-      animation: avatarFadeIn 0.3s ease both;
-    }
-    @keyframes avatarFadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+      /* NO fade animation — was causing CLS/repaint on navigation */
     }
     .profile-avatar-overlay {
       position: absolute; inset: 0;
@@ -845,6 +1047,23 @@
         });
       }
     }
+    // ── Always reset body scroll lock on page load/navigation ──
+    // When navigating back via browser history, bfcache restores the DOM
+    // with body.overflow still "hidden" if the modal was open. This fixes it.
+    function resetPageState() {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      var backdrop = document.getElementById('photoMgmtBackdrop');
+      if (backdrop) backdrop.classList.remove('open');
+    }
+    // Fire immediately for normal page loads
+    document.addEventListener('DOMContentLoaded', resetPageState);
+    // Fire for bfcache restores (browser back/forward)
+    window.addEventListener('pageshow', function(e) {
+      // e.persisted = true means the page was restored from bfcache
+      resetPageState();
+    });
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closePhotoMgmt();
     });
@@ -855,7 +1074,7 @@
 
 
 
-  <div class="container pb-5 mb-5 mt-5">
+  <div class="container pb-5 mb-5 mt-5" style="min-height:100vh;">
     <div class="row">
       <!-- Sidebar -->
       <div class="col-12 col-lg-4 mb-4">
@@ -888,12 +1107,18 @@
                      src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
                      alt="Profile Photo" class="profile-avatar-img"
                      width="120" height="120"
+                     loading="eager"
+                     fetchpriority="high"
+                     decoding="sync"
                      style="opacity:1;display:block;" />
               @else
                 <img id="avatarPreview"
                      src="https://ui-avatars.com/api/?name={{ urlencode(substr(auth()->user()->name, 0, 2)) }}&background=ff8c00&color=000&size=200&bold=true"
                      alt="Profile Photo" class="profile-avatar-img"
                      width="120" height="120"
+                     loading="eager"
+                     fetchpriority="high"
+                     decoding="sync"
                      style="opacity:1;display:block;" />
               @endif
               {{-- Hover overlay --}}
@@ -975,7 +1200,7 @@
             </div>
 
             {{-- User name below avatar --}}
-            <div class="fw-bold profile-name-text d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.3rem; letter-spacing:0.01em;">
+            <div class="fw-bold profile-name-text d-flex align-items-center justify-content-center gap-2 mb-1" style="font-size:1.05rem; letter-spacing:0.01em;">
               {{ auth()->user()->name }}
               @if(auth()->user()->is_verified)
                 <div style="display:inline-flex; align-items:center; justify-content:center; background:#1da1f2; border-radius:50%; width:17px; height:17px; box-shadow:0 0 6px rgba(29,161,242,0.4);" title="Verified">
@@ -1118,122 +1343,6 @@
           </ul>
         </div>
         
-        <style>
-          /* ── SIDEBAR NAV (matches wallet page) ── */
-          .side-nav-card {
-            background: #111111;
-            border: 1px solid rgba(255,140,0,0.2); border-radius: 18px;
-            padding: 1.25rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            margin-bottom: 1.5rem;
-            transform: translateZ(0);
-          }
-          .side-nav-title {
-            font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
-            text-transform: uppercase; color: rgba(255,255,255,0.35);
-            padding: 0 0.5rem 0.75rem; margin-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,140,0,0.12);
-          }
-          .side-nav-link {
-            display: flex; align-items: center; gap: 0.75rem;
-            width: 100%; padding: 0.75rem 0.9rem; border-radius: 12px;
-            color: rgba(255,255,255,0.75); text-decoration: none;
-            font-size: 0.92rem; font-weight: 500; font-family: "Outfit", sans-serif;
-            background: transparent; border: 1px solid transparent; text-align: left;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-            margin-bottom: 3px; cursor: pointer; position: relative;
-            /* Prevent blue flash on mobile touch */
-            -webkit-tap-highlight-color: transparent !important;
-            -webkit-touch-callout: none;
-            touch-action: manipulation;
-          }
-          /* Only apply hover styles on true pointer devices (not touch) */
-          @media (hover: hover) and (pointer: fine) {
-            .side-nav-link:hover {
-              background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.04) 100%);
-              color: #ffffff;
-              border-color: rgba(255,140,0,0.25);
-              box-shadow: 0 4px 15px rgba(255,140,0,0.12), inset 4px 0 0 #ff8c00;
-            }
-            .side-nav-link:hover svg {
-              opacity: 1; color: #ff8c00;
-              transform: scale(1.1);
-            }
-          }
-          /* Remove focus outlines/rings - blur() called via JS on click */
-          .side-nav-link:focus,
-          .side-nav-link:focus-visible {
-            outline: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
-            border-color: transparent !important;
-            color: rgba(255,255,255,0.75) !important;
-          }
-          /* Suppress blue/purple browser tap color on mobile */
-          .side-nav-link:active:not(.active),
-          .side-nav-link:visited {
-            color: rgba(255,255,255,0.75) !important;
-            -webkit-tap-highlight-color: transparent !important;
-          }
-          .side-nav-link.active:focus,
-          .side-nav-link.active:focus-visible {
-            outline: none !important;
-            background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
-            color: #ff8c00 !important;
-            border-color: rgba(255,140,0,0.35) !important;
-            box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
-          }
-          .side-nav-link:active:not(.active) {
-            background: rgba(255,140,0,0.1) !important;
-            transform: scale(0.98);
-          }
-          .side-nav-link svg {
-            flex-shrink: 0; opacity: 0.75;
-            transition: transform 0.25s ease, color 0.2s ease, opacity 0.2s ease;
-          }
-          .side-nav-link.active {
-            background: linear-gradient(90deg, rgba(255,140,0,0.22) 0%, rgba(255,140,0,0.08) 100%) !important;
-            color: #ff8c00 !important;
-            border-color: rgba(255,140,0,0.35) !important;
-            font-weight: 700;
-            box-shadow: inset 4px 0 0 #ff8c00, 0 4px 15px rgba(255,140,0,0.15) !important;
-          }
-          .side-nav-link.active:focus,
-          .side-nav-link.active:focus-visible {
-            outline: none !important;
-          }
-          .side-nav-link.active svg {
-            opacity: 1; color: #ff8c00;
-            filter: drop-shadow(0 0 5px rgba(255,140,0,0.5));
-          }
-          [data-bs-theme="light"] .side-nav-card { background:#fff; border-color:rgba(255,140,0,0.3); }
-          [data-bs-theme="light"] .side-nav-link {
-            color:rgba(0,0,0,0.7);
-            -webkit-tap-highlight-color: transparent;
-          }
-          [data-bs-theme="light"] .side-nav-link:focus,
-          [data-bs-theme="light"] .side-nav-link:focus-visible {
-            outline: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
-            border-color: transparent !important;
-            color: rgba(0,0,0,0.7) !important;
-          }
-          [data-bs-theme="light"] .side-nav-link.active:focus,
-          [data-bs-theme="light"] .side-nav-link.active:focus-visible {
-            background: linear-gradient(90deg, rgba(255,140,0,0.18) 0%, rgba(255,140,0,0.05) 100%) !important;
-            color: #e67e00 !important;
-            border-color: rgba(255,140,0,0.35) !important;
-            box-shadow: inset 3px 0 0 #ff8c00, 0 4px 12px rgba(255,140,0,0.12) !important;
-          }
-          @media (hover: hover) and (pointer: fine) {
-            [data-bs-theme="light"] .side-nav-link:hover {
-              background: linear-gradient(90deg, rgba(255,140,0,0.15) 0%, rgba(255,140,0,0.03) 100%) !important;
-              color: #000000 !important;
-              border-color: rgba(255,140,0,0.3) !important;
-              box-shadow: 0 4px 12px rgba(255,140,0,0.1), inset 4px 0 0 #ff8c00 !important;
-            }
-          }
-        </style>
 
         {{-- --- PHOTOS CARD --- --}}
         @php
