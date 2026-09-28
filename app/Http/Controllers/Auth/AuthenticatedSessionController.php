@@ -39,11 +39,15 @@ class AuthenticatedSessionController extends Controller
 
         // Determine the intended destination — skip it if it points back to login or the landing page
         $intended = $request->session()->pull('url.intended');
-        $loginUrl = route('login');
-        $homeUrl = url('/');
         
-        if ($intended && $intended !== $loginUrl && rtrim($intended, '/') !== rtrim($homeUrl, '/') && !str_contains($intended, '/login')) {
-            return redirect($intended);
+        if ($intended) {
+            $path = parse_url($intended, PHP_URL_PATH) ?? '/';
+            $normalizedPath = rtrim($path, '/');
+            
+            // Only redirect to intended if it's a specific inner page (not root '/', not '/login')
+            if ($normalizedPath !== '' && $normalizedPath !== '/login') {
+                return redirect($intended);
+            }
         }
 
         if ($request->user()->is_admin) {

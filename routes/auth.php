@@ -23,9 +23,20 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('login', function () {
-        // Login is via the #authModal on the homepage — no standalone login page exists.
-        return redirect('/');
+    Route::get('login', function (\Illuminate\Http\Request $request) {
+        if ($request->filled('ref')) {
+            session(['ref_code' => $request->input('ref')]);
+        }
+
+        $hasReferral = session()->has('ref_code') || $request->filled('ref') || $request->filled('referral_code');
+
+        // The standalone login page only appears when the user has been referred
+        if ($hasReferral) {
+            return view('auth.login');
+        }
+
+        // If not referred, redirect to homepage with auth modal query
+        return redirect('/?auth=login');
     })->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);

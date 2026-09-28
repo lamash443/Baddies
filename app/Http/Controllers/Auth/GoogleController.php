@@ -98,7 +98,16 @@ class GoogleController extends Controller
                     ->causedBy($user)
                     ->log('Logged in via Google OAuth');
 
-                return redirect()->intended(route('dashboard'))
+                $intended = session()->pull('url.intended');
+                if ($intended) {
+                    $path = parse_url($intended, PHP_URL_PATH) ?? '/';
+                    $normalizedPath = rtrim($path, '/');
+                    if ($normalizedPath !== '' && $normalizedPath !== '/login') {
+                        return redirect($intended)->with('success', 'Successfully logged in with Google!');
+                    }
+                }
+
+                return redirect()->route('dashboard')
                     ->with('success', 'Successfully logged in with Google!');
             }
 
