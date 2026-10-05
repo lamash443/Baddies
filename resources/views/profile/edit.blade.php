@@ -327,16 +327,17 @@
       box-shadow: 0 0 10px 2px rgba(255,165,0,0.4) !important;
     }
 
-    /* Danger button keeps its own colour but same shape */
+    /* Request Deletion Button matches site theme */
     .btn-danger-custom {
       display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-      background: transparent; border: 2px solid #dc3545; color: #dc3545;
+      background: transparent; border: 2px solid orange; color: orange;
       padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.88rem; font-weight: 700;
       font-family: "Outfit", sans-serif; text-decoration: none; transition: all 0.3s ease;
+      cursor: pointer;
     }
     .btn-danger-custom:hover {
-      background: #dc3545; color: #fff;
-      box-shadow: 0 0 18px 4px rgba(220,53,69,0.5);
+      background: orange; color: #000; border-color: orange;
+      box-shadow: 0 0 18px 4px rgba(255,165,0,0.55), 0 0 35px rgba(255,165,0,0.25);
       transform: translateY(-1px);
     }
 

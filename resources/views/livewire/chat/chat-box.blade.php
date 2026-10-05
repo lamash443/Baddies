@@ -53,12 +53,14 @@
             if (this.isLongPress) {
                 e.preventDefault();
                 e.stopPropagation();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
                 this.isLongPress = false;
                 return;
             }
             if (this.selectedIds.length > 0) {
                 e.preventDefault();
                 e.stopPropagation();
+                if (e.stopImmediatePropagation) e.stopImmediatePropagation();
                 let idx = this.selectedIds.indexOf(id);
                 if (idx > -1) {
                     this.selectedIds.splice(idx, 1);
@@ -138,6 +140,51 @@
             this.showDeleteModal = false;
         }
     }">
+
+    <script>
+        // Runs synchronously before paint — sets correct theme variables immediately
+        // to prevent flash of white/light bubble backgrounds on wire:navigate transitions
+        (function() {
+            var dark = (localStorage.getItem('theme') || 'dark') === 'dark';
+            var el = document.currentScript.parentElement;
+            if (!el) return;
+            if (dark) {
+                el.style.setProperty('--chat-bg', '#0d0d0d');
+                el.style.setProperty('--bubble-sent-bg', '#005c4b');
+                el.style.setProperty('--bubble-received-bg', '#202c33');
+                el.style.setProperty('--bubble-text', '#e9edef');
+                el.style.setProperty('--bubble-meta', 'rgba(255,255,255,0.6)');
+                el.style.setProperty('--date-bg', '#182229');
+                el.style.setProperty('--date-text', 'rgba(255,255,255,0.6)');
+                el.style.setProperty('--deleted-bg', 'rgba(32,44,51,0.95)');
+                el.style.setProperty('--deleted-text', '#8696a0');
+                el.style.setProperty('--reply-bg', 'rgba(255,255,255,0.05)');
+                el.style.setProperty('--reply-border-me', 'rgba(255,255,255,0.3)');
+                el.style.setProperty('--reply-border-other', '#ff8c00');
+                el.style.setProperty('--header-bg', '#0d0d0d');
+                el.style.setProperty('--input-area-bg', '#0d0d0d');
+                el.style.setProperty('--input-bg-color', 'rgba(255,255,255,0.07)');
+                el.style.backgroundColor = '#0d0d0d';
+            } else {
+                el.style.setProperty('--chat-bg', '#efeae2');
+                el.style.setProperty('--bubble-sent-bg', '#e2ffc7');
+                el.style.setProperty('--bubble-received-bg', '#ffffff');
+                el.style.setProperty('--bubble-text', '#1a1a1a');
+                el.style.setProperty('--bubble-meta', 'rgba(0,0,0,0.55)');
+                el.style.setProperty('--date-bg', '#ffffff');
+                el.style.setProperty('--date-text', 'rgba(0,0,0,0.6)');
+                el.style.setProperty('--deleted-bg', 'rgba(240,242,245,0.95)');
+                el.style.setProperty('--deleted-text', '#6c757d');
+                el.style.setProperty('--reply-bg', 'rgba(0,0,0,0.04)');
+                el.style.setProperty('--reply-border-me', 'rgba(0,0,0,0.2)');
+                el.style.setProperty('--reply-border-other', '#ff8c00');
+                el.style.setProperty('--header-bg', '#0d0d0d');
+                el.style.setProperty('--input-area-bg', '#0d0d0d');
+                el.style.setProperty('--input-bg-color', 'rgba(255,255,255,0.07)');
+                el.style.backgroundColor = '#efeae2';
+            }
+        })();
+    </script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -299,20 +346,22 @@
 
 
                 {{-- Avatar --}}
-                @if($activeUserId === 'announcement')
+                @if($activeUserId === 'announcement' || ($activeUser && $activeUser->is_admin))
                     @php
                         $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
                         $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+                        $siteName = $siteName ?? \App\Models\SiteSetting::get('site_name', 'Kenyan Baddies');
+                        $siteInitials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $siteName), 0, 2)) ?: 'KB';
                     @endphp
                     <div class="text-decoration-none d-block flex-shrink-0">
                         @if($announcementLogo)
                             <div class="d-flex align-items-center justify-content-center bg-dark" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
-                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
+                                <img src="{{ $announcementLogo }}" alt="{{ $siteName }}" class="rounded-circle w-100 h-100" style="object-fit: contain;">
                             </div>
                         @else
                             <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 8px rgba(255,140,0,0.5);">
                                 <div class="rounded-circle w-100 h-100 d-flex justify-content-center align-items-center text-white fw-bold" style="font-size: 1rem; background: linear-gradient(135deg, rgba(255,140,0,0.4), rgba(255,140,0,0.2));">
-                                    KB
+                                    {{ $siteInitials }}
                                 </div>
                             </div>
                         @endif
@@ -340,12 +389,12 @@
 
                 {{-- Name + Status --}}
                 <div class="ms-3 flex-grow-1" style="min-width: 0;">
-                    @if($activeUserId === 'announcement')
-                        <div class="fw-bold d-flex align-items-center gap-1" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            Kenyan Baddies
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                    @if($activeUserId === 'announcement' || ($activeUser && $activeUser->is_admin))
+                        @php $siteName = \App\Models\SiteSetting::get('site_name', 'Kenyan Baddies'); @endphp
+                        <div class="fw-bold" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ $siteName }}
                         </div>
-                        <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Message</small>
+                        <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Announcement</small>
                     @else
                         <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
                             <div class="fw-bold" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
@@ -385,6 +434,7 @@
                         </button>
                     @endif
                 @endif
+
             </div>
 
             {{-- Selection Action Header — Swapped cleanly via Alpine --}}
@@ -465,7 +515,7 @@
                         $borderStyle = 'none';
                     }
                 @endphp
-                <div class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper {{ $isSender ? 'justify-content-end' : 'justify-content-start' }}" data-msg-id="{{ $message->id }}">
+                <div wire:key="message-{{ $message->id }}" class="d-flex w-100 mb-3 align-items-center position-relative message-wrapper {{ $isSender ? 'justify-content-end' : 'justify-content-start' }}" data-msg-id="{{ $message->id }}">
                     
                     <div class="px-2 py-2 shadow-sm position-relative msg-bubble" 
                          :class="{ 'selected-bubble': selectedIds.includes({{ $message->id }}) }"
@@ -591,7 +641,7 @@
             <div x-init="if(!replyData) { replyData = { id: {{ $replyToId }}, name: 'User', text: '...' }; }"></div>
         @endif
 
-        @if($activeUserId !== 'announcement')
+        @if($activeUserId !== 'announcement' && !($activeUser && $activeUser->is_admin))
 
 
             <!-- Input Area -->
@@ -679,41 +729,72 @@
             document.addEventListener('livewire:navigated', scrollToBottom);
         </script>
 
-    <!-- WhatsApp-Style Delete Popup Modal -->
+    <!-- Delete Message Modal -->
     <div x-cloak x-show="showDeleteModal" :class="showDeleteModal ? 'd-flex' : 'd-none'"
          @keydown.window.escape="showDeleteModal = false"
-         class="position-fixed top-0 start-0 w-100 h-100 align-items-center justify-content-center p-3"
-         style="z-index: 99999; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px);">
-        <div @click.outside="showDeleteModal = false" 
-             class="bg-dark text-white p-4 shadow-lg"
-             style="width: 100%; max-width: 350px; border-radius: 18px; background: linear-gradient(145deg, #1f2937, #111827) !important; border: 1px solid rgba(255,140,0,0.35) !important;">
-            <h6 class="fw-bold mb-3 text-white" style="font-size: 1.05rem;" x-text="selectedIds.length > 1 ? 'Delete ' + selectedIds.length + ' messages?' : 'Delete message?'">
-                Delete message?
-            </h6>
-            
-            <div class="d-flex flex-column gap-2 mt-3">
+         class="position-fixed top-0 start-0 w-100 h-100 align-items-center justify-content-center"
+         style="z-index: 99999; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"
+         x-transition:enter="transition ease-out duration-150"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+
+        <div @click.outside="showDeleteModal = false"
+             style="width: 100%; max-width: 380px; margin: 0 1rem 1.5rem;
+                    background: linear-gradient(145deg, rgba(20,12,0,0.97), rgba(13,13,13,0.97));
+                    border: 1px solid rgba(255,140,0,0.3);
+                    border-radius: 20px;
+                    box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+                    overflow: hidden;">
+
+            {{-- Header --}}
+            <div style="padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid rgba(255,140,0,0.12);">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white" style="font-size: 0.98rem; line-height: 1.3;" x-text="selectedIds.length > 1 ? 'Delete ' + selectedIds.length + ' messages?' : 'Delete message?'">Delete message?</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 1px;">This action cannot be undone</div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div style="padding: 0.85rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
                 <template x-if="canDeleteForEveryone">
-                    <button type="button" 
+                    <button type="button"
                             @click="confirmDeleteForEveryone()"
-                            class="btn w-100 text-start d-flex align-items-center justify-content-between py-2.5 px-3 rounded-3 text-danger border-danger"
-                            style="background: rgba(220,53,69,0.12); border: 1px solid rgba(220,53,69,0.4); font-weight: 500;">
-                        <span>Delete for Everyone</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            class="w-100 d-flex align-items-center gap-3 text-start"
+                            style="background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.3); border-radius: 12px; padding: 0.75rem 1rem; color: #ff6b6b; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease;"
+                            onmouseenter="this.style.background='rgba(220,53,69,0.2)'; this.style.borderColor='rgba(220,53,69,0.5)'"
+                            onmouseleave="this.style.background='rgba(220,53,69,0.1)'; this.style.borderColor='rgba(220,53,69,0.3)'">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Delete for Everyone
                     </button>
                 </template>
 
-                <button type="button" 
+                <button type="button"
                         @click="confirmDeleteForMe()"
-                        class="btn w-100 text-start d-flex align-items-center justify-content-between py-2.5 px-3 rounded-3 text-white"
-                        style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); font-weight: 500;">
-                    <span>Delete for Me</span>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        class="w-100 d-flex align-items-center gap-3 text-start"
+                        style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.75rem 1rem; color: rgba(255,255,255,0.85); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease;"
+                        onmouseenter="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.2)'"
+                        onmouseleave="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Delete for Me
                 </button>
 
-                <button type="button" 
+                <button type="button"
                         @click="clear()"
-                        class="btn btn-link text-warning text-decoration-none w-100 text-end pt-2 pb-0 pe-2 fw-semibold"
-                        style="font-size: 0.92rem;">
+                        class="w-100"
+                        style="background: transparent; border: 1px solid rgba(255,140,0,0.2); border-radius: 12px; padding: 0.65rem 1rem; color: #ff8c00; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease; margin-top: 0.15rem;"
+                        onmouseenter="this.style.background='rgba(255,140,0,0.08)'; this.style.borderColor='rgba(255,140,0,0.4)'"
+                        onmouseleave="this.style.background='transparent'; this.style.borderColor='rgba(255,140,0,0.2)'">
                     Cancel
                 </button>
             </div>

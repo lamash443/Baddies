@@ -42,6 +42,51 @@ class ChatBox extends Component
         }
     }
 
+    public function togglePinCurrent()
+    {
+        if (!$this->activeUserId || $this->activeUserId === 'announcement') return;
+        $myId = auth()->id();
+        $isPinned = \App\Models\ChatPin::where('user_id', $myId)->where('pinned_user_id', $this->activeUserId)->exists();
+        if ($isPinned) {
+            \App\Models\ChatPin::where('user_id', $myId)->where('pinned_user_id', $this->activeUserId)->delete();
+        } else {
+            \App\Models\ChatPin::firstOrCreate(['user_id' => $myId, 'pinned_user_id' => $this->activeUserId]);
+        }
+        $this->dispatch('chat-pin-updated');
+    }
+
+    public function archiveCurrent()
+    {
+        if (!$this->activeUserId || $this->activeUserId === 'announcement') return;
+        \App\Models\ChatArchive::firstOrCreate([
+            'user_id' => auth()->id(),
+            'archived_user_id' => $this->activeUserId,
+        ]);
+        return redirect()->route('chat.index');
+    }
+
+    public function unarchiveCurrent()
+    {
+        if (!$this->activeUserId || $this->activeUserId === 'announcement') return;
+        \App\Models\ChatArchive::where('user_id', auth()->id())
+            ->where('archived_user_id', $this->activeUserId)
+            ->delete();
+        $this->dispatch('chat-archive-updated');
+        // Redirect to the chat without ?showArchived so the list goes back to active view
+        return redirect()->route('chat.show', $this->activeUserId);
+    }
+
+    public function deleteCurrentChat()
+    {
+        if (!$this->activeUserId || $this->activeUserId === 'announcement') return;
+        $myId = auth()->id();
+        Message::where('sender_id', $myId)->where('receiver_id', $this->activeUserId)->update(['deleted_by_sender' => true]);
+        Message::where('sender_id', $this->activeUserId)->where('receiver_id', $myId)->update(['deleted_by_receiver' => true]);
+        \App\Models\ChatArchive::where('user_id', $myId)->where('archived_user_id', $this->activeUserId)->delete();
+        \App\Models\ChatPin::where('user_id', $myId)->where('pinned_user_id', $this->activeUserId)->delete();
+        return redirect()->route('chat.index');
+    }
+
     public function setReply($messageId)
     {
         $this->replyToId = $messageId;
@@ -181,9 +226,19 @@ class ChatBox extends Component
             }
         }
 
+        $isPinned = false;
+        $isArchived = false;
+        if ($activeUser) {
+            $myId = auth()->id();
+            $isPinned = \App\Models\ChatPin::where('user_id', $myId)->where('pinned_user_id', $activeUser->id)->exists();
+            $isArchived = \App\Models\ChatArchive::where('user_id', $myId)->where('archived_user_id', $activeUser->id)->exists();
+        }
+
         return view('livewire.chat.chat-box', [
             'messages' => $messages,
             'activeUser' => $activeUser,
+            'isPinned' => $isPinned,
+            'isArchived' => $isArchived,
         ]);
     }
 }

@@ -103,7 +103,12 @@ x-cloak>
 
           <div class="col-md-6">
             <label class="form-label">{{ __('Age') }} <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" name="hookup_age" placeholder="e.g. 24" min="18" max="99" required>
+            <input type="number" class="form-control" name="hookup_age" placeholder="e.g. 24" min="18" max="99" required
+                onkeydown="if(['-', '+', 'e', 'E'].includes(event.key)) event.preventDefault();"
+                oninput="if(this.value !== '' && parseInt(this.value, 10) < 0) this.value = '';"
+                onblur="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
+                onchange="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }">
+            <div class="form-text text-secondary" style="font-size:0.75rem;">Minimum age allowed is 18 years.</div>
           </div>
 
           <div class="col-md-6">

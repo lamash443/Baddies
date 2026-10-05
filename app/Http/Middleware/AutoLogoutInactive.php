@@ -29,7 +29,7 @@ class AutoLogoutInactive
                     return response()->json(['message' => 'Session expired due to inactivity.'], 401);
                 }
 
-                return redirect()->route('login')
+                return redirect('/')
                     ->with('status', 'You have been logged out due to 30 minutes of inactivity.');
             }
         }

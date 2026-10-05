@@ -57,7 +57,13 @@
 
         <div class="mb-3">
             <label for="age" class="form-label">{{ __('Age') }}</label>
-            <input id="age" name="age" type="number" min="18" max="100" class="form-control" value="{{ old('age', $user->age) }}" />
+            <input id="age" name="age" type="number" min="18" max="100" class="form-control" value="{{ old('age', $user->age) }}"
+                onkeydown="if(['-', '+', 'e', 'E'].includes(event.key)) event.preventDefault();"
+                oninput="if(this.value !== '' && parseInt(this.value, 10) < 0) this.value = '';"
+                onblur="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
+                onchange="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
+                placeholder="18" />
+            <div class="form-text text-secondary" style="font-size:0.75rem;">Minimum age allowed is 18 years.</div>
             @error('age')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 

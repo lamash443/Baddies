@@ -23,7 +23,7 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('login', function (\Illuminate\Http\Request $request) {
+    Route::get('referral', function (\Illuminate\Http\Request $request) {
         if ($request->filled('ref')) {
             session(['ref_code' => $request->input('ref')]);
         }
@@ -39,7 +39,7 @@ Route::middleware('guest')->group(function () {
         return redirect('/?auth=login');
     })->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('referral', [AuthenticatedSessionController::class, 'store']);
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

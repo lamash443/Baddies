@@ -26,16 +26,19 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        // Block login if user has a pending account deletion request
+        // If user logs back in, cancel any pending deletion request
         if (Auth::user()->deletion_requested_at) {
-            Auth::guard('web')->logout();
-
-            return redirect('/?deletion_pending=1');
+            Auth::user()->update(['deletion_requested_at' => null]);
+            $request->session()->flash('login_success', 'Welcome back! Your account deletion request has been cancelled.');
+        } else {
+            $request->session()->flash('login_success', 'Welcome back, ' . $request->user()->name . '! You have successfully logged in.');
         }
 
-        $request->session()->regenerate();
+        // Update last_seen_at to prevent immediate AutoLogoutInactive trigger for dormant accounts
+        Auth::user()->update(['last_seen_at' => now()]);
+        \Illuminate\Support\Facades\Cache::put('user_last_seen_' . Auth::id(), true, now()->addMinutes(2));
 
-        $request->session()->flash('login_success', 'Welcome back, ' . $request->user()->name . '! You have successfully logged in.');
+        $request->session()->regenerate();
 
         // Determine the intended destination — skip it if it points back to login or the landing page
         $intended = $request->session()->pull('url.intended');

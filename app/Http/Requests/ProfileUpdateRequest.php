@@ -62,4 +62,18 @@ class ProfileUpdateRequest extends FormRequest
             'calls_enabled' => ['boolean'],
         ];
     }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'age.min' => 'You must be at least 18 years old.',
+            'age.max' => 'Age cannot exceed 100 years.',
+            'age.integer' => 'Please enter a valid age.',
+        ];
+    }
 }

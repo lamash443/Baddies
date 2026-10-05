@@ -92,7 +92,13 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 
         <div class="mb-3">
             <label for="age" class="form-label"><?php echo e(__('Age')); ?></label>
-            <input id="age" name="age" type="number" min="18" max="100" class="form-control" value="<?php echo e(old('age', $user->age)); ?>" />
+            <input id="age" name="age" type="number" min="18" max="100" class="form-control" value="<?php echo e(old('age', $user->age)); ?>"
+                onkeydown="if(['-', '+', 'e', 'E'].includes(event.key)) event.preventDefault();"
+                oninput="if(this.value !== '' && parseInt(this.value, 10) < 0) this.value = '';"
+                onblur="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
+                onchange="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
+                placeholder="18" />
+            <div class="form-text text-secondary" style="font-size:0.75rem;">Minimum age allowed is 18 years.</div>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['age'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

@@ -1,3 +1,201 @@
+<div class="chat-list border-end border-secondary position-relative" style="height: 75vh; overflow-y: auto; -webkit-overflow-scrolling: touch;"
+    wire:poll.4s
+    data-show-archived="{{ $showArchived ? 'true' : 'false' }}"
+    data-archive-count="{{ count($archivedConversations) }}"
+    @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd" @touchcancel="touchEnd" @scroll.passive="if ($el.scrollTop > 20) showArchiveButton = false"
+    x-data="{
+        selectedChats: [],
+        longPressTimer: null,
+        didLongPress: false,
+        startX: 0,
+        startY: 0,
+
+        pullDistance: 0,
+        pullStartY: 0,
+        isPulling: false,
+        canPull: false,
+        pullThreshold: 75,
+        holdArchiveTimer: null,
+        isArchiveReady: false,
+        showArchiveButton: false,
+
+        init() {
+            // Force reset scroll on load to fix iOS history restoration blocking pull-to-refresh
+            setTimeout(() => { this.$el.scrollTop = 0; }, 50);
+        },
+        
+        touchStart(e) {
+            // Allow pull-to-reveal to start on chat rows (anchor tags). Only block on form elements/buttons.
+            if (e.target.closest('button, input')) {
+                this.canPull = false;
+                return;
+            }
+            
+            // Read state dynamically from DOM to avoid frozen variables after Livewire morph
+            const isArchived = this.$el.getAttribute('data-show-archived') === 'true';
+            const archiveCount = parseInt(this.$el.getAttribute('data-archive-count') || '0');
+
+            // Use <= 5 to be forgiving in case of 1px Safari scroll offsets
+            if ($el.scrollTop <= 5 && archiveCount > 0 && !isArchived && !this.showArchiveButton) {
+                this.pullStartY = e.touches[0].clientY;
+                this.isPulling = true;
+                this.canPull = true;
+                this.pullDistance = 0;
+                this.isArchiveReady = false;
+                if(this.holdArchiveTimer) clearTimeout(this.holdArchiveTimer);
+                this.holdArchiveTimer = null;
+            } else {
+                this.canPull = false;
+            }
+        },
+        touchMove(e) {
+            if (!this.canPull || !this.isPulling) return;
+            const y = e.touches[0].clientY;
+            const diff = y - this.pullStartY;
+            
+            if (diff > 0) {
+                // Pulling down at top of list — intercept and prevent native scroll/bounce
+                if (e.cancelable) e.preventDefault();
+                
+                // Frictional pull
+                this.pullDistance = Math.min(diff * 0.45, 120);
+
+                if (this.pullDistance >= this.pullThreshold) {
+                    if (!this.holdArchiveTimer && !this.isArchiveReady) {
+                        this.holdArchiveTimer = setTimeout(() => {
+                            this.isArchiveReady = true;
+                            if (navigator.vibrate) navigator.vibrate(50);
+                        }, 700); // 700ms hold required
+                    }
+                } else {
+                    if (this.holdArchiveTimer) {
+                        clearTimeout(this.holdArchiveTimer);
+                        this.holdArchiveTimer = null;
+                    }
+                    this.isArchiveReady = false;
+                }
+            } else {
+                // Scrolling down the list normally — abort pull and let native scroll take over
+                this.isPulling = false;
+                this.canPull = false;
+            }
+        },
+        touchEnd(e) {
+            if (!this.isPulling) return;
+            this.isPulling = false;
+            if (this.holdArchiveTimer) {
+                clearTimeout(this.holdArchiveTimer);
+                this.holdArchiveTimer = null;
+            }
+            if (this.isArchiveReady) {
+                // Reveal the button instead of auto-navigating
+                this.showArchiveButton = true;
+            }
+            this.pullDistance = 0;
+            this.isArchiveReady = false;
+        },
+
+        startPress(id, event) {
+            const e = event || window.event;
+            if (e?.button !== undefined && e.button !== 0) return;
+            this.didLongPress = false;
+            if (e) {
+                this.startX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+                this.startY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+            }
+            this.clearLongPress();
+            this.longPressTimer = setTimeout(() => {
+                this.didLongPress = true;
+                const numericId = Number(id);
+                if (numericId > 0 && !this.selectedChats.includes(numericId)) {
+                    this.selectedChats.push(numericId);
+                }
+                if (navigator.vibrate) navigator.vibrate(40);
+                this.longPressTimer = null;
+            }, 450);
+        },
+
+        movePress(event) {
+            if (!this.longPressTimer) return;
+            const e = event || window.event;
+            const currentX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+            const currentY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+            if (Math.abs(currentX - this.startX) > 10 || Math.abs(currentY - this.startY) > 10) {
+                this.clearLongPress();
+            }
+        },
+
+        endPress() {
+            this.clearLongPress();
+        },
+
+        clearLongPress() {
+            if (this.longPressTimer) {
+                clearTimeout(this.longPressTimer);
+                this.longPressTimer = null;
+            }
+        },
+
+        isSelected(id) {
+            return this.selectedChats.includes(Number(id));
+        },
+
+        toggleSelected(id) {
+            const numericId = Number(id);
+            if (!numericId) return;
+            const index = this.selectedChats.indexOf(numericId);
+            if (index === -1) {
+                this.selectedChats.push(numericId);
+            } else {
+                this.selectedChats.splice(index, 1);
+            }
+        },
+
+        clearSelection() {
+            this.selectedChats = [];
+            this.didLongPress = false;
+        },
+
+        selectedIds() {
+            return this.selectedChats.map(id => Number(id)).filter(id => id > 0).join(',');
+        },
+
+        handleClick(id, event, url) {
+            const numericId = Number(id);
+            if (this.didLongPress) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                this.didLongPress = false;
+                return;
+            }
+            if (this.selectedChats.length > 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                this.toggleSelected(numericId);
+                return;
+            }
+            if (url) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (window.Livewire) {
+                    Livewire.navigate(url);
+                } else {
+                    window.location.href = url;
+                }
+            }
+        },
+
+        showDeleteModal: false,
+        pendingDeleteIds: '',
+
+        cancelDelete() {
+            this.showDeleteModal = false;
+            this.pendingDeleteIds = '';
+        }
+    }">
+
 <style>
 .chat-list {
     --chat-list-text: #111111;
@@ -11,87 +209,111 @@
     --chat-list-muted-light: rgba(255,255,255,0.3);
     --chat-list-unread: #ffffff;
 }
+/* Custom flex helper WITHOUT !important so Alpine x-show can override it */
+.cl-flex { display: flex; }
+[x-cloak] { display: none !important; }
+
+/* Selection checkmark animations */
+@keyframes checkmark-pop-in {
+    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+    65%  { transform: scale(1.2) rotate(3deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes checkmark-pop-out {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+}
+.chat-check-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #ff8c00;
+    border: 2px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6;
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 0;
+    transition: none;
+}
+.chat-check-badge.is-selected {
+    animation: checkmark-pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.chat-check-badge.is-deselected {
+    animation: checkmark-pop-out 0.18s ease-in forwards;
+}
 </style>
-<div class="chat-list border-end border-secondary position-relative" style="height: 75vh; overflow-y: auto;">
-    <div x-data="{ 
-        selectedChats: [],
-        longPressTimer: null,
-        startPress(id) {
-            this.longPressTimer = setTimeout(() => {
-                if(!this.selectedChats.includes(id)) {
-                    this.selectedChats.push(id);
-                }
-            }, 250); // 250ms fast long press
-        },
-        endPress() {
-            if (this.longPressTimer) {
-                clearTimeout(this.longPressTimer);
-            }
-        },
-        handleClick(id, e) {
-            if (this.selectedChats.length > 0) {
-                e.preventDefault();
-                let idx = this.selectedChats.indexOf(id);
-                if (idx > -1) {
-                    this.selectedChats.splice(idx, 1);
-                } else {
-                    this.selectedChats.push(id);
-                }
-            }
-        },
-        archiveSelected() {
-            if (this.selectedChats.length === 0) return;
-            $wire.archiveSelected(this.selectedChats).then(() => {
-                this.selectedChats = [];
-            });
-        },
-        unarchiveSelected() {
-            if (this.selectedChats.length === 0) return;
-            $wire.unarchiveSelected(this.selectedChats).then(() => {
-                this.selectedChats = [];
-            });
-        },
-        deleteSelected() {
-            if (this.selectedChats.length === 0) return;
-            if(confirm('Are you sure you want to delete selected chats?')) {
-                $wire.deleteSelected(this.selectedChats).then(() => {
-                    this.selectedChats = [];
-                });
-            }
-        }
-    }">
 
-    {{-- Action Bar Overlay (Appears when chats are selected) --}}
-    <div x-transition.opacity 
-         :class="selectedChats.length > 0 ? 'd-flex' : 'd-none'"
-         class="position-absolute top-0 start-0 w-100 p-3 align-items-center justify-content-between" 
-         style="display: none; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); height: 60px; background: #0d0d0d;">
-         
-         <div class="d-flex align-items-center gap-3">
-             <button @click="selectedChats = []" class="btn text-white p-0 d-flex align-items-center justify-content-center">
-                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-             </button>
-             <span class="text-white fw-bold fs-5" x-text="selectedChats.length"></span>
-         </div>
-         <div class="d-flex align-items-center gap-4">
-             @if(!$showArchived)
-             <button @click="archiveSelected" class="btn text-white p-0" title="Archive">
-                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
-             </button>
-             @else
-             <button @click="unarchiveSelected" class="btn text-white p-0" title="Unarchive">
-                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
-             </button>
-             @endif
-             <button @click="deleteSelected" class="btn text-danger p-0" title="Delete">
-                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-             </button>
-         </div>
-    </div>
+    {{-- Delete Confirmation Modal — removed from DOM entirely when not needed via x-if --}}
+    <template x-if="showDeleteModal">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+             style="z-index: 200; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"
+             x-transition:enter="transition ease-out duration-150"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
 
-    {{-- Header --}}
-    <div class="p-3 border-bottom border-secondary d-flex align-items-center gap-2">
-        <div class="d-flex align-items-center gap-2 flex-grow-1">
+            <div @click.outside="cancelDelete()"
+                 style="width: 100%; max-width: 380px; margin: 0 1.25rem;
+                        background: linear-gradient(145deg, rgba(20,12,0,0.97), rgba(13,13,13,0.97));
+                        border: 1px solid rgba(255,140,0,0.3);
+                        border-radius: 20px;
+                        box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+                        overflow: hidden;">
+
+                {{-- Header --}}
+                <div style="padding: 1.25rem 1.25rem 0.75rem; border-bottom: 1px solid rgba(255,140,0,0.12);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(220,53,69,0.15); border: 1px solid rgba(220,53,69,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white" style="font-size: 0.98rem; line-height: 1.3;" x-text="selectedChats.length > 1 ? 'Delete ' + selectedChats.length + ' chats?' : 'Delete chat?'">Delete chat?</div>
+                            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 1px;">This action cannot be undone</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div style="padding: 0.85rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button type="button"
+                            @click.stop="let _ids = pendingDeleteIds; showDeleteModal=false; pendingDeleteIds=''; selectedChats=[]; didLongPress=false; $wire.handleChatListAction('delete', _ids).then(() => $wire.$refresh())"
+                            class="w-100 d-flex align-items-center gap-3 text-start"
+                            style="background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.3); border-radius: 12px; padding: 0.75rem 1rem; color: #ff6b6b; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease;"
+                            onmouseenter="this.style.background='rgba(220,53,69,0.2)'; this.style.borderColor='rgba(220,53,69,0.5)'"
+                            onmouseleave="this.style.background='rgba(220,53,69,0.1)'; this.style.borderColor='rgba(220,53,69,0.3)'">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        Delete Chat
+                    </button>
+
+                    <button type="button"
+                            @click.stop="cancelDelete()"
+                            class="w-100"
+                            style="background: transparent; border: 1px solid rgba(255,140,0,0.2); border-radius: 12px; padding: 0.65rem 1rem; color: #ff8c00; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease; margin-top: 0.15rem;"
+                            onmouseenter="this.style.background='rgba(255,140,0,0.08)'; this.style.borderColor='rgba(255,140,0,0.4)'"
+                            onmouseleave="this.style.background='transparent'; this.style.borderColor='rgba(255,140,0,0.2)'">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    {{-- Header Container --}}
+    <div class="p-3 border-bottom border-secondary border-opacity-50 position-relative" style="min-height:64px; background: inherit; z-index: 20;">
+        
+        {{-- Normal Logo (Always present, covered by overlay when selecting) --}}
+        <div class="d-flex align-items-center gap-2 w-100">
             <a href="{{ route('dashboard') }}" class="text-decoration-none d-flex align-items-center" title="Back to Dashboard">
                 @if(!empty($siteSettings['logo']))
                     <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Logo" style="max-height:48px;width:auto;object-fit:contain;margin-left:-0.5rem;">
@@ -108,123 +330,140 @@
                 </span>
             @endif
         </div>
+
+        {{-- SELECTION ACTION BAR (Absolute Overlay) --}}
+        <div x-show="selectedChats.length > 0" 
+             style="display: none; background: #0d0d0d; z-index: 50; top: 0; left: 0; right: 0; bottom: 0;" 
+             class="position-absolute w-100 h-100">
+             
+            <div class="d-flex align-items-center justify-content-between h-100 px-3 w-100">
+                <div class="d-flex align-items-center gap-3">
+                    <button type="button" @click.stop.prevent="clearSelection()" class="btn text-white p-0 d-flex align-items-center justify-content-center" style="border:none;background:none;cursor:pointer;" title="Cancel">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    </button>
+                    <span class="fw-bold" style="color:#fff;font-size:1rem;" x-text="selectedChats.length + ' selected'"></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    {{-- PIN --}}
+                    <button type="button"
+                            @click.prevent.stop="let _ids = selectedIds(); if(_ids){ selectedChats=[]; didLongPress=false; $wire.handleChatListAction('pin', _ids).then(() => $wire.$refresh()); }"
+                            title="Pin"
+                            style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ff8c00;transition:background 0.2s,transform 0.1s;touch-action:manipulation;"
+                            onmouseenter="this.style.background='rgba(255,140,0,0.28)'"
+                            onmouseleave="this.style.background='rgba(255,140,0,0.15)'">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14l-1.5-6H6.5L5 17z"></path><path d="M9 11V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v7"></path></svg>
+                    </button>
+                    @if(!$showArchived)
+                    {{-- ARCHIVE --}}
+                    <button type="button"
+                            @click.prevent.stop="let _ids = selectedIds(); if(_ids){ selectedChats=[]; didLongPress=false; $wire.handleChatListAction('archive', _ids).then(() => $wire.$refresh()); }"
+                            title="Archive"
+                            style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ff8c00;transition:background 0.2s,transform 0.1s;touch-action:manipulation;"
+                            onmouseenter="this.style.background='rgba(255,140,0,0.28)'"
+                            onmouseleave="this.style.background='rgba(255,140,0,0.15)'">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    </button>
+                    @else
+                    {{-- UNARCHIVE --}}
+                    <button type="button"
+                            @click.prevent.stop="let _ids = selectedIds(); if(_ids){ selectedChats=[]; didLongPress=false; $wire.handleChatListAction('unarchive', _ids).then(() => $wire.$refresh()); }"
+                            title="Unarchive"
+                            style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,140,0,0.15);color:#ff8c00;transition:background 0.2s,transform 0.1s;touch-action:manipulation;"
+                            onmouseenter="this.style.background='rgba(255,140,0,0.28)'"
+                            onmouseleave="this.style.background='rgba(255,140,0,0.15)'">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+                    </button>
+                    @endif
+                    {{-- DELETE --}}
+                    <button type="button"
+                            @click.prevent.stop="if(selectedChats.length){ pendingDeleteIds = selectedIds(); showDeleteModal = true; }"
+                            title="Delete"
+                            style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:rgba(239,68,68,0.12);color:#ef4444;transition:background 0.2s,transform 0.1s;touch-action:manipulation;"
+                            onmouseenter="this.style.background='rgba(239,68,68,0.25)'"
+                            onmouseleave="this.style.background='rgba(239,68,68,0.12)'">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    {{-- Global Announcement --}}
-    @if(!auth()->user()->is_admin)
-        @php
-            $adminUser = \App\Models\User::where('is_admin', true)->first();
-            $announcementActive = \App\Models\SiteSetting::get('chat_announcement_active');
-            $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
-            $announcementLogo = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
-            
-            $latestAnnouncement = null;
-            $unreadCount = 0;
-            if ($adminUser) {
-                $latestAnnouncement = \App\Models\Message::where('sender_id', $adminUser->id)
-                                        ->where('receiver_id', auth()->id())
-                                        ->where('deleted_by_receiver', false)
-                                        ->latest()->first();
-                $unreadCount = \App\Models\Message::where('sender_id', $adminUser->id)
-                                        ->where('receiver_id', auth()->id())
-                                        ->where('deleted_by_receiver', false)
-                                        ->where('is_read', false)
-                                        ->count();
-            }
-        @endphp
-        @if($announcementActive && $latestAnnouncement)
-            <a href="{{ route('chat.show', 'announcement') }}" wire:navigate class="chat-row text-decoration-none d-block w-100 position-relative" style="border-bottom: 1px solid rgba(255,140,0,0.15); padding: 0.55rem 0.75rem; transition: all 0.2s ease;">
-                <div class="d-flex align-items-start gap-3">
-                    {{-- Avatar --}}
-                    <div class="position-relative flex-shrink-0">
-                        @if($announcementLogo)
-                            <div class="d-flex align-items-center justify-content-center bg-dark" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; padding:2px; box-shadow: 0 0 10px rgba(255,140,0,0.4);">
-                                <img src="{{ $announcementLogo }}" alt="Kenyan Baddies" class="rounded-circle w-100 h-100" style="object-fit: contain;">
-                            </div>
-                        @else
-                            <div class="d-flex align-items-center justify-content-center" style="width:52px; height:52px; border-radius:50%; border: 2px solid #ff8c00; box-shadow: 0 0 10px rgba(255,140,0,0.4); background: linear-gradient(135deg, rgba(255,140,0,0.3), rgba(255,140,0,0.1));">
-                                <span class="fw-bold text-white">KB</span>
-                            </div>
-                        @endif
-                        {{-- Pinned Badge Overlay --}}
-                        <div class="position-absolute align-items-center justify-content-center bg-primary rounded-circle d-flex" 
-                             style="width: 20px; height: 20px; bottom: -2px; right: -2px; border: 2px solid #1a1a1a;">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        </div>
-                    </div>
+    {{-- Pull-to-Archive: hidden Livewire trigger --}}
+    <a href="{{ route('chat.index') . '?showArchived=1' }}" wire:navigate x-ref="archiveTrigger" @click="showArchiveButton = true" class="d-none"></a>
 
-                    {{-- Name + Message --}}
-                    <div class="flex-grow-1" style="min-width: 0;">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="d-flex align-items-center gap-1" style="font-size: 0.95rem; font-weight: 800; color: #ff8c00;">
-                                Kenyan Baddies
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
-                            </span>
-                            <span class="d-flex align-items-center gap-2">
-                                <span style="font-size: 0.65rem; color: #ff8c00; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,140,0,0.15); padding: 2px 6px; border-radius: 4px;">Announcement</span>
-                            </span>
-                        </div>
-                        <div style="font-size: 0.85rem; color: var(--chat-list-text); line-height: 1.5;" class="d-flex justify-content-between align-items-center">
-                            <div class="text-truncate" style="max-width: 80%;">
-                                {!! nl2br(e($latestAnnouncement->body)) !!}
-                            </div>
-                            @if($unreadCount > 0)
-                                <span class="badge rounded-pill ms-2" style="background: #ff8c00; color: #000; font-size: 0.65rem; font-weight: 800;">
-                                    {{ $unreadCount }}
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </a>
-        @endif
+    {{-- Pull-to-Archive Visual Indicator (Pushes list down) --}}
+    <div x-show="pullDistance > 0 && !{{ $showArchived ? 'true' : 'false' }}" 
+         class="w-100 d-flex flex-column align-items-center justify-content-end overflow-hidden" 
+         style="background: inherit; z-index: 5;" 
+         :style="`height: ${pullDistance}px; opacity: ${pullDistance / pullThreshold}; transition: ${isPulling ? 'none' : 'height 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s'}`">
+        <div class="rounded-circle d-flex align-items-center justify-content-center mb-2 flex-shrink-0" 
+             :style="isArchiveReady ? 'background: #ff8c00; transform: scale(1.1); transition: all 0.2s;' : 'background: rgba(255,255,255,0.08); transition: all 0.2s;'"
+             style="width: 36px; height: 36px;">
+             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :stroke="isArchiveReady ? '#000' : '#fff'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                 <polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line>
+             </svg>
+        </div>
+        <span class="fw-bold flex-shrink-0" style="font-size: 0.72rem; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 0.8rem;" 
+              :style="isArchiveReady ? 'color: #ff8c00;' : 'color: rgba(255,255,255,0.4);'" 
+              x-text="isArchiveReady ? 'Release to reveal archive' : (pullDistance >= pullThreshold ? 'Hold...' : 'Pull down to reveal')"></span>
+    </div>
+
+    {{-- Global Announcement block removed to treat admin chat as regular chat --}}
+
+    {{-- Archive Toggle --}}
+    @if(!$showArchived && count($archivedConversations) > 0)
+        <a href="{{ route('chat.index') . '?showArchived=1' }}" wire:navigate
+            :class="showArchiveButton ? 'd-flex' : 'd-none d-md-flex'"
+            class="chat-row w-100 align-items-center px-3 py-2 text-start text-decoration-none"
+            style="border: none; border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer; background: transparent;">
+            
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0" 
+                 style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,140,0,0.05)); border: 1px solid rgba(255,140,0,0.2);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+            </div>
+            
+            <div class="ms-3 flex-grow-1">
+                <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.95rem;">Archived Chats</div>
+                <div style="color: var(--chat-list-muted); font-size: 0.8rem;">{{ count($archivedConversations) }} conversations</div>
+            </div>
+        </a>
+    @elseif($showArchived)
+        <a href="{{ route('chat.index') }}" wire:navigate
+            class="chat-row w-100 d-flex align-items-center px-3 py-2 text-decoration-none"
+            style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer; background: transparent;">
+
+            <div class="d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,140,0,0.05)); border: 1px solid rgba(255,140,0,0.2);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 5 5 12 12 19"/></svg>
+            </div>
+
+            <div class="ms-3 flex-grow-1">
+                <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.95rem;">Back to Active Chats</div>
+                <div style="color: var(--chat-list-muted); font-size: 0.8rem;">Leave archive view</div>
+            </div>
+        </a>
     @endif
 
-    {{-- Conversation Rows --}}
-    <div class="list-group list-group-flush mt-2" wire:poll.10s>
-        @if(!$showArchived && count($archivedConversations) > 0)
-            <div class="position-relative chat-row-wrapper mb-2 mx-2" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer;" wire:click="toggleArchived">
-                <div class="chat-row text-decoration-none d-block w-100" style="padding: 0.5rem 1rem; transition: all 0.2s ease;">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
-                            </div>
-                            <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.9rem;">Archived</div>
-                        </div>
-                        <div class="text-muted fw-bold pe-2" style="font-size: 0.8rem;">
-                            {{ count($archivedConversations) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @elseif($showArchived)
-            <div class="position-relative chat-row-wrapper mb-2 mx-2" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); cursor: pointer;" wire:click="toggleArchived">
-                <div class="chat-row text-decoration-none d-block w-100" style="padding: 0.5rem 1rem; transition: all 0.2s ease;">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            </div>
-                            <div class="fw-bold" style="color: var(--chat-list-text); font-size: 0.9rem;">Back to Active Chats</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @php
+        {{-- Conversation Rows --}}
+        <div class="list-group list-group-flush mt-2">
+            @php
             $displayConversations = $showArchived ? $archivedConversations : $conversations;
         @endphp
 
         @forelse($displayConversations as $user)
-            @if(!auth()->user()->is_admin && $user->is_admin)
-                @continue
-            @endif
             @php
-                $hasPhoto   = $user->profile_photo || $user->photos->first();
-                $cover      = $user->profile_photo ? asset('storage/'.$user->profile_photo) : ($hasPhoto ? asset('storage/'.$user->photos->first()->path) : null);
-                $initials   = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $user->name), 0, 2));
+                if ($user->is_admin) {
+                    $announcementLogoPath = \App\Models\SiteSetting::get('chat_announcement_logo') ?: \App\Models\SiteSetting::get('logo');
+                    $hasPhoto   = (bool) $announcementLogoPath;
+                    $cover      = $announcementLogoPath ? asset('storage/'.$announcementLogoPath) : null;
+                    $userName   = \App\Models\SiteSetting::get('site_name', 'Kenyan Baddies');
+                    $initials   = 'KB';
+                } else {
+                    $hasPhoto   = $user->profile_photo || $user->photos->first();
+                    $cover      = $user->profile_photo ? asset('storage/'.$user->profile_photo) : ($hasPhoto ? asset('storage/'.$user->photos->first()->path) : null);
+                    $userName   = $user->name;
+                    $initials   = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $userName), 0, 2));
+                }
                 $online     = $user->isOnline();
 
                 $lastMsg = $user->last_message;
@@ -252,22 +491,27 @@
                     }
                 }
                 $isActive = $activeUserId == $user->id;
+                $isPinned = in_array($user->id, $pinnedUserIds ?? []);
             @endphp
 
-            <div class="position-relative chat-row-wrapper mb-1" 
-                 :class="{ 'bg-secondary bg-opacity-25': selectedChats.includes({{ $user->id }}) }"
-                 style="background: {{ $isActive ? 'rgba(255,140,0,0.08)' : 'transparent' }}; border-left: 3px solid {{ $isActive ? '#ff8c00' : 'transparent' }}; transition: background 0.2s;">
-                
-                <a href="{{ route('chat.show', $user->id) }}" wire:navigate class="chat-row text-decoration-none d-block w-100" 
-                   style="padding: 0.55rem 0.75rem; transition: all 0.2s ease; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none;"
-                   @contextmenu.prevent
-                   @touchstart="startPress({{ $user->id }})"
-                   @touchend="endPress()"
-                   @touchmove="endPress()"
-                   @mousedown="startPress({{ $user->id }})"
-                   @mouseup="endPress()"
-                   @mouseleave="endPress()"
-                   @click="handleClick({{ $user->id }}, $event)">
+            <div wire:key="chat-user-{{ $user->id }}"
+                 class="position-relative chat-row-wrapper mb-1"
+                 :class="{ 'chat-row-selected': isSelected({{ $user->id }}) }"
+                 style="background: {{ ($isActive || $isPinned) ? 'rgba(255,140,0,0.06)' : 'transparent' }}; border-left: 3px solid {{ ($isActive || $isPinned) ? '#ff8c00' : 'transparent' }}; transition: background 0.2s; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;"
+                 @touchstart.passive="startPress({{ $user->id }}, $event)"
+                 @touchmove.passive="movePress($event)"
+                 @touchend.passive="endPress()"
+                 @touchcancel.passive="endPress()"
+                 @mousedown="startPress({{ $user->id }}, $event)"
+                 @mousemove="movePress($event)"
+                 @mouseup="endPress()"
+                 @mouseleave="endPress()"
+                 @contextmenu.prevent>
+
+                <a href="{{ route('chat.show', $user->id) }}"
+                   class="chat-row text-decoration-none d-block w-100"
+                   style="padding: 0.55rem 0.75rem; transition: background 0.08s ease-out, border-left-color 0.08s ease-out;"
+                   @click="handleClick({{ $user->id }}, $event, '{{ route('chat.show', $user->id) }}')">
                     <div class="d-flex align-items-start gap-3">
 
                         {{-- Avatar --}}
@@ -284,11 +528,17 @@
                                 </div>
                             @endif
 
+
+
                             {{-- Selection Checkmark Overlay on Avatar --}}
-                            <div :class="selectedChats.includes({{ $user->id }}) ? 'd-flex' : 'd-none'" 
-                                 class="position-absolute align-items-center justify-content-center bg-success rounded-circle" 
-                                 style="display: none; width: 22px; height: 22px; bottom: -2px; right: -2px; z-index: 5; border: 2px solid #1a1a1a;">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <div class="chat-check-badge"
+                                 x-data="{ wasSelected: false }"
+                                 x-effect="if (selectedChats.includes({{ $user->id }})) wasSelected = true"
+                                 :class="{
+                                     'is-selected':   selectedChats.includes({{ $user->id }}),
+                                     'is-deselected': wasSelected && !selectedChats.includes({{ $user->id }})
+                                 }">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
 
@@ -296,11 +546,19 @@
                         <div class="flex-grow-1" style="min-width: 0;">
                             {{-- Top row: Name + Time --}}
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span style="font-size: 0.92rem; font-weight: 700; color: {{ $unread > 0 ? 'var(--chat-list-unread)' : 'var(--chat-list-text)' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $user->name }}
+                                <span style="font-size: 0.92rem; font-weight: 700; color: {{ $unread > 0 ? 'var(--chat-list-unread)' : 'var(--chat-list-text)' }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;">
+                                    {{ $userName }}
+                                    @if($user->is_admin)
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="#0d6efd" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ms-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01" stroke="#fff"></polyline></svg>
+                                    @endif
                                 </span>
-                                <span style="font-size: 0.62rem; color: {{ $unread > 0 ? '#ff8c00' : 'var(--chat-list-muted-light)' }}; white-space: nowrap; margin-left: 0.5rem; font-weight: 600;">
-                                    {{ $timeAgo }}
+                                <span class="d-flex align-items-center gap-1">
+                                    @if($isPinned)
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="#ff8c00" stroke="#ff8c00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="me-1" title="Pinned"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14l-1.5-6H6.5L5 17z"></path><path d="M9 11V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v7"></path></svg>
+                                    @endif
+                                    <span style="font-size: 0.62rem; color: {{ $unread > 0 ? '#ff8c00' : 'var(--chat-list-muted-light)' }}; white-space: nowrap; font-weight: 600;">
+                                        {{ $timeAgo }}
+                                    </span>
                                 </span>
                             </div>
 
@@ -343,23 +601,92 @@
                     </div>
                 </a>
 
+
+
             </div>
         @empty
-            <div class="d-flex flex-column align-items-center justify-content-center py-5 px-3" style="color: rgba(255,255,255,0.3);">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.3;">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <p class="mb-1 fw-bold" style="font-size: 0.95rem; color: rgba(255,255,255,0.5);">{{ $showArchived ? 'No archived chats' : 'No conversations yet' }}</p>
-                <p class="mb-0" style="font-size: 0.78rem;">{{ $showArchived ? '' : 'Start a chat from a member\'s profile!' }}</p>
+            <div class="d-flex flex-column align-items-center justify-content-center px-4" style="min-height: 260px; text-align: center;">
+
+                {{-- Glowing icon container --}}
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,140,0,0.18), rgba(255,140,0,0.05)); border: 1.5px solid rgba(255,140,0,0.25); box-shadow: 0 0 24px rgba(255,140,0,0.12); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+                    @if($showArchived)
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                    @else
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    @endif
+                </div>
+
+                {{-- Title --}}
+                <p style="font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.75); margin: 0 0 0.4rem; letter-spacing: 0.01em;">
+                    {{ $showArchived ? 'No archived chats' : 'No conversations yet' }}
+                </p>
+
+                {{-- Subtitle --}}
+                @if(!$showArchived)
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.35); margin: 0; line-height: 1.6; max-width: 200px;">
+                        Head to a member's profile and tap <strong style="color: rgba(255,140,0,0.7);">Message</strong> to start chatting.
+                    </p>
+                @endif
+
+                {{-- Archived chats button --}}
+                @if(!$showArchived && count($archivedConversations) > 0)
+                    <a href="{{ route('chat.index') . '?showArchived=1' }}" wire:navigate
+                       class="d-flex align-items-center gap-2 text-decoration-none mt-4"
+                       style="padding: 0.55rem 1.2rem; border-radius: 50px; background: rgba(255,140,0,0.1); border: 1px solid rgba(255,140,0,0.28); color: #ff8c00; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 2px 12px rgba(255,140,0,0.08);"
+                       onmouseenter="this.style.background='rgba(255,140,0,0.2)'; this.style.boxShadow='0 4px 18px rgba(255,140,0,0.2)'"
+                       onmouseleave="this.style.background='rgba(255,140,0,0.1)'; this.style.boxShadow='0 2px 12px rgba(255,140,0,0.08)'">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                        {{ count($archivedConversations) }} Archived {{ count($archivedConversations) === 1 ? 'Chat' : 'Chats' }}
+                    </a>
+                @endif
+
             </div>
         @endforelse
     </div>
-
     <style>
-        .chat-row:hover {
-            background: rgba(255,140,0,0.06) !important;
-            border-left-color: rgba(255,140,0,0.4) !important;
+        /* ── Desktop / Mouse: real hover that fades in fast, disappears instantly on leave ── */
+        @media (hover: hover) and (pointer: fine) {
+            .chat-row {
+                transition: none !important;
+            }
+            .chat-row:hover {
+                background: rgba(255,140,0,0.08) !important;
+                border-left-color: rgba(255,140,0,0.5) !important;
+                transition: background 0.08s ease-out, border-left-color 0.08s ease-out !important;
+            }
+            .chat-row-wrapper:hover .chat-row {
+                background: rgba(255,140,0,0.08) !important;
+            }
+            .chat-action-btn {
+                transition: none !important;
+            }
+            .chat-action-btn:hover {
+                color: #ff8c00 !important;
+                opacity: 1 !important;
+                background: rgba(255,140,0,0.18) !important;
+                transition: color 0.08s ease-out, background 0.08s ease-out !important;
+            }
+        }
+
+        /* ── Mobile / Touch: :active fires on press and clears the INSTANT finger lifts ── */
+        @media (hover: none) {
+            .chat-row:active {
+                background: rgba(255,140,0,0.10) !important;
+                border-left-color: rgba(255,140,0,0.5) !important;
+            }
+            .chat-action-btn:active {
+                color: #ff8c00 !important;
+                background: rgba(255,140,0,0.18) !important;
+            }
+        }
+
+        .chat-row-selected {
+            background: rgba(255,140,0,0.12) !important;
         }
     </style>
-    </div>
+
+    <script>
+    {{-- No custom JS needed — all actions use Livewire.dispatch('chat-list-action') --}}
+    {{-- which is handled by #[On('chat-list-action')] in ChatList.php               --}}
+    </script>
 </div>

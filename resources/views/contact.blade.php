@@ -46,12 +46,16 @@
     /* BUTTONS */
     .btn-orange {
       display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
-      background:orange; border:2px solid orange; color:#000;
+      background:transparent; border:2px solid orange; color:orange;
       padding:0.85rem 2rem; border-radius:8px; font-size:1rem; font-weight:800; font-family:"Outfit",sans-serif;
-      text-decoration:none; transition:all 0.3s ease; border: none;
+      text-decoration:none; transition:all 0.3s ease; cursor:pointer;
       letter-spacing: 0.03em;
     }
-    .btn-orange:hover { background:#fff; color:orange; box-shadow:0 0 15px rgba(255,165,0,0.5); transform: translateY(-1px); }
+    .btn-orange:hover {
+      background:orange; color:#000; border-color:orange;
+      box-shadow:0 0 18px 4px rgba(255,165,0,0.55), 0 0 35px rgba(255,165,0,0.25);
+      transform:translateY(-1px);
+    }
 
     /* SUPPORT BADGE/INFO */
     .support-badge {
@@ -60,8 +64,23 @@
       margin-bottom: 1.5rem;
     }
     .user-info-badge {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;
+      background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.25);
+      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+    }
+    .user-info-title {
+      font-weight: 700; font-size: 0.95rem; color: #ffffff;
+    }
+    .user-info-title span {
+      color: #ff8c00; font-weight: 800;
+    }
+    .user-info-email {
+      font-size: 0.825rem; color: rgba(255,255,255,0.75); font-weight: 500;
+    }
+    .ticket-badge-user {
+      background: #ff8c00; color: #000000 !important; font-weight: 800;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 0.4em 0.85em; border-radius: 6px; display: inline-block;
+      box-shadow: 0 2px 8px rgba(255,140,0,0.3);
     }
 
     /* LIGHT THEME */
@@ -74,7 +93,11 @@
     [data-bs-theme="light"] .form-control { background: #fff; color: #000; border-color: rgba(0,0,0,0.15); }
     [data-bs-theme="light"] .form-control:focus { background: #fff; color: #000; border-color: orange; }
     [data-bs-theme="light"] .form-control::placeholder { color: rgba(0,0,0,0.4); }
-    [data-bs-theme="light"] .user-info-badge { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+    [data-bs-theme="light"] .user-info-badge { background: rgba(255,140,0,0.06); border-color: rgba(255,140,0,0.3); }
+    [data-bs-theme="light"] .user-info-title { color: #111111; }
+    [data-bs-theme="light"] .user-info-title span { color: #d97706; }
+    [data-bs-theme="light"] .user-info-email { color: #4b5563; }
+    [data-bs-theme="light"] .ticket-badge-user { background: #ff8c00; color: #000000 !important; box-shadow: 0 2px 6px rgba(255,140,0,0.2); }
 
     /* CHAR COUNTER */
     .char-counter {
@@ -129,16 +152,13 @@
               <div class="user-info-badge mb-4">
                 <div class="row g-2 align-items-center">
                   <div class="col-auto">
-                    <div style="width: 42px; height: 42px; border-radius: 50%; background: orange; color: #000; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                    <div style="width: 42px; height: 42px; border-radius: 50%; background: #ff8c00; color: #000; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(255,140,0,0.3);">
                       {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                   </div>
                   <div class="col">
-                    <div class="fw-bold text-light" style="font-size: 0.95rem;">Submitting as: <span style="color:orange;">{{ Auth::user()->name }}</span></div>
-                    <div class="small text-secondary" style="font-size: 0.8rem;">{{ Auth::user()->email }}</div>
-                  </div>
-                  <div class="col-auto">
-                    <span class="badge bg-orange text-dark fw-bold px-2.5 py-1.5" style="font-size: 0.75rem; text-transform: uppercase;">User Ticket</span>
+                    <div class="user-info-title">Submitting as: <span>{{ Auth::user()->name }}</span></div>
+                    <div class="user-info-email">{{ Auth::user()->email }}</div>
                   </div>
                 </div>
               </div>

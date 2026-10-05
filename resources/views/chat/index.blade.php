@@ -11,6 +11,41 @@
             document.addEventListener('livewire:navigated', applyTheme);
         })();
     </script>
+    <style>
+        /* Anti-FOUC: Pre-apply chat bubble CSS variables before any component renders.
+           This prevents the white/light flash on bubble backgrounds when entering a chat. */
+        .chat-box {
+            --chat-bg: #efeae2;
+            --bubble-sent-bg: #e2ffc7;
+            --bubble-received-bg: #ffffff;
+            --bubble-text: #1a1a1a;
+            --bubble-meta: rgba(0,0,0,0.55);
+            --date-bg: #ffffff;
+            --date-text: rgba(0,0,0,0.6);
+            --deleted-bg: rgba(240,242,245,0.95);
+            --deleted-text: #6c757d;
+            --reply-bg: rgba(0,0,0,0.04);
+            --header-bg: #0d0d0d;
+            --input-area-bg: #0d0d0d;
+            --input-bg-color: rgba(255,255,255,0.07);
+            background-color: var(--chat-bg) !important;
+        }
+        [data-bs-theme="dark"] .chat-box {
+            --chat-bg: #0d0d0d;
+            --bubble-sent-bg: #005c4b;
+            --bubble-received-bg: #202c33;
+            --bubble-text: #e9edef;
+            --bubble-meta: rgba(255,255,255,0.6);
+            --date-bg: #182229;
+            --date-text: rgba(255,255,255,0.6);
+            --deleted-bg: rgba(32,44,51,0.95);
+            --deleted-text: #8696a0;
+            --reply-bg: rgba(255,255,255,0.05);
+            --header-bg: #0d0d0d;
+            --input-area-bg: #0d0d0d;
+            --input-bg-color: rgba(255,255,255,0.07);
+        }
+    </style>
     <meta charset="utf-8">
     <x-site-favicon />
     <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">

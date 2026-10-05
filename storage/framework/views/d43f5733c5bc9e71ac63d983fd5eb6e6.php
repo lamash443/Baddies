@@ -1,7 +1,7 @@
-<section class="dash-card" style="border-color: rgba(220,53,69,0.2);">
+<section class="dash-card" style="border-color: rgba(255,140,0,0.2);">
     <header>
-        <h2 class="dash-card-title" style="color: #ff4d4d !important; font-size:1rem;">
-            <svg style="display:inline; width:18px; height:18px; margin-right:0.4rem; vertical-align:-3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <h2 class="dash-card-title" style="color: #ffffff !important; font-size:1rem;">
+            <svg style="display:inline; width:18px; height:18px; margin-right:0.4rem; vertical-align:-3px; color: #ff8c00;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
             </svg>
             <?php echo e(__('Delete Account')); ?>
@@ -14,7 +14,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>
         </svg>
-        <?php echo e(__('Request Account Deletion')); ?>
+        <?php echo e(__('Submit Request')); ?>
 
     </button>
 </section>
@@ -97,7 +97,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                         </svg>
-                        <?php echo e(__('Submit Deletion Request')); ?>
+                        <?php echo e(__('Submit Request')); ?>
 
                     </button>
                 </div>
@@ -107,12 +107,12 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 </div>
 
 <style>
-/* ══ DELETE MODAL STYLES ══ */
+/* ══ DELETE MODAL STYLES (SITE THEME ORANGE) ══ */
 .del-modal {
     background: #0d0d0d;
-    border: 1px solid rgba(220, 53, 69, 0.35);
+    border: 1.5px solid rgba(255, 140, 0, 0.4);
     border-radius: 20px;
-    box-shadow: 0 30px 80px rgba(220, 53, 69, 0.15), 0 0 0 1px rgba(255,255,255,0.04);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 25px rgba(255, 140, 0, 0.2);
     overflow: hidden;
     font-family: "Outfit", sans-serif;
 }
@@ -123,29 +123,29 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     align-items: center;
     gap: 1rem;
     padding: 1.5rem 1.75rem 1.25rem;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255, 140, 0, 0.15);
     position: relative;
 }
 .del-modal__icon {
     flex-shrink: 0;
     width: 48px; height: 48px;
     border-radius: 14px;
-    background: rgba(220,53,69,0.1);
-    border: 1px solid rgba(220,53,69,0.25);
+    background: rgba(255,140,0,0.1);
+    border: 1px solid rgba(255,140,0,0.25);
     display: flex; align-items: center; justify-content: center;
-    color: #ff4d4d;
+    color: #ff8c00;
 }
 .del-modal__heading-wrap { flex: 1; min-width: 0; }
 .del-modal__title {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #ff4d4d;
+    color: #ffffff;
     margin: 0 0 0.15rem;
     line-height: 1.2;
 }
 .del-modal__sub {
     font-size: 0.78rem;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.5);
     margin: 0;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -162,7 +162,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     transition: all 0.2s ease;
     padding: 0;
 }
-.del-modal__close:hover { background: rgba(220,53,69,0.15); border-color: rgba(220,53,69,0.3); color: #ff4d4d; }
+.del-modal__close:hover { background: rgba(255,140,0,0.15); border-color: rgba(255,140,0,0.3); color: #ff8c00; }
 
 /* Body */
 .del-modal__body { padding: 1.5rem 1.75rem; }
@@ -170,21 +170,21 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 .del-modal__info-box {
     display: flex;
     gap: 0.85rem;
-    background: rgba(220,53,69,0.05);
-    border: 1px solid rgba(220,53,69,0.15);
+    background: rgba(255,140,0,0.08);
+    border: 1px solid rgba(255,140,0,0.2);
     border-radius: 12px;
     padding: 1rem 1.1rem;
     margin-bottom: 1.25rem;
 }
 .del-modal__info-icon {
     flex-shrink: 0;
-    color: #ff6b6b;
+    color: #ff8c00;
     margin-top: 2px;
 }
 .del-modal__info-title {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #ff6b6b;
+    color: #ff8c00;
     margin: 0 0 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -195,7 +195,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
 }
 .del-modal__info-list li {
     font-size: 0.82rem;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.7);
     padding: 0.2rem 0;
     padding-left: 1.1rem;
     position: relative;
@@ -205,7 +205,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     content: '›';
     position: absolute;
     left: 0;
-    color: #ff4d4d;
+    color: #ff8c00;
     font-weight: 700;
 }
 
@@ -215,13 +215,13 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     display: block;
     font-size: 0.82rem;
     font-weight: 600;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.75);
     margin-bottom: 0.5rem;
 }
 .del-modal__input {
     width: 100%;
     background: rgba(255,255,255,0.04);
-    border: 1.5px solid rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,140,0,0.25);
     border-radius: 10px;
     color: #fff;
     padding: 0.7rem 1rem;
@@ -231,20 +231,20 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     outline: none;
 }
 .del-modal__input:focus {
-    border-color: rgba(220,53,69,0.5);
-    box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
-    background: rgba(255,255,255,0.06);
+    border-color: #ff8c00;
+    box-shadow: 0 0 0 3px rgba(255,140,0,0.15);
+    background: rgba(0,0,0,0.4);
 }
-.del-modal__input::placeholder { color: rgba(255,255,255,0.25); }
+.del-modal__input::placeholder { color: rgba(255,255,255,0.3); }
 
 .del-modal__error {
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    color: #ff4d4d;
+    color: #ff8c00;
     font-size: 0.8rem;
     margin-top: 0.45rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* Footer */
@@ -253,13 +253,13 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     align-items: center;
     gap: 0.75rem;
     padding: 1.1rem 1.75rem 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.07);
+    border-top: 1px solid rgba(255,140,0,0.15);
 }
 .del-modal__btn-cancel {
     flex: 1;
     background: transparent;
-    border: 1.5px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.65);
+    border: 1.5px solid rgba(255,140,0,0.35);
+    color: rgba(255,255,255,0.8);
     border-radius: 10px;
     padding: 0.65rem 1.25rem;
     font-size: 0.88rem;
@@ -269,9 +269,9 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     transition: all 0.2s ease;
 }
 .del-modal__btn-cancel:hover {
-    background: rgba(255,255,255,0.06);
-    border-color: rgba(255,255,255,0.3);
-    color: #fff;
+    background: rgba(255,140,0,0.1);
+    border-color: #ff8c00;
+    color: #ff8c00;
 }
 .del-modal__btn-delete {
     flex: 1.5;
@@ -279,30 +279,60 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    border: none;
-    color: #fff;
+    background: #ff8c00;
+    border: 2px solid #ff8c00;
+    color: #000;
     border-radius: 10px;
     padding: 0.65rem 1.25rem;
     font-size: 0.88rem;
-    font-weight: 700;
+    font-weight: 800;
     font-family: "Outfit", sans-serif;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+    box-shadow: 0 4px 15px rgba(255,140,0,0.3);
 }
 .del-modal__btn-delete:hover {
-    background: linear-gradient(135deg, #e84055, #dc3545);
-    box-shadow: 0 6px 20px rgba(220,53,69,0.45);
+    background: #e07a00;
+    border-color: #e07a00;
+    color: #000;
+    box-shadow: 0 0 18px 4px rgba(255, 165, 0, 0.55), 0 0 35px rgba(255, 165, 0, 0.25);
     transform: translateY(-1px);
 }
 .del-modal__btn-delete:active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(220,53,69,0.3);
+    box-shadow: 0 2px 10px rgba(255,140,0,0.3);
 }
+
+/* Light theme support */
+[data-bs-theme="light"] .del-modal {
+    background: #ffffff;
+    border-color: rgba(255, 140, 0, 0.4);
+    box-shadow: 0 15px 45px rgba(0,0,0,0.15), 0 0 25px rgba(255, 140, 0, 0.2);
+}
+[data-bs-theme="light"] .del-modal__title { color: #111111; }
+[data-bs-theme="light"] .del-modal__sub { color: rgba(0,0,0,0.6); }
+[data-bs-theme="light"] .del-modal__info-list li { color: rgba(0,0,0,0.75); }
+[data-bs-theme="light"] .del-modal__label { color: rgba(0,0,0,0.8); }
+[data-bs-theme="light"] .del-modal__input { background: #fff; color: #111; border-color: rgba(0,0,0,0.2); }
+[data-bs-theme="light"] .del-modal__btn-cancel { color: #111; border-color: rgba(0,0,0,0.25); }
+[data-bs-theme="light"] .del-modal__btn-cancel:hover { background: rgba(255,140,0,0.1); color: #ff8c00; }
 
 /* Modal backdrop tint */
 #confirmUserDeletionModal .modal-backdrop { background: rgba(0,0,0,0.85); }
+
+/* Mobile responsiveness */
+@media (max-width: 575.98px) {
+    .del-modal__footer {
+        padding: 1rem 1.25rem 1.25rem;
+        gap: 0.5rem;
+    }
+    .del-modal__btn-cancel,
+    .del-modal__btn-delete {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+}
 </style>
 
 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($errors->userDeletion->isNotEmpty()): ?>

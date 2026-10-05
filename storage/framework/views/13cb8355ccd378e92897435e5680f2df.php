@@ -263,8 +263,8 @@
 (function () {
   'use strict';
 
-  const TIMEOUT_MS    = 10 * 60 * 1000;  // ⚠️ TEST: 10 min → change to 30 for prod
-  const WARNING_MS    = 9  * 60 * 1000;  // ⚠️ TEST: 9 min  → change to 29 for prod
+  const TIMEOUT_MS    = 15 * 60 * 1000;  // 15 min total → auto-logout
+  const WARNING_MS    = 14 * 60 * 1000;  // 14 min → show warning popup
   const WARNING_SEC   = 60;
   const CIRCUMFERENCE = 2 * Math.PI * 35; // r=35 → ≈ 219.9
 
@@ -286,9 +286,8 @@
   );
 
   function onActivity() {
-    if (warningShown) {
-      alKeepAlive();
-    } else {
+    // When warning is visible, do NOT auto-dismiss — only the button should dismiss
+    if (!warningShown) {
       resetTimers();
     }
   }
