@@ -38,8 +38,10 @@ Route::middleware('guest')->group(function () {
         // If not referred, redirect to homepage with auth modal query
         return redirect('/?auth=login');
     })->name('login');
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
 
-    Route::post('referral', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
