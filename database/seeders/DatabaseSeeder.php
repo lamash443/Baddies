@@ -2,24 +2,38 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Page;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Page::updateOrCreate(
+            ['slug' => 'contact'],
+            [
+                'title' => 'Contact',
+                'content' => '<p>Contact our support team for assistance.</p>',
+                'phone' => '+254700000000',
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        Page::updateOrCreate(
+            ['slug' => 'terms'],
+            [
+                'title' => 'Terms of Service',
+                'content' => '<p>Please read these Terms of Service carefully before using Baddies Club.</p>',
+                'phone' => null,
+            ]
+        );
+
+        Page::updateOrCreate(
+            ['slug' => 'privacy'],
+            [
+                'title' => 'Privacy Policy',
+                'content' => '<p>Your privacy is important to us. This Privacy Policy explains how your information is handled.</p>',
+                'phone' => null,
+            ]
+        );
     }
 }

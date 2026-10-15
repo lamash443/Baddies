@@ -32,6 +32,9 @@ class PayHeroService
     {
         $formattedPhone = $this->formatPhoneNumber($phoneNumber);
         $credentials    = $this->authToken ?: base64_encode($this->username . ':' . $this->password);
+        $authorization  = str_starts_with($credentials, 'Basic ')
+            ? $credentials
+            : 'Basic ' . $credentials;
 
         $payload = [
             'amount'             => (float) $amount,
@@ -52,7 +55,7 @@ class PayHeroService
         try {
             $response = Http::withHeaders([
                 'Content-Type'  => 'application/json',
-                'Authorization' => 'Basic ' . $credentials,
+                'Authorization' => $authorization,
             ])->post('https://backend.payhero.co.ke/api/v2/payments', $payload);
 
             if ($response->successful()) {
@@ -105,10 +108,13 @@ class PayHeroService
     public function checkStatus(string $checkoutRequestId): array
     {
         $credentials = $this->authToken ?: base64_encode($this->username . ':' . $this->password);
+        $authorization = str_starts_with($credentials, 'Basic ')
+            ? $credentials
+            : 'Basic ' . $credentials;
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Basic ' . $credentials,
+                'Authorization' => $authorization,
             ])->get('https://backend.payhero.co.ke/api/v2/transaction-status', [
                 'reference' => $checkoutRequestId,
             ]);

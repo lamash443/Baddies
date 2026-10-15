@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -9,66 +10,102 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])
-        ->name('auth.google');
 
-    Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback'])
-        ->name('auth.google.callback');
+    // Google Authentication
+    Route::get('auth/google', [
+        \App\Http\Controllers\Auth\GoogleController::class,
+        'redirectToGoogle',
+    ])->name('auth.google');
 
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+    Route::get('auth/google/callback', [
+        \App\Http\Controllers\Auth\GoogleController::class,
+        'handleGoogleCallback',
+    ])->name('auth.google.callback');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // Registration
+    Route::get('register', [
+        RegisteredUserController::class,
+        'create',
+    ])->name('register');
 
-    // Standard login route — required by Laravel middleware (Authenticate, RedirectIfAuthenticated)
-    Route::get('login', function (\Illuminate\Http\Request $request) {
-        // If a ref code is passed, store it and forward to the referral page
+    Route::post('register', [
+        RegisteredUserController::class,
+        'store',
+    ]);
+
+    // Standard Login
+    Route::get('login', function (Request $request) {
         if ($request->filled('ref')) {
             session(['ref_code' => $request->input('ref')]);
-            return redirect()->route('referral.login', ['ref' => $request->input('ref')]);
+
+            return redirect()->route('referral.login', [
+                'ref' => $request->input('ref'),
+            ]);
         }
-        // Default: redirect to homepage with login modal open
+
         return redirect('/?auth=login');
     })->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
+    Route::post('login', [
+        AuthenticatedSessionController::class,
+        'store',
+    ])->name('login.post');
 
-    // Referral-specific login page (shown when a referral code is present)
-    Route::get('referral', function (\Illuminate\Http\Request $request) {
+    // Referral Login Page
+    Route::get('referral', function (Request $request) {
         if ($request->filled('ref')) {
             session(['ref_code' => $request->input('ref')]);
         }
 
-        $hasReferral = session()->has('ref_code') || $request->filled('ref') || $request->filled('referral_code');
+        if ($request->filled('referral_code')) {
+            session(['ref_code' => $request->input('referral_code')]);
+        }
 
-        // The standalone referral login page only appears when the user has been referred
+        $hasReferral = session()->has('ref_code');
+
         if ($hasReferral) {
             return view('auth.login');
         }
 
-        // If not referred, redirect to homepage with auth modal query
         return redirect('/?auth=login');
     })->name('referral.login');
 
-    Route::post('referral', [AuthenticatedSessionController::class, 'store'])->name('referral.store');
+    // Referral Login Submission
+    Route::post('referral', [
+        AuthenticatedSessionController::class,
+        'store',
+    ])->name('referral.store');
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
+    // Password Reset
+    Route::get('forgot-password', [
+        PasswordResetLinkController::class,
+        'create',
+    ])->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
+    Route::post('forgot-password', [
+        PasswordResetLinkController::class,
+        'store',
+    ])->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+    Route::get('reset-password/{token}', [
+        NewPasswordController::class,
+        'create',
+    ])->name('password.reset');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    Route::post('reset-password', [
+        NewPasswordController::class,
+        'store',
+    ])->name('password.store');
 });
 
+// Authenticated Routes
 Route::middleware('auth')->group(function () {
+
+    // Email Verification
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -76,17 +113,32 @@ Route::middleware('auth')->group(function () {
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
+    Route::post('email/verification-notification', [
+        EmailVerificationNotificationController::class,
+        'store',
+    ])->middleware('throttle:6,1')
         ->name('verification.send');
 
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-        ->name('password.confirm');
+    // Password Confirmation
+    Route::get('confirm-password', [
+        ConfirmablePasswordController::class,
+        'show',
+    ])->name('password.confirm');
 
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
+    Route::post('confirm-password', [
+        ConfirmablePasswordController::class,
+        'store',
+    ]);
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    // Update Password
+    Route::put('password', [
+        PasswordController::class,
+        'update',
+    ])->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+    // Logout
+    Route::post('logout', [
+        AuthenticatedSessionController::class,
+        'destroy',
+    ])->name('logout');
 });

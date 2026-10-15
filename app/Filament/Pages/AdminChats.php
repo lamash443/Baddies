@@ -121,8 +121,8 @@ class AdminChats extends Page
         $adminIds = User::where('is_admin', true)->pluck('id')->toArray();
 
         $rows = Message::select(
-                DB::raw('LEAST(sender_id, receiver_id) as user_a'),
-                DB::raw('GREATEST(sender_id, receiver_id) as user_b'),
+                DB::raw('CASE WHEN sender_id < receiver_id THEN sender_id ELSE receiver_id END as user_a'),
+                DB::raw('CASE WHEN sender_id > receiver_id THEN sender_id ELSE receiver_id END as user_b'),
                 DB::raw('MAX(id) as last_message_id'),
                 DB::raw('COUNT(id) as total_messages')
             )
