@@ -1,4 +1,4 @@
-﻿---
+---
 deployment:
   tasks:
     - /bin/echo "Laravel deployment started"
