@@ -1,5 +1,5 @@
+yaml
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/kenyaba/public_html/
-    - /bin/cp -R . $DEPLOYPATH
+    - /bin/echo "Deployment started"
