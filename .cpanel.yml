@@ -2,4 +2,5 @@ yaml
 ---
 deployment:
   tasks:
-    - /bin/echo "Deployment started"
+    - /bin/echo "Laravel deployment started"
+    - /bin/cp -R /home/kenyanba/laravel-app/public/. /home/kenyanba/public_html/
