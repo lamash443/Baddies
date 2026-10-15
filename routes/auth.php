@@ -23,6 +23,20 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    // Standard login route — required by Laravel middleware (Authenticate, RedirectIfAuthenticated)
+    Route::get('login', function (\Illuminate\Http\Request $request) {
+        // If a ref code is passed, store it and forward to the referral page
+        if ($request->filled('ref')) {
+            session(['ref_code' => $request->input('ref')]);
+            return redirect()->route('referral.login', ['ref' => $request->input('ref')]);
+        }
+        // Default: redirect to homepage with login modal open
+        return redirect('/?auth=login');
+    })->name('login');
+
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
+
+    // Referral-specific login page (shown when a referral code is present)
     Route::get('referral', function (\Illuminate\Http\Request $request) {
         if ($request->filled('ref')) {
             session(['ref_code' => $request->input('ref')]);
@@ -30,16 +44,16 @@ Route::middleware('guest')->group(function () {
 
         $hasReferral = session()->has('ref_code') || $request->filled('ref') || $request->filled('referral_code');
 
-        // The standalone login page only appears when the user has been referred
+        // The standalone referral login page only appears when the user has been referred
         if ($hasReferral) {
             return view('auth.login');
         }
 
         // If not referred, redirect to homepage with auth modal query
         return redirect('/?auth=login');
-    })->name('login');
+    })->name('referral.login');
 
-    Route::post('referral', [AuthenticatedSessionController::class, 'store']);
+    Route::post('referral', [AuthenticatedSessionController::class, 'store'])->name('referral.store');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
