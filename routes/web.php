@@ -824,14 +824,20 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
                 $results[] = ['label' => 'Storage fallback', 'cmd' => 'route fallback check', 'out' => 'ℹ️ symlink() unavailable or restricted on shared host. Cleaned storage directory so Laravel fallback route (/storage/{path}) seamlessly serves all images! ✅', 'ok' => true];
             }
 
-            // Set permissions using PHP chmod
-            foreach ([
-                $appDir . '/storage' => 0775,
-                $appDir . '/bootstrap/cache' => 0775,
-            ] as $path => $mode) {
-                $ok2 = @chmod($path, $mode);
-                $results[] = ['label' => "chmod $path", 'cmd' => "chmod($path, 0775)", 'out' => $ok2 ? '✅ Done' : '⚠️ chmod failed (may still work)', 'ok' => $ok2];
-            }
+            // Set recursive permissions using PHP chmod
+            $chmodR = function ($dir, $mode) use (&$chmodR): void {
+                if (!file_exists($dir)) return;
+                @chmod($dir, $mode);
+                if (is_dir($dir)) {
+                    foreach (scandir($dir) ?: [] as $item) {
+                        if ($item === '.' || $item === '..') continue;
+                        $chmodR($dir . '/' . $item, $mode);
+                    }
+                }
+            };
+            $chmodR($appDir . '/storage', 0775);
+            $chmodR($appDir . '/bootstrap/cache', 0775);
+            $results[] = ['label' => "chmod recursive", 'cmd' => "chmodR(storage, 0775)", 'out' => '✅ Storage & cache directories permissions set to 0775', 'ok' => true];
 
             // Verify
             $symOk = is_link($link) && is_dir($link);
