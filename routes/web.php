@@ -680,21 +680,44 @@ Route::get('/privacy', function () {
     return view('privacy', compact('sitePage'));
 })->name('privacy');
 
-// Direct media/storage serving fallback for shared hosting / cPanel environments where symlinks may be broken or unlinked
+// Direct media/storage serving fallback for shared hosting / cPanel environments
 Route::get('/storage/{path}', function (string $path) {
     $cleanPath = str_replace(['..', "\0"], '', $path);
-    $filePath = storage_path('app/public/' . $cleanPath);
+    $cleanPath = ltrim($cleanPath, '/');
 
-    $realBase = realpath(storage_path('app/public'));
-    $realFile = realpath($filePath);
+    $candidates = [
+        storage_path('app/public/' . $cleanPath),
+        storage_path('app/' . $cleanPath),
+        storage_path('app/private/' . $cleanPath),
+        public_path('storage/' . $cleanPath),
+        base_path('public/storage/' . $cleanPath),
+        '/home/kenyanba/public_html/storage/' . $cleanPath,
+        '/home/kenyanba/storage/app/public/' . $cleanPath,
+        '/home/kenyanba/repositories/Baddies/storage/app/public/' . $cleanPath,
+    ];
 
-    if (!$realFile || !$realBase || !str_starts_with($realFile, $realBase) || !is_file($realFile)) {
+    $foundFile = null;
+    foreach ($candidates as $c) {
+        if (is_file($c)) {
+            $foundFile = $c;
+            break;
+        }
+    }
+
+    if (!$foundFile) {
         abort(404);
     }
 
-    $mime = mime_content_type($realFile) ?: 'application/octet-stream';
+    $ext = strtolower(pathinfo($cleanPath, PATHINFO_EXTENSION));
+    $mimes = [
+        'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
+        'gif' => 'image/gif', 'webp' => 'image/webp', 'svg' => 'image/svg+xml',
+        'mp4' => 'video/mp4', 'mov' => 'video/quicktime', 'webm' => 'video/webm',
+        'pdf' => 'application/pdf',
+    ];
+    $mime = $mimes[$ext] ?? (@mime_content_type($foundFile) ?: 'application/octet-stream');
 
-    return response()->file($realFile, [
+    return response()->file($foundFile, [
         'Content-Type' => $mime,
         'Cache-Control' => 'public, max-age=31536000',
     ]);
@@ -886,6 +909,58 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
         'exec() status'   => function_exists('exec') ? '✅ Enabled' : 'ℹ️ Disabled (Artisan::call active)',
     ];
 
+    // Scan storage directories for media files
+    $scanDirs = [
+        'repositories/Baddies/storage/app/public' => $appDir . '/storage/app/public',
+        'public_html/storage' => '/home/kenyanba/public_html/storage',
+        'repositories/Baddies/storage/app' => $appDir . '/storage/app',
+    ];
+    $mediaScans = [];
+    foreach ($scanDirs as $name => $path) {
+        if (!is_dir($path)) {
+            $mediaScans[] = ['name' => $name, 'status' => 'Directory does not exist', 'count' => 0, 'files' => []];
+            continue;
+        }
+        $count = 0;
+        $files = [];
+        try {
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS));
+            foreach ($it as $f) {
+                if ($f->isFile()) {
+                    $count++;
+                    if (count($files) < 6) {
+                        $files[] = str_replace($path . DIRECTORY_SEPARATOR, '', $f->getPathname());
+                    }
+                }
+            }
+            $mediaScans[] = ['name' => $name, 'status' => "$count files found", 'count' => $count, 'files' => $files];
+        } catch (\Throwable $e) {
+            $mediaScans[] = ['name' => $name, 'status' => 'Error: ' . $e->getMessage(), 'count' => 0, 'files' => []];
+        }
+    }
+
+    $siteImagesCheck = [];
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('site_settings')) {
+            $rows = \Illuminate\Support\Facades\DB::table('site_settings')
+                ->whereIn('key', ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background'])
+                ->get();
+            foreach ($rows as $r) {
+                if ($r->value) {
+                    $clean = ltrim($r->value, '/');
+                    $existsInPublic = file_exists($appDir . '/storage/app/public/' . $clean);
+                    $existsInHtml = file_exists('/home/kenyanba/public_html/storage/' . $clean);
+                    $siteImagesCheck[] = [
+                        'key' => $r->key,
+                        'file' => $r->value,
+                        'exists' => ($existsInPublic || $existsInHtml),
+                        'loc' => $existsInPublic ? 'storage/app/public' : ($existsInHtml ? 'public_html/storage' : '❌ MISSING FROM DISK'),
+                    ];
+                }
+            }
+        }
+    } catch (\Throwable $e) {}
+
     $token = 'kbc-setup-2026-secure';
     $base  = '/server-setup?token=' . $token;
 
@@ -945,6 +1020,23 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
   <a class="btn s" href="<?=$base?>&action=migrate">🗄️ Migrate</a>
   <a class="btn s" href="<?=$base?>&action=status">🔄 Refresh</a>
 </div>
+<h2>📁 Storage Media Diagnostics</h2>
+<div class="res ok2">
+  <div class="lbl">Storage Directories File Counts</div>
+  <div class="out"><?php foreach ($mediaScans as $ms): ?>
+• <?=htmlspecialchars($ms['name'])?>: <?=htmlspecialchars($ms['status'])?>
+<?php if (!empty($ms['files'])): ?>   Samples: <?=htmlspecialchars(implode(', ', $ms['files']))?>
+<?php endif; ?>
+<?php endforeach; ?></div>
+</div>
+<?php if (!empty($siteImagesCheck)): ?>
+<div class="res ok2">
+  <div class="lbl">Database Site Settings Image Files Check</div>
+  <div class="out"><?php foreach ($siteImagesCheck as $sic): ?>
+• <?=htmlspecialchars($sic['key'])?> (<?=htmlspecialchars($sic['file'])?>): <?=htmlspecialchars($sic['loc'])?>
+<?php endforeach; ?></div>
+</div>
+<?php endif; ?>
 <?php if (!empty($results)): ?>
 <h2>Results — <?=htmlspecialchars($action)?></h2>
 <?php foreach ($results as $r): $cls = $r['ok'] ? 'ok2' : 'fail'; ?>
