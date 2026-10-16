@@ -700,5 +700,183 @@ Route::get('/storage/{path}', function (string $path) {
     ]);
 })->where('path', '.*')->name('storage.local.fallback');
 
+
 require __DIR__.'/auth.php';
 
+// =============================================================================
+// ONE-TIME SERVER SETUP ROUTE (no terminal needed)
+// URL: /server-setup?token=kbc-setup-2026-secure
+// Delete this route once setup is confirmed working.
+// =============================================================================
+Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
+
+    // ── Auth guard ──────────────────────────────────────────────────────────
+    if ($request->query('token') !== 'kbc-setup-2026-secure') {
+        abort(404);
+    }
+
+    $appDir  = base_path();
+    $php     = PHP_BINARY;          // uses the same PHP that's running Laravel
+    $artisan = $appDir . '/artisan';
+    $envFile = $appDir . '/.env';
+
+    $results = [];
+    $action  = $request->query('action', 'status');
+
+    $run = function (string $cmd) use (&$results): array {
+        $output = [];
+        $code   = 0;
+        exec($cmd . ' 2>&1', $output, $code);
+        $entry = ['cmd' => $cmd, 'out' => implode("\n", $output), 'ok' => $code === 0];
+        $results[] = $entry;
+        return $entry;
+    };
+
+    // ── Actions ─────────────────────────────────────────────────────────────
+    if (in_array($action, ['fix-env', 'full-setup'])) {
+        $env = file_get_contents($envFile);
+        $patches = [
+            '/^APP_URL=.*/m'         => 'APP_URL=https://www.kenyanbaddies.com',
+            '/^FILESYSTEM_DISK=.*/m' => 'FILESYSTEM_DISK=public',
+            '/^SESSION_DRIVER=.*/m'  => 'SESSION_DRIVER=database',
+            '/^SESSION_DOMAIN=.*/m'  => 'SESSION_DOMAIN=null',
+            '/^APP_DEBUG=.*/m'       => 'APP_DEBUG=false',
+        ];
+        foreach ($patches as $pattern => $replacement) {
+            $env = preg_replace($pattern, $replacement, $env);
+        }
+        file_put_contents($envFile, $env);
+        $results[] = ['cmd' => 'Patch .env', 'out' => "APP_URL, FILESYSTEM_DISK, SESSION_DRIVER, SESSION_DOMAIN updated ✅", 'ok' => true];
+    }
+
+    if (in_array($action, ['fix-storage', 'full-setup'])) {
+        $pubHtml = '/home/kenyanba/public_html';
+        $target  = '/home/kenyanba/repositories/Baddies/storage/app/public';
+        $link    = $pubHtml . '/storage';
+
+        if (is_link($link) || file_exists($link)) {
+            $run("rm -rf " . escapeshellarg($link));
+        }
+        symlink($target, $link);
+        $results[] = ['cmd' => 'Create storage symlink', 'out' => "$link → $target", 'ok' => is_link($link)];
+
+        $run("chmod -R 775 " . escapeshellarg($appDir . '/storage'));
+        $run("chmod -R 775 " . escapeshellarg($appDir . '/bootstrap/cache'));
+    }
+
+    if (in_array($action, ['clear-cache', 'full-setup'])) {
+        $run("$php $artisan config:clear");
+        $run("$php $artisan cache:clear");
+        $run("$php $artisan route:clear");
+        $run("$php $artisan view:clear");
+    }
+
+    if (in_array($action, ['migrate', 'full-setup'])) {
+        $run("$php $artisan migrate --force");
+    }
+
+    if (in_array($action, ['rebuild-cache', 'full-setup'])) {
+        $run("$php $artisan config:cache");
+        $run("$php $artisan route:cache");
+        $run("$php $artisan view:cache");
+    }
+
+    // ── Current status ───────────────────────────────────────────────────────
+    $env     = file_get_contents($envFile);
+    $getVal  = fn($k) => preg_match("/^{$k}=(.*)$/m", $env, $m) ? trim($m[1]) : '(not set)';
+    $symlink = '/home/kenyanba/public_html/storage';
+    $symOk   = is_link($symlink) && is_dir(readlink($symlink));
+
+    $status = [
+        'APP_URL'         => $getVal('APP_URL'),
+        'APP_ENV'         => $getVal('APP_ENV'),
+        'APP_DEBUG'       => $getVal('APP_DEBUG'),
+        'SESSION_DRIVER'  => $getVal('SESSION_DRIVER'),
+        'FILESYSTEM_DISK' => $getVal('FILESYSTEM_DISK'),
+        'SESSION_DOMAIN'  => $getVal('SESSION_DOMAIN'),
+        'DB_DATABASE'     => $getVal('DB_DATABASE'),
+        'PHP_BINARY'      => PHP_BINARY,
+        'PHP_VERSION'     => PHP_VERSION,
+        'Storage Symlink' => $symOk ? '✅ OK → ' . readlink($symlink) : '❌ Missing or broken',
+    ];
+
+    // ── HTML ─────────────────────────────────────────────────────────────────
+    $token = 'kbc-setup-2026-secure';
+    $base  = '/server-setup?token=' . $token;
+
+    $html = '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KBC Server Setup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0d0d;color:#eee;padding:1.5rem}
+h1{color:#ff8c00;font-size:1.6rem;margin-bottom:.2rem}
+.sub{color:#777;font-size:.85rem;margin-bottom:1.5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.card{background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:1rem}
+.card h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:.35rem}
+.val{font-size:.95rem;word-break:break-all}
+.ok{color:#4ade80}.bad{color:#f87171}.warn{color:#fb923c}
+.btns{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.5rem}
+.btn{padding:.55rem 1.1rem;border-radius:7px;font-weight:600;font-size:.85rem;text-decoration:none;display:inline-block}
+.p{background:#ff8c00;color:#000}
+.s{background:#222;color:#ddd;border:1px solid #333}
+.g{background:#15803d;color:#fff}
+h2{color:#ff8c00;font-size:1.1rem;margin-bottom:.75rem}
+.res{margin-bottom:.6rem;background:#111;border:1px solid #222;border-radius:7px;padding:.85rem}
+.res.ok2{border-left:3px solid #4ade80}.res.fail{border-left:3px solid #f87171}
+.cmd{font-size:.75rem;color:#666;font-family:monospace;margin-bottom:.35rem}
+.out{font-family:monospace;font-size:.82rem;white-space:pre-wrap;word-break:break-word}
+.warn-box{background:#431407;border:1px solid #ea580c;border-radius:8px;padding:.9rem;margin-bottom:1.5rem;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>🔧 KBC Server Setup</h1>
+<p class="sub">kenyanbaddies.com — Browser-based server configuration</p>
+<div class="warn-box">⚠️ <strong>Remove this route</strong> from <code>routes/web.php</code> once everything is confirmed working.</div>
+<div class="grid">';
+
+    foreach ($status as $k => $v) {
+        $good = match($k) {
+            'APP_URL'         => str_contains($v, 'kenyanbaddies'),
+            'APP_ENV'         => $v === 'production',
+            'APP_DEBUG'       => $v === 'false',
+            'SESSION_DRIVER'  => $v === 'database',
+            'FILESYSTEM_DISK' => $v === 'public',
+            'SESSION_DOMAIN'  => in_array($v, ['null', '', '(not set)']),
+            'Storage Symlink' => str_starts_with($v, '✅'),
+            default           => true,
+        };
+        $cls = $good ? 'ok' : 'bad';
+        $html .= "<div class=\"card\"><h3>" . htmlspecialchars($k) . "</h3><div class=\"val $cls\">" . htmlspecialchars($v) . "</div></div>";
+    }
+
+    $html .= '</div>
+<h2>Actions</h2>
+<div class="btns">
+  <a class="btn p" href="' . $base . '&action=full-setup">🚀 Full Setup (do this first)</a>
+  <a class="btn s" href="' . $base . '&action=fix-env">📝 Fix .env</a>
+  <a class="btn s" href="' . $base . '&action=fix-storage">🔗 Fix Storage Symlink</a>
+  <a class="btn s" href="' . $base . '&action=clear-cache">🗑️ Clear All Caches</a>
+  <a class="btn s" href="' . $base . '&action=migrate">🗄️ Run Migrations</a>
+  <a class="btn g" href="' . $base . '&action=rebuild-cache">⚡ Rebuild Caches</a>
+  <a class="btn s" href="' . $base . '&action=status">🔄 Refresh</a>
+</div>';
+
+    if (!empty($results)) {
+        $html .= '<h2>Results — ' . htmlspecialchars($action) . '</h2>';
+        foreach ($results as $r) {
+            $cls = $r['ok'] ? 'ok2' : 'fail';
+            $html .= '<div class="res ' . $cls . '"><div class="cmd">$ ' . htmlspecialchars($r['cmd']) . '</div>'
+                   . '<div class="out">' . htmlspecialchars($r['out'] ?: '(no output)') . '</div></div>';
+        }
+    }
+
+    $html .= '</body></html>';
+
+    return response($html, 200)->header('Content-Type', 'text/html');
+
+})->name('server.setup');
