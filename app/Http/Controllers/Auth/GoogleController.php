@@ -119,12 +119,12 @@ class GoogleController extends Controller
                     ];
                     foreach ($allowedMemberPrefixes as $prefix) {
                         if (str_starts_with($normalizedPath, $prefix)) {
-                            return redirect($intended)->with('success', 'Successfully logged in with Google!');
+                            return redirect($normalizedPath)->with('success', 'Successfully logged in with Google!');
                         }
                     }
                 }
 
-                return redirect()->route('dashboard')
+                return redirect('/dashboard')
                     ->with('success', 'Successfully logged in with Google!');
             }
 
@@ -166,7 +166,7 @@ class GoogleController extends Controller
                 ->causedBy($newUser)
                 ->log('Registered account via Google OAuth');
 
-            return redirect()->route('dashboard')
+            return redirect('/dashboard')
                 ->with('success', 'Welcome to Kenyan Baddies Club! Your account has been created via Google.');
 
         } catch (\Exception $e) {

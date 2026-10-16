@@ -8,8 +8,6 @@ deployment:
     - /bin/rm -rf /home/kenyanba/public_html/storage
     - /bin/ln -sfn /home/kenyanba/repositories/Baddies/storage/app/public /home/kenyanba/public_html/storage
 
-    - /bin/echo "=== Step 3: Copy production .env ==="
-    - /bin/cp /home/kenyanba/repositories/Baddies/.env.production /home/kenyanba/repositories/Baddies/.env
 
     - /bin/echo "=== Step 4: Set directory permissions ==="
     - /bin/chmod -R 775 /home/kenyanba/repositories/Baddies/storage

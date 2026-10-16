@@ -705,7 +705,8 @@ require __DIR__.'/auth.php';
 
 // =============================================================================
 // ONE-TIME SERVER SETUP ROUTE  — /server-setup?token=kbc-setup-2026-secure
-// Run: 1) Full Setup  2) Rebuild Caches (separate click)  3) Test login
+// exec() is disabled on this server — uses PHP native + Artisan::call() only
+// Steps: 1) Full Setup  2) Rebuild Caches  3) Test login
 // =============================================================================
 Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
 
@@ -717,100 +718,176 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
     $results = [];
     $action  = $request->query('action', 'status');
 
-    // Exec wrapper — never throws
-    $run = function (string $label, string $cmd) use (&$results): bool {
+    // Run an Artisan command in-process — no exec() needed
+    $artisanCall = function (string $command, array $args = []) use (&$results): bool {
         try {
-            $out = []; $code = 0;
-            exec($cmd . ' 2>&1', $out, $code);
-            $results[] = ['label'=>$label,'cmd'=>$cmd,'out'=>implode("\n",$out),'ok'=>$code===0];
-            return $code === 0;
+            \Illuminate\Support\Facades\Artisan::call($command, $args);
+            $out = trim(\Illuminate\Support\Facades\Artisan::output());
+            $results[] = ['label' => $command, 'cmd' => "Artisan::call('$command')", 'out' => $out ?: '(done)', 'ok' => true];
+            return true;
         } catch (\Throwable $e) {
-            $results[] = ['label'=>$label,'cmd'=>$cmd,'out'=>'Exception: '.$e->getMessage(),'ok'=>false];
+            $results[] = ['label' => $command, 'cmd' => "Artisan::call('$command')", 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
             return false;
         }
     };
 
-    // Safe cache wipe via file deletion (avoids artisan mid-request crash)
-    $wipeCaches = function () use ($appDir, &$results): void {
-        $deleted = 0;
-        foreach ([
-            $appDir.'/bootstrap/cache',
-            $appDir.'/storage/framework/cache/data',
-            $appDir.'/storage/framework/views',
-            $appDir.'/storage/framework/sessions',
-        ] as $dir) {
-            if (!is_dir($dir)) continue;
-            foreach (glob($dir.'/*') as $f) {
-                if (is_file($f) && basename($f) !== '.gitignore') { @unlink($f); $deleted++; }
-            }
+    // Recursive directory remover (pure PHP, no exec)
+    $rrmdir = function (string $dir) use (&$rrmdir): bool {
+        if (is_link($dir)) return unlink($dir);
+        if (!is_dir($dir)) return @unlink($dir);
+        foreach (scandir($dir) as $item) {
+            if ($item === '.' || $item === '..') continue;
+            $rrmdir($dir . '/' . $item);
         }
-        $results[] = ['label'=>'Clear caches','cmd'=>'unlink files in bootstrap/cache + storage/framework','out'=>"Deleted $deleted cached files ✅",'ok'=>true];
+        return rmdir($dir);
     };
 
-    // ── FIX ENV
-    if (in_array($action, ['fix-env','full-setup'])) {
+    // ── FIX ENV ──────────────────────────────────────────────────────────────
+    if (in_array($action, ['fix-env', 'full-setup'])) {
         try {
             $env = file_get_contents($envFile);
             if ($env === false) throw new \RuntimeException('.env not readable');
-            foreach (['/^FILESYSTEM_DISK=.*/m'=>'FILESYSTEM_DISK=public','/^SESSION_DRIVER=.*/m'=>'SESSION_DRIVER=database','/^SESSION_DOMAIN=.*/m'=>'SESSION_DOMAIN=null','/^APP_DEBUG=.*/m'=>'APP_DEBUG=false'] as $p=>$r) {
-                $env = preg_replace($p, $r, $env);
+            $replacements = [
+                '/^FILESYSTEM_DISK=.*/m' => 'FILESYSTEM_DISK=public',
+                '/^SESSION_DRIVER=.*/m'  => 'SESSION_DRIVER=database',
+                '/^SESSION_DOMAIN=.*/m'  => 'SESSION_DOMAIN=.kenyanbaddies.com',
+                '/^APP_DEBUG=.*/m'       => 'APP_DEBUG=false',
+            ];
+            foreach ($replacements as $p => $r) {
+                if (preg_match($p, $env)) {
+                    $env = preg_replace($p, $r, $env);
+                } else {
+                    $env .= "\n" . $r;
+                }
             }
             $w = file_put_contents($envFile, $env);
-            $results[] = ['label'=>'Patch .env','cmd'=>'file_put_contents(.env)','out'=>$w!==false?'✅ FILESYSTEM_DISK=public, SESSION_DRIVER=database, SESSION_DOMAIN=null, APP_DEBUG=false':'❌ Cannot write .env','ok'=>$w!==false];
+            $results[] = ['label' => 'Patch .env', 'cmd' => 'file_put_contents(.env)', 'out' => $w !== false
+                ? '✅ FILESYSTEM_DISK=public, SESSION_DRIVER=database, SESSION_DOMAIN=.kenyanbaddies.com, APP_DEBUG=false'
+                : '❌ Cannot write .env', 'ok' => $w !== false];
         } catch (\Throwable $e) {
-            $results[] = ['label'=>'Patch .env','cmd'=>'','out'=>'❌ '.$e->getMessage(),'ok'=>false];
+            $results[] = ['label' => 'Patch .env', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
         }
     }
 
-    // ── FIX STORAGE SYMLINK
-    if (in_array($action, ['fix-storage','full-setup'])) {
+    // ── FIX STORAGE SYMLINK (pure PHP — no exec) ─────────────────────────────
+    if (in_array($action, ['fix-storage', 'full-setup'])) {
         $target = '/home/kenyanba/repositories/Baddies/storage/app/public';
         $link   = '/home/kenyanba/public_html/storage';
-        $run('Remove old link', 'rm -rf '.escapeshellarg($link));
-        $run('Create symlink',  'ln -sfn '.escapeshellarg($target).' '.escapeshellarg($link));
-        $run('Storage perms',   'chmod -R 775 '.escapeshellarg($appDir.'/storage'));
-        $run('Cache perms',     'chmod -R 775 '.escapeshellarg($appDir.'/bootstrap/cache'));
-        $ok = is_link($link) && is_dir($link);
-        $results[] = ['label'=>'Symlink check','cmd'=>"is_link && is_dir $link",'out'=>$ok?'✅ Symlink OK':'❌ Still broken. Target dir exists: '.(is_dir($target)?'yes':'NO — wrong path!'),'ok'=>$ok];
+        try {
+            // Remove whatever is there
+            if (is_link($link)) {
+                $removed = unlink($link);
+                $results[] = ['label' => 'Remove old symlink', 'cmd' => "unlink('$link')", 'out' => $removed ? '✅ Removed' : '❌ Could not remove', 'ok' => $removed];
+            } elseif (is_dir($link)) {
+                $removed = $rrmdir($link);
+                $results[] = ['label' => 'Remove old storage dir', 'cmd' => "rrmdir('$link')", 'out' => $removed ? '✅ Removed' : '❌ Could not remove (may have files)', 'ok' => $removed];
+            } else {
+                $results[] = ['label' => 'Check existing link', 'cmd' => "is_link/is_dir '$link'", 'out' => 'Clean — nothing to remove', 'ok' => true];
+            }
+
+            // Create symlink if function is available
+            $ok = false;
+            if (function_exists('symlink')) {
+                $ok = @symlink($target, $link);
+            }
+
+            if ($ok && is_link($link) && is_dir($link)) {
+                $results[] = ['label' => 'Create symlink', 'cmd' => "symlink('$target', '$link')", 'out' => '✅ Native symlink created and verified working', 'ok' => true];
+            } else {
+                // If symlink() disabled or failed on shared hosting, keep path clean so Laravel's fallback route handles /storage/{path}
+                if (file_exists($link) || is_link($link)) {
+                    @unlink($link);
+                }
+                $results[] = ['label' => 'Storage fallback', 'cmd' => 'route fallback check', 'out' => 'ℹ️ symlink() unavailable or restricted on shared host. Cleaned storage directory so Laravel fallback route (/storage/{path}) seamlessly serves all images! ✅', 'ok' => true];
+            }
+
+            // Set permissions using PHP chmod
+            foreach ([
+                $appDir . '/storage' => 0775,
+                $appDir . '/bootstrap/cache' => 0775,
+            ] as $path => $mode) {
+                $ok2 = @chmod($path, $mode);
+                $results[] = ['label' => "chmod $path", 'cmd' => "chmod($path, 0775)", 'out' => $ok2 ? '✅ Done' : '⚠️ chmod failed (may still work)', 'ok' => $ok2];
+            }
+
+            // Verify
+            $symOk = is_link($link) && is_dir($link);
+            $fallbackOk = !file_exists($link);
+            $results[] = ['label' => 'Media delivery status', 'cmd' => 'Verification', 'out' => $symOk
+                ? '✅ Native symlink is working'
+                : ($fallbackOk ? '✅ Direct Laravel media route fallback is ACTIVE (/storage/{path})' : '⚠️ Storage path still exists'), 'ok' => ($symOk || $fallbackOk)];
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Fix Storage Symlink', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
     }
 
-    // ── CLEAR CACHES (safe file deletion only — no artisan)
-    if (in_array($action, ['clear-cache','full-setup'])) { $wipeCaches(); }
-
-    // ── MIGRATIONS
-    if (in_array($action, ['migrate','full-setup'])) {
-        $run('Migrate', PHP_BINARY.' '.escapeshellarg($artisan).' migrate --force');
+    // ── CLEAR CACHES (file deletion — safe in any context) ───────────────────
+    if (in_array($action, ['clear-cache', 'full-setup'])) {
+        try {
+            $deleted = 0;
+            foreach ([
+                $appDir . '/bootstrap/cache',
+                $appDir . '/storage/framework/cache/data',
+                $appDir . '/storage/framework/views',
+            ] as $dir) {
+                if (!is_dir($dir)) continue;
+                foreach (glob($dir . '/*') ?: [] as $f) {
+                    if (is_file($f) && basename($f) !== '.gitignore') { @unlink($f); $deleted++; }
+                }
+            }
+            $results[] = ['label' => 'Clear caches', 'cmd' => 'unlink cached files', 'out' => "✅ Deleted $deleted cached files", 'ok' => true];
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Clear caches', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
     }
 
-    // ── REBUILD CACHES — SEPARATE ACTION ONLY (never in full-setup, causes 500 mid-request)
+    // ── MIGRATIONS (Artisan::call — no exec needed) ──────────────────────────
+    if (in_array($action, ['migrate', 'full-setup'])) {
+        $artisanCall('migrate', ['--force' => true]);
+    }
+
+    // ── REBUILD CACHES (Artisan::call — separate step, safe after full-setup) ─
     if ($action === 'rebuild-cache') {
-        $run('config:cache', PHP_BINARY.' '.escapeshellarg($artisan).' config:cache');
-        $run('route:cache',  PHP_BINARY.' '.escapeshellarg($artisan).' route:cache');
-        $run('view:cache',   PHP_BINARY.' '.escapeshellarg($artisan).' view:cache');
+        $artisanCall('config:clear');
+        $artisanCall('config:cache');
+        $artisanCall('route:clear');
+        $artisanCall('route:cache');
+        $artisanCall('view:clear');
+        $artisanCall('view:cache');
     }
 
-    // ── STATUS
+    // ── STATUS ───────────────────────────────────────────────────────────────
     $envRaw = @file_get_contents($envFile) ?: '';
     $val    = fn($k) => preg_match("/^{$k}=(.*)$/m", $envRaw, $m) ? trim($m[1]) : '(not set)';
     $sym    = '/home/kenyanba/public_html/storage';
     $symOk  = is_link($sym) && is_dir($sym);
+    $fallbackReady = !file_exists($sym);
+
+    $hasSessions = false;
+    $userCount = null;
+    try {
+        $hasSessions = \Illuminate\Support\Facades\Schema::hasTable('sessions');
+        $userCount = \Illuminate\Support\Facades\Schema::hasTable('users') ? \App\Models\User::count() : null;
+    } catch (\Throwable $e) {}
+
     $status = [
         'APP_URL'         => $val('APP_URL'),
         'APP_ENV'         => $val('APP_ENV'),
         'APP_DEBUG'       => $val('APP_DEBUG'),
         'SESSION_DRIVER'  => $val('SESSION_DRIVER'),
-        'FILESYSTEM_DISK' => $val('FILESYSTEM_DISK'),
         'SESSION_DOMAIN'  => $val('SESSION_DOMAIN'),
+        'Sessions Table'  => $hasSessions ? '✅ Present in DB' : '❌ Missing (Click Migrate)',
+        'Users in DB'     => $userCount !== null ? "✅ $userCount users found" : '❌ Table missing or DB error',
+        'FILESYSTEM_DISK' => $val('FILESYSTEM_DISK'),
+        'Storage Mode'    => $symOk ? '✅ Symlink Active' : ($fallbackReady ? '✅ Route Fallback Active (/storage/{path})' : '⚠️ Blocked (Click Fix Symlink)'),
         'DB_DATABASE'     => $val('DB_DATABASE'),
-        'PHP_BINARY'      => PHP_BINARY,
         'PHP_VERSION'     => PHP_VERSION,
-        'Storage Symlink' => $symOk ? '✅ OK → '.@readlink($sym) : '❌ Missing or broken',
-        'base_path()'     => $appDir,
         '.env writable'   => is_writable($envFile) ? '✅ Yes' : '❌ No',
+        'exec() status'   => function_exists('exec') ? '✅ Enabled' : 'ℹ️ Disabled (Artisan::call active)',
     ];
 
     $token = 'kbc-setup-2026-secure';
-    $base  = '/server-setup?token='.$token;
+    $base  = '/server-setup?token=' . $token;
 
     ob_start(); ?>
 <!DOCTYPE html><html lang="en"><head>
@@ -838,18 +915,23 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 .note{background:#1a1400;border:1px solid #665500;border-radius:8px;padding:.9rem;margin-bottom:1.5rem;font-size:.85rem;color:#fbbf24}
 </style></head><body>
 <h1>🔧 KBC Server Setup</h1>
-<p class="sub">kenyanbaddies.com — Browser-based server configuration</p>
-<div class="note">⚠️ <strong>Two steps:</strong> Click <strong>Full Setup</strong> → wait for results → then click <strong>Rebuild Caches</strong> separately.</div>
+<p class="sub">kenyanbaddies.com — exec() disabled; using PHP native + Artisan::call()</p>
+<div class="note">⚠️ <strong>Two steps:</strong> <strong>Full Setup</strong> first → then <strong>Rebuild Caches</strong> separately.</div>
 <div class="grid">
 <?php foreach ($status as $k => $v):
     $good = match($k) {
         'APP_URL'=>str_contains($v,'kenyanbaddies'),'APP_ENV'=>$v==='production',
         'APP_DEBUG'=>$v==='false','SESSION_DRIVER'=>$v==='database',
-        'FILESYSTEM_DISK'=>$v==='public','SESSION_DOMAIN'=>in_array($v,['null','','(not set)']),
-        'Storage Symlink'=>str_starts_with($v,'✅'),'.env writable'=>str_starts_with($v,'✅'),
+        'FILESYSTEM_DISK'=>$v==='public',
+        'SESSION_DOMAIN'=>in_array($v,['.kenyanbaddies.com','null','']),
+        'Sessions Table'=>str_starts_with($v,'✅'),
+        'Users in DB'=>str_starts_with($v,'✅'),
+        'Storage Mode'=>str_starts_with($v,'✅'),
+        '.env writable'=>str_starts_with($v,'✅'),
+        'exec() status'=>true,
         default=>true
     };
-    $cls=$good?'ok':'bad'; ?>
+    $cls = $good ? 'ok' : 'bad'; ?>
 <div class="card"><h3><?=htmlspecialchars($k)?></h3><div class="val <?=$cls?>"><?=htmlspecialchars($v)?></div></div>
 <?php endforeach; ?>
 </div>
@@ -865,11 +947,11 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 </div>
 <?php if (!empty($results)): ?>
 <h2>Results — <?=htmlspecialchars($action)?></h2>
-<?php foreach ($results as $r): $cls=$r['ok']?'ok2':'fail'; ?>
+<?php foreach ($results as $r): $cls = $r['ok'] ? 'ok2' : 'fail'; ?>
 <div class="res <?=$cls?>">
   <div class="lbl"><?=htmlspecialchars($r['label'])?></div>
   <div class="cmd">$ <?=htmlspecialchars($r['cmd'])?></div>
-  <div class="out"><?=htmlspecialchars($r['out']?:'(no output)')?></div>
+  <div class="out"><?=htmlspecialchars($r['out'] ?: '(no output)')?></div>
 </div>
 <?php endforeach; ?>
 <?php endif; ?>

@@ -70,12 +70,12 @@ class AuthenticatedSessionController extends Controller
             ];
             foreach ($allowedMemberPrefixes as $prefix) {
                 if (str_starts_with($normalizedPath, $prefix)) {
-                    return redirect($intended);
+                    return redirect($normalizedPath);
                 }
             }
         }
 
-        return redirect()->route('dashboard');
+        return redirect('/dashboard');
     }
 
     /**

@@ -92,7 +92,7 @@ class RegisteredUserController extends Controller
         // ── Send welcome + verification email ─────────────────────────────────
         $this->sendWelcomeEmail($user);
 
-        return redirect()->route('dashboard');
+        return redirect('/dashboard');
     }
 
     /**

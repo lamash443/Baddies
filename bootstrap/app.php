@@ -12,9 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        $middleware->append(\App\Http\Middleware\TrackVisitor::class);
-        $middleware->append(\App\Http\Middleware\UpdateLastSeen::class);
-        $middleware->append(\App\Http\Middleware\AutoLogoutInactive::class);
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackVisitor::class,
+            \App\Http\Middleware\UpdateLastSeen::class,
+            \App\Http\Middleware\AutoLogoutInactive::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'webhook/payhero',
         ]);
@@ -25,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn ($request) => '/?auth=login');
 
         // Send already-authenticated users who hit guest-only routes to dashboard.
-        $middleware->redirectUsersTo(fn ($request) => route('dashboard'));
+        $middleware->redirectUsersTo(fn ($request) => '/dashboard');
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {
