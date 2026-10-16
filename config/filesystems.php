@@ -40,7 +40,7 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            'root' => env('FILESYSTEM_PUBLIC_ROOT', (is_dir('/home/kenyanba/public_html') ? '/home/kenyanba/public_html/storage' : storage_path('app/public'))),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
             'throw' => false,

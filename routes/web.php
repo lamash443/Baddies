@@ -686,19 +686,17 @@ Route::get('/storage/{path}', function (string $path) {
     $cleanPath = ltrim($cleanPath, '/');
 
     $candidates = [
-        storage_path('app/public/' . $cleanPath),
-        storage_path('app/' . $cleanPath),
-        storage_path('app/private/' . $cleanPath),
-        public_path('storage/' . $cleanPath),
-        base_path('public/storage/' . $cleanPath),
         '/home/kenyanba/public_html/storage/' . $cleanPath,
-        '/home/kenyanba/storage/app/public/' . $cleanPath,
+        storage_path('app/public/' . $cleanPath),
+        base_path('storage/app/public/' . $cleanPath),
         '/home/kenyanba/repositories/Baddies/storage/app/public/' . $cleanPath,
+        storage_path('app/' . $cleanPath),
+        public_path('storage/' . $cleanPath),
     ];
 
     $foundFile = null;
     foreach ($candidates as $c) {
-        if (is_file($c)) {
+        if (@is_file($c) || @file_exists($c)) {
             $foundFile = $c;
             break;
         }
@@ -817,11 +815,33 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             if ($ok && is_link($link) && is_dir($link)) {
                 $results[] = ['label' => 'Create symlink', 'cmd' => "symlink('$target', '$link')", 'out' => '✅ Native symlink created and verified working', 'ok' => true];
             } else {
-                // If symlink() disabled or failed on shared hosting, keep path clean so Laravel's fallback route handles /storage/{path}
-                if (file_exists($link) || is_link($link)) {
-                    @unlink($link);
-                }
-                $results[] = ['label' => 'Storage fallback', 'cmd' => 'route fallback check', 'out' => 'ℹ️ symlink() unavailable or restricted on shared host. Cleaned storage directory so Laravel fallback route (/storage/{path}) seamlessly serves all images! ✅', 'ok' => true];
+                // Shared hosting: symlink() disabled. Recursively mirror storage/app/public into public_html/storage
+                $copyDir = function ($src, $dst) use (&$copyDir): int {
+                    $c = 0;
+                    if (!is_dir($dst)) @mkdir($dst, 0775, true);
+                    foreach (scandir($src) ?: [] as $f) {
+                        if ($f === '.' || $f === '..') continue;
+                        $sf = $src . '/' . $f;
+                        $df = $dst . '/' . $f;
+                        if (is_dir($sf)) {
+                            $c += $copyDir($sf, $df);
+                        } else {
+                            if (@copy($sf, $df)) {
+                                @chmod($df, 0664);
+                                $c++;
+                            }
+                        }
+                    }
+                    return $c;
+                };
+
+                $copied = $copyDir($target, $link);
+                $results[] = [
+                    'label' => 'Public Storage Mirror',
+                    'cmd'   => "copyDir('$target', '$link')",
+                    'out'   => "✅ Mirrored $copied media files directly into public_html/storage! LiteSpeed web server now serves all images natively 🚀",
+                    'ok'    => $copied > 0
+                ];
             }
 
             // Set recursive permissions using PHP chmod
@@ -837,14 +857,17 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             };
             $chmodR($appDir . '/storage', 0775);
             $chmodR($appDir . '/bootstrap/cache', 0775);
-            $results[] = ['label' => "chmod recursive", 'cmd' => "chmodR(storage, 0775)", 'out' => '✅ Storage & cache directories permissions set to 0775', 'ok' => true];
+            if (is_dir($link)) {
+                $chmodR($link, 0775);
+            }
+            $results[] = ['label' => "chmod recursive", 'cmd' => "chmodR(storage, 0775)", 'out' => '✅ Storage & public_html/storage permissions set to 0775', 'ok' => true];
 
             // Verify
             $symOk = is_link($link) && is_dir($link);
-            $fallbackOk = !file_exists($link);
+            $dirOk = is_dir($link) && count(glob($link . '/*') ?: []) > 0;
             $results[] = ['label' => 'Media delivery status', 'cmd' => 'Verification', 'out' => $symOk
                 ? '✅ Native symlink is working'
-                : ($fallbackOk ? '✅ Direct Laravel media route fallback is ACTIVE (/storage/{path})' : '⚠️ Storage path still exists'), 'ok' => ($symOk || $fallbackOk)];
+                : ($dirOk ? '✅ Direct public_html/storage delivery is ACTIVE (LiteSpeed native serving)' : '⚠️ Storage path still empty'), 'ok' => ($symOk || $dirOk)];
         } catch (\Throwable $e) {
             $results[] = ['label' => 'Fix Storage Symlink', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
         }
@@ -890,7 +913,7 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
     $val    = fn($k) => preg_match("/^{$k}=(.*)$/m", $envRaw, $m) ? trim($m[1]) : '(not set)';
     $sym    = '/home/kenyanba/public_html/storage';
     $symOk  = is_link($sym) && is_dir($sym);
-    $fallbackReady = !file_exists($sym);
+    $dirOk  = is_dir($sym) && count(glob($sym . '/*') ?: []) > 0;
 
     $hasSessions = false;
     $userCount = null;
@@ -908,7 +931,7 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
         'Sessions Table'  => $hasSessions ? '✅ Present in DB' : '❌ Missing (Click Migrate)',
         'Users in DB'     => $userCount !== null ? "✅ $userCount users found" : '❌ Table missing or DB error',
         'FILESYSTEM_DISK' => $val('FILESYSTEM_DISK'),
-        'Storage Mode'    => $symOk ? '✅ Symlink Active' : ($fallbackReady ? '✅ Route Fallback Active (/storage/{path})' : '⚠️ Blocked (Click Fix Symlink)'),
+        'Storage Mode'    => $symOk ? '✅ Symlink Active' : ($dirOk ? '✅ Direct Web Root Active (public_html/storage)' : '⚠️ Not mirrored (Click Fix Storage)'),
         'DB_DATABASE'     => $val('DB_DATABASE'),
         'PHP_VERSION'     => PHP_VERSION,
         '.env writable'   => is_writable($envFile) ? '✅ Yes' : '❌ No',
