@@ -1,7 +1,32 @@
 ---
 deployment:
   tasks:
-    - /bin/echo "Laravel deployment started"
+    - /bin/echo "=== Step 1: Copy public files to web root ==="
     - /bin/cp -R /home/kenyanba/laravel-app/public/. /home/kenyanba/public_html/
+
+    - /bin/echo "=== Step 2: Fix storage symlink for images ==="
     - /bin/rm -rf /home/kenyanba/public_html/storage
     - /bin/ln -sfn /home/kenyanba/laravel-app/storage/app/public /home/kenyanba/public_html/storage
+
+    - /bin/echo "=== Step 3: Copy production .env (sets APP_URL, FILESYSTEM_DISK, etc.) ==="
+    - /bin/cp /home/kenyanba/laravel-app/.env.production /home/kenyanba/laravel-app/.env
+
+    - /bin/echo "=== Step 4: Set correct directory permissions ==="
+    - /bin/chmod -R 775 /home/kenyanba/laravel-app/storage
+    - /bin/chmod -R 775 /home/kenyanba/laravel-app/bootstrap/cache
+
+    - /bin/echo "=== Step 5: Clear all Laravel caches ==="
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan config:clear
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan cache:clear
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan route:clear
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan view:clear
+
+    - /bin/echo "=== Step 6: Run database migrations ==="
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan migrate --force
+
+    - /bin/echo "=== Step 7: Rebuild caches for production speed ==="
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan config:cache
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan route:cache
+    - /usr/local/bin/php /home/kenyanba/laravel-app/artisan view:cache
+
+    - /bin/echo "=== Deployment complete ==="

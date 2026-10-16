@@ -18,6 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'webhook/payhero',
         ]);
+
+        // Send unauthenticated users directly to the homepage login modal.
+        // Skipping the /login GET route avoids a double-redirect that can
+        // fragment the session on shared-hosting DB backends (Truehost).
+        $middleware->redirectGuestsTo(fn ($request) => '/?auth=login');
+
+        // Send already-authenticated users who hit guest-only routes to dashboard.
+        $middleware->redirectUsersTo(fn ($request) => route('dashboard'));
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -31,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return response()->json(['message' => 'Page Expired.'], 419);
                 }
 
-                return redirect()->route('login')->with('error', 'Your session has expired. Please log in again.');
+                return redirect('/?auth=login')->with('error', 'Your session has expired. Please log in again.');
             }
         });
     })->create();

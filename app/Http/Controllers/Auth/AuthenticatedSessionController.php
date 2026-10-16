@@ -26,6 +26,12 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // Pull url.intended BEFORE session regenerate to avoid losing it on
+        // shared-hosting DB backends where the old session row may be deleted
+        // before the new one is committed, causing the next request to see an
+        // empty session and treat the user as a guest.
+        $intended = $request->session()->pull('url.intended');
+
         // If user logs back in, cancel any pending deletion request
         if (Auth::user()->deletion_requested_at) {
             Auth::user()->update(['deletion_requested_at' => null]);
@@ -38,19 +44,20 @@ class AuthenticatedSessionController extends Controller
         Auth::user()->update(['last_seen_at' => now()]);
         \Illuminate\Support\Facades\Cache::put('user_last_seen_' . Auth::id(), true, now()->addMinutes(2));
 
-        $request->session()->regenerate();
+        // Set last_activity BEFORE regenerate so AutoLogoutInactive never sees
+        // a missing value on the very first authenticated request.
         session(['last_activity' => time()]);
+        $request->session()->regenerate();
 
         if ($request->user()->is_admin) {
             return redirect('/admin');
         }
 
         // Only redirect to intended destination if it is an explicit authenticated member area
-        $intended = $request->session()->pull('url.intended');
         if ($intended) {
             $path = parse_url($intended, PHP_URL_PATH) ?? '/';
             $normalizedPath = '/' . trim($path, '/');
-            
+
             $allowedMemberPrefixes = [
                 '/dashboard',
                 '/profile',
