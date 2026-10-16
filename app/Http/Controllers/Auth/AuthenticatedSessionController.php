@@ -39,25 +39,36 @@ class AuthenticatedSessionController extends Controller
         \Illuminate\Support\Facades\Cache::put('user_last_seen_' . Auth::id(), true, now()->addMinutes(2));
 
         $request->session()->regenerate();
-
-        // Determine the intended destination — skip it if it points back to login or the landing page
-        $intended = $request->session()->pull('url.intended');
-        
-        if ($intended) {
-            $path = parse_url($intended, PHP_URL_PATH) ?? '/';
-            $normalizedPath = rtrim($path, '/');
-            
-            // Only redirect to intended if it's a specific inner page (not root '/', not '/login')
-            if ($normalizedPath !== '' && $normalizedPath !== '/login') {
-                return redirect($intended);
-            }
-        }
+        session(['last_activity' => time()]);
 
         if ($request->user()->is_admin) {
             return redirect('/admin');
         }
 
-        return redirect(route('dashboard', absolute: false));
+        // Only redirect to intended destination if it is an explicit authenticated member area
+        $intended = $request->session()->pull('url.intended');
+        if ($intended) {
+            $path = parse_url($intended, PHP_URL_PATH) ?? '/';
+            $normalizedPath = '/' . trim($path, '/');
+            
+            $allowedMemberPrefixes = [
+                '/dashboard',
+                '/profile',
+                '/wallet',
+                '/chat',
+                '/verification',
+                '/user-photos',
+                '/user-videos',
+                '/classifieds/create',
+            ];
+            foreach ($allowedMemberPrefixes as $prefix) {
+                if (str_starts_with($normalizedPath, $prefix)) {
+                    return redirect($intended);
+                }
+            }
+        }
+
+        return redirect()->route('dashboard');
     }
 
     /**

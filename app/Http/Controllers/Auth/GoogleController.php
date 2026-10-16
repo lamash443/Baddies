@@ -93,17 +93,34 @@ class GoogleController extends Controller
                 }
 
                 Auth::login($user, true);
+                session(['last_activity' => time()]);
 
                 activity()
                     ->causedBy($user)
                     ->log('Logged in via Google OAuth');
 
+                if ($user->is_admin) {
+                    return redirect('/admin');
+                }
+
                 $intended = session()->pull('url.intended');
                 if ($intended) {
                     $path = parse_url($intended, PHP_URL_PATH) ?? '/';
-                    $normalizedPath = rtrim($path, '/');
-                    if ($normalizedPath !== '' && $normalizedPath !== '/login') {
-                        return redirect($intended)->with('success', 'Successfully logged in with Google!');
+                    $normalizedPath = '/' . trim($path, '/');
+                    $allowedMemberPrefixes = [
+                        '/dashboard',
+                        '/profile',
+                        '/wallet',
+                        '/chat',
+                        '/verification',
+                        '/user-photos',
+                        '/user-videos',
+                        '/classifieds/create',
+                    ];
+                    foreach ($allowedMemberPrefixes as $prefix) {
+                        if (str_starts_with($normalizedPath, $prefix)) {
+                            return redirect($intended)->with('success', 'Successfully logged in with Google!');
+                        }
                     }
                 }
 
@@ -143,6 +160,7 @@ class GoogleController extends Controller
             ]);
 
             Auth::login($newUser, true);
+            session(['last_activity' => time()]);
 
             activity()
                 ->causedBy($newUser)

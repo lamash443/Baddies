@@ -680,4 +680,25 @@ Route::get('/privacy', function () {
     return view('privacy', compact('sitePage'));
 })->name('privacy');
 
+// Direct media/storage serving fallback for shared hosting / cPanel environments where symlinks may be broken or unlinked
+Route::get('/storage/{path}', function (string $path) {
+    $cleanPath = str_replace(['..', "\0"], '', $path);
+    $filePath = storage_path('app/public/' . $cleanPath);
+
+    $realBase = realpath(storage_path('app/public'));
+    $realFile = realpath($filePath);
+
+    if (!$realFile || !$realBase || !str_starts_with($realFile, $realBase) || !is_file($realFile)) {
+        abort(404);
+    }
+
+    $mime = mime_content_type($realFile) ?: 'application/octet-stream';
+
+    return response()->file($realFile, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*')->name('storage.local.fallback');
+
 require __DIR__.'/auth.php';
+

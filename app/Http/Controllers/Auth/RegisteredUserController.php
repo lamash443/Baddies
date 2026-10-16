@@ -87,11 +87,12 @@ class RegisteredUserController extends Controller
         // event(new Registered($user)); // Disabled to prevent Laravel from sending the default plain-text verification email
 
         Auth::login($user);
+        session(['last_activity' => time()]);
 
         // ── Send welcome + verification email ─────────────────────────────────
         $this->sendWelcomeEmail($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('dashboard');
     }
 
     /**

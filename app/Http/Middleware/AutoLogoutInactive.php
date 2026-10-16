@@ -10,17 +10,15 @@ class AutoLogoutInactive
 {
     /**
      * Inactivity timeout in minutes before the user is automatically logged out.
-     * ⚠️ TESTING: set to 10 min — change back to 30 for production.
      */
-    protected int $timeoutMinutes = 10;
+    protected int $timeoutMinutes = 30;
 
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            $lastSeen = $user->last_seen_at;
+            $lastActivity = session('last_activity');
 
-            if ($lastSeen && now()->diffInMinutes($lastSeen) >= $this->timeoutMinutes) {
+            if ($lastActivity && (time() - $lastActivity) >= ($this->timeoutMinutes * 60)) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
@@ -32,6 +30,9 @@ class AutoLogoutInactive
                 return redirect('/')
                     ->with('status', 'You have been logged out due to 30 minutes of inactivity.');
             }
+
+            // Update session last_activity on every authenticated request
+            session(['last_activity' => time()]);
         }
 
         return $next($request);

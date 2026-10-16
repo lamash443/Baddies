@@ -310,7 +310,7 @@
     @endif
 
     {{-- Form --}}
-    <form method="POST" action="{{ route('login') }}" novalidate>
+    <form method="POST" action="{{ route('login.post') }}" novalidate>
       @csrf
 
       {{-- Email --}}
