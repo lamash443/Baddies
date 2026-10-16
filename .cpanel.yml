@@ -15,18 +15,18 @@ deployment:
     - /bin/chmod -R 775 /home/kenyanba/repositories/Baddies/storage
     - /bin/chmod -R 775 /home/kenyanba/repositories/Baddies/bootstrap/cache
 
-    - /bin/echo "=== Step 5: Clear all Laravel caches ==="
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan config:clear
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan cache:clear
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan route:clear
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan view:clear
+    - /bin/echo "=== Step 5: Clear all Laravel caches (using lsphp) ==="
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan config:clear
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan cache:clear
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan route:clear
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan view:clear
 
     - /bin/echo "=== Step 6: Run database migrations ==="
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan migrate --force
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan migrate --force
 
     - /bin/echo "=== Step 7: Rebuild production caches ==="
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan config:cache
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan route:cache
-    - /usr/local/bin/php /home/kenyanba/repositories/Baddies/artisan view:cache
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan config:cache
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan route:cache
+    - /usr/local/bin/lsphp /home/kenyanba/repositories/Baddies/artisan view:cache
 
     - /bin/echo "=== Deployment complete ==="

@@ -736,7 +736,7 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
     if (in_array($action, ['fix-env', 'full-setup'])) {
         $env = file_get_contents($envFile);
         $patches = [
-            '/^APP_URL=.*/m'         => 'APP_URL=https://www.kenyanbaddies.com',
+            // Note: APP_URL left as-is — server may use www or non-www, both are fine
             '/^FILESYSTEM_DISK=.*/m' => 'FILESYSTEM_DISK=public',
             '/^SESSION_DRIVER=.*/m'  => 'SESSION_DRIVER=database',
             '/^SESSION_DOMAIN=.*/m'  => 'SESSION_DOMAIN=null',
@@ -746,39 +746,44 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             $env = preg_replace($pattern, $replacement, $env);
         }
         file_put_contents($envFile, $env);
-        $results[] = ['cmd' => 'Patch .env', 'out' => "APP_URL, FILESYSTEM_DISK, SESSION_DRIVER, SESSION_DOMAIN updated ✅", 'ok' => true];
+        $results[] = ['cmd' => 'Patch .env', 'out' => "FILESYSTEM_DISK, SESSION_DRIVER, SESSION_DOMAIN, APP_DEBUG updated ✅", 'ok' => true];
     }
 
     if (in_array($action, ['fix-storage', 'full-setup'])) {
-        $pubHtml = '/home/kenyanba/public_html';
-        $target  = '/home/kenyanba/repositories/Baddies/storage/app/public';
-        $link    = $pubHtml . '/storage';
+        $target = '/home/kenyanba/repositories/Baddies/storage/app/public';
+        $link   = '/home/kenyanba/public_html/storage';
 
-        if (is_link($link) || file_exists($link)) {
-            $run("rm -rf " . escapeshellarg($link));
-        }
-        symlink($target, $link);
-        $results[] = ['cmd' => 'Create storage symlink', 'out' => "$link → $target", 'ok' => is_link($link)];
+        // Use exec ln -sfn — PHP's symlink() is often blocked by server permissions
+        $run("rm -rf " . escapeshellarg($link));
+        $run("ln -sfn " . escapeshellarg($target) . ' ' . escapeshellarg($link));
+
+        // Verify it worked
+        $symOk = is_link($link) && is_dir($link);
+        $results[] = ['cmd' => 'Verify symlink', 'out' => $symOk
+            ? "✅ $link → $target"
+            : "❌ Failed — check permissions. Target exists: " . (is_dir($target) ? 'yes' : 'no'),
+            'ok' => $symOk];
 
         $run("chmod -R 775 " . escapeshellarg($appDir . '/storage'));
         $run("chmod -R 775 " . escapeshellarg($appDir . '/bootstrap/cache'));
     }
 
     if (in_array($action, ['clear-cache', 'full-setup'])) {
-        $run("$php $artisan config:clear");
-        $run("$php $artisan cache:clear");
-        $run("$php $artisan route:clear");
-        $run("$php $artisan view:clear");
+        // PHP_BINARY = /usr/local/bin/lsphp on this LiteSpeed server
+        $run(PHP_BINARY . " $artisan config:clear");
+        $run(PHP_BINARY . " $artisan cache:clear");
+        $run(PHP_BINARY . " $artisan route:clear");
+        $run(PHP_BINARY . " $artisan view:clear");
     }
 
     if (in_array($action, ['migrate', 'full-setup'])) {
-        $run("$php $artisan migrate --force");
+        $run(PHP_BINARY . " $artisan migrate --force");
     }
 
     if (in_array($action, ['rebuild-cache', 'full-setup'])) {
-        $run("$php $artisan config:cache");
-        $run("$php $artisan route:cache");
-        $run("$php $artisan view:cache");
+        $run(PHP_BINARY . " $artisan config:cache");
+        $run(PHP_BINARY . " $artisan route:cache");
+        $run(PHP_BINARY . " $artisan view:cache");
     }
 
     // ── Current status ───────────────────────────────────────────────────────
