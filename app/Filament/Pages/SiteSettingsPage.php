@@ -41,10 +41,37 @@ class SiteSettingsPage extends Page implements HasForms
         if (! $val || trim($val) === '') {
             return null;
         }
-        if (! Storage::disk('public')->exists($val)) {
+
+        $clean = ltrim($val, '/');
+        if (str_starts_with($clean, 'storage/')) {
+            $clean = substr($clean, 8);
+        }
+        $clean = ltrim($clean, '/');
+
+        $disk = Storage::disk('public');
+        $cpanelStorage = '/home/kenyanba/public_html/storage/' . $clean;
+        $localPublicStorage = storage_path('app/public/' . $clean);
+        $publicStorage = public_path('storage/' . $clean);
+
+        $exists = $disk->exists($clean)
+            || file_exists($cpanelStorage)
+            || file_exists($localPublicStorage)
+            || file_exists($publicStorage);
+
+        if (! $exists) {
             return null;
         }
-        return $val;
+
+        // Auto-heal mirror to cPanel direct storage if present
+        if (file_exists($localPublicStorage) && is_dir('/home/kenyanba/public_html/storage') && ! file_exists($cpanelStorage)) {
+            @mkdir(dirname($cpanelStorage), 0755, true);
+            @copy($localPublicStorage, $cpanelStorage);
+        } elseif (file_exists($cpanelStorage) && ! file_exists($localPublicStorage)) {
+            @mkdir(dirname($localPublicStorage), 0755, true);
+            @copy($cpanelStorage, $localPublicStorage);
+        }
+
+        return $clean;
     }
 
     public function mount(): void
@@ -156,7 +183,14 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Site Logo')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor()
+                            ->helperText('PNG, JPG, SVG, or WEBP logo. Recommended height: 50-80px.'),
                     ]),
 
                 Section::make('Favicon')
@@ -166,7 +200,13 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Favicon')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->acceptedFileTypes(['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/ico'])
+                            ->helperText('Browser tab icon (.ico, .png, .svg, .webp).'),
                     ]),
 
                 Section::make('Preloader')
@@ -176,7 +216,14 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Preloader Image')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor()
+                            ->helperText('Animated GIF, SVG, WebP, or PNG shown while pages load.'),
                     ]),
 
                 // ── HERO SECTION ──────────────────────────────────────────────────
@@ -194,20 +241,38 @@ class SiteSettingsPage extends Page implements HasForms
                             ->rows(3)
                             ->maxLength(1000),
                         FileUpload::make('hero_background')
-                            ->label('Homepage Hero Background Image (http://127.0.0.1:8000/)')
+                            ->label('Homepage Hero Background Image (https://kenyanbaddies.com/)')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor(),
                         FileUpload::make('escort_girls_header_background')
-                            ->label('Escort Girls Header Image (http://127.0.0.1:8000/escort-girls)')
+                            ->label('Escort Girls Header Image (https://kenyanbaddies.com/escort-girls)')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor(),
                         FileUpload::make('call_boys_header_background')
-                            ->label('Call Boys Header Image (http://127.0.0.1:8000/category/call-boys)')
+                            ->label('Call Boys Header Image (https://kenyanbaddies.com/category/call-boys)')
                             ->disk('public')
                             ->directory('site')
-                            ->image(),
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor(),
                     ]),
 
                 // ── CALL GIRLS SECTION ────────────────────────────────────────────
@@ -525,7 +590,13 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Announcement Sender Logo')
                             ->disk('public')
                             ->directory('site')
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
                             ->image()
+                            ->imageEditor()
                             ->helperText('Optional: Upload a logo/avatar for the announcement. If left blank, the site logo is used.'),
                         Repeater::make('chat_announcements')
                             ->label('Announcements')
@@ -608,15 +679,62 @@ class SiteSettingsPage extends Page implements HasForms
         foreach ($allKeys as $key) {
             $newValue = $data[$key] ?? null;
 
-            if (in_array($key, $fileKeys) && is_array($newValue)) {
-                $newValue = reset($newValue) ?: null;
-            }
+            if (in_array($key, $fileKeys)) {
+                if (is_array($newValue)) {
+                    $newValue = reset($newValue) ?: null;
+                }
+                if (is_string($newValue)) {
+                    $newValue = ltrim($newValue, '/');
+                    if (str_starts_with($newValue, 'storage/')) {
+                        $newValue = substr($newValue, 8);
+                    }
+                    $newValue = ltrim($newValue, '/');
+                }
+                if ($newValue === '') {
+                    $newValue = null;
+                }
 
-            $oldValue = SiteSetting::get($key);
+                $oldValue = SiteSetting::get($key);
+                $oldClean = null;
+                if ($oldValue && is_string($oldValue)) {
+                    $oldClean = ltrim($oldValue, '/');
+                    if (str_starts_with($oldClean, 'storage/')) {
+                        $oldClean = substr($oldClean, 8);
+                    }
+                    $oldClean = ltrim($oldClean, '/');
+                }
 
-            // Delete old file only for file-upload fields
-            if (in_array($key, $fileKeys) && $oldValue && $oldValue !== $newValue && Storage::disk('public')->exists($oldValue)) {
-                Storage::disk('public')->delete($oldValue);
+                // Delete old file only for file-upload fields when removed or replaced
+                if ($oldClean && $oldClean !== $newValue) {
+                    Storage::disk('public')->delete($oldClean);
+                    @unlink(storage_path('app/public/' . $oldClean));
+                    @unlink('/home/kenyanba/public_html/storage/' . $oldClean);
+                    @unlink(public_path('storage/' . $oldClean));
+                }
+
+                // Mirror new file across both local and cPanel storage locations
+                if ($newValue && is_string($newValue)) {
+                    $localPath = storage_path('app/public/' . $newValue);
+                    $cpanelPath = '/home/kenyanba/public_html/storage/' . $newValue;
+                    $publicPath = public_path('storage/' . $newValue);
+
+                    if (file_exists($localPath)) {
+                        if (is_dir('/home/kenyanba/public_html/storage')) {
+                            @mkdir(dirname($cpanelPath), 0755, true);
+                            @copy($localPath, $cpanelPath);
+                        }
+                        if (is_dir(public_path('storage')) && ! file_exists($publicPath)) {
+                            @mkdir(dirname($publicPath), 0755, true);
+                            @copy($localPath, $publicPath);
+                        }
+                    } elseif (file_exists($cpanelPath)) {
+                        @mkdir(dirname($localPath), 0755, true);
+                        @copy($cpanelPath, $localPath);
+                    } elseif (file_exists($publicPath)) {
+                        @mkdir(dirname($localPath), 0755, true);
+                        @copy($publicPath, $localPath);
+                    }
+                }
             }
 
             SiteSetting::set($key, $newValue);
