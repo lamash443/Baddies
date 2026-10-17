@@ -80,12 +80,23 @@ class PayHeroService
                 return ['success' => true, 'data' => $response->json()];
             }
 
-            Log::error('PayHero Payment Response Failure:', ['status' => $response->status(), 'body' => $response->body()]);
+            $status = $response->status();
+            $rawMsg = $response->json('error_message') ?? $response->json('message') ?? $response->body();
+
+            Log::error('PayHero Payment Response Failure:', ['status' => $status, 'body' => $response->body()]);
+
+            $friendlyMsg = 'PayHero request failed with status ' . $status . ': ' . $rawMsg;
+            if ($status === 401 && (str_contains(strtolower((string) $rawMsg), 'unable to perform request') || empty($rawMsg))) {
+                $friendlyMsg = "PayHero Authorization Failed (401: Unable to perform request). This typically occurs when: 1) The PayHero Service Wallet balance is 0.00 KES (top up KES 50-100 float on app.payhero.co.ke), 2) The API Username / Password has expired or changed, or 3) Channel ID ({$this->channelId}) is inactive.";
+            } elseif ($status === 404) {
+                $friendlyMsg = "PayHero Endpoint Not Found (404: $rawMsg). Please verify your PayHero API configuration.";
+            }
 
             return [
                 'success' => false,
-                'message' => 'PayHero request failed with status ' . $response->status() . ': '
-                    . ($response->json('error_message') ?? $response->json('message') ?? $response->body()),
+                'status'  => $status,
+                'raw'     => $rawMsg,
+                'message' => $friendlyMsg,
             ];
         } catch (\Exception $e) {
             Log::error('PayHero Payment Exception: ' . $e->getMessage());

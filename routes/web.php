@@ -640,13 +640,29 @@ Route::match(['GET', 'POST', 'HEAD'], '/payhero/callback', $payheroWebhook);
 Route::match(['GET', 'POST', 'HEAD'], '/api/payhero/webhook', $payheroWebhook);
 Route::match(['GET', 'POST', 'HEAD'], '/api/payhero/callback', $payheroWebhook);
 Route::match(['GET', 'POST', 'HEAD'], '/payment/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/payment/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/payment/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/payment/webhook', $payheroWebhook);
 Route::match(['GET', 'POST', 'HEAD'], '/callback/payhero', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/payhero-callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/mpesa/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/mpesa/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/mpesa/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/mpesa/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/webhook', $payheroWebhook);
 
 // Payment route aliases to prevent 404s
 Route::get('/checkout/mpesa', fn () => redirect()->route('checkout.mpesa'));
 Route::get('/checkout', fn () => redirect()->route('checkout.mpesa'));
 Route::get('/payhero', fn () => redirect()->route('checkout.mpesa'));
 Route::get('/payment', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/mpesa', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/mpesa-checkout', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/payhero/checkout', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/payment/checkout', fn () => redirect()->route('checkout.mpesa'));
 
 
 Route::get('/contact', function () {
@@ -746,7 +762,7 @@ require __DIR__.'/auth.php';
 // exec() is disabled on this server — uses PHP native + Artisan::call() only
 // Steps: 1) Full Setup  2) Rebuild Caches  3) Test login
 // =============================================================================
-Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
+Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Request $request) {
 
     if ($request->query('token') !== 'kbc-setup-2026-secure') { abort(404); }
 
@@ -808,20 +824,103 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
         }
     }
 
+    // ── SEED MEMBERSHIP PLANS ───────────────────────────────────────────────
+    if (in_array($action, ['seed-plans', 'full-setup'])) {
+        try {
+            $plansCount = \App\Models\MembershipPlan::count();
+            if ($plansCount === 0 || $action === 'seed-plans') {
+                $seeder = new \Database\Seeders\MembershipPlanSeeder();
+                $seeder->run();
+                $newCount = \App\Models\MembershipPlan::count();
+                $results[] = [
+                    'label' => 'Seed Membership Plans',
+                    'cmd'   => 'MembershipPlanSeeder::run()',
+                    'out'   => "✅ Membership plans seeded successfully ($newCount active plans in DB: chat, regular, prime, prime-vip, vip)",
+                    'ok'    => true,
+                ];
+            } else {
+                $results[] = [
+                    'label' => 'Membership Plans Check',
+                    'cmd'   => 'MembershipPlan::count()',
+                    'out'   => "✅ $plansCount membership plans already present in database",
+                    'ok'    => true,
+                ];
+            }
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Seed Membership Plans', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
+    }
+
+    // ── SAVE PAYHERO SETTINGS ────────────────────────────────────────────────
+    if ($action === 'save-payhero') {
+        try {
+            $newU = trim((string) $request->input('payhero_username', $request->query('payhero_username', '')));
+            $newP = trim((string) $request->input('payhero_password', $request->query('payhero_password', '')));
+            $newC = trim((string) $request->input('payhero_channel_id', $request->query('payhero_channel_id', '')));
+            $newA = trim((string) $request->input('payhero_account_id', $request->query('payhero_account_id', '')));
+            $newW = trim((string) $request->input('payhero_callback_url', $request->query('payhero_callback_url', '')));
+
+            if ($newU !== '') { \App\Models\SiteSetting::set('payhero_username', $newU); }
+            if ($newP !== '') { \App\Models\SiteSetting::set('payhero_password', $newP); }
+            if ($newC !== '') { \App\Models\SiteSetting::set('payhero_channel_id', $newC); }
+            if ($newA !== '') { \App\Models\SiteSetting::set('payhero_account_id', $newA); }
+            if ($newW !== '') { \App\Models\SiteSetting::set('payhero_callback_url', $newW); }
+
+            // Clear any stale auth_token so fresh username:password is used
+            \App\Models\SiteSetting::set('payhero_auth_token', null);
+
+            // Update .env file as well
+            $env = file_get_contents($envFile);
+            if ($env !== false) {
+                $envUpdates = [];
+                if ($newU !== '') $envUpdates['/^PAYHERO_USERNAME=.*/m'] = 'PAYHERO_USERNAME=' . $newU;
+                if ($newP !== '') $envUpdates['/^PAYHERO_PASSWORD=.*/m'] = 'PAYHERO_PASSWORD=' . $newP;
+                if ($newC !== '') $envUpdates['/^PAYHERO_CHANNEL_ID=.*/m'] = 'PAYHERO_CHANNEL_ID=' . $newC;
+                if ($newA !== '') $envUpdates['/^PAYHERO_ACCOUNT_ID=.*/m'] = 'PAYHERO_ACCOUNT_ID=' . $newA;
+                if ($newW !== '') $envUpdates['/^PAYHERO_CALLBACK_URL=.*/m'] = 'PAYHERO_CALLBACK_URL=' . $newW;
+
+                foreach ($envUpdates as $pat => $rep) {
+                    if (preg_match($pat, $env)) {
+                        $env = preg_replace($pat, $rep, $env);
+                    } else {
+                        $env .= "\n" . $rep;
+                    }
+                }
+                file_put_contents($envFile, $env);
+            }
+
+            // Flush config and route caches
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+            $results[] = [
+                'label' => 'Save PayHero Credentials',
+                'cmd'   => 'Update SiteSettings, .env, and clear caches',
+                'out'   => "✅ PayHero credentials successfully saved to Database & .env!\nUsername: " . ($newU ?: '(preserved)') . "\nChannel ID: " . ($newC ?: '(preserved)') . "\nCallback URL: " . ($newW ?: '(preserved)'),
+                'ok'    => true,
+            ];
+            $action = 'test-payhero'; // Automatically run test with newly saved credentials
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Save PayHero', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
+    }
+
     // ── TEST PAYHERO ──────────────────────────────────────────────────────────
-    if ($action === 'test-payhero') {
+    if (in_array($action, ['test-payhero', 'save-payhero'])) {
         try {
             $phUser = \App\Models\SiteSetting::get('payhero_username', config('services.payhero.username'));
             $phPass = \App\Models\SiteSetting::get('payhero_password', config('services.payhero.password'));
             $phChan = \App\Models\SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id'));
+            $phAcc  = \App\Models\SiteSetting::get('payhero_account_id', config('services.payhero.account_id'));
             $phCb   = \App\Models\SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url')) ?: url('/webhook/payhero');
 
             $results[] = [
-                'label' => 'PayHero Settings Diagnostic',
+                'label' => '1. PayHero Settings Diagnostic',
                 'cmd'   => 'Verify PayHero credentials in DB & .env',
                 'out'   => "Username: " . ($phUser ? substr($phUser, 0, 4) . '****' : '❌ NOT CONFIGURED') .
                            "\nPassword: " . ($phPass ? '**** (Configured)' : '❌ NOT CONFIGURED') .
                            "\nChannel ID: " . ($phChan ?: '❌ NOT CONFIGURED') .
+                           "\nAccount ID: " . ($phAcc ?: 'None') .
                            "\nActive Callback URL: " . $phCb,
                 'ok'    => !empty($phUser) && !empty($phPass) && !empty($phChan),
             ];
@@ -830,7 +929,7 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             $webhookUrl = url('/webhook/payhero');
             $localPing = \Illuminate\Support\Facades\Http::timeout(5)->get($webhookUrl);
             $results[] = [
-                'label' => 'Local Webhook Health (GET /webhook/payhero)',
+                'label' => '2. Local Webhook Health (GET /webhook/payhero)',
                 'cmd'   => "Http::get('$webhookUrl')",
                 'out'   => "HTTP Status: " . $localPing->status() . " — " . $localPing->body(),
                 'ok'    => $localPing->status() === 200,
@@ -840,19 +939,80 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             $testPayload = ['event' => 'test', 'external_reference' => 'test_diagnose', 'status' => 'success'];
             $postPing = \Illuminate\Support\Facades\Http::timeout(5)->post($webhookUrl, $testPayload);
             $results[] = [
-                'label' => 'Local Webhook Callback Processing (POST /webhook/payhero)',
+                'label' => '3. Local Webhook Callback Processing (POST /webhook/payhero)',
                 'cmd'   => "Http::post('$webhookUrl', testPayload)",
                 'out'   => "HTTP Status: " . $postPing->status() . " — " . $postPing->body(),
                 'ok'    => $postPing->status() === 200,
             ];
 
-            // 3. Test PayHero cloud API connectivity
-            $apiPing = \Illuminate\Support\Facades\Http::timeout(5)->get('https://backend.payhero.co.ke/api/v2/transaction-status');
+            // 3. Test PayHero API Authentication (Payment Channels)
+            $authHeader = 'Basic ' . base64_encode($phUser . ':' . $phPass);
+            $chanResp = \Illuminate\Support\Facades\Http::timeout(8)
+                ->withHeaders(['Authorization' => $authHeader])
+                ->get('https://backend.payhero.co.ke/api/v2/payment_channels');
+
+            $chanStatus = $chanResp->status();
+            $chanRaw    = $chanResp->body();
+
+            if ($chanResp->successful()) {
+                $results[] = [
+                    'label' => '4. PayHero API Authentication (GET /api/v2/payment_channels)',
+                    'cmd'   => "Authorization: Basic <base64(username:password)>",
+                    'out'   => "✅ HTTP Status: 200 OK — Credentials authenticated successfully!\nChannels: " . $chanRaw,
+                    'ok'    => true,
+                ];
+            } else {
+                $errExplanation = ($chanStatus === 401 && str_contains(strtolower((string) $chanRaw), 'unable to perform request'))
+                    ? "\n\n⚠️ PayHero returned HTTP 401: 'Unable to perform request'." .
+                      "\nPayHero returns this for 3 primary reasons:" .
+                      "\n  1) 💰 SERVICE WALLET FLOAT IS 0.00 KES: PayHero requires float in your prepaid Service Wallet to process STK pushes. Top up KES 50-100 on https://app.payhero.co.ke under 'Wallets' -> 'Service Wallet'." .
+                      "\n  2) 🔑 API KEYS CHANGED OR EXPIRED: Check https://app.payhero.co.ke/api_keys and update the Username & Password below." .
+                      "\n  3) 📡 CHANNEL ID: Ensure Channel ID ($phChan) is active on app.payhero.co.ke."
+                    : "\nRaw response: $chanRaw";
+
+                $results[] = [
+                    'label' => '4. PayHero API Authentication (GET /api/v2/payment_channels)',
+                    'cmd'   => "Authorization: Basic <base64(username:password)>",
+                    'out'   => "HTTP Status: $chanStatus$errExplanation",
+                    'ok'    => false,
+                ];
+            }
+
+            // 4. Test Service Wallet Balance
+            $walletResp = \Illuminate\Support\Facades\Http::timeout(8)
+                ->withHeaders(['Authorization' => $authHeader])
+                ->get('https://backend.payhero.co.ke/api/v2/wallets?wallet_type=service_wallet');
+
             $results[] = [
-                'label' => 'PayHero Cloud Server Reachability',
-                'cmd'   => 'GET https://backend.payhero.co.ke/api/v2/transaction-status',
-                'out'   => "HTTP Status: " . $apiPing->status() . " (PayHero cloud is online and responsive)",
-                'ok'    => in_array($apiPing->status(), [200, 400, 401]),
+                'label' => '5. PayHero Service Wallet Balance Check',
+                'cmd'   => 'GET https://backend.payhero.co.ke/api/v2/wallets?wallet_type=service_wallet',
+                'out'   => "HTTP Status: " . $walletResp->status() . " — " . ($walletResp->successful() ? $walletResp->body() : $walletResp->body()),
+                'ok'    => $walletResp->successful(),
+            ];
+
+            // 5. Test Live STK Push Simulation Probe
+            $probePayload = [
+                'amount'             => 10,
+                'phone_number'       => '254712345678',
+                'provider'           => 'm-pesa',
+                'network_code'       => '63902',
+                'channel_id'         => (int) $phChan,
+                'external_reference' => 'test_probe_' . time(),
+                'callback_url'       => $phCb,
+            ];
+            if (!empty($phAcc)) { $probePayload['account_id'] = (int) $phAcc; }
+
+            $probeResp = \Illuminate\Support\Facades\Http::timeout(8)
+                ->withHeaders([
+                    'Content-Type'  => 'application/json',
+                    'Authorization' => $authHeader,
+                ])->post('https://backend.payhero.co.ke/api/v2/payments', $probePayload);
+
+            $results[] = [
+                'label' => '6. PayHero Payment Initiation Probe (POST /api/v2/payments)',
+                'cmd'   => "POST https://backend.payhero.co.ke/api/v2/payments",
+                'out'   => "HTTP Status: " . $probeResp->status() . "\nBody: " . $probeResp->body(),
+                'ok'    => $probeResp->successful(),
             ];
         } catch (\Throwable $e) {
             $results[] = ['label' => 'Test PayHero', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
@@ -1123,11 +1283,44 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
   <a class="btn p" href="<?=$base?>&action=full-setup">🚀 1. Full Setup</a>
   <a class="btn g" href="<?=$base?>&action=rebuild-cache">⚡ 2. Rebuild Caches</a>
   <a class="btn p" href="<?=$base?>&action=test-payhero">💳 Test PayHero</a>
+  <a class="btn s" href="<?=$base?>&action=seed-plans">🌱 Seed Plans</a>
   <a class="btn s" href="<?=$base?>&action=fix-storage">🔗 Fix Symlink</a>
   <a class="btn s" href="<?=$base?>&action=fix-env">📝 Fix .env</a>
   <a class="btn s" href="<?=$base?>&action=clear-cache">🗑️ Clear Caches</a>
   <a class="btn s" href="<?=$base?>&action=migrate">🗄️ Migrate</a>
   <a class="btn s" href="<?=$base?>&action=status">🔄 Refresh</a>
+</div>
+<h2>💳 PayHero M-Pesa Live Credentials & Instant Test</h2>
+<div class="card" style="background:#161616;border:1px solid #ff8c00;border-radius:8px;padding:1.25rem;margin-bottom:1.5rem;">
+  <p style="color:#aaa;font-size:0.85rem;margin-bottom:1rem;">
+    Update your PayHero API keys below and click <strong>Save &amp; Test Live</strong>. The keys are automatically saved to the database and <code>.env</code> file, caches cleared, and a live verification probe is run.
+  </p>
+  <form method="POST" action="<?=$base?>&action=save-payhero" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.9rem;align-items:end;">
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">API Username</label>
+      <input type="text" name="payhero_username" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('payhero_username', config('services.payhero.username')) ?? '')?>" placeholder="e.g. IlvxJNuM91zkYWIdu8jN" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">API Password</label>
+      <input type="password" name="payhero_password" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('payhero_password', config('services.payhero.password')) ?? '')?>" placeholder="Enter new or existing password" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Channel ID</label>
+      <input type="text" name="payhero_channel_id" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id')) ?? '')?>" placeholder="e.g. 11727" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Account ID (Optional)</label>
+      <input type="text" name="payhero_account_id" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('payhero_account_id', config('services.payhero.account_id')) ?? '')?>" placeholder="e.g. 7806" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div style="grid-column:1/-1;">
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Callback / Webhook URL</label>
+      <input type="text" name="payhero_callback_url" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url')) ?: url('/webhook/payhero'))?>" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div style="grid-column:1/-1;display:flex;gap:0.75rem;margin-top:0.5rem;">
+      <button type="submit" class="btn p" style="border:none;cursor:pointer;">💾 Save &amp; Test Live</button>
+      <a class="btn s" href="<?=$base?>&action=test-payhero">🔄 Run Diagnostic Test Only</a>
+    </div>
+  </form>
 </div>
 <h2>📁 Storage Media Diagnostics</h2>
 <div class="res ok2">

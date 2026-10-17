@@ -105,7 +105,13 @@ class PaymentController extends Controller
         }
 
         // Mark failed if API request failed
-        $deposit->update(['status' => 'failed']);
+        $deposit->update([
+            'status' => 'failed',
+            'meta'   => array_merge($deposit->meta ?? [], [
+                'failure_reason' => $result['message'] ?? 'PayHero API initiation failed',
+                'gateway_status' => $result['status'] ?? null,
+            ]),
+        ]);
 
         return response()->json([
             'success' => false,
