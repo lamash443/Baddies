@@ -25,6 +25,12 @@ class RegisteredUserController extends Controller
      */
     public function create(Request $request): View
     {
+        if (Auth::check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         if ($request->filled('ref') && ! session()->has('ref_code')) {
             session(['ref_code' => $request->input('ref')]);
         }
@@ -47,13 +53,18 @@ class RegisteredUserController extends Controller
 
         $email = strtolower(trim((string) $request->email));
         if ($email && User::where('email', $email)->exists()) {
-            session()->flash('toast_type', 'warning');
-            session()->flash('toast_title', 'Email Already Registered');
-            session()->flash('toast_msg', 'This email address is already registered. Please log in instead or use another email.');
+            return redirect()->back()
+                ->withErrors(['email' => 'This email address is already registered. Please log in instead.'])
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('toast_type',  'warning')
+                ->with('toast_title', 'Email Already Registered')
+                ->with('toast_msg',   'This email address is already registered. Please log in instead or use another email.');
+        }
 
-            throw ValidationException::withMessages([
-                'email' => 'This email address is already registered. Please log in instead.',
-            ]);
+        if (Auth::check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         $request->validate([

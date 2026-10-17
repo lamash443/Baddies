@@ -58,4 +58,50 @@ class AuthToastTest extends TestCase
         $response->assertSessionHas('toast_title', 'Incorrect Password');
         $this->assertGuest();
     }
+
+    public function test_authenticated_user_visiting_login_get_clears_session(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/login');
+
+        $response->assertRedirect('/?auth=login');
+        $this->assertGuest();
+    }
+
+    public function test_authenticated_user_submitting_unregistered_email_login_is_rejected_and_not_bypassed_to_dashboard(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'active_session_user@test.com',
+        ]);
+
+        $response = $this->actingAs($user)->post('/login', [
+            'email' => 'does_not_exist_404@test.com',
+            'password' => 'SomePassword123!',
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+        $response->assertSessionHas('toast_type', 'warning');
+        $response->assertSessionHas('toast_title', 'Email Not Registered');
+        $this->assertGuest();
+    }
+
+    public function test_authenticated_user_can_reauthenticate_as_different_user(): void
+    {
+        $user1 = User::factory()->create([
+            'email' => 'user_one@test.com',
+        ]);
+        $user2 = User::factory()->create([
+            'email' => 'user_two@test.com',
+            'password' => bcrypt('UserTwoPass123!'),
+        ]);
+
+        $response = $this->actingAs($user1)->post('/login', [
+            'email' => 'user_two@test.com',
+            'password' => 'UserTwoPass123!',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+        $this->assertAuthenticatedAs($user2);
+    }
 }

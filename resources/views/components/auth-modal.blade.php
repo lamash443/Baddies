@@ -251,7 +251,8 @@
                 @csrf
                 <div class="mb-3">
                   <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
-                  <input id="login-email" type="email" name="email" class="form-control auth-custom-input" value="{{ old('email') }}" required autofocus placeholder="Enter your email">
+                  <input id="login-email" type="email" name="email" class="form-control auth-custom-input @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus placeholder="Enter your email">
+                  @error('email')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-2">
@@ -260,7 +261,8 @@
                       <a href="{{ route('password.request') }}" class="small text-decoration-none switch-link" style="font-weight:600;">Forgot?</a>
                     @endif
                   </div>
-                  <input id="login-password" type="password" name="password" class="form-control auth-custom-input" required placeholder="Enter your password">
+                  <input id="login-password" type="password" name="password" class="form-control auth-custom-input @error('password') is-invalid @enderror" required placeholder="Enter your password">
+                  @error('password')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-4">
                   <div class="form-check d-flex align-items-center gap-2">
@@ -420,7 +422,7 @@
         window.history.replaceState({path: newUrl}, '', newUrl);
       }
 
-      @if($errors->any() && !in_array(request()->route()->getName(), ['password.request', 'password.reset']))
+      @if($errors->any() && !in_array(optional(request()->route())->getName(), ['password.request', 'password.reset']))
         var modal = new bootstrap.Modal(authModalEl);
         modal.show();
         @if(old('name') || $errors->has('name'))

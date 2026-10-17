@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -24,7 +27,43 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        // If an already-authenticated session exists, log them out cleanly first
+        // so that new credentials are fully validated and authenticated
+        if (Auth::check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        $email = strtolower(trim((string) $request->input('email')));
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            RateLimiter::hit($request->throttleKey());
+
+            return redirect()->back()
+                ->withErrors(['email' => 'No account exists with this email address. Please sign up.'])
+                ->withInput($request->only('email', 'remember'))
+                ->with('toast_type',  'warning')
+                ->with('toast_title', 'Email Not Registered')
+                ->with('toast_msg',   'No account exists with this email address. Please check your spelling or sign up.');
+        }
+
+        try {
+            $request->authenticate();
+        } catch (ValidationException $e) {
+            $errorMsg = $e->errors()['email'][0] ?? 'Authentication failed.';
+            $isNotReg = stripos($errorMsg, 'No account exists') !== false || stripos($errorMsg, 'not registered') !== false;
+
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput($request->only('email', 'remember'))
+                ->with('toast_type',  $isNotReg ? 'warning' : 'danger')
+                ->with('toast_title', $isNotReg ? 'Email Not Registered' : 'Incorrect Password')
+                ->with('toast_msg',   $isNotReg
+                    ? 'No account exists with this email address. Please check your spelling or sign up.'
+                    : 'The password you entered is incorrect. Please try again or click Forgot Password.');
+        }
 
         // Pull url.intended BEFORE session regenerate to avoid losing it on
         // shared-hosting DB backends where the old session row may be deleted

@@ -13,73 +13,84 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Google Authentication
+Route::get('auth/google', [
+    \App\Http\Controllers\Auth\GoogleController::class,
+    'redirectToGoogle',
+])->name('auth.google');
+
+Route::get('auth/google/callback', [
+    \App\Http\Controllers\Auth\GoogleController::class,
+    'handleGoogleCallback',
+])->name('auth.google.callback');
+
+// Registration
+Route::get('register', [
+    RegisteredUserController::class,
+    'create',
+])->name('register');
+
+Route::post('register', [
+    RegisteredUserController::class,
+    'store',
+]);
+
+// Standard Login - If already logged in, clears old session so user can authenticate
+Route::get('login', function (Request $request) {
+    if (Auth::check()) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
+    if ($request->filled('ref')) {
+        session(['ref_code' => $request->input('ref')]);
+
+        return redirect()->route('referral.login', [
+            'ref' => $request->input('ref'),
+        ]);
+    }
+
+    return redirect('/?auth=login');
+})->name('login');
+
+Route::post('login', [
+    AuthenticatedSessionController::class,
+    'store',
+])->name('login.post');
+
+// Referral Login Page
+Route::get('referral', function (Request $request) {
+    if (Auth::check()) {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
+    if ($request->filled('ref')) {
+        session(['ref_code' => $request->input('ref')]);
+    }
+
+    if ($request->filled('referral_code')) {
+        session(['ref_code' => $request->input('referral_code')]);
+    }
+
+    $hasReferral = session()->has('ref_code');
+
+    if ($hasReferral) {
+        return view('auth.login');
+    }
+
+    return redirect('/?auth=login');
+})->name('referral.login');
+
+// Referral Login Submission
+Route::post('referral', [
+    AuthenticatedSessionController::class,
+    'store',
+])->name('referral.store');
+
 Route::middleware('guest')->group(function () {
-
-    // Google Authentication
-    Route::get('auth/google', [
-        \App\Http\Controllers\Auth\GoogleController::class,
-        'redirectToGoogle',
-    ])->name('auth.google');
-
-    Route::get('auth/google/callback', [
-        \App\Http\Controllers\Auth\GoogleController::class,
-        'handleGoogleCallback',
-    ])->name('auth.google.callback');
-
-    // Registration
-    Route::get('register', [
-        RegisteredUserController::class,
-        'create',
-    ])->name('register');
-
-    Route::post('register', [
-        RegisteredUserController::class,
-        'store',
-    ]);
-
-    // Standard Login
-    Route::get('login', function (Request $request) {
-        if ($request->filled('ref')) {
-            session(['ref_code' => $request->input('ref')]);
-
-            return redirect()->route('referral.login', [
-                'ref' => $request->input('ref'),
-            ]);
-        }
-
-        return redirect('/?auth=login');
-    })->name('login');
-
-    Route::post('login', [
-        AuthenticatedSessionController::class,
-        'store',
-    ])->name('login.post');
-
-    // Referral Login Page
-    Route::get('referral', function (Request $request) {
-        if ($request->filled('ref')) {
-            session(['ref_code' => $request->input('ref')]);
-        }
-
-        if ($request->filled('referral_code')) {
-            session(['ref_code' => $request->input('referral_code')]);
-        }
-
-        $hasReferral = session()->has('ref_code');
-
-        if ($hasReferral) {
-            return view('auth.login');
-        }
-
-        return redirect('/?auth=login');
-    })->name('referral.login');
-
-    // Referral Login Submission
-    Route::post('referral', [
-        AuthenticatedSessionController::class,
-        'store',
-    ])->name('referral.store');
-
     // Password Reset
     Route::get('forgot-password', [
         PasswordResetLinkController::class,
