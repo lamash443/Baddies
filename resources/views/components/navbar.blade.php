@@ -1,5 +1,33 @@
-<link rel="stylesheet" href="/css/theme-system.css">
+<link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 <style>
+  /* Guaranteed Pure CSS Theme Icon Visibility */
+  #themeIconMoon,
+  #themeIconMoonMobile {
+    display: none !important;
+  }
+  #themeIconSun,
+  #themeIconSunMobile {
+    display: block !important;
+  }
+
+  [data-bs-theme="light"] #themeIconMoon,
+  [data-bs-theme="light"] #themeIconMoonMobile {
+    display: block !important;
+  }
+  [data-bs-theme="light"] #themeIconSun,
+  [data-bs-theme="light"] #themeIconSunMobile {
+    display: none !important;
+  }
+
+  [data-bs-theme="dark"] #themeIconMoon,
+  [data-bs-theme="dark"] #themeIconMoonMobile {
+    display: none !important;
+  }
+  [data-bs-theme="dark"] #themeIconSun,
+  [data-bs-theme="dark"] #themeIconSunMobile {
+    display: block !important;
+  }
+
   /* Global anti-FOUC link color overrides */
   :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
     --bs-link-color: rgba(255, 255, 255, 0.8) !important;
@@ -482,7 +510,7 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
-            <svg id="themeIconMoonMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg id="themeIconMoonMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
@@ -579,7 +607,7 @@
                   <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                   <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
-                <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
               </button>
@@ -656,11 +684,17 @@
 if (!window._navbarLogicInitialized) {
   window._navbarLogicInitialized = true;
 
-  // Sync aria labels and tooltips
-  function syncThemeTooltips() {
-    const theme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
-    const isLight = theme === 'light';
-    const titleText = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+  // Sync icons and tooltips
+  function syncThemeIcons() {
+    var theme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+    var isLight = theme === 'light';
+    var suns = document.querySelectorAll('#themeIconSun, #themeIconSunMobile');
+    var moons = document.querySelectorAll('#themeIconMoon, #themeIconMoonMobile');
+    
+    suns.forEach(function(el) { el.style.setProperty('display', isLight ? 'none' : 'block', 'important'); });
+    moons.forEach(function(el) { el.style.setProperty('display', isLight ? 'block' : 'none', 'important'); });
+
+    var titleText = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
     document.querySelectorAll('#themeToggleBtn, #themeToggleBtnMobile').forEach(function(btn) {
       btn.setAttribute('title', titleText);
       btn.setAttribute('aria-label', titleText);
@@ -669,14 +703,14 @@ if (!window._navbarLogicInitialized) {
 
   // Instant theme switcher with transition lock (prevents layout and transition lag)
   function switchThemeInstant(targetTheme) {
-    const htmlEl = document.documentElement;
+    var htmlEl = document.documentElement;
     htmlEl.classList.add('theme-switching');
     htmlEl.setAttribute('data-bs-theme', targetTheme);
     try {
       localStorage.setItem('theme', targetTheme);
     } catch (e) {}
 
-    syncThemeTooltips();
+    syncThemeIcons();
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: targetTheme } }));
 
     // Release lock after painting
@@ -687,8 +721,10 @@ if (!window._navbarLogicInitialized) {
     });
   }
 
-  document.addEventListener('DOMContentLoaded', syncThemeTooltips);
-  document.addEventListener('livewire:navigated', syncThemeTooltips);
+  // Synchronize immediately and on lifecycle events
+  syncThemeIcons();
+  document.addEventListener('DOMContentLoaded', syncThemeIcons);
+  document.addEventListener('livewire:navigated', syncThemeIcons);
 
   // Handle Theme Toggle Clicks instantly
   document.addEventListener('click', function(e) {

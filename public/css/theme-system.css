@@ -13,6 +13,15 @@ html.theme-switching *::after {
 }
 
 /* ── 2. ZERO-FLICKER THEME ICONS (PURE CSS) ── */
+#themeIconMoon,
+#themeIconMoonMobile {
+  display: none !important;
+}
+#themeIconSun,
+#themeIconSunMobile {
+  display: block !important;
+}
+
 [data-bs-theme="dark"] #themeIconSun,
 [data-bs-theme="dark"] #themeIconSunMobile {
   display: block !important;
