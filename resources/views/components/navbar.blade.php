@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="/css/theme-system.css">
 <style>
   /* Global anti-FOUC link color overrides */
   :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
@@ -469,8 +470,8 @@
           @endif
           
           <!-- Mobile Theme Toggle Button -->
-          <button id="themeToggleBtnMobile" class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme">
-            <svg id="themeIconSunMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <button id="themeToggleBtnMobile" class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme" aria-label="Toggle Theme">
+            <svg id="themeIconSunMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -566,8 +567,8 @@
               @endif
 
               <!-- Desktop Theme Toggle -->
-              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="background-color: transparent; flex-shrink: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Toggle Theme">
-                <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="background-color: transparent; flex-shrink: 0; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.opacity='0.75'; this.style.transform='scale(1.08)';" onmouseout="this.style.opacity='1'; this.style.transform='scale(1)';" title="Toggle Theme" aria-label="Toggle Theme">
+                <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="5"></circle>
                   <line x1="12" y1="1" x2="12" y2="3"></line>
                   <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -651,38 +652,52 @@
 </header>
 
 <script>
-// --- Theme and Navbar Global Logic ---
-// We use Event Delegation so these listeners survive Livewire DOM replacements.
+// --- High Performance Instant Theme and Navbar Global Logic ---
 if (!window._navbarLogicInitialized) {
   window._navbarLogicInitialized = true;
 
-  // Apply saved theme immediately on load
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-bs-theme', savedTheme);
-
-  // Sync icons on DOM load or Livewire navigate
-  function syncThemeIcons() {
+  // Sync aria labels and tooltips
+  function syncThemeTooltips() {
     const theme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
-    const suns = document.querySelectorAll('#themeIconSun, #themeIconSunMobile');
-    const moons = document.querySelectorAll('#themeIconMoon, #themeIconMoonMobile');
-    suns.forEach(el => el.style.display = theme === 'light' ? 'none' : 'block');
-    moons.forEach(el => el.style.display = theme === 'light' ? 'block' : 'none');
+    const isLight = theme === 'light';
+    const titleText = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    document.querySelectorAll('#themeToggleBtn, #themeToggleBtnMobile').forEach(function(btn) {
+      btn.setAttribute('title', titleText);
+      btn.setAttribute('aria-label', titleText);
+    });
   }
 
-  document.addEventListener('DOMContentLoaded', syncThemeIcons);
-  document.addEventListener('livewire:navigated', syncThemeIcons);
+  // Instant theme switcher with transition lock (prevents layout and transition lag)
+  function switchThemeInstant(targetTheme) {
+    const htmlEl = document.documentElement;
+    htmlEl.classList.add('theme-switching');
+    htmlEl.setAttribute('data-bs-theme', targetTheme);
+    try {
+      localStorage.setItem('theme', targetTheme);
+    } catch (e) {}
 
-  // Handle Theme Toggle Clicks
+    syncThemeTooltips();
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: targetTheme } }));
+
+    // Release lock after painting
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        htmlEl.classList.remove('theme-switching');
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', syncThemeTooltips);
+  document.addEventListener('livewire:navigated', syncThemeTooltips);
+
+  // Handle Theme Toggle Clicks instantly
   document.addEventListener('click', function(e) {
     const themeBtn = e.target.closest('#themeToggleBtn') || e.target.closest('#themeToggleBtnMobile');
     if (themeBtn) {
-      const htmlEl = document.documentElement;
-      const currentTheme = htmlEl.getAttribute('data-bs-theme') || 'dark';
+      e.preventDefault();
+      const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      
-      htmlEl.setAttribute('data-bs-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      syncThemeIcons();
+      switchThemeInstant(newTheme);
     }
   });
 

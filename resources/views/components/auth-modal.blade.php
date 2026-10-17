@@ -1,7 +1,7 @@
 <!-- ══ AUTH MODAL ══ -->
 <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down" style="max-width: 480px;">
-    <div class="modal-content auth-modal-content border-0 shadow-lg" style="background:#000000; border: 1px solid rgba(255,140,0,0.5) !important; box-shadow: 0 0 40px rgba(255,140,0,0.25) !important;">
+    <div class="modal-content auth-modal-content border-0 shadow-lg">
       
       <div class="modal-header border-0 pb-0 pt-4 px-4 px-md-5 position-relative">
         <!-- Optional Back Button (hidden by default) -->
@@ -36,9 +36,8 @@
             </button>
           </li>
         </ul>
-
         <style>
-                    .auth-modal-content { border-radius: 1.5rem !important; }
+          .auth-modal-content { border-radius: 1.5rem !important; background: #000000; border: 1px solid rgba(255,140,0,0.5); box-shadow: 0 0 40px rgba(255,140,0,0.25); }
           #authTabs .auth-tab-btn {
             border-radius: .6rem;
             font-size: 1.05rem;

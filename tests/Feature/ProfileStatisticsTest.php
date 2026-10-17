@@ -146,6 +146,6 @@ class ProfileStatisticsTest extends TestCase
     {
         $response = $this->get('/profile/statistics');
 
-        $response->assertRedirect('/login');
+        $response->assertRedirect('/?auth=login');
     }
 }

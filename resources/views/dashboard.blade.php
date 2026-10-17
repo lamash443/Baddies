@@ -18,7 +18,9 @@
   <!-- CRITICAL ANTI-FOUC & ANTI-BLUE-LINK STYLES (Parsed BEFORE Bootstrap CSS) -->
   <style>
     *, *::before, *::after { box-sizing:border-box; }
-    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d !important; color:#fff !important; min-height:100vh; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; min-height:100vh; }
+    [data-bs-theme="dark"] body { background:#0d0d0d !important; color:#fff !important; }
+    [data-bs-theme="light"] body { background:#f8fafc !important; color:#0f172a !important; }
 
     /* Override Bootstrap 5 link colors globally before Bootstrap loads */
     :root, [data-bs-theme="dark"], [data-bs-theme="light"] {
@@ -43,9 +45,10 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/theme-system.css">
   <style>
     *, *::before, *::after { box-sizing:border-box; }
-    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
+    html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; min-height:100vh; }
 
     /* NAVBAR STYLES (Required for x-navbar) */
     .nr-navbar { background:linear-gradient(160deg,#0d0d0d 0%,#1a0f00 50%,#0d0d0d 100%) !important; border-bottom:2px solid rgba(255,140,0,0.6); box-shadow:inset 0 -2px 30px rgba(255,140,0,0.06); padding-top:1.25rem !important; padding-bottom:1.25rem !important; }

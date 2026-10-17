@@ -21,7 +21,7 @@ class VerificationTest extends TestCase
             'photo' => $photo,
         ]);
 
-        $response->assertRedirect('/login');
+        $response->assertRedirect('/?auth=login');
 
         $this->assertDatabaseCount('verification_submissions', 0);
     }

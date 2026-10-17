@@ -22,7 +22,7 @@ class ProfileMediaTest extends TestCase
             'photo' => $photo,
         ]);
 
-        $response->assertRedirect('/login');
+        $response->assertRedirect('/?auth=login');
 
         $this->assertDatabaseCount('user_photos', 0);
     }

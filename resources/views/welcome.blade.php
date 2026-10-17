@@ -25,18 +25,19 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/listing-card.css">
+  <link rel="stylesheet" href="/css/theme-system.css">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
       font-family: "Outfit", sans-serif;
-      background: #000000;
-      color: #fff;
       min-height: 100vh;
       overflow-x: hidden !important;
       max-width: 100vw;
     }
+    [data-bs-theme="dark"] body { background: #000000; color: #fff; }
+    [data-bs-theme="light"] body { background: #f8fafc; color: #0f172a; }
 
     /* ── HERO ── */
     .home-hero {

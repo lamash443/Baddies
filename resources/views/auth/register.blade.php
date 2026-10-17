@@ -13,16 +13,17 @@
   <meta name="description" content="Join Kenyan Baddies Club. Create your account today.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/theme-system.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
       font-family: "Outfit", sans-serif;
-      background: #0a0a0a;
-      color: #fff;
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
     }
+    [data-bs-theme="dark"] body { background: #0a0a0a; color: #fff; }
+    [data-bs-theme="light"] body { background: #f8fafc; color: #0f172a; }
 
     /* Radial glow background */
     body::before {
