@@ -33,6 +33,16 @@ else
     echo "  ℹ️  Current APP_URL: $(grep APP_URL $APP_DIR/.env)"
 fi
 
+# Ensure PAYHERO_CALLBACK_URL points to the live domain
+if grep -q "trycloudflare" "$APP_DIR/.env" || ! grep -q "PAYHERO_CALLBACK_URL" "$APP_DIR/.env"; then
+    if grep -q "PAYHERO_CALLBACK_URL" "$APP_DIR/.env"; then
+        sed -i 's|PAYHERO_CALLBACK_URL=.*|PAYHERO_CALLBACK_URL=https://kenyanbaddies.com/webhook/payhero|g' "$APP_DIR/.env"
+    else
+        echo 'PAYHERO_CALLBACK_URL=https://kenyanbaddies.com/webhook/payhero' >> "$APP_DIR/.env"
+    fi
+    echo "  ✅ PAYHERO_CALLBACK_URL set to https://kenyanbaddies.com/webhook/payhero"
+fi
+
 echo ""
 echo "============================================="
 echo " Step 3: Ensure SESSION_DRIVER=database"

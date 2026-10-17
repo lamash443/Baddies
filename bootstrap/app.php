@@ -19,6 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'webhook/payhero',
+            'webhook/payhero/*',
+            'api/webhook/payhero',
+            'api/webhook/payhero/*',
+            'payhero/webhook',
+            'payhero/webhook/*',
+            'payhero/callback',
+            'payhero/callback/*',
+            'api/payhero/webhook',
+            'api/payhero/callback',
+            'payment/callback',
+            'callback/payhero',
+            'api/*',
         ]);
 
         // Send unauthenticated users directly to the homepage login modal.

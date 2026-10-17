@@ -13,9 +13,13 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect Trailing Slashes If Not A Folder (Exclude webhooks and APIs to avoid breaking POST payloads)...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteCond %{REQUEST_URI} !^/webhook
+    RewriteCond %{REQUEST_URI} !^/payhero
+    RewriteCond %{REQUEST_URI} !^/api
+    RewriteCond %{REQUEST_URI} !^/payment
     RewriteRule ^ %1 [L,R=301]
 
     # Send Requests To Front Controller...

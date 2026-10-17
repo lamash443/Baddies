@@ -629,7 +629,24 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::post('/webhook/payhero', [PaymentController::class, 'webhook'])->name('webhook.payhero');
+// ── PAYHERO WEBHOOK & PAYMENT ROUTES ──────────────────────────────────────────
+// Supports GET / HEAD for health checks & dashboard verification, and POST for payment callbacks
+$payheroWebhook = [PaymentController::class, 'webhook'];
+
+Route::match(['GET', 'POST', 'HEAD'], '/webhook/payhero', $payheroWebhook)->name('webhook.payhero');
+Route::match(['GET', 'POST', 'HEAD'], '/api/webhook/payhero', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/payhero/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/payhero/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/payhero/webhook', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/api/payhero/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/payment/callback', $payheroWebhook);
+Route::match(['GET', 'POST', 'HEAD'], '/callback/payhero', $payheroWebhook);
+
+// Payment route aliases to prevent 404s
+Route::get('/checkout/mpesa', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/checkout', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/payhero', fn () => redirect()->route('checkout.mpesa'));
+Route::get('/payment', fn () => redirect()->route('checkout.mpesa'));
 
 
 Route::get('/contact', function () {
@@ -769,10 +786,11 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             $env = file_get_contents($envFile);
             if ($env === false) throw new \RuntimeException('.env not readable');
             $replacements = [
-                '/^FILESYSTEM_DISK=.*/m' => 'FILESYSTEM_DISK=public',
-                '/^SESSION_DRIVER=.*/m'  => 'SESSION_DRIVER=database',
-                '/^SESSION_DOMAIN=.*/m'  => 'SESSION_DOMAIN=.kenyanbaddies.com',
-                '/^APP_DEBUG=.*/m'       => 'APP_DEBUG=false',
+                '/^FILESYSTEM_DISK=.*/m'      => 'FILESYSTEM_DISK=public',
+                '/^SESSION_DRIVER=.*/m'       => 'SESSION_DRIVER=database',
+                '/^SESSION_DOMAIN=.*/m'       => 'SESSION_DOMAIN=.kenyanbaddies.com',
+                '/^APP_DEBUG=.*/m'            => 'APP_DEBUG=false',
+                '/^PAYHERO_CALLBACK_URL=.*/m' => 'PAYHERO_CALLBACK_URL=https://kenyanbaddies.com/webhook/payhero',
             ];
             foreach ($replacements as $p => $r) {
                 if (preg_match($p, $env)) {
@@ -783,10 +801,61 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
             }
             $w = file_put_contents($envFile, $env);
             $results[] = ['label' => 'Patch .env', 'cmd' => 'file_put_contents(.env)', 'out' => $w !== false
-                ? '✅ FILESYSTEM_DISK=public, SESSION_DRIVER=database, SESSION_DOMAIN=.kenyanbaddies.com, APP_DEBUG=false'
+                ? '✅ FILESYSTEM_DISK=public, SESSION_DRIVER=database, SESSION_DOMAIN=.kenyanbaddies.com, APP_DEBUG=false, PAYHERO_CALLBACK_URL=https://kenyanbaddies.com/webhook/payhero'
                 : '❌ Cannot write .env', 'ok' => $w !== false];
         } catch (\Throwable $e) {
             $results[] = ['label' => 'Patch .env', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
+    }
+
+    // ── TEST PAYHERO ──────────────────────────────────────────────────────────
+    if ($action === 'test-payhero') {
+        try {
+            $phUser = \App\Models\SiteSetting::get('payhero_username', config('services.payhero.username'));
+            $phPass = \App\Models\SiteSetting::get('payhero_password', config('services.payhero.password'));
+            $phChan = \App\Models\SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id'));
+            $phCb   = \App\Models\SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url')) ?: url('/webhook/payhero');
+
+            $results[] = [
+                'label' => 'PayHero Settings Diagnostic',
+                'cmd'   => 'Verify PayHero credentials in DB & .env',
+                'out'   => "Username: " . ($phUser ? substr($phUser, 0, 4) . '****' : '❌ NOT CONFIGURED') .
+                           "\nPassword: " . ($phPass ? '**** (Configured)' : '❌ NOT CONFIGURED') .
+                           "\nChannel ID: " . ($phChan ?: '❌ NOT CONFIGURED') .
+                           "\nActive Callback URL: " . $phCb,
+                'ok'    => !empty($phUser) && !empty($phPass) && !empty($phChan),
+            ];
+
+            // 1. Test local webhook endpoint with GET ping
+            $webhookUrl = url('/webhook/payhero');
+            $localPing = \Illuminate\Support\Facades\Http::timeout(5)->get($webhookUrl);
+            $results[] = [
+                'label' => 'Local Webhook Health (GET /webhook/payhero)',
+                'cmd'   => "Http::get('$webhookUrl')",
+                'out'   => "HTTP Status: " . $localPing->status() . " — " . $localPing->body(),
+                'ok'    => $localPing->status() === 200,
+            ];
+
+            // 2. Test local webhook endpoint with a dummy test POST payload
+            $testPayload = ['event' => 'test', 'external_reference' => 'test_diagnose', 'status' => 'success'];
+            $postPing = \Illuminate\Support\Facades\Http::timeout(5)->post($webhookUrl, $testPayload);
+            $results[] = [
+                'label' => 'Local Webhook Callback Processing (POST /webhook/payhero)',
+                'cmd'   => "Http::post('$webhookUrl', testPayload)",
+                'out'   => "HTTP Status: " . $postPing->status() . " — " . $postPing->body(),
+                'ok'    => $postPing->status() === 200,
+            ];
+
+            // 3. Test PayHero cloud API connectivity
+            $apiPing = \Illuminate\Support\Facades\Http::timeout(5)->get('https://backend.payhero.co.ke/api/v2/transaction-status');
+            $results[] = [
+                'label' => 'PayHero Cloud Server Reachability',
+                'cmd'   => 'GET https://backend.payhero.co.ke/api/v2/transaction-status',
+                'out'   => "HTTP Status: " . $apiPing->status() . " (PayHero cloud is online and responsive)",
+                'ok'    => in_array($apiPing->status(), [200, 400, 401]),
+            ];
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Test PayHero', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
         }
     }
 
@@ -922,20 +991,27 @@ Route::get('/server-setup', function (\Illuminate\Http\Request $request) {
         $userCount = \Illuminate\Support\Facades\Schema::hasTable('users') ? \App\Models\User::count() : null;
     } catch (\Throwable $e) {}
 
+    $phUserConfigured = !empty(\App\Models\SiteSetting::get('payhero_username', config('services.payhero.username')));
+    $phChannelId = \App\Models\SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id'));
+    $phCallbackUrl = \App\Models\SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url')) ?: url('/webhook/payhero');
+
     $status = [
-        'APP_URL'         => $val('APP_URL'),
-        'APP_ENV'         => $val('APP_ENV'),
-        'APP_DEBUG'       => $val('APP_DEBUG'),
-        'SESSION_DRIVER'  => $val('SESSION_DRIVER'),
-        'SESSION_DOMAIN'  => $val('SESSION_DOMAIN'),
-        'Sessions Table'  => $hasSessions ? '✅ Present in DB' : '❌ Missing (Click Migrate)',
-        'Users in DB'     => $userCount !== null ? "✅ $userCount users found" : '❌ Table missing or DB error',
-        'FILESYSTEM_DISK' => $val('FILESYSTEM_DISK'),
-        'Storage Mode'    => $symOk ? '✅ Symlink Active' : ($dirOk ? '✅ Direct Web Root Active (public_html/storage)' : '⚠️ Not mirrored (Click Fix Storage)'),
-        'DB_DATABASE'     => $val('DB_DATABASE'),
-        'PHP_VERSION'     => PHP_VERSION,
-        '.env writable'   => is_writable($envFile) ? '✅ Yes' : '❌ No',
-        'exec() status'   => function_exists('exec') ? '✅ Enabled' : 'ℹ️ Disabled (Artisan::call active)',
+        'APP_URL'          => $val('APP_URL'),
+        'APP_ENV'          => $val('APP_ENV'),
+        'APP_DEBUG'        => $val('APP_DEBUG'),
+        'SESSION_DRIVER'   => $val('SESSION_DRIVER'),
+        'SESSION_DOMAIN'   => $val('SESSION_DOMAIN'),
+        'Sessions Table'   => $hasSessions ? '✅ Present in DB' : '❌ Missing (Click Migrate)',
+        'Users in DB'      => $userCount !== null ? "✅ $userCount users found" : '❌ Table missing or DB error',
+        'FILESYSTEM_DISK'  => $val('FILESYSTEM_DISK'),
+        'Storage Mode'     => $symOk ? '✅ Symlink Active' : ($dirOk ? '✅ Direct Web Root Active (public_html/storage)' : '⚠️ Not mirrored (Click Fix Storage)'),
+        'PayHero Status'   => $phUserConfigured ? '✅ Credentials Configured' : '⚠️ Missing Credentials',
+        'PayHero Channel'  => $phChannelId ? '✅ Channel ' . $phChannelId : '⚠️ Missing Channel ID',
+        'PayHero Callback' => $phCallbackUrl,
+        'DB_DATABASE'      => $val('DB_DATABASE'),
+        'PHP_VERSION'      => PHP_VERSION,
+        '.env writable'    => is_writable($envFile) ? '✅ Yes' : '❌ No',
+        'exec() status'    => function_exists('exec') ? '✅ Enabled' : 'ℹ️ Disabled (Artisan::call active)',
     ];
 
     // Scan storage directories for media files
@@ -1031,6 +1107,9 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
         'Sessions Table'=>str_starts_with($v,'✅'),
         'Users in DB'=>str_starts_with($v,'✅'),
         'Storage Mode'=>str_starts_with($v,'✅'),
+        'PayHero Status'=>str_starts_with($v,'✅'),
+        'PayHero Channel'=>str_starts_with($v,'✅'),
+        'PayHero Callback'=>!str_contains($v,'trycloudflare') && !str_contains($v,'localhost'),
         '.env writable'=>str_starts_with($v,'✅'),
         'exec() status'=>true,
         default=>true
@@ -1043,6 +1122,7 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 <div class="btns">
   <a class="btn p" href="<?=$base?>&action=full-setup">🚀 1. Full Setup</a>
   <a class="btn g" href="<?=$base?>&action=rebuild-cache">⚡ 2. Rebuild Caches</a>
+  <a class="btn p" href="<?=$base?>&action=test-payhero">💳 Test PayHero</a>
   <a class="btn s" href="<?=$base?>&action=fix-storage">🔗 Fix Symlink</a>
   <a class="btn s" href="<?=$base?>&action=fix-env">📝 Fix .env</a>
   <a class="btn s" href="<?=$base?>&action=clear-cache">🗑️ Clear Caches</a>

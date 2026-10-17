@@ -22,7 +22,24 @@ class PayHeroService
         $this->authToken   = SiteSetting::get('payhero_auth_token', config('services.payhero.auth_token'));
         $this->channelId   = (int) SiteSetting::get('payhero_channel_id', config('services.payhero.channel_id'));
         $this->accountId   = SiteSetting::get('payhero_account_id', config('services.payhero.account_id'));
-        $this->callbackUrl = SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url'));
+
+        // Determine sensible default callback URL
+        $defaultCallback = url('/webhook/payhero');
+        if (app()->isProduction() && str_starts_with($defaultCallback, 'http://')) {
+            $defaultCallback = 'https://' . substr($defaultCallback, 7);
+        }
+
+        $configuredCallback = SiteSetting::get('payhero_callback_url', config('services.payhero.callback_url'));
+
+        // If not set, or pointing to local/tunnel development domains, use production URL
+        if (empty($configuredCallback)
+            || str_contains($configuredCallback, 'localhost')
+            || str_contains($configuredCallback, '127.0.0.1')
+            || str_contains($configuredCallback, 'trycloudflare.com')) {
+            $this->callbackUrl = $defaultCallback;
+        } else {
+            $this->callbackUrl = $configuredCallback;
+        }
     }
 
     /**

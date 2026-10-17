@@ -306,8 +306,8 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('PayHero Callback / Webhook URL')
                             ->url()
                             ->columnSpanFull()
-                            ->placeholder('https://endif-ruth-digest-veterans.trycloudflare.com/webhook/payhero')
-                            ->helperText('Public URL where PayHero sends M-Pesa payment status webhooks.'),
+                            ->placeholder('https://kenyanbaddies.com/webhook/payhero')
+                            ->helperText('Public URL where PayHero sends M-Pesa payment status webhooks. Recommended: https://kenyanbaddies.com/webhook/payhero'),
                     ]),
 
                 // ── GOOGLE OAUTH SETTINGS ─────────────────────────────────────────
