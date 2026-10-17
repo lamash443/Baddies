@@ -19,9 +19,20 @@ class GoogleController extends Controller
      */
     protected function setupGoogleConfig(): bool
     {
-        $clientId     = SiteSetting::get('google_client_id', config('services.google.client_id'));
-        $clientSecret = SiteSetting::get('google_client_secret', config('services.google.client_secret'));
-        $redirectUri  = SiteSetting::get('google_redirect_uri', config('services.google.redirect', url('/auth/google/callback')));
+        $clientId     = SiteSetting::get('google_client_id') ?: config('services.google.client_id');
+        $clientSecret = SiteSetting::get('google_client_secret') ?: config('services.google.client_secret');
+        $redirectUri  = SiteSetting::get('google_redirect_uri') ?: config('services.google.redirect');
+
+        if (empty($redirectUri) || str_contains($redirectUri, '127.0.0.1') || str_contains($redirectUri, 'localhost')) {
+            $redirectUri = 'https://kenyanbaddies.com/auth/google/callback';
+        }
+
+        // Always force HTTPS for live domain
+        if (str_contains($redirectUri, 'kenyanbaddies.com') && str_starts_with($redirectUri, 'http://')) {
+            $redirectUri = 'https://' . substr($redirectUri, 7);
+        }
+
+        $redirectUri = rtrim($redirectUri, '/');
 
         if (empty($clientId) || empty($clientSecret)) {
             return false;
@@ -94,6 +105,7 @@ class GoogleController extends Controller
 
                 Auth::login($user, true);
                 session(['last_activity' => time()]);
+                request()->session()->save();
 
                 activity()
                     ->causedBy($user)
@@ -161,6 +173,7 @@ class GoogleController extends Controller
 
             Auth::login($newUser, true);
             session(['last_activity' => time()]);
+            request()->session()->save();
 
             activity()
                 ->causedBy($newUser)

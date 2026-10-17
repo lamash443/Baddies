@@ -127,7 +127,7 @@ class SiteSettingsPage extends Page implements HasForms
             // ── Google OAuth Login Settings ────────────────────────────────────
             'google_client_id'     => SiteSetting::get('google_client_id', config('services.google.client_id')),
             'google_client_secret' => SiteSetting::get('google_client_secret', config('services.google.client_secret')),
-            'google_redirect_uri'  => SiteSetting::get('google_redirect_uri', config('services.google.redirect', url('/auth/google/callback'))),
+            'google_redirect_uri'  => SiteSetting::get('google_redirect_uri', config('services.google.redirect', 'https://kenyanbaddies.com/auth/google/callback')),
 
             // ── SMTP Mail Settings ─────────────────────────────────────────────
             'mail_mailer'       => SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
@@ -395,8 +395,9 @@ class SiteSettingsPage extends Page implements HasForms
                             ->label('Google OAuth Redirect URI')
                             ->url()
                             ->columnSpanFull()
-                            ->placeholder(url('/auth/google/callback'))
-                            ->helperText('The Authorized Redirect URI registered in Google Cloud Console.'),
+                            ->default('https://kenyanbaddies.com/auth/google/callback')
+                            ->placeholder('https://kenyanbaddies.com/auth/google/callback')
+                            ->helperText('Copy this EXACT URI into Google Cloud Console > APIs & Services > Credentials > OAuth 2.0 Client IDs > "Authorized redirect URIs". (Make sure both https://kenyanbaddies.com/auth/google/callback and https://www.kenyanbaddies.com/auth/google/callback are added in Google Console).'),
                     ]),
 
                 // ── SMTP MAIL SETTINGS ────────────────────────────────────────────
