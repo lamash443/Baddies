@@ -6,10 +6,29 @@
       border-top:2px solid rgba(255,140,0,0.6);
       box-shadow:inset 0 2px 30px rgba(255,140,0,0.06);
     }
-    .nr-footer__brand,.nr-footer__title{color:#fff;}
+    .nr-footer__brand { color:#fff; }
+    .nr-footer__title {
+      color:#fff;
+      font-size:1.05rem;
+      font-weight:700;
+      letter-spacing:0.02em;
+      margin-bottom:1rem;
+    }
+    .nr-footer p {
+      font-size:0.95rem;
+      line-height:1.65;
+      color:rgba(255,255,255,0.75);
+    }
+    .nr-footer ul {
+      font-size:0.95rem;
+    }
+    .nr-footer ul li {
+      margin-bottom:0.6rem;
+    }
     .nr-footer a {
       color:rgba(255,140,0,0.92); text-decoration:none;
       display:inline-block; position:relative; padding-bottom:3px; transition:color 0.3s ease;
+      font-size:0.95rem;
     }
     .nr-footer a::after {
       content:""; position:absolute; left:0; bottom:0;
@@ -21,10 +40,14 @@
     .nr-footer a:hover,.nr-footer a:focus{color:#fff;text-decoration:none;}
     .nr-footer a:hover::after,.nr-footer a:focus::after{transform:scaleX(1);}
     .nr-footer__logo-text {
-      font-size:1.05rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
+      font-size:1.35rem; font-weight:800; letter-spacing:-0.5px; line-height:1;
       background:linear-gradient(135deg,#ff8c00,#ffb347);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
       display:inline-block;
+    }
+    .nr-footer__bottom {
+      font-size:0.9rem;
+      color:rgba(255,255,255,0.6);
     }
     hr.border-light-subtle{border-color:rgba(255,255,255,0.1) !important;}
 </style>
@@ -37,44 +60,44 @@
         <div class="nr-footer__logo mb-3">
           <a href="/" class="text-decoration-none">
             @if(!empty($siteSettings['logo']))
-                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:48px;width:auto;object-fit:contain;">
+                <img src="{{ asset('storage/' . $siteSettings['logo']) }}" alt="Baddies Club Logo" style="max-height:52px;width:auto;object-fit:contain;">
             @else
                 <span class="nr-footer__logo-text">Baddies Club</span>
             @endif
           </a>
         </div>
-        <p class="mb-3" style="font-size:0.78rem;">Browse trusted local listings, discover providers, and connect faster.</p>
+        <p class="mb-3">Browse trusted local listings, discover providers, and connect faster.</p>
       </div>
       <div class="col-6 col-lg-2">
-        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Explore</h3>
-        <ul class="list-unstyled mb-0" style="font-size:0.78rem;">
-          <li class="mb-2"><a href="/">Home</a></li>
-          <li class="mb-2"><a href="{{ route('escort-girls') }}">Escort Girls</a></li>
-          <li class="mb-2"><a href="/category/call-boys">Call Boys</a></li>
-          <li class="mb-2"><a href="/videos">Videos</a></li>
-          <li class="mb-2"><a href="/classifieds">Adult Classifieds</a></li>
+        <h3 class="nr-footer__title">Explore</h3>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/">Home</a></li>
+          <li><a href="{{ route('escort-girls') }}">Escort Girls</a></li>
+          <li><a href="/category/call-boys">Call Boys</a></li>
+          <li><a href="/videos">Videos</a></li>
+          <li><a href="/classifieds">Adult Classifieds</a></li>
         </ul>
       </div>
       <div class="col-6 col-lg-2">
-        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Pages</h3>
-        <ul class="list-unstyled mb-0" style="font-size:0.78rem;">
-          <li class="mb-2"><a href="/terms">Terms</a></li>
-          <li class="mb-2"><a href="/privacy">Privacy Policy</a></li>
+        <h3 class="nr-footer__title">Pages</h3>
+        <ul class="list-unstyled mb-0">
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
         </ul>
       </div>
       <div class="col-12 col-lg-4">
-        <h3 class="nr-footer__title h6" style="font-size:0.78rem;">Contact</h3>
-        <ul class="list-unstyled mb-3" style="font-size:0.78rem;">
+        <h3 class="nr-footer__title">Contact</h3>
+        <ul class="list-unstyled mb-3">
           @php $contactPage = \App\Models\Page::where('slug','contact')->first(); @endphp
           @if(!empty($contactPage?->phone))
-            <li class="mb-2"><a href="tel:{{ $contactPage->phone }}">{{ $contactPage->phone }}</a></li>
+            <li><a href="tel:{{ $contactPage->phone }}">{{ $contactPage->phone }}</a></li>
           @endif
-          <li class="mb-2"><a href="{{ route('contact') }}">Contact Support</a></li>
+          <li><a href="{{ route('contact') }}">Contact Support</a></li>
         </ul>
       </div>
     </div>
     <hr class="border-light-subtle my-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small">
+    <div class="nr-footer__bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
       <div>Copyright 2026 Baddies-Club.</div>
       <div>All rights reserved.</div>
     </div>
