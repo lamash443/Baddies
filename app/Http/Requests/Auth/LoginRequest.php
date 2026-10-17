@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -56,11 +57,30 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        $email = strtolower(trim((string) $this->input('email')));
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            RateLimiter::hit($this->throttleKey());
+
+            session()->flash('toast_type', 'warning');
+            session()->flash('toast_title', 'Email Not Registered');
+            session()->flash('toast_msg', 'No account exists with this email address. Please check your spelling or sign up.');
+
+            throw ValidationException::withMessages([
+                'email' => 'No account exists with this email address. Please sign up.',
+            ]);
+        }
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            session()->flash('toast_type', 'danger');
+            session()->flash('toast_title', 'Incorrect Password');
+            session()->flash('toast_msg', 'The password you entered is incorrect. Please try again or click Forgot Password.');
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'The password you entered is incorrect. Please try again.',
             ]);
         }
 

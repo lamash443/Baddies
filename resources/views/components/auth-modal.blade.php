@@ -525,77 +525,8 @@
   });
 </script>
 
-@if($errors->has('email') && !old('name'))
-<style>
-  .auth-err-toast {
-    position: fixed; top: 5.5rem; right: 2rem; z-index: 1060; /* Above modal (1055) */
-    display: flex; align-items: flex-start; gap: 0.85rem;
-    background: #0d0d0d;
-    border: 1px solid rgba(220,53,69,0.45);
-    border-left: 4px solid #dc3545;
-    border-radius: 14px;
-    padding: 1rem 1.25rem;
-    max-width: 360px; width: calc(100vw - 4rem);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04);
-    font-family: "Outfit", ui-sans-serif, sans-serif;
-    animation: authErrToastIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
-    overflow: hidden;
-  }
-  @keyframes authErrToastIn {
-    from { opacity:0; transform: translateY(-20px) scale(0.93); }
-    to   { opacity:1; transform: translateY(0) scale(1); }
-  }
-  .auth-err-toast__icon {
-    flex-shrink:0; margin-top:2px;
-    width:38px; height:38px; border-radius:11px;
-    background:rgba(220,53,69,0.12); border:1px solid rgba(220,53,69,0.3);
-    display:flex; align-items:center; justify-content:center; color:#ff4d4d;
-  }
-  .auth-err-toast__body { flex:1; min-width:0; }
-  .auth-err-toast__title { font-size:.88rem; font-weight:700; color:#ff4d4d; margin:0 0 .2rem; line-height:1.2; }
-  .auth-err-toast__msg   { font-size:.8rem;  color:rgba(255,255,255,.6); margin:0; line-height:1.5; }
-  .auth-err-toast__close {
-    flex-shrink:0; align-self:flex-start;
-    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
-    border-radius:7px; width:26px; height:26px;
-    display:flex; align-items:center; justify-content:center;
-    color:rgba(255,255,255,.45); cursor:pointer; padding:0; transition:all .2s;
-  }
-  .auth-err-toast__close:hover { background:rgba(220,53,69,.15); border-color:rgba(220,53,69,.35); color:#ff4d4d; }
-  .auth-err-toast__bar {
-    position:absolute; bottom:0; left:0; height:3px;
-    background:linear-gradient(90deg,#dc3545,rgba(220,53,69,.1));
-    border-radius:0 0 0 14px;
-    animation:authErrToastBar 6s linear both;
-  }
-  @keyframes authErrToastBar { from{width:100%} to{width:0%} }
-  
-  /* ── LIGHT THEME OVERRIDES ── */
-  [data-bs-theme="light"] .auth-err-toast { background: #ffffff; border-color: rgba(220,53,69,0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-  [data-bs-theme="light"] .auth-err-toast__title { color: #dc3545; }
-  [data-bs-theme="light"] .auth-err-toast__msg { color: rgba(0,0,0,0.7); }
-  [data-bs-theme="light"] .auth-err-toast__close { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.5); }
-  [data-bs-theme="light"] .auth-err-toast__close:hover { background: rgba(220,53,69,0.1); color: #dc3545; border-color: rgba(220,53,69,0.2); }
-</style>
-<div class="auth-err-toast" id="authErrToast" role="alert" aria-live="assertive">
-  <div class="auth-err-toast__icon">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-  </div>
-  <div class="auth-err-toast__body">
-    <p class="auth-err-toast__title">Login Failed</p>
-    <p class="auth-err-toast__msg">{{ $errors->first('email') }}</p>
-  </div>
-  <button class="auth-err-toast__close" onclick="document.getElementById('authErrToast').remove();" aria-label="Dismiss">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  </button>
-  <div class="auth-err-toast__bar"></div>
-</div>
-<script>setTimeout(()=>{const t=document.getElementById('authErrToast');if(t)t.remove();},6000);</script>
-@endif
+
+
 
 {{-- ── SCROLL LOCK: disable body scroll when auth modal opens (works on mobile) ── --}}
 <script>

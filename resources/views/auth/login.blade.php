@@ -250,6 +250,7 @@
   </style>
 </head>
 <body>
+<x-site-toast />
 @php
   $siteLogo = \App\Models\SiteSetting::get('logo');
   $refCode  = session('ref_code') ?? request('ref') ?? request('referral_code');

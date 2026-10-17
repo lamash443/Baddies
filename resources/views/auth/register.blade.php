@@ -198,6 +198,7 @@
   </style>
 </head>
 <body>
+<x-site-toast />
 @php
   $siteLogo = \App\Models\SiteSetting::get('logo');
   $refCode  = request()->query('ref') ?? session('ref_code');

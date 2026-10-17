@@ -45,6 +45,17 @@ class RegisteredUserController extends Controller
             }
         }
 
+        $email = strtolower(trim((string) $request->email));
+        if ($email && User::where('email', $email)->exists()) {
+            session()->flash('toast_type', 'warning');
+            session()->flash('toast_title', 'Email Already Registered');
+            session()->flash('toast_msg', 'This email address is already registered. Please log in instead or use another email.');
+
+            throw ValidationException::withMessages([
+                'email' => 'This email address is already registered. Please log in instead.',
+            ]);
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
@@ -88,6 +99,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
         session(['last_activity' => time()]);
+        session()->flash('login_success', 'Welcome to Baddies Club, ' . $user->name . '! Your account has been created.');
 
         // ── Send welcome + verification email ─────────────────────────────────
         $this->sendWelcomeEmail($user);
