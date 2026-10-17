@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 
 class AutoLogoutInactive
 {
@@ -19,16 +20,28 @@ class AutoLogoutInactive
             $lastActivity = session('last_activity');
 
             if ($lastActivity && (time() - $lastActivity) >= ($this->timeoutMinutes * 60)) {
-                Auth::logout();
+                $user = Auth::user();
+
+                Auth::guard('web')->logout();
+
+                if ($user) {
+                    $user->forceFill(['remember_token' => null])->saveQuietly();
+                }
+
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
+
+                $cookie = Cookie::forget(Auth::guard('web')->getRecallerName());
 
                 if ($request->expectsJson()) {
                     return response()->json(['message' => 'Session expired due to inactivity.'], 401);
                 }
 
-                return redirect('/')
-                    ->with('status', 'You have been logged out due to 30 minutes of inactivity.');
+                return redirect('/?auth=login')
+                    ->withCookie($cookie)
+                    ->with('toast_type', 'warning')
+                    ->with('toast_title', 'Session Expired')
+                    ->with('toast_msg', 'You have been logged out due to inactivity. Please log in again.');
             }
 
             // Update session last_activity on every authenticated request

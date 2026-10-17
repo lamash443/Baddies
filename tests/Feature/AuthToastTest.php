@@ -104,4 +104,33 @@ class AuthToastTest extends TestCase
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($user2);
     }
+
+    public function test_google_redirect_forces_account_selection_prompt(): void
+    {
+        config([
+            'services.google.client_id' => 'mock-client-id',
+            'services.google.client_secret' => 'mock-client-secret',
+            'services.google.redirect' => 'https://kenyanbaddies.com/auth/google/callback',
+        ]);
+
+        $response = $this->get('/auth/google');
+
+        $response->assertRedirect();
+        $targetUrl = $response->headers->get('Location');
+        $this->assertStringContainsString('prompt=select_account', $targetUrl);
+    }
+
+    public function test_logout_clears_remember_token_and_cookie(): void
+    {
+        $user = User::factory()->create([
+            'remember_token' => 'existing_token_xyz',
+        ]);
+
+        $response = $this->actingAs($user)->post('/logout');
+
+        $response->assertRedirect('/');
+        $this->assertGuest();
+        $this->assertNull($user->fresh()->remember_token);
+        $response->assertCookieExpired(auth()->guard('web')->getRecallerName());
+    }
 }

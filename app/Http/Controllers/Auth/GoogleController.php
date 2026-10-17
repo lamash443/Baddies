@@ -52,13 +52,25 @@ class GoogleController extends Controller
      */
     public function redirectToGoogle()
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            Auth::guard('web')->logout();
+            if ($user) {
+                $user->forceFill(['remember_token' => null])->saveQuietly();
+            }
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+        }
+
         if (!$this->setupGoogleConfig()) {
             Log::warning('Google OAuth attempted, but credentials are missing in SiteSetting / .env');
             return redirect()->route('home')->with('error', 'Google Login is currently being configured. Please log in with email and password.');
         }
 
         try {
-            return Socialite::driver('google')->redirect();
+            return Socialite::driver('google')
+                ->with(['prompt' => 'select_account'])
+                ->redirect();
         } catch (\Exception $e) {
             Log::error('Google OAuth Redirect Error: ' . $e->getMessage());
             return redirect()->route('home')->with('error', 'Could not connect to Google authentication. Please try again.');
@@ -103,7 +115,7 @@ class GoogleController extends Controller
                     $user->update($updateData);
                 }
 
-                Auth::login($user, true);
+                Auth::login($user, false);
                 session(['last_activity' => time()]);
                 request()->session()->save();
 
@@ -171,7 +183,7 @@ class GoogleController extends Controller
                 'referred_by_id'    => $referrer?->id,
             ]);
 
-            Auth::login($newUser, true);
+            Auth::login($newUser, false);
             session(['last_activity' => time()]);
             request()->session()->save();
 

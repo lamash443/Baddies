@@ -123,12 +123,24 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+
         Auth::guard('web')->logout();
+
+        if ($user) {
+            $user->forceFill(['remember_token' => null])->saveQuietly();
+        }
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $cookie = \Illuminate\Support\Facades\Cookie::forget(Auth::guard('web')->getRecallerName());
+
+        return redirect('/')
+            ->withCookie($cookie)
+            ->with('toast_type', 'success')
+            ->with('toast_title', 'Logged Out')
+            ->with('toast_msg', 'You have been successfully logged out.');
     }
 }
