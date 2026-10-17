@@ -5,7 +5,8 @@
 
     RewriteEngine On
 
-    # Redirect www to non-www
+    # Redirect www to non-www (exclude POST requests to ensure form data and auth are never stripped by 301)
+    RewriteCond %{REQUEST_METHOD} !POST
     RewriteCond %{HTTP_HOST} ^www\.kenyanbaddies\.com [NC]
     RewriteRule ^(.*)$ https://kenyanbaddies.com/$1 [L,R=301]
 
@@ -38,4 +39,8 @@
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, DELETE, PUT"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN"
+</IfModule>
+
+<IfModule LiteSpeed>
+    CacheLookup public off
 </IfModule>

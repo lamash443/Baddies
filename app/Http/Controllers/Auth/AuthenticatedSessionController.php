@@ -44,10 +44,11 @@ class AuthenticatedSessionController extends Controller
         Auth::user()->update(['last_seen_at' => now()]);
         \Illuminate\Support\Facades\Cache::put('user_last_seen_' . Auth::id(), true, now()->addMinutes(2));
 
-        // Set last_activity BEFORE regenerate so AutoLogoutInactive never sees
-        // a missing value on the very first authenticated request.
+        // Set last_activity and regenerate session
         session(['last_activity' => time()]);
         $request->session()->regenerate();
+        $request->session()->put('last_activity', time());
+        $request->session()->save();
 
         if ($request->user()->is_admin) {
             return redirect('/admin');

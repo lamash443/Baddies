@@ -247,7 +247,7 @@
 
             <div id="login-step-2" class="d-none">
               <h2 class="auth-title">Log in</h2>
-              <form method="POST" action="{{ route('login.post') }}">
+              <form method="POST" action="{{ url('/login') }}">
                 @csrf
                 <div class="mb-3">
                   <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
