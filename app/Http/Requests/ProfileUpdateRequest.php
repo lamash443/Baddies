@@ -40,27 +40,33 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            'phone_number' => ['nullable', 'string', 'max:255'],
-            'gender' => ['nullable', 'string', 'in:Male,Female,Other'],
+            // Digits, +, spaces, hyphens only — max 15
+            'phone_number'       => ['nullable', 'string', 'max:15', 'regex:/^[0-9+\s\-]*$/'],
+            'gender'             => ['nullable', 'string', 'in:Male,Female,Other'],
             'sexual_orientation' => ['nullable', 'string', 'in:Straight,Gay,Lesbian,Bisexual,Other'],
-            'age' => ['nullable', 'integer', 'min:18', 'max:100'],
-            'nationality' => ['nullable', 'string', 'max:255'],
-            'county' => ['nullable', 'string', 'max:255'],
-            'city_town' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'area' => ['nullable', 'string', 'max:255'],
-            'nearby_places' => ['nullable', 'string'],
-            'services' => ['nullable', 'array'],
-            'services.*' => ['string'],
-            'other_services' => ['nullable', 'string'],
-            'incalls_rate' => ['nullable', 'integer', 'min:0'],
-            'outcalls_rate' => ['nullable', 'integer', 'min:0'],
-            'other_cities' => ['nullable', 'string'],
+            'age'                => ['nullable', 'integer', 'min:18', 'max:100'],
+            // Letters, spaces, hyphens, apostrophes — max 60
+            'nationality'        => ['nullable', 'string', 'max:60', 'regex:/^[\p{L}\s\'\-]*$/u'],
+            'county'             => ['nullable', 'string', 'max:60', 'regex:/^[\p{L}\s\'\-]*$/u'],
+            'city_town'          => ['nullable', 'string', 'max:60', 'regex:/^[\p{L}\s\'\-]*$/u'],
+            'location'           => ['nullable', 'string', 'max:60', 'regex:/^[\p{L}\s\'\-]*$/u'],
+            'area'               => ['nullable', 'string', 'max:60', 'regex:/^[\p{L}\s\'\-]*$/u'],
+            // Letters, spaces, commas, hyphens, periods — max 200
+            'nearby_places'      => ['nullable', 'string', 'max:200', 'regex:/^[\p{L}\s,.\-]*$/u'],
+            'services'           => ['nullable', 'array'],
+            'services.*'         => ['string'],
+            // Letters, spaces, commas, hyphens — max 100
+            'other_services'     => ['nullable', 'string', 'max:100', 'regex:/^[\p{L}\s,\-]*$/u'],
+            'incalls_rate'       => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'outcalls_rate'      => ['nullable', 'integer', 'min:0', 'max:999999'],
+            // Letters, spaces, commas, hyphens — max 100
+            'other_cities'       => ['nullable', 'string', 'max:100', 'regex:/^[\p{L}\s,\-]*$/u'],
             'favorites_visibility' => ['nullable', 'string', 'in:everybody,favourites,nobody'],
-            'photos_visibility' => ['nullable', 'string', 'in:everybody,favourites,nobody'],
-            'email_notifications' => ['nullable', 'string', 'in:messages,none'],
-            'calls_enabled' => ['boolean'],
+            'photos_visibility'    => ['nullable', 'string', 'in:everybody,favourites,nobody'],
+            'email_notifications'  => ['nullable', 'string', 'in:messages,none'],
+            'calls_enabled'        => ['boolean'],
         ];
+
     }
 
     /**
@@ -71,9 +77,29 @@ class ProfileUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'age.min' => 'You must be at least 18 years old.',
-            'age.max' => 'Age cannot exceed 100 years.',
-            'age.integer' => 'Please enter a valid age.',
+            'age.min'                    => 'You must be at least 18 years old.',
+            'age.max'                    => 'Age cannot exceed 100 years.',
+            'age.integer'                => 'Please enter a valid age.',
+            'phone_number.max'           => 'Phone number cannot exceed 15 characters.',
+            'phone_number.regex'         => 'Phone number may only contain digits, +, spaces and hyphens.',
+            'nationality.max'            => 'Nationality cannot exceed 60 characters.',
+            'nationality.regex'          => 'Nationality may only contain letters and spaces — no punctuation or emojis.',
+            'county.max'                 => 'County cannot exceed 60 characters.',
+            'county.regex'               => 'County may only contain letters and spaces — no punctuation or emojis.',
+            'city_town.max'              => 'City/Town cannot exceed 60 characters.',
+            'city_town.regex'            => 'City/Town may only contain letters, spaces and hyphens.',
+            'location.max'               => 'Location cannot exceed 60 characters.',
+            'location.regex'             => 'Location may only contain letters, spaces and hyphens.',
+            'area.max'                   => 'Area cannot exceed 60 characters.',
+            'area.regex'                 => 'Area may only contain letters, spaces and hyphens.',
+            'nearby_places.max'          => 'Nearby places cannot exceed 200 characters.',
+            'nearby_places.regex'        => 'Nearby places may only contain letters, spaces, commas and hyphens.',
+            'other_services.max'         => 'Other services cannot exceed 100 characters.',
+            'other_services.regex'       => 'Other services may only contain letters, spaces and commas.',
+            'other_cities.max'           => 'Other cities cannot exceed 100 characters.',
+            'other_cities.regex'         => 'Other cities may only contain letters, spaces and commas.',
+            'incalls_rate.max'           => 'Incalls rate cannot exceed 999,999 Ksh.',
+            'outcalls_rate.max'          => 'Outcalls rate cannot exceed 999,999 Ksh.',
         ];
     }
 }

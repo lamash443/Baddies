@@ -1,4 +1,4 @@
-<section class="dash-card">
+﻿<section class="dash-card">
     <header>
         <h2 class="dash-card-title" style="font-size:1rem;">{{ __('Profile Information') }}</h2>
         <p class="dash-card-text" style="font-size:0.8rem;">{{ __("Update your account's profile information and email address.") }}</p>
@@ -22,12 +22,17 @@
             <label for="email" class="form-label">{{ __('Email') }}</label>
             <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" readonly style="cursor: not-allowed;" autocomplete="username" />
             @error('email')<div class="text-danger">{{ $message }}</div>@enderror
-
         </div>
 
         <div class="mb-3">
             <label for="phone_number" class="form-label">{{ __('Phone Number') }}</label>
-            <input id="phone_number" name="phone_number" type="text" class="form-control" value="{{ old('phone_number', $user->phone_number) }}" autocomplete="tel" />
+            <input id="phone_number" name="phone_number" type="text" class="form-control pf-sanitise"
+                data-pattern="phone"
+                maxlength="15"
+                placeholder="+254 7XX XXX XXX"
+                value="{{ old('phone_number', $user->phone_number) }}"
+                autocomplete="tel" />
+            <div class="form-text text-secondary pf-hint">Digits, + and spaces only. Max 15 characters.</div>
             @error('phone_number')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -63,53 +68,86 @@
                 onblur="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
                 onchange="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
                 placeholder="18" />
-            <div class="form-text text-secondary" style="font-size:0.75rem;">Minimum age allowed is 18 years.</div>
+            <div class="form-text text-secondary pf-hint">Minimum age is 18, maximum is 100.</div>
             @error('age')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="nationality" class="form-label">{{ __('Nationality') }}</label>
-            <input id="nationality" name="nationality" type="text" class="form-control" value="{{ old('nationality', $user->nationality) }}" />
+            <input id="nationality" name="nationality" type="text" class="form-control pf-sanitise"
+                data-pattern="name"
+                maxlength="60"
+                placeholder="e.g. Kenyan"
+                value="{{ old('nationality', $user->nationality) }}" />
+            <div class="form-text text-secondary pf-hint">Letters and spaces only. Max 60 characters.</div>
             @error('nationality')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="county" class="form-label">{{ __('County') }}</label>
-            <input id="county" name="county" type="text" class="form-control" value="{{ old('county', $user->county) }}" list="county-list" />
+            <input id="county" name="county" type="text" class="form-control pf-sanitise"
+                data-pattern="name"
+                maxlength="60"
+                value="{{ old('county', $user->county) }}"
+                list="county-list" />
             <datalist id="county-list">
-                @foreach(['Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua','Murang\'a','Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'] as $county)
+                @foreach(['Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua',"Murang'a",'Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'] as $county)
                     <option value="{{ $county }}">
                 @endforeach
             </datalist>
+            <div class="form-text text-secondary pf-hint">Letters and spaces only. Max 60 characters.</div>
             @error('county')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="city_town" class="form-label">{{ __('City / Town') }}</label>
-            <input id="city_town" name="city_town" type="text" class="form-control" value="{{ old('city_town', $user->city_town) }}" />
+            <input id="city_town" name="city_town" type="text" class="form-control pf-sanitise"
+                data-pattern="name"
+                maxlength="60"
+                placeholder="e.g. Nairobi"
+                value="{{ old('city_town', $user->city_town) }}" />
+            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('city_town')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="location" class="form-label">{{ __('Location') }}</label>
-            <input id="location" name="location" type="text" class="form-control" value="{{ old('location', $user->location) }}" list="location-list" />
+            <input id="location" name="location" type="text" class="form-control pf-sanitise"
+                data-pattern="name"
+                maxlength="60"
+                value="{{ old('location', $user->location) }}"
+                list="location-list" />
             <datalist id="location-list">
                 @foreach(['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road','Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'] as $loc)
                     <option value="{{ $loc }}">
                 @endforeach
             </datalist>
+            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('location')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="area" class="form-label">{{ __('Area') }}</label>
-            <input id="area" name="area" type="text" class="form-control" value="{{ old('area', $user->area) }}" />
+            <input id="area" name="area" type="text" class="form-control pf-sanitise"
+                data-pattern="name"
+                maxlength="60"
+                placeholder="e.g. Westlands"
+                value="{{ old('area', $user->area) }}" />
+            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('area')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
         <div class="mb-3">
             <label for="nearby_places" class="form-label">{{ __('Nearby Places') }}</label>
-            <textarea id="nearby_places" name="nearby_places" class="form-control" rows="3">{{ old('nearby_places', $user->nearby_places) }}</textarea>
+            <textarea id="nearby_places" name="nearby_places" class="form-control pf-sanitise"
+                data-pattern="places"
+                maxlength="200"
+                rows="3"
+                placeholder="e.g. Westgate Mall, Junction Mall">{{ old('nearby_places', $user->nearby_places) }}</textarea>
+            <div class="d-flex justify-content-between align-items-center mt-1">
+                <div class="form-text text-secondary pf-hint">Letters, spaces, commas and hyphens only.</div>
+                <div class="form-text text-secondary" id="counter-nearby_places">0 / 200</div>
+            </div>
             @error('nearby_places')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -140,7 +178,12 @@
 
         <div class="mb-3">
             <label for="other_services" class="form-label">{{ __('Other services') }}</label>
-            <input id="other_services" name="other_services" type="text" class="form-control" value="{{ old('other_services', $user->other_services) }}" />
+            <input id="other_services" name="other_services" type="text" class="form-control pf-sanitise"
+                data-pattern="list"
+                maxlength="100"
+                placeholder="e.g. Massage, Companionship"
+                value="{{ old('other_services', $user->other_services) }}" />
+            <div class="form-text text-secondary pf-hint">Letters, spaces and commas only. Max 100 characters.</div>
             @error('other_services')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -148,28 +191,37 @@
             <div class="col-md-6 mb-3 mb-md-0">
                 <label for="incalls_rate" class="form-label">{{ __('Incalls rate') }}</label>
                 <div class="input-group">
-                    <input id="incalls_rate" name="incalls_rate" type="number" min="0" class="form-control" value="{{ old('incalls_rate', $user->incalls_rate) }}" />
+                    <input id="incalls_rate" name="incalls_rate" type="number" min="0" max="999999" class="form-control"
+                        value="{{ old('incalls_rate', $user->incalls_rate) }}"
+                        onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
+                <div class="form-text text-secondary pf-hint">Positive numbers only. Max 999,999 Ksh.</div>
                 @error('incalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
                 <label for="outcalls_rate" class="form-label">{{ __('Outcalls rate') }}</label>
                 <div class="input-group">
-                    <input id="outcalls_rate" name="outcalls_rate" type="number" min="0" class="form-control" value="{{ old('outcalls_rate', $user->outcalls_rate) }}" />
+                    <input id="outcalls_rate" name="outcalls_rate" type="number" min="0" max="999999" class="form-control"
+                        value="{{ old('outcalls_rate', $user->outcalls_rate) }}"
+                        onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
+                <div class="form-text text-secondary pf-hint">Positive numbers only. Max 999,999 Ksh.</div>
                 @error('outcalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
         </div>
 
         <div class="mb-4">
             <label for="other_cities" class="form-label">{{ __('Other cities') }}</label>
-            <input id="other_cities" name="other_cities" type="text" class="form-control" value="{{ old('other_cities', $user->other_cities) }}" />
+            <input id="other_cities" name="other_cities" type="text" class="form-control pf-sanitise"
+                data-pattern="list"
+                maxlength="100"
+                placeholder="e.g. Mombasa, Kisumu, Nakuru"
+                value="{{ old('other_cities', $user->other_cities) }}" />
+            <div class="form-text text-secondary pf-hint">Letters, spaces and commas only. Max 100 characters.</div>
             @error('other_cities')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
-
-
 
         <div class="d-flex align-items-center gap-3">
             <button type="submit" class="btn-orange">{{ __('Save') }}</button>
@@ -179,3 +231,48 @@
         </div>
     </form>
 </section>
+
+<script>
+(function () {
+  /* Allowed-character patterns per field type — anything NOT matching is stripped */
+  var PATTERNS = {
+    phone:  /[^0-9+\s\-]/g,
+    name:   /[^a-zA-Z\u00C0-\u024F\s'\-]/g,
+    places: /[^a-zA-Z\u00C0-\u024F\s,.\-]/g,
+    list:   /[^a-zA-Z\u00C0-\u024F\s,\-]/g
+  };
+  /* Strip emoji / symbol blocks */
+  var EMOJI_RE = /[\uD800-\uDFFF\u2600-\u27BF\u2300-\u23FF\uFE00-\uFE0F]/g;
+
+  function sanitise(el) {
+    var pattern = PATTERNS[el.dataset.pattern];
+    if (!pattern) return;
+    var pos = el.selectionStart;
+    var before = el.value;
+    var after = before.replace(EMOJI_RE, '').replace(pattern, '');
+    if (after !== before) {
+      el.value = after;
+      var removed = before.length - after.length;
+      try { el.setSelectionRange(Math.max(0, pos - removed), Math.max(0, pos - removed)); } catch(e) {}
+    }
+    updateCounter(el);
+  }
+
+  function updateCounter(el) {
+    var counter = document.getElementById('counter-' + el.id);
+    if (!counter) return;
+    var max = parseInt(el.getAttribute('maxlength'), 10);
+    var len = el.value.length;
+    counter.textContent = len + ' / ' + max;
+    counter.style.color = len >= max ? '#dc3545' : len >= max * 0.85 ? '#ffc107' : '';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.pf-sanitise').forEach(function (el) {
+      el.addEventListener('input', function () { sanitise(el); });
+      el.addEventListener('paste', function () { setTimeout(function () { sanitise(el); }, 0); });
+      updateCounter(el);
+    });
+  });
+})();
+</script>
