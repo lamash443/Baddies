@@ -20,14 +20,18 @@ use Illuminate\Database\Eloquent\Builder;
 class VisitorResource extends Resource
 {
     protected static ?string $model = Visitor::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
     protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
     protected static ?string $navigationLabel = 'Unique Visitors';
     protected static ?int    $navigationSort  = 5;
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Visitor::distinct('ip_address')->count('ip_address');
+        try {
+            return (string) Visitor::distinct('ip_address')->count('ip_address');
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public static function getNavigationBadgeColor(): string
@@ -37,22 +41,37 @@ class VisitorResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->selectRaw('
-                MAX(id) as id,
-                ip_address,
-                MAX(country) as country,
-                MAX(country_code) as country_code,
-                MAX(city) as city,
-                MAX(region) as region,
-                MAX(user_agent) as user_agent,
-                MIN(COALESCE(first_visit_at, created_at)) as first_visit_at,
-                MAX(COALESCE(last_visit_at, updated_at)) as last_visit_at,
-                SUM(visits_count) as visits_count,
-                SUM(total_time_seconds) as total_time_seconds,
-                MAX(created_at) as created_at
-            ')
-            ->groupBy('ip_address');
+        try {
+            $hasCountry = \Illuminate\Support\Facades\Schema::hasColumn('visitors', 'country');
+            $hasTime = \Illuminate\Support\Facades\Schema::hasColumn('visitors', 'total_time_seconds');
+
+            $select = [
+                'MAX(id) as id',
+                'ip_address',
+                'MAX(user_agent) as user_agent',
+                'MIN(created_at) as first_visit_at',
+                'MAX(COALESCE(last_visit_at, updated_at)) as last_visit_at',
+                'SUM(visits_count) as visits_count',
+                'MAX(created_at) as created_at',
+            ];
+
+            if ($hasCountry) {
+                $select[] = 'MAX(country) as country';
+                $select[] = 'MAX(country_code) as country_code';
+                $select[] = 'MAX(city) as city';
+                $select[] = 'MAX(region) as region';
+            }
+
+            if ($hasTime) {
+                $select[] = 'SUM(total_time_seconds) as total_time_seconds';
+            }
+
+            return parent::getEloquentQuery()
+                ->selectRaw(implode(', ', $select))
+                ->groupBy('ip_address');
+        } catch (\Throwable $e) {
+            return parent::getEloquentQuery();
+        }
     }
 
     public static function table(Table $table): Table

@@ -1,7 +1,7 @@
 @php
     $columns = $this->getColumns();
     $pollingInterval = $this->getPollingInterval();
-    $visitors = $this->uniqueVisitors;
+    $visitors = $this->uniqueVisitors ?? collect();
     $totalCount = $visitors->count();
 @endphp
 
@@ -239,7 +239,7 @@
 
                 <div class="flex items-center gap-3">
                     <a
-                        href="{{ \App\Filament\Resources\VisitorResource::getUrl('index') }}"
+                        href="{{ url('/admin/visitors') }}"
                         class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 dark:border-white/10 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                         <span>Open Full Visitors Page</span>

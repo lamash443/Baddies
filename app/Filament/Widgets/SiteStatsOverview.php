@@ -25,83 +25,101 @@ class SiteStatsOverview extends StatsOverviewWidget
      */
     public function getUniqueVisitorsProperty(): Collection
     {
-        $hasCountry = Schema::hasColumn('visitors', 'country');
-        $hasTime = Schema::hasColumn('visitors', 'total_time_seconds');
+        try {
+            $hasCountry = Schema::hasColumn('visitors', 'country');
+            $hasTime = Schema::hasColumn('visitors', 'total_time_seconds');
 
-        $select = [
-            'ip_address',
-            'MAX(user_agent) as user_agent',
-            'MIN(COALESCE(first_visit_at, created_at)) as first_visit_at',
-            'MAX(COALESCE(last_visit_at, updated_at)) as last_visit_at',
-            'SUM(visits_count) as visits_count',
-            'MAX(id) as id',
-        ];
+            $select = [
+                'ip_address',
+                'MAX(user_agent) as user_agent',
+                'MIN(created_at) as first_visit_at',
+                'MAX(COALESCE(last_visit_at, updated_at)) as last_visit_at',
+                'SUM(visits_count) as visits_count',
+                'MAX(id) as id',
+            ];
 
-        if ($hasCountry) {
-            $select[] = 'MAX(country) as country';
-            $select[] = 'MAX(country_code) as country_code';
-            $select[] = 'MAX(city) as city';
-            $select[] = 'MAX(region) as region';
-        }
+            if ($hasCountry) {
+                $select[] = 'MAX(country) as country';
+                $select[] = 'MAX(country_code) as country_code';
+                $select[] = 'MAX(city) as city';
+                $select[] = 'MAX(region) as region';
+            }
 
-        if ($hasTime) {
-            $select[] = 'SUM(total_time_seconds) as total_time_seconds';
-        }
+            if ($hasTime) {
+                $select[] = 'SUM(total_time_seconds) as total_time_seconds';
+            }
 
-        $query = Visitor::query();
+            $query = Visitor::query();
 
-        if (!empty(trim($this->search))) {
-            $term = trim($this->search);
-            $query->where(function ($q) use ($term, $hasCountry) {
-                $q->where('ip_address', 'like', "%{$term}%");
-                if ($hasCountry) {
-                    $q->orWhere('country', 'like', "%{$term}%")
-                      ->orWhere('city', 'like', "%{$term}%");
-                }
-            });
-        }
-
-        $records = $query
-            ->selectRaw(implode(', ', $select))
-            ->groupBy('ip_address')
-            ->orderByDesc('last_visit_at')
-            ->limit(100)
-            ->get();
-
-        // Ensure location is populated for records that have null country
-        foreach ($records as $visitor) {
-            if (empty($visitor->country) && !empty($visitor->ip_address)) {
-                $geo = GeoLocationService::lookup($visitor->ip_address);
-                if (!empty($geo['country'])) {
-                    $visitor->country = $geo['country'];
-                    $visitor->country_code = $geo['country_code'];
-                    $visitor->city = $geo['city'];
-                    $visitor->region = $geo['region'];
-
-                    // Update in background if table has columns
+            if (!empty(trim($this->search))) {
+                $term = trim($this->search);
+                $query->where(function ($q) use ($term, $hasCountry) {
+                    $q->where('ip_address', 'like', "%{$term}%");
                     if ($hasCountry) {
-                        Visitor::where('ip_address', $visitor->ip_address)
-                            ->whereNull('country')
-                            ->update([
-                                'country' => $geo['country'],
-                                'country_code' => $geo['country_code'],
-                                'city' => $geo['city'],
-                                'region' => $geo['region'],
-                            ]);
+                        $q->orWhere('country', 'like', "%{$term}%")
+                          ->orWhere('city', 'like', "%{$term}%");
+                    }
+                });
+            }
+
+            $records = $query
+                ->selectRaw(implode(', ', $select))
+                ->groupBy('ip_address')
+                ->orderByDesc('last_visit_at')
+                ->limit(100)
+                ->get();
+
+            // Ensure location is populated for records that have null country
+            foreach ($records as $visitor) {
+                if (empty($visitor->country) && !empty($visitor->ip_address)) {
+                    $geo = GeoLocationService::lookup($visitor->ip_address);
+                    if (!empty($geo['country'])) {
+                        $visitor->country = $geo['country'];
+                        $visitor->country_code = $geo['country_code'];
+                        $visitor->city = $geo['city'];
+                        $visitor->region = $geo['region'];
+
+                        // Update in background if table has columns
+                        if ($hasCountry) {
+                            try {
+                                Visitor::where('ip_address', $visitor->ip_address)
+                                    ->whereNull('country')
+                                    ->update([
+                                        'country' => $geo['country'],
+                                        'country_code' => $geo['country_code'],
+                                        'city' => $geo['city'],
+                                        'region' => $geo['region'],
+                                    ]);
+                            } catch (\Throwable $e) {}
+                        }
                     }
                 }
             }
-        }
 
-        return $records;
+            return $records;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('SiteStatsOverview unique visitors error: ' . $e->getMessage());
+            return collect();
+        }
     }
 
     protected function getStats(): array
     {
-        $totalUniqueVisitors = Visitor::distinct('ip_address')->count('ip_address');
-        $todayUniqueVisitors = Visitor::whereDate('visit_date', today())->distinct('ip_address')->count('ip_address');
-        $totalActivities = \Spatie\Activitylog\Models\Activity::count();
-        $todayActivities = \Spatie\Activitylog\Models\Activity::whereDate('created_at', today())->count();
+        try {
+            $totalUniqueVisitors = Visitor::distinct('ip_address')->count('ip_address');
+            $todayUniqueVisitors = Visitor::whereDate('visit_date', today())->distinct('ip_address')->count('ip_address');
+        } catch (\Throwable $e) {
+            $totalUniqueVisitors = 0;
+            $todayUniqueVisitors = 0;
+        }
+
+        try {
+            $totalActivities = \Spatie\Activitylog\Models\Activity::count();
+            $todayActivities = \Spatie\Activitylog\Models\Activity::whereDate('created_at', today())->count();
+        } catch (\Throwable $e) {
+            $totalActivities = 0;
+            $todayActivities = 0;
+        }
 
         return [
             Stat::make('Total Unique Visitors', number_format($totalUniqueVisitors))
@@ -137,4 +155,5 @@ class SiteStatsOverview extends StatsOverviewWidget
         ];
     }
 }
+
 

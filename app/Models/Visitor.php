@@ -96,15 +96,22 @@ class Visitor extends Model
                 // Auto resolve on the fly if not cached
                 $geo = GeoLocationService::lookup($this->ip_address);
                 if (!empty($geo['country'])) {
-                    $this->updateQuietly([
-                        'country' => $geo['country'],
-                        'country_code' => $geo['country_code'],
-                        'city' => $geo['city'],
-                        'region' => $geo['region'],
-                    ]);
                     $flag = GeoLocationService::getFlagEmoji($geo['country_code']);
                     $city = $geo['city'];
                     $country = $geo['country'];
+
+                    try {
+                        if (\Illuminate\Support\Facades\Schema::hasColumn('visitors', 'country')) {
+                            $this->updateQuietly([
+                                'country' => $geo['country'],
+                                'country_code' => $geo['country_code'],
+                                'city' => $geo['city'],
+                                'region' => $geo['region'],
+                            ]);
+                        }
+                    } catch (\Throwable $e) {
+                        // Ignore if table columns are not yet migrated
+                    }
                 }
             }
         }
