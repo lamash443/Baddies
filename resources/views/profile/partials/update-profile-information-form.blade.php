@@ -1,4 +1,4 @@
-﻿<section class="dash-card">
+<section class="dash-card">
     <header>
         <h2 class="dash-card-title" style="font-size:1rem;">{{ __('Profile Information') }}</h2>
         <p class="dash-card-text" style="font-size:0.8rem;">{{ __("Update your account's profile information and email address.") }}</p>
@@ -32,7 +32,7 @@
                 placeholder="+254 7XX XXX XXX"
                 value="{{ old('phone_number', $user->phone_number) }}"
                 autocomplete="tel" />
-            <div class="form-text text-secondary pf-hint">Digits, + and spaces only. Max 15 characters.</div>
+
             @error('phone_number')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -68,7 +68,7 @@
                 onblur="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
                 onchange="if(this.value !== '' && parseInt(this.value, 10) < 18) { this.value = 18; }"
                 placeholder="18" />
-            <div class="form-text text-secondary pf-hint">Minimum age is 18, maximum is 100.</div>
+
             @error('age')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -76,10 +76,9 @@
             <label for="nationality" class="form-label">{{ __('Nationality') }}</label>
             <input id="nationality" name="nationality" type="text" class="form-control pf-sanitise"
                 data-pattern="name"
-                maxlength="60"
+                maxlength="30"
                 placeholder="e.g. Kenyan"
                 value="{{ old('nationality', $user->nationality) }}" />
-            <div class="form-text text-secondary pf-hint">Letters and spaces only. Max 60 characters.</div>
             @error('nationality')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -87,7 +86,7 @@
             <label for="county" class="form-label">{{ __('County') }}</label>
             <input id="county" name="county" type="text" class="form-control pf-sanitise"
                 data-pattern="name"
-                maxlength="60"
+                maxlength="30"
                 value="{{ old('county', $user->county) }}"
                 list="county-list" />
             <datalist id="county-list">
@@ -95,7 +94,6 @@
                     <option value="{{ $county }}">
                 @endforeach
             </datalist>
-            <div class="form-text text-secondary pf-hint">Letters and spaces only. Max 60 characters.</div>
             @error('county')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -103,10 +101,9 @@
             <label for="city_town" class="form-label">{{ __('City / Town') }}</label>
             <input id="city_town" name="city_town" type="text" class="form-control pf-sanitise"
                 data-pattern="name"
-                maxlength="60"
+                maxlength="30"
                 placeholder="e.g. Nairobi"
                 value="{{ old('city_town', $user->city_town) }}" />
-            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('city_town')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -114,7 +111,7 @@
             <label for="location" class="form-label">{{ __('Location') }}</label>
             <input id="location" name="location" type="text" class="form-control pf-sanitise"
                 data-pattern="name"
-                maxlength="60"
+                maxlength="30"
                 value="{{ old('location', $user->location) }}"
                 list="location-list" />
             <datalist id="location-list">
@@ -122,7 +119,6 @@
                     <option value="{{ $loc }}">
                 @endforeach
             </datalist>
-            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('location')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -130,10 +126,9 @@
             <label for="area" class="form-label">{{ __('Area') }}</label>
             <input id="area" name="area" type="text" class="form-control pf-sanitise"
                 data-pattern="name"
-                maxlength="60"
+                maxlength="30"
                 placeholder="e.g. Westlands"
                 value="{{ old('area', $user->area) }}" />
-            <div class="form-text text-secondary pf-hint">Letters, spaces and hyphens only. Max 60 characters.</div>
             @error('area')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -144,10 +139,7 @@
                 maxlength="200"
                 rows="3"
                 placeholder="e.g. Westgate Mall, Junction Mall">{{ old('nearby_places', $user->nearby_places) }}</textarea>
-            <div class="d-flex justify-content-between align-items-center mt-1">
-                <div class="form-text text-secondary pf-hint">Letters, spaces, commas and hyphens only.</div>
-                <div class="form-text text-secondary" id="counter-nearby_places">0 / 200</div>
-            </div>
+
             @error('nearby_places')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -183,7 +175,7 @@
                 maxlength="100"
                 placeholder="e.g. Massage, Companionship"
                 value="{{ old('other_services', $user->other_services) }}" />
-            <div class="form-text text-secondary pf-hint">Letters, spaces and commas only. Max 100 characters.</div>
+
             @error('other_services')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -196,7 +188,7 @@
                         onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
-                <div class="form-text text-secondary pf-hint">Positive numbers only. Max 999,999 Ksh.</div>
+
                 @error('incalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-6">
@@ -207,7 +199,7 @@
                         onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
                 </div>
-                <div class="form-text text-secondary pf-hint">Positive numbers only. Max 999,999 Ksh.</div>
+
                 @error('outcalls_rate')<div class="text-danger">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -219,7 +211,7 @@
                 maxlength="100"
                 placeholder="e.g. Mombasa, Kisumu, Nakuru"
                 value="{{ old('other_cities', $user->other_cities) }}" />
-            <div class="form-text text-secondary pf-hint">Letters, spaces and commas only. Max 100 characters.</div>
+
             @error('other_cities')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
