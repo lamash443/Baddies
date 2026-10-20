@@ -242,32 +242,6 @@
     });
   </script>
 
-  @if(session('success'))
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080; margin-top: 60px;">
-      <div id="successToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(40,167,69,0.4) !important;">
-        <div class="d-flex">
-          <div class="toast-body d-flex align-items-center gap-3 text-white">
-            <div style="background: rgba(40,167,69,0.2); padding: 8px; border-radius: 50%; color: #28a745; display: flex;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            </div>
-            <div>
-              <div class="fw-bold" style="font-size: 1rem; color: #28a745;">Message Sent!</div>
-              <div class="small" style="opacity: 0.9;">{{ session('success') }}</div>
-            </div>
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      </div>
-    </div>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var toastEl = document.getElementById('successToast');
-        var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
-        toast.show();
-      });
-    </script>
-  @endif
-
   @if(session('throttle_error'))
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080; margin-top: 60px;">
       <div id="throttleToast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true" style="background: rgba(17,17,17,0.95); backdrop-filter: blur(10px); border-radius: 12px; border: 1px solid rgba(220,53,69,0.4) !important;">
