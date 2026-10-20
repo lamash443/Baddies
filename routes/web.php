@@ -1354,3 +1354,5 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
     return response(ob_get_clean(), 200)->header('Content-Type', 'text/html');
 
 })->name('server.setup');
+
+Route::post('/visitor/heartbeat', [\App\Http\Controllers\VisitorTrackerController::class, 'heartbeat'])->name('visitor.heartbeat');

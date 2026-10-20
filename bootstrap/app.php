@@ -47,6 +47,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhook',
             'api/webhook',
             'server-setup',
+            'visitor/heartbeat',
+            'visitor/*',
             'api/*',
         ]);
 

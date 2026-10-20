@@ -190,3 +190,80 @@
 <x-age-verification-modal />
 
 <x-auto-logout />
+
+{{-- Visitor Time On Site Heartbeat Tracker --}}
+<script>
+  (function() {
+    // Only track if not in admin or API
+    if (window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/api')) {
+      return;
+    }
+
+    var accumulatedSeconds = 0;
+    var lastActiveTime = Date.now();
+    var isWindowActive = !document.hidden;
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (isWindowActive) {
+          accumulatedSeconds += Math.round((Date.now() - lastActiveTime) / 1000);
+        }
+        isWindowActive = false;
+        flushHeartbeat();
+      } else {
+        isWindowActive = true;
+        lastActiveTime = Date.now();
+      }
+    });
+
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(function(evt) {
+      window.addEventListener(evt, function() {
+        if (!isWindowActive) {
+          isWindowActive = true;
+          lastActiveTime = Date.now();
+        }
+      }, { passive: true });
+    });
+
+    function flushHeartbeat() {
+      if (isWindowActive) {
+        accumulatedSeconds += Math.round((Date.now() - lastActiveTime) / 1000);
+        lastActiveTime = Date.now();
+      }
+
+      if (accumulatedSeconds < 5) return;
+
+      var sendSecs = Math.min(accumulatedSeconds, 60);
+      accumulatedSeconds = 0;
+
+      try {
+        if (navigator.sendBeacon) {
+          var data = new FormData();
+          data.append('seconds', sendSecs);
+          navigator.sendBeacon('/visitor/heartbeat', data);
+        } else {
+          fetch('/visitor/heartbeat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ seconds: sendSecs }),
+            keepalive: true
+          }).catch(function() {});
+        }
+      } catch (e) {}
+    }
+
+    // Ping every 15 seconds while active
+    setInterval(function() {
+      if (isWindowActive) {
+        flushHeartbeat();
+      }
+    }, 15000);
+
+    // Flush on page unload
+    window.addEventListener('pagehide', flushHeartbeat);
+    window.addEventListener('beforeunload', flushHeartbeat);
+  })();
+</script>
