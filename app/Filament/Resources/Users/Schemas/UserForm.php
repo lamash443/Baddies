@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use App\Models\Location;
 
 class UserForm
 {
@@ -130,21 +131,57 @@ class UserForm
                             ->minValue(18),
                         TextInput::make('nationality'),
                         Select::make('county')
-                            ->options([
-                                'Mombasa'=>'Mombasa','Nakuru'=>'Nakuru','Kiambu'=>'Kiambu','Kisumu'=>'Kisumu','Machakos'=>'Machakos','Kajiado'=>'Kajiado','Uasin Gishu'=>'Uasin Gishu','Kilifi'=>'Kilifi','Meru'=>'Meru','Nyeri'=>'Nyeri','Embu'=>'Embu','Kakamega'=>'Kakamega','Bungoma'=>'Bungoma','Bomet'=>'Bomet','Kisii'=>'Kisii','Migori'=>'Migori','Homa Bay'=>'Homa Bay','Siaya'=>'Siaya','Vihiga'=>'Vihiga','Trans Nzoia'=>'Trans Nzoia','Nandi'=>'Nandi','Elgeyo Marakwet'=>'Elgeyo Marakwet','Baringo'=>'Baringo','Laikipia'=>'Laikipia','Nyandarua'=>'Nyandarua','Murang\'a'=>'Murang\'a','Kirinyaga'=>'Kirinyaga','Tharaka Nithi'=>'Tharaka Nithi','Isiolo'=>'Isiolo','Garissa'=>'Garissa','Wajir'=>'Wajir','Mandera'=>'Mandera','Marsabit'=>'Marsabit','Samburu'=>'Samburu','Turkana'=>'Turkana','West Pokot'=>'West Pokot','Lamu'=>'Lamu','Taita Taveta'=>'Taita Taveta','Kwale'=>'Kwale','Tana River'=>'Tana River','Narok'=>'Narok','Kericho'=>'Kericho','Nyamira'=>'Nyamira','Rachuonyo'=>'Rachuonyo',
+                            ->options(function () {
+                                $static = ['Nairobi','Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua',"Murang'a",'Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'];
+                                $db = Location::where('is_active', true)->where('type', 'county')->orderBy('name')->pluck('name')->toArray();
+                                $all = array_unique(array_merge($static, $db));
+                                sort($all);
+                                return array_combine($all, $all);
+                            })
+                            ->searchable()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label('County Name')
+                                    ->required()
+                                    ->maxLength(100),
                             ])
-                            ->searchable(),
+                            ->createOptionUsing(function (array $data) {
+                                $location = Location::firstOrCreate(
+                                    ['name' => $data['name']],
+                                    ['type' => 'county', 'is_active' => true]
+                                );
+                                return $location->name;
+                            })
+                            ->nullable(),
                         TextInput::make('city_town'),
                         Select::make('location')
-                            ->options([
-                                'Major Roads' => [
-                                    'James Gichuru Road'=>'James Gichuru Road','Southern Bypass'=>'Southern Bypass','Gitanga Road'=>'Gitanga Road','Naivasha Road'=>'Naivasha Road','Northern Bypass'=>'Northern Bypass','Eastern Bypass'=>'Eastern Bypass','Manyanja Rd'=>'Manyanja Rd','Waiyaki Way'=>'Waiyaki Way','Kiambu Road'=>'Kiambu Road','Langata Road'=>'Langata Road','Outering Road'=>'Outering Road','Kangundo Road'=>'Kangundo Road','Ngong Road'=>'Ngong Road','Kamiti Road'=>'Kamiti Road','Jogoo Road'=>'Jogoo Road','Mombasa Road'=>'Mombasa Road','Thika Road'=>'Thika Road',
-                                ],
-                                'Nairobi Areas' => [
-                                    'Allsops'=>'Allsops','Banana'=>'Banana','Buruburu'=>'Buruburu','Chokaa'=>'Chokaa','Dagoretti'=>'Dagoretti','Dandora'=>'Dandora','Donholm'=>'Donholm','Eastlands'=>'Eastlands','Eastleigh'=>'Eastleigh','Embakasi'=>'Embakasi','Garden City'=>'Garden City','Githurai 44'=>'Githurai 44','Githurai 45'=>'Githurai 45','Homeland'=>'Homeland','Hurlingham'=>'Hurlingham','Huruma'=>'Huruma','Imara Daima'=>'Imara Daima','Jamhuri'=>'Jamhuri','Joska'=>'Joska','Juja'=>'Juja','Kabete'=>'Kabete','Kahawa Sukari'=>'Kahawa Sukari','Kahawa Wendani'=>'Kahawa Wendani','Kahawa West'=>'Kahawa West','Kamulu'=>'Kamulu','Kangemi'=>'Kangemi','Karen'=>'Karen','Kariobangi'=>'Kariobangi','Kasarani'=>'Kasarani','Kawangware'=>'Kawangware','Kayole'=>'Kayole','Kenyatta Road'=>'Kenyatta Road','Kibera'=>'Kibera','Kikuyu'=>'Kikuyu','Kileleshwa'=>'Kileleshwa','Kilimani'=>'Kilimani','Kitengela'=>'Kitengela','Kitisuru'=>'Kitisuru','Komarock'=>'Komarock','Langata'=>'Langata','Lavington'=>'Lavington','Loresho'=>'Loresho','Madaraka'=>'Madaraka','Makadara'=>'Makadara','Malaa'=>'Malaa','Mathare'=>'Mathare','Milimani'=>'Milimani','Mlolongo'=>'Mlolongo','Muthaiga'=>'Muthaiga','Muthangari'=>'Muthangari','Muthurwa'=>'Muthurwa','Mwiki'=>'Mwiki','Nairobi Town'=>'Nairobi Town','Nairobi West'=>'Nairobi West','Ndenderu'=>'Ndenderu','Ngara'=>'Ngara','Ngong'=>'Ngong','Ngumba'=>'Ngumba','Njiru'=>'Njiru','Pangani'=>'Pangani','Parklands'=>'Parklands','Roasters'=>'Roasters','Ongata Rongai'=>'Ongata Rongai','Roysambu'=>'Roysambu','Ruai'=>'Ruai','Ruaka'=>'Ruaka','Ruaraka'=>'Ruaraka','Ruiru'=>'Ruiru','Runda'=>'Runda','Saika'=>'Saika','South B'=>'South B','South C'=>'South C','Syokimau'=>'Syokimau','Thogoto'=>'Thogoto','Thome'=>'Thome','Umoja'=>'Umoja','Upper Hill'=>'Upper Hill','Utawala'=>'Utawala','Uthiru'=>'Uthiru','Westlands'=>'Westlands',
-                                ],
+                            ->options(function () {
+                                $static = ['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road','Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'];
+                                $db = Location::where('is_active', true)->whereIn('type', ['road', 'area'])->orderBy('name')->pluck('name')->toArray();
+                                $all = array_unique(array_merge($static, $db));
+                                sort($all);
+                                return array_combine($all, $all);
+                            })
+                            ->searchable()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label('Location / Area Name')
+                                    ->required()
+                                    ->maxLength(100),
+                                Select::make('type')
+                                    ->label('Type')
+                                    ->options(['area' => 'Area', 'road' => 'Road'])
+                                    ->default('area')
+                                    ->required(),
                             ])
-                            ->searchable(),
+                            ->createOptionUsing(function (array $data) {
+                                $location = Location::firstOrCreate(
+                                    ['name' => $data['name']],
+                                    ['type' => $data['type'] ?? 'area', 'is_active' => true]
+                                );
+                                return $location->name;
+                            })
+                            ->nullable(),
                         TextInput::make('area'),
                         TextInput::make('nearby_places'),
                         Select::make('services')

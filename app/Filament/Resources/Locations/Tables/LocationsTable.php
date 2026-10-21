@@ -3,12 +3,13 @@
 namespace App\Filament\Resources\Locations\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 class LocationsTable
 {
@@ -38,13 +39,14 @@ class LocationsTable
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'road' => 'Road',
-                        'area' => 'Area',
+                        'road'   => 'Road',
+                        'area'   => 'Area',
                         'county' => 'County',
                     ]),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

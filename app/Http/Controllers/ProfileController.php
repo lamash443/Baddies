@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Location;
 use App\Models\MembershipPlan;
 use App\Models\UserPhoto;
 use App\Models\UserVideo;
@@ -96,6 +97,24 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        // Auto-save new county to locations table for admin management
+        $county = $request->validated('county');
+        if ($county) {
+            Location::firstOrCreate(
+                ['name' => $county],
+                ['type' => 'county', 'is_active' => true]
+            );
+        }
+
+        // Auto-save new location to locations table for admin management
+        $location = $request->validated('location');
+        if ($location) {
+            Location::firstOrCreate(
+                ['name' => $location],
+                ['type' => 'area', 'is_active' => true]
+            );
+        }
 
         $tab = in_array($request->input('_redirect_tab'), ['tab-profile', 'tab-settings'])
             ? $request->input('_redirect_tab')

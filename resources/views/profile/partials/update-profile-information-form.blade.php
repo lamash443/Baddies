@@ -82,18 +82,29 @@
             @error('nationality')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
+        @php
+            $kenyanCounties = ['Nairobi','Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua',"Murang'a",'Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'];
+            $dbCounties = \App\Models\Location::where('is_active', true)->where('type', 'county')->orderBy('name')->pluck('name')->toArray();
+            $allCounties = array_unique(array_merge($kenyanCounties, $dbCounties));
+            sort($allCounties);
+            $currentCounty = old('county', $user->county);
+            $isCustomCounty = $currentCounty && !in_array($currentCounty, $allCounties);
+        @endphp
         <div class="mb-3">
-            <label for="county" class="form-label">{{ __('County') }}</label>
-            <input id="county" name="county" type="text" class="form-control pf-sanitise"
+            <label for="county_select" class="form-label">{{ __('County') }}</label>
+            <select id="county_select" class="form-select" onchange="handleCountyChange(this)">
+                <option value="">{{ __('Select County') }}</option>
+                @foreach($allCounties as $c)
+                    <option value="{{ $c }}" {{ $currentCounty === $c ? 'selected' : '' }}>{{ $c }}</option>
+                @endforeach
+                <option value="__other__" {{ $isCustomCounty ? 'selected' : '' }}>✏️ Other (type below)</option>
+            </select>
+            <input id="county" name="county" type="text" class="form-control pf-sanitise mt-2"
                 data-pattern="name"
                 maxlength="30"
-                value="{{ old('county', $user->county) }}"
-                list="county-list" />
-            <datalist id="county-list">
-                @foreach(['Mombasa','Nakuru','Kiambu','Kisumu','Machakos','Kajiado','Uasin Gishu','Kilifi','Meru','Nyeri','Embu','Kakamega','Bungoma','Bomet','Kisii','Migori','Homa Bay','Siaya','Vihiga','Trans Nzoia','Nandi','Elgeyo Marakwet','Baringo','Laikipia','Nyandarua',"Murang'a",'Kirinyaga','Tharaka Nithi','Isiolo','Garissa','Wajir','Mandera','Marsabit','Samburu','Turkana','West Pokot','Lamu','Taita Taveta','Kwale','Tana River','Narok','Kericho','Nyamira','Rachuonyo'] as $county)
-                    <option value="{{ $county }}">
-                @endforeach
-            </datalist>
+                placeholder="Type your county..."
+                value="{{ $isCustomCounty ? $currentCounty : ($currentCounty && !in_array($currentCounty, $allCounties) ? $currentCounty : '') }}"
+                style="display: {{ $isCustomCounty ? 'block' : 'none' }};" />
             @error('county')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -107,18 +118,29 @@
             @error('city_town')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
+        @php
+            $staticLocations = ['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road','Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'];
+            $dbLocations = \App\Models\Location::where('is_active', true)->whereIn('type', ['road','area'])->orderBy('name')->pluck('name')->toArray();
+            $allLocations = array_unique(array_merge($staticLocations, $dbLocations));
+            sort($allLocations);
+            $currentLocation = old('location', $user->location);
+            $isCustomLocation = $currentLocation && !in_array($currentLocation, $allLocations);
+        @endphp
         <div class="mb-3">
-            <label for="location" class="form-label">{{ __('Location') }}</label>
-            <input id="location" name="location" type="text" class="form-control pf-sanitise"
+            <label for="location_select" class="form-label">{{ __('Location') }}</label>
+            <select id="location_select" class="form-select" onchange="handleLocationChange(this)">
+                <option value="">{{ __('Select Location / Area') }}</option>
+                @foreach($allLocations as $loc)
+                    <option value="{{ $loc }}" {{ $currentLocation === $loc ? 'selected' : '' }}>{{ $loc }}</option>
+                @endforeach
+                <option value="__other__" {{ $isCustomLocation ? 'selected' : '' }}>✏️ Other (type below)</option>
+            </select>
+            <input id="location" name="location" type="text" class="form-control pf-sanitise mt-2"
                 data-pattern="name"
                 maxlength="30"
-                value="{{ old('location', $user->location) }}"
-                list="location-list" />
-            <datalist id="location-list">
-                @foreach(['James Gichuru Road','Southern Bypass','Gitanga Road','Naivasha Road','Northern Bypass','Eastern Bypass','Manyanja Rd','Waiyaki Way','Kiambu Road','Langata Road','Outering Road','Kangundo Road','Ngong Road','Kamiti Road','Jogoo Road','Mombasa Road','Thika Road','Allsops','Banana','Buruburu','Chokaa','Dagoretti','Dandora','Donholm','Eastlands','Eastleigh','Embakasi','Garden City','Githurai 44','Githurai 45','Homeland','Hurlingham','Huruma','Imara Daima','Jamhuri','Joska','Juja','Kabete','Kahawa Sukari','Kahawa Wendani','Kahawa West','Kamulu','Kangemi','Karen','Kariobangi','Kasarani','Kawangware','Kayole','Kenyatta Road','Kibera','Kikuyu','Kileleshwa','Kilimani','Kitengela','Kitisuru','Komarock','Langata','Lavington','Loresho','Madaraka','Makadara','Malaa','Mathare','Milimani','Mlolongo','Muthaiga','Muthangari','Muthurwa','Mwiki','Nairobi Town','Nairobi West','Ndenderu','Ngara','Ngong','Ngumba','Njiru','Pangani','Parklands','Roasters','Ongata Rongai','Roysambu','Ruai','Ruaka','Ruaraka','Ruiru','Runda','Saika','South B','South C','Syokimau','Thogoto','Thome','Umoja','Upper Hill','Utawala','Uthiru','Westlands'] as $loc)
-                    <option value="{{ $loc }}">
-                @endforeach
-            </datalist>
+                placeholder="Type your location..."
+                value="{{ $isCustomLocation ? $currentLocation : '' }}"
+                style="display: {{ $isCustomLocation ? 'block' : 'none' }};" />
             @error('location')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
@@ -229,7 +251,7 @@
   /* Allowed-character patterns per field type — anything NOT matching is stripped */
   var PATTERNS = {
     phone:  /[^0-9+\s\-]/g,
-    name:   /[^a-zA-Z\u00C0-\u024F\s'\-]/g,
+    name:   /[^a-zA-Z\u00C0-\u024F0-9\s'\-]/g,
     places: /[^a-zA-Z\u00C0-\u024F\s,.\-]/g,
     list:   /[^a-zA-Z\u00C0-\u024F\s,\-]/g
   };
@@ -267,4 +289,48 @@
     });
   });
 })();
+
+/* County dropdown handler */
+function handleCountyChange(sel) {
+  var customInput = document.getElementById('county');
+  if (sel.value === '__other__') {
+    customInput.style.display = 'block';
+    customInput.value = '';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = sel.value;
+  }
+}
+
+/* Location dropdown handler */
+function handleLocationChange(sel) {
+  var customInput = document.getElementById('location');
+  if (sel.value === '__other__') {
+    customInput.style.display = 'block';
+    customInput.value = '';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+    customInput.value = sel.value;
+  }
+}
+
+/* On page load, sync hidden inputs from dropdowns if no custom value is active */
+document.addEventListener('DOMContentLoaded', function() {
+  var countySelect = document.getElementById('county_select');
+  var countyInput  = document.getElementById('county');
+  if (countySelect && countyInput) {
+    if (countyInput.style.display !== 'block' && countySelect.value && countySelect.value !== '__other__') {
+      countyInput.value = countySelect.value;
+    }
+  }
+  var locSelect = document.getElementById('location_select');
+  var locInput  = document.getElementById('location');
+  if (locSelect && locInput) {
+    if (locInput.style.display !== 'block' && locSelect.value && locSelect.value !== '__other__') {
+      locInput.value = locSelect.value;
+    }
+  }
+});
 </script>
