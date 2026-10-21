@@ -317,10 +317,13 @@
 
       {{-- Email --}}
       <div class="mb-3">
-        <label class="auth-label" for="email">Email Address</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="auth-label mb-0" for="email">Email Address</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
+        </div>
         <input id="email" type="email" name="email"
           class="auth-custom-input" placeholder="Enter your email address"
-          value="{{ old('email') }}" autocomplete="email" required autofocus>
+          value="{{ old('email') }}" autocomplete="email" required autofocus maxlength="40">
         @error('email')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
@@ -335,7 +338,7 @@
         <div class="input-wrap">
           <input id="password" type="password" name="password"
             class="auth-custom-input" placeholder="Enter your password"
-            autocomplete="current-password" required
+            autocomplete="current-password" required maxlength="64"
             style="padding-right:2.8rem;">
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password','eye1')" aria-label="Toggle Password Visibility" tabindex="-1">
             <svg id="eye1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -377,5 +380,6 @@
     }
   }
 </script>
+<script src="{{ asset('js/auth-sanitizer.js') }}"></script>
 </body>
 </html>

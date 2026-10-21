@@ -31,10 +31,45 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Sanitize email and password inputs
+        $rawEmail = (string) $request->input('email', '');
+        $cleanEmail = strtolower(trim(preg_replace('/[^a-zA-Z0-9@._\-+]/', '', $rawEmail)));
+        $cleanEmail = mb_substr($cleanEmail, 0, 40);
+
+        $rawPassword = (string) $request->input('password', '');
+        $cleanPassword = preg_replace('/[^a-zA-Z0-9@$#&!%*?._\-+=~]/', '', $rawPassword);
+        $cleanPassword = mb_substr($cleanPassword, 0, 12);
+
+        $rawConfirm = (string) $request->input('password_confirmation', '');
+        $cleanConfirm = preg_replace('/[^a-zA-Z0-9@$#&!%*?._\-+=~]/', '', $rawConfirm);
+        $cleanConfirm = mb_substr($cleanConfirm, 0, 12);
+
+        $request->merge([
+            'email' => $cleanEmail,
+            'password' => $cleanPassword,
+            'password_confirmation' => $cleanConfirm,
+        ]);
+
         $request->validate([
             'token' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'email:rfc', 'max:40'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:12',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d$@#&!%*?._\-+=~])[a-zA-Z0-9$@#&!%*?._\-+=~]{8,12}$/',
+            ],
+        ], [
+            'email.required' => 'Please enter your email address.',
+            'email.max' => 'Email address cannot exceed 40 characters.',
+            'email.email' => 'Please provide a valid email address.',
+            'password.required' => 'Please enter a password.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.max' => 'Password cannot exceed 12 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
+            'password.regex' => 'The password must be 8 to 12 characters long and contain at least one uppercase letter, one lowercase letter, and one number or symbol.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

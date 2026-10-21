@@ -32,6 +32,19 @@ class LoginRequest extends FormRequest
                 $inputs[$key] = preg_replace($emojiPattern, '', $value);
             }
         }
+
+        // Email sanitization: lowercase, allowed email punctuation only (@._-+), max 40 chars
+        if (isset($inputs['email']) && is_string($inputs['email'])) {
+            $cleanEmail = strtolower(trim(preg_replace('/[^a-zA-Z0-9@._\-+]/', '', $inputs['email'])));
+            $inputs['email'] = mb_substr($cleanEmail, 0, 40);
+        }
+
+        // Password sanitization: remove spaces and dangerous characters (<>'"`), max 64 chars
+        if (isset($inputs['password']) && is_string($inputs['password'])) {
+            $cleanPassword = preg_replace('/[\s\'\"\`\<\>]/', '', $inputs['password']);
+            $inputs['password'] = mb_substr($cleanPassword, 0, 64);
+        }
+
         $this->replace($inputs);
     }
 
@@ -43,8 +56,22 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => ['required', 'string', 'email:rfc', 'max:40'],
+            'password' => ['required', 'string', 'max:64'],
+        ];
+    }
+
+    /**
+     * Custom validation error messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.max' => 'Email address cannot exceed 40 characters.',
+            'password.required' => 'Please enter your password.',
+            'password.max' => 'Password cannot exceed 64 characters.',
         ];
     }
 

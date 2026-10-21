@@ -206,7 +206,10 @@
 
       {{-- Email --}}
       <div class="mb-3">
-        <label class="field-label" for="email">Email Address</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="field-label mb-0" for="email">Email Address</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
+        </div>
         <input
           id="email"
           class="form-control auth-custom-input"
@@ -215,6 +218,7 @@
           value="{{ old('email', $request->email) }}"
           required autofocus autocomplete="username"
           placeholder="your@email.com"
+          maxlength="40"
         >
         @error('email')
           <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
@@ -223,7 +227,10 @@
 
       {{-- New Password --}}
       <div class="mb-3">
-        <label class="field-label" for="password">New Password</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="field-label mb-0" for="password">New Password</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">8–12 chars</span>
+        </div>
         <div class="input-pw-wrap">
           <input
             id="password"
@@ -231,7 +238,9 @@
             type="password"
             name="password"
             required autocomplete="new-password"
-            placeholder="Min. 8 characters"
+            placeholder="8-12 characters"
+            minlength="8"
+            maxlength="12"
             oninput="checkStrength(this.value)"
           >
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password', this)" tabindex="-1" aria-label="Show password">
@@ -242,7 +251,7 @@
         <!-- Strength bar -->
         <div class="pw-strength-wrap">
           <div class="pw-strength-bar-bg"><div class="pw-strength-bar" id="pwStrengthBar"></div></div>
-          <p class="pw-strength-label" id="pwStrengthLabel">Enter a password</p>
+          <p class="pw-strength-label" id="pwStrengthLabel">Enter a password (8-12 chars)</p>
         </div>
         @error('password')
           <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
@@ -251,7 +260,10 @@
 
       {{-- Confirm Password --}}
       <div class="mb-4">
-        <label class="field-label" for="password_confirmation">Confirm Password</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="field-label mb-0" for="password_confirmation">Confirm Password</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 12 chars</span>
+        </div>
         <div class="input-pw-wrap">
           <input
             id="password_confirmation"
@@ -259,7 +271,9 @@
             type="password"
             name="password_confirmation"
             required autocomplete="new-password"
-            placeholder="Re-enter your password"
+            placeholder="Repeat password (8-12 chars)"
+            minlength="8"
+            maxlength="12"
           >
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password_confirmation', this)" tabindex="-1" aria-label="Show confirm password">
             <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -306,10 +320,10 @@
     const bar   = document.getElementById('pwStrengthBar');
     const label = document.getElementById('pwStrengthLabel');
     let score = 0;
-    if (val.length >= 8)                          score++;
+    if (val.length >= 8 && val.length <= 12)     score++;
     if (/[A-Z]/.test(val))                        score++;
     if (/[0-9]/.test(val))                        score++;
-    if (/[^A-Za-z0-9]/.test(val))                score++;
+    if (/[$@#&!%*?._\-+=~]/.test(val))           score++;
 
     const levels = [
       { pct: '0%',   color: 'transparent',         text: 'Enter a password',      labelColor: 'rgba(255,255,255,0.4)' },

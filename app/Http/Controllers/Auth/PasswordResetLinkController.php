@@ -33,8 +33,18 @@ class PasswordResetLinkController extends Controller
             return back()->with('throttle_error', 'You have requested too many password resets. Please try again tomorrow.');
         }
 
+        // Sanitize email input
+        $rawEmail = (string) $request->input('email', '');
+        $cleanEmail = strtolower(trim(preg_replace('/[^a-zA-Z0-9@._\-+]/', '', $rawEmail)));
+        $cleanEmail = mb_substr($cleanEmail, 0, 40);
+        $request->merge(['email' => $cleanEmail]);
+
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string', 'email:rfc', 'max:40'],
+        ], [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'email.max' => 'Email address cannot exceed 40 characters.',
         ]);
 
         // We will send the password reset link to this user. Once we have attempted

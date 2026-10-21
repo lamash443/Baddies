@@ -51,7 +51,36 @@ class RegisteredUserController extends Controller
             }
         }
 
-        $email = strtolower(trim((string) $request->email));
+        // ── Input Sanitization & Limits ──────────────────────────────────────
+        // Full Name: letters, single spaces, hyphens, apostrophes, periods only (max 40 chars)
+        $rawName = (string) $request->input('name', '');
+        $cleanName = preg_replace('/[^a-zA-Z\s\-\'\.]/', '', $rawName);
+        $cleanName = trim(preg_replace('/\s+/', ' ', $cleanName));
+        $cleanName = mb_substr($cleanName, 0, 40);
+        $cleanName = trim($cleanName, " -'.");
+        $request->merge(['name' => $cleanName]);
+
+        // Email: alphanumeric, @, ., _, -, + only (max 40 chars)
+        $rawEmail = (string) $request->input('email', '');
+        $cleanEmail = strtolower(trim(preg_replace('/[^a-zA-Z0-9@._\-+]/', '', $rawEmail)));
+        $cleanEmail = mb_substr($cleanEmail, 0, 40);
+        $request->merge(['email' => $cleanEmail]);
+
+        // Password & Confirm: safe alphanumeric + specific password punctuation (@$#&!%*?._\-+=~), max 12 chars
+        $rawPassword = (string) $request->input('password', '');
+        $cleanPassword = preg_replace('/[^a-zA-Z0-9@$#&!%*?._\-+=~]/', '', $rawPassword);
+        $cleanPassword = mb_substr($cleanPassword, 0, 12);
+
+        $rawConfirm = (string) $request->input('password_confirmation', '');
+        $cleanConfirm = preg_replace('/[^a-zA-Z0-9@$#&!%*?._\-+=~]/', '', $rawConfirm);
+        $cleanConfirm = mb_substr($cleanConfirm, 0, 12);
+
+        $request->merge([
+            'password' => $cleanPassword,
+            'password_confirmation' => $cleanConfirm,
+        ]);
+
+        $email = $cleanEmail;
         if ($email && User::where('email', $email)->exists()) {
             return redirect()->back()
                 ->withErrors(['email' => 'This email address is already registered. Please log in instead.'])
@@ -68,11 +97,30 @@ class RegisteredUserController extends Controller
         }
 
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d$@#&!%*?]).{8,}$/'],
+            'name' => ['required', 'string', 'min:2', 'max:40', 'regex:/^[a-zA-Z\s\-\'\.]+$/'],
+            'email' => ['required', 'string', 'lowercase', 'email:rfc', 'max:40', 'unique:'.User::class],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:12',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d$@#&!%*?._\-+=~])[a-zA-Z0-9$@#&!%*?._\-+=~]{8,12}$/',
+            ],
         ], [
-            'password.regex' => 'The password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number or symbol.',
+            'name.required' => 'Please enter your full name.',
+            'name.min' => 'Full name must be at least 2 characters.',
+            'name.max' => 'Full name cannot exceed 40 characters.',
+            'name.regex' => 'Full name may only contain letters, spaces, hyphens, apostrophes, and periods.',
+            'email.required' => 'Please enter your email address.',
+            'email.max' => 'Email address cannot exceed 40 characters.',
+            'email.email' => 'Please provide a valid email address.',
+            'email.unique' => 'This email address is already registered. Please log in instead.',
+            'password.required' => 'Please enter a password.',
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.max' => 'Password cannot exceed 12 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
+            'password.regex' => 'The password must be 8 to 12 characters long and contain at least one uppercase letter, one lowercase letter, and one number or symbol.',
         ]);
 
         // Resolve referrer from URL param, form field, or session

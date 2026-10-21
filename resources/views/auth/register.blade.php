@@ -266,29 +266,38 @@
 
       {{-- Name --}}
       <div class="mb-3">
-        <label class="auth-label" for="name">Full Name</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="auth-label mb-0" for="name">Full Name</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
+        </div>
         <input id="name" type="text" name="name"
-          class="auth-custom-input" placeholder="Enter your name"
-          value="{{ old('name') }}" autocomplete="name" required>
+          class="auth-custom-input" placeholder="Enter your name (max 40 chars)"
+          value="{{ old('name') }}" autocomplete="name" required maxlength="40">
         @error('name')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Email --}}
       <div class="mb-3">
-        <label class="auth-label" for="email">Email Address</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="auth-label mb-0" for="email">Email Address</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
+        </div>
         <input id="email" type="email" name="email"
-          class="auth-custom-input" placeholder="Enter a valid email"
-          value="{{ old('email') }}" autocomplete="email" required>
+          class="auth-custom-input" placeholder="Enter a valid email (max 40 chars)"
+          value="{{ old('email') }}" autocomplete="email" required maxlength="40">
         @error('email')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Password --}}
       <div class="mb-3">
-        <label class="auth-label" for="password">Password</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="auth-label mb-0" for="password">Password</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">8–12 chars</span>
+        </div>
         <div class="input-wrap">
           <input id="password" type="password" name="password"
-            class="auth-custom-input" placeholder="Min 8 characters"
-            autocomplete="new-password" required
+            class="auth-custom-input" placeholder="8-12 characters"
+            autocomplete="new-password" required minlength="8" maxlength="12"
             style="padding-right:2.8rem;">
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password','eye1')" tabindex="-1">
             <svg id="eye1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -304,7 +313,7 @@
             <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width:0%;transition:width 0.3s ease,background-color 0.3s ease;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
           <ul class="list-unstyled mb-0" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.75rem;">
-            <li id="req-length" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>8+ characters</li>
+            <li id="req-length" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>8-12 characters</li>
             <li id="req-upper"  class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>Uppercase</li>
             <li id="req-lower"  class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>Lowercase</li>
             <li id="req-number" class="pwd-req"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>Number/Symbol</li>
@@ -316,11 +325,14 @@
 
       {{-- Confirm password --}}
       <div class="mb-4">
-        <label class="auth-label" for="password_confirmation">Confirm Password</label>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="auth-label mb-0" for="password_confirmation">Confirm Password</label>
+          <span class="small text-white-50" style="font-size:0.75rem;">Max 12 chars</span>
+        </div>
         <div class="input-wrap">
           <input id="password_confirmation" type="password" name="password_confirmation"
-            class="auth-custom-input" placeholder="Repeat password"
-            autocomplete="new-password" required
+            class="auth-custom-input" placeholder="Repeat password (8-12 chars)"
+            autocomplete="new-password" required minlength="8" maxlength="12"
             style="padding-right:2.8rem;">
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password_confirmation','eye2')" tabindex="-1">
             <svg id="eye2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -391,10 +403,10 @@
         }
         strengthContainer.classList.remove('d-none');
 
-        var hasLength = val.length >= 8;
+        var hasLength = val.length >= 8 && val.length <= 12;
         var hasLower  = /[a-z]/.test(val);
         var hasUpper  = /[A-Z]/.test(val);
-        var hasNum    = /[0-9$@#&!%*?]/.test(val);
+        var hasNum    = /[0-9$@#&!%*?._\-+=~]/.test(val);
 
         setReq(reqLength, hasLength);
         setReq(reqLower,  hasLower);
@@ -428,6 +440,7 @@
     }
   });
 </script>
+<script src="{{ asset('js/auth-sanitizer.js') }}"></script>
 </body>
 </html>
 
