@@ -11,16 +11,16 @@
 
   $locParts = [];
   if (!empty($user->location)) {
-      $locParts[] = trim($user->location);
+      $locParts[] = trim((string)$user->location);
   }
-  if (!empty($user->county) && (!isset($locParts[0]) || strcasecmp($locParts[0], trim($user->county)) !== 0)) {
-      $locParts[] = trim($user->county);
+  if (!empty($user->county) && (!isset($locParts[0]) || strcasecmp($locParts[0], trim((string)$user->county)) !== 0)) {
+      $locParts[] = trim((string)$user->county);
   }
   if (empty($locParts) && !empty($user->city_town)) {
-      $locParts[] = trim($user->city_town);
+      $locParts[] = trim((string)$user->city_town);
   }
   if (empty($locParts) && !empty($user->area)) {
-      $locParts[] = trim($user->area);
+      $locParts[] = trim((string)$user->area);
   }
   $locationLabel = !empty($locParts) ? implode(', ', $locParts) : null;
   // Subscription plan normalization

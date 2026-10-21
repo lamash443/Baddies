@@ -775,18 +775,20 @@
             ? asset('storage/' . $firstSpPhoto->path)
             : "https://ui-avatars.com/api/?name=".urlencode(substr($sp->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
           // Plan badge
-          $spRawPlan = strtolower(trim($sp->subscription_plan ?? 'regular'));
+          $spRawPlan = strtolower(trim((string)($sp->subscription_plan ?? 'regular')));
           if (in_array($spRawPlan, ['prime_vip', 'prime-vip', 'primevip'])) {
               $spPlanType  = 'prime_vip';  $spPlanLabel = 'Prime VIP';
           } elseif (in_array($spRawPlan, ['prime', 'prime_escort'])) {
               $spPlanType  = 'prime';       $spPlanLabel = 'Prime';
           } elseif (in_array($spRawPlan, ['vip', 'vip_escort'])) {
               $spPlanType  = 'vip';         $spPlanLabel = 'VIP';
+          } else {
+              $spPlanType  = 'regular';     $spPlanLabel = 'Regular';
           }
           $spLocParts = [];
-          if (!empty($sp->location)) { $spLocParts[] = trim($sp->location); }
-          if (!empty($sp->county) && (!isset($spLocParts[0]) || strcasecmp($spLocParts[0], trim($sp->county)) !== 0)) { $spLocParts[] = trim($sp->county); }
-          if (empty($spLocParts) && !empty($sp->city_town)) { $spLocParts[] = trim($sp->city_town); }
+          if (!empty($sp->location)) { $spLocParts[] = trim((string)$sp->location); }
+          if (!empty($sp->county) && (!isset($spLocParts[0]) || strcasecmp($spLocParts[0], trim((string)$sp->county)) !== 0)) { $spLocParts[] = trim((string)$sp->county); }
+          if (empty($spLocParts) && !empty($sp->city_town)) { $spLocParts[] = trim((string)$sp->city_town); }
           $spLocLabel = !empty($spLocParts) ? implode(', ', $spLocParts) : null;
         @endphp
         <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card" style="position:relative;">
