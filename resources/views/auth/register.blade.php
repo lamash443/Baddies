@@ -250,12 +250,7 @@
       </div>
     @endif
 
-    {{-- Global errors --}}
-    @if($errors->any() && !$errors->has('name') && !$errors->has('email') && !$errors->has('password'))
-      <div class="mb-3 p-3 rounded" style="background:rgba(220,53,69,0.12);border:1px solid rgba(220,53,69,0.35);font-size:0.82rem;color:#ff6b6b;">
-        {{ $errors->first() }}
-      </div>
-    @endif
+      {{-- Errors displayed only as toasts via x-site-toast --}}
 
     {{-- Form --}}
     <form method="POST" action="{{ route('register') }}" novalidate>
@@ -266,37 +261,26 @@
 
       {{-- Name --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="auth-label mb-0" for="name">Full Name</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-        </div>
+        <label class="auth-label" for="name">Full Name</label>
         <input id="name" type="text" name="name"
-          class="auth-custom-input" placeholder="Enter your name (max 40 chars)"
+          class="auth-custom-input" placeholder="Enter your full name"
           value="{{ old('name') }}" autocomplete="name" required maxlength="40">
-        @error('name')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Email --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="auth-label mb-0" for="email">Email Address</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-        </div>
+        <label class="auth-label" for="email">Email Address</label>
         <input id="email" type="email" name="email"
-          class="auth-custom-input" placeholder="Enter a valid email (max 40 chars)"
+          class="auth-custom-input" placeholder="Enter your email address"
           value="{{ old('email') }}" autocomplete="email" required maxlength="40">
-        @error('email')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Password --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="auth-label mb-0" for="password">Password</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">8–12 chars</span>
-        </div>
+        <label class="auth-label" for="password">Password</label>
         <div class="input-wrap">
           <input id="password" type="password" name="password"
-            class="auth-custom-input" placeholder="8-12 characters"
+            class="auth-custom-input" placeholder="Enter your password"
             autocomplete="new-password" required minlength="8" maxlength="12"
             style="padding-right:2.8rem;">
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password','eye1')" tabindex="-1">
@@ -320,18 +304,14 @@
           </ul>
         </div>
 
-        @error('password')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Confirm password --}}
       <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="auth-label mb-0" for="password_confirmation">Confirm Password</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 12 chars</span>
-        </div>
+        <label class="auth-label" for="password_confirmation">Confirm Password</label>
         <div class="input-wrap">
           <input id="password_confirmation" type="password" name="password_confirmation"
-            class="auth-custom-input" placeholder="Repeat password (8-12 chars)"
+            class="auth-custom-input" placeholder="Repeat password"
             autocomplete="new-password" required minlength="8" maxlength="12"
             style="padding-right:2.8rem;">
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password_confirmation','eye2')" tabindex="-1">

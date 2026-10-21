@@ -70,10 +70,21 @@
       $toastMsg   = $emailError;
       $toastType  = 'danger';
     }
+  } elseif (isset($errors) && $errors->has('name')) {
+    $toastTitle = 'Invalid Name';
+    $toastMsg   = $errors->first('name');
+    $toastType  = 'warning';
+  } elseif (isset($errors) && $errors->has('password')) {
+    $toastTitle = 'Password Error';
+    $toastMsg   = $errors->first('password');
+    $toastType  = 'danger';
+  } elseif (isset($errors) && $errors->any()) {
+    $toastTitle = 'Notice';
+    $toastMsg   = $errors->first();
+    $toastType  = 'warning';
   }
 @endphp
 
-@if($toastMsg)
 <style>
   .site-toast {
     position: fixed; top: 5.5rem; right: 2rem; z-index: 999999;
@@ -149,6 +160,48 @@
   [data-bs-theme="light"] .site-toast__close { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); color: rgba(0,0,0,0.5); }
 </style>
 
+<script>
+  window.showSiteToast = function (title, msg, type) {
+    type = type || 'warning';
+    var old = document.getElementById('siteToast');
+    if (old) old.remove();
+
+    var iconHtml = '';
+    if (type === 'warning') {
+      iconHtml = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+    } else if (type === 'danger') {
+      iconHtml = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+    } else {
+      iconHtml = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+    }
+
+    var div = document.createElement('div');
+    div.className = 'site-toast site-toast--' + type;
+    div.id = 'siteToast';
+    div.setAttribute('role', 'alert');
+    div.setAttribute('aria-live', 'assertive');
+    div.innerHTML =
+      '<div class="site-toast__icon">' + iconHtml + '</div>' +
+      '<div class="site-toast__body">' +
+        '<p class="site-toast__title">' + (title || 'Notice') + '</p>' +
+        '<p class="site-toast__msg">' + (msg || '') + '</p>' +
+      '</div>' +
+      '<button class="site-toast__close" onclick="document.getElementById(\'siteToast\').remove();" aria-label="Dismiss">' +
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+      '</button>' +
+      '<div class="site-toast__bar"></div>';
+
+    document.body.appendChild(div);
+
+    clearTimeout(window._siteToastTimeout);
+    window._siteToastTimeout = setTimeout(function() {
+      var t = document.getElementById('siteToast');
+      if (t === div) t.remove();
+    }, 6000);
+  };
+</script>
+
+@if($toastMsg)
 <div class="site-toast site-toast--{{ $toastType }}" id="siteToast" role="alert" aria-live="assertive">
   <div class="site-toast__icon">
     @if($toastType === 'warning')
@@ -182,7 +235,8 @@
   <div class="site-toast__bar"></div>
 </div>
 <script>
-  setTimeout(function() {
+  clearTimeout(window._siteToastTimeout);
+  window._siteToastTimeout = setTimeout(function() {
     var t = document.getElementById('siteToast');
     if (t) t.remove();
   }, 6000);

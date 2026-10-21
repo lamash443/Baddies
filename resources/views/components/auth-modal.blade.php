@@ -249,12 +249,8 @@
               <form method="POST" action="{{ url('/login') }}">
                 @csrf
                 <div class="mb-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-                  </div>
-                  <input id="login-email" type="email" name="email" class="form-control auth-custom-input @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus placeholder="Enter your email" maxlength="40" autocomplete="email">
-                  @error('email')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
+                  <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
+                  <input id="login-email" type="email" name="email" class="form-control auth-custom-input" value="{{ old('email') }}" required autofocus placeholder="Enter your email address" maxlength="40" autocomplete="email">
                 </div>
                 <div class="mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-2">
@@ -263,8 +259,7 @@
                       <a href="{{ route('password.request') }}" class="small text-decoration-none switch-link" style="font-weight:600;">Forgot?</a>
                     @endif
                   </div>
-                  <input id="login-password" type="password" name="password" class="form-control auth-custom-input @error('password') is-invalid @enderror" required placeholder="Enter your password" maxlength="64" autocomplete="current-password">
-                  @error('password')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
+                  <input id="login-password" type="password" name="password" class="form-control auth-custom-input" required placeholder="Enter your password" maxlength="64" autocomplete="current-password">
                 </div>
                 <div class="mb-4">
                   <div class="form-check d-flex align-items-center gap-2">
@@ -314,27 +309,16 @@
               <form method="POST" action="{{ route('register') }}">
                 @csrf
                 <div class="mb-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Full Name</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-                  </div>
-                  <input id="reg-name" type="text" name="name" class="form-control auth-custom-input" value="{{ old('name') }}" required placeholder="Enter your name (max 40 chars)" maxlength="40" autocomplete="name">
-                  @error('name')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
+                  <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Full Name</label>
+                  <input id="reg-name" type="text" name="name" class="form-control auth-custom-input" value="{{ old('name') }}" required placeholder="Enter your name" maxlength="40" autocomplete="name">
                 </div>
                 <div class="mb-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-                  </div>
-                  <input id="reg-email" type="email" name="email" class="form-control auth-custom-input" value="{{ old('email') }}" required placeholder="Enter a valid email (max 40 chars)" maxlength="40" autocomplete="email">
-                  @error('email')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
+                  <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Email Address</label>
+                  <input id="reg-email" type="email" name="email" class="form-control auth-custom-input" value="{{ old('email') }}" required placeholder="Enter your email address" maxlength="40" autocomplete="email">
                 </div>
                 <div class="mb-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Password</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">8–12 chars</span>
-                  </div>
-                  <input id="reg-password" type="password" name="password" class="form-control auth-custom-input" required placeholder="8-12 characters" minlength="8" maxlength="12" autocomplete="new-password">
+                  <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Password</label>
+                  <input id="reg-password" type="password" name="password" class="form-control auth-custom-input" required placeholder="Enter your password" minlength="8" maxlength="12" autocomplete="new-password">
                   <div class="mt-2 d-none" id="password-strength-container">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                       <span class="small fw-bold" id="password-strength-text" style="font-size: 0.75rem; letter-spacing: 0.02em;">Password Strength</span>
@@ -351,14 +335,10 @@
                       </ul>
                     </div>
                   </div>
-                  @error('password')<div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Confirm Password</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">Max 12 chars</span>
-                  </div>
-                  <input id="reg-password-confirm" type="password" name="password_confirmation" class="form-control auth-custom-input" required placeholder="Repeat password (8-12 chars)" minlength="8" maxlength="12" autocomplete="new-password">
+                  <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">Confirm Password</label>
+                  <input id="reg-password-confirm" type="password" name="password_confirmation" class="form-control auth-custom-input" required placeholder="Repeat password" minlength="8" maxlength="12" autocomplete="new-password">
                 </div>
                 <button type="submit" id="reg-submit-btn" class="btn btn-orange-lg w-100 shadow-sm" disabled style="opacity: 0.6; cursor: not-allowed;">Sign Up</button>
               </form>

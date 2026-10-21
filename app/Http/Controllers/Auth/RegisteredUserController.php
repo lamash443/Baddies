@@ -51,13 +51,34 @@ class RegisteredUserController extends Controller
             }
         }
 
-        // ── Input Sanitization & Limits ──────────────────────────────────────
-        // Full Name: letters, single spaces, hyphens, apostrophes, periods only (max 40 chars)
-        $rawName = (string) $request->input('name', '');
-        $cleanName = preg_replace('/[^a-zA-Z\s\-\'\.]/', '', $rawName);
-        $cleanName = trim(preg_replace('/\s+/', ' ', $cleanName));
-        $cleanName = mb_substr($cleanName, 0, 40);
-        $cleanName = trim($cleanName, " -'.");
+        // ── Full Name Validation & Limits ────────────────────────────────────
+        $rawName = trim((string) $request->input('name', ''));
+        $emojiPattern = '/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}]/u';
+
+        // Disallow digits (0-9), emojis, and all other punctuation/symbols except hyphen, apostrophe, period
+        if (
+            preg_match('/[0-9]/', $rawName) ||
+            preg_match($emojiPattern, $rawName) ||
+            preg_match('/[^a-zA-Z\s\-\'\.]/', $rawName)
+        ) {
+            return redirect()->back()
+                ->withErrors(['name' => 'Please enter a valid full name. Numbers, emojis, and special symbols are not allowed.'])
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('toast_type',  'warning')
+                ->with('toast_title', 'Invalid Name')
+                ->with('toast_msg',   'Please enter a valid full name. Numbers, emojis, and special symbols are not allowed.');
+        }
+
+        if (mb_strlen($rawName) < 2 || mb_strlen($rawName) > 40) {
+            return redirect()->back()
+                ->withErrors(['name' => 'Full name must be between 2 and 40 characters.'])
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('toast_type',  'warning')
+                ->with('toast_title', 'Invalid Name')
+                ->with('toast_msg',   'Full name must be between 2 and 40 characters.');
+        }
+
+        $cleanName = trim(preg_replace('/\s+/', ' ', $rawName), " -'.");
         $request->merge(['name' => $cleanName]);
 
         // Email: alphanumeric, @, ., _, -, + only (max 40 chars)

@@ -144,14 +144,8 @@
 
             <!-- Email Address -->
             <div class="mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label small fw-bold mb-0" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">{{ __('Email Address') }}</label>
-                    <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-                </div>
-                <input id="email" class="form-control auth-custom-input" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="Enter your email (max 40 chars)" maxlength="40" autocomplete="email">
-                @error('email')
-                    <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
-                @enderror
+                <label class="form-label small fw-bold mb-2" style="color:rgba(255,140,0,0.9); letter-spacing:.03em; text-transform:uppercase;">{{ __('Email Address') }}</label>
+                <input id="email" class="form-control auth-custom-input" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="Enter your email address" maxlength="40" autocomplete="email">
             </div>
 
             <button type="submit" class="btn btn-orange-lg w-100 shadow-sm mt-2">

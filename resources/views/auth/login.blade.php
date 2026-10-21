@@ -304,12 +304,7 @@
     
     <div class="or-divider mb-3"><hr><span>OR</span></div>
 
-    {{-- Global errors --}}
-    @if($errors->any() && !$errors->has('email') && !$errors->has('password'))
-      <div class="mb-3 p-3 rounded" style="background:rgba(220,53,69,0.12);border:1px solid rgba(220,53,69,0.35);font-size:0.84rem;color:#ff6b6b;">
-        {{ $errors->first() }}
-      </div>
-    @endif
+      {{-- Errors displayed only as toasts via x-site-toast --}}
 
     {{-- Form --}}
     <form method="POST" action="{{ url('/login') }}" novalidate>
@@ -317,14 +312,10 @@
 
       {{-- Email --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="auth-label mb-0" for="email">Email Address</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-        </div>
+        <label class="auth-label" for="email">Email Address</label>
         <input id="email" type="email" name="email"
           class="auth-custom-input" placeholder="Enter your email address"
           value="{{ old('email') }}" autocomplete="email" required autofocus maxlength="40">
-        @error('email')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       {{-- Password --}}
@@ -344,7 +335,6 @@
             <svg id="eye1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        @error('password')<div class="field-error">{{ $message }}</div>@enderror
       </div>
 
       <div class="mb-4 mt-3">

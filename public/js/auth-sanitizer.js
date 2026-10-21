@@ -1,20 +1,50 @@
 /**
  * Kenyan Baddies Club - Authentication Input Sanitizer & Limits Enforcer
- * Enforces strict character limits, allowed punctuations, and eradicates invalid symbols/emojis.
+ * Enforces character limits, allowed punctuations, and eradicates invalid symbols/emojis.
+ * Displays toast alerts on disallowed characters without redirecting or navigating away.
  */
 (function () {
   'use strict';
 
   var EMOJI_REGEX = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2B55}\u{203C}\u{2049}\u{2122}\u{2139}\u{2194}-\u{2199}\u{21A9}-\u{21AA}\u{231A}-\u{231B}\u{23E9}-\u{23EC}\u{23F0}\u{23F3}\u{25AA}-\u{25AB}\u{25FB}-\u{25FE}\u{2614}-\u{2615}\u{2648}-\u{2653}\u{267F}\u{2693}\u{26A1}\u{26AA}-\u{26AB}\u{26BD}-\u{26BE}\u{26C4}-\u{26C5}\u{26CE}\u{26D4}\u{26EA}\u{26F2}-\u{26F3}\u{26F5}\u{26FA}\u{26FD}\u{2702}\u{2705}\u{2708}-\u{270D}\u{270F}\u{2712}\u{2714}\u{2716}\u{271D}\u{2721}\u{2728}\u{2733}-\u{2734}\u{2744}\u{2747}\u{274C}\u{274E}\u{2753}-\u{2755}\u{2757}\u{2763}-\u{2764}\u{2795}-\u{2797}\u{27A1}\u{27B0}\u{27BF}\u{2934}-\u{2935}\u{2B05}-\u{2B07}\u{3030}\u{303D}\u{3297}\u{3299}]/gu;
 
+  var lastToastTime = 0;
+  function triggerNameWarningToast() {
+    var now = Date.now();
+    if (now - lastToastTime < 2500) return; // Debounce so user isn't spammed while typing
+    lastToastTime = now;
+
+    if (typeof window.showSiteToast === 'function') {
+      window.showSiteToast(
+        'Invalid Name',
+        'Please enter a valid full name. Numbers, emojis, and special symbols are not allowed.',
+        'warning'
+      );
+    }
+  }
+
+  /**
+   * Check if a name contains any eradicated characters:
+   * Digits (0-9), emojis, or symbols (!@#$%^&*()_+={}[];:"<>,/?\|`~)
+   */
+  window.nameHasDisallowedChars = function (val) {
+    if (!val) return false;
+    if (/[0-9]/.test(val)) return true;
+    if (EMOJI_REGEX.test(val)) return true;
+    if (/[^a-zA-Z\s\-\'\.]/.test(val)) return true;
+    return false;
+  };
+
   /**
    * Full Name sanitizer:
    * - Max 40 characters
    * - Allowed: letters (a-z, A-Z), single spaces, hyphens (-), apostrophes ('), and periods (.)
-   * - Eradicates all numbers, emojis, and all other punctuation (!@#$%^&*()_+={}[];:"<>,/?\|`~)
+   * - Eradicates all numbers, emojis, and all other punctuation
    */
   window.sanitizeAuthName = function (val) {
     if (!val) return '';
+    var hadDisallowed = window.nameHasDisallowedChars(val);
+
     var clean = val.replace(EMOJI_REGEX, '');
     clean = clean.replace(/[^a-zA-Z\s\-\'\.]/g, '');
     clean = clean.replace(/^[\s\-\'\.]+/, ''); // no leading punctuation or space
@@ -22,15 +52,20 @@
     clean = clean.replace(/\-{2,}/g, '-');     // collapse multiple hyphens
     clean = clean.replace(/\'{2,}/g, "'");     // collapse multiple apostrophes
     clean = clean.replace(/\.{2,}/g, '.');     // collapse multiple periods
-    return clean.slice(0, 40);
+    clean = clean.slice(0, 40);
+
+    if (hadDisallowed) {
+      triggerNameWarningToast();
+    }
+
+    return clean;
   };
 
   /**
    * Email sanitizer:
    * - Max 40 characters
    * - Allowed: letters, digits, and specific email punctuation: @, ., _, -, +
-   * - Eradicates spaces, commas, quotes, brackets, slashes, other symbols, and emojis
-   * - Enforces at most one '@'
+   * - Eradicates spaces, quotes, brackets, slashes, other symbols, and emojis
    */
   window.sanitizeAuthEmail = function (val) {
     if (!val) return '';
@@ -40,15 +75,14 @@
     if (firstAt !== -1) {
       clean = clean.substring(0, firstAt + 1) + clean.substring(firstAt + 1).replace(/@/g, '');
     }
-    clean = clean.replace(/\.{2,}/g, '.'); // collapse multiple dots
+    clean = clean.replace(/\.{2,}/g, '.');
     return clean.slice(0, 40);
   };
 
   /**
    * Password on signup & confirmation sanitizer:
    * - Max 12 characters (and min 8)
-   * - Allowed: alphanumeric + specific safe password symbols: @ $ # & ! % * ? . _ - + = ~
-   * - Eradicates spaces, quotes (' " `), angle brackets (< >), slashes (/ \), colons, commas, other punctuations, emojis
+   * - Allowed: alphanumeric + safe password symbols
    */
   window.sanitizeAuthSignupPassword = function (val) {
     if (!val) return '';
@@ -60,7 +94,6 @@
   /**
    * Password on login sanitizer:
    * - Max 64 characters
-   * - Eradicates spaces, quotes, angle brackets, emojis
    */
   window.sanitizeAuthLoginPassword = function (val) {
     if (!val) return '';
@@ -127,14 +160,14 @@
     sanitizeInputElement(e.target);
   }, true);
 
-  // Paste listener to ensure immediate sanitization on clipboard paste
+  // Paste listener for immediate sanitization
   document.addEventListener('paste', function (e) {
     setTimeout(function () {
       sanitizeInputElement(e.target);
     }, 10);
   }, true);
 
-  // Blur listener for final cleaning (trimming trailing spaces/punctuations, lowercasing email)
+  // Blur listener for final trimming
   document.addEventListener('blur', function (e) {
     var el = e.target;
     if (!el || el.tagName !== 'INPUT') return;
@@ -150,7 +183,38 @@
     }
   }, true);
 
-  // Apply on DOM ready to set maxlengths immediately
+  // Intercept form submissions to guarantee invalid names are never submitted
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!form || form.tagName !== 'FORM') return;
+
+    var nameInput = form.querySelector('#reg-name, #name, input[name="name"]');
+    if (nameInput) {
+      var val = (nameInput.value || '').trim();
+
+      // Check for disallowed characters
+      if (window.nameHasDisallowedChars(val)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        triggerNameWarningToast();
+        nameInput.focus();
+        return false;
+      }
+
+      // Check min length
+      if (val.length < 2) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (typeof window.showSiteToast === 'function') {
+          window.showSiteToast('Invalid Name', 'Please enter your full name (at least 2 letters).', 'warning');
+        }
+        nameInput.focus();
+        return false;
+      }
+    }
+  }, true);
+
+  // Apply on DOM ready
   document.addEventListener('DOMContentLoaded', function () {
     var nameInputs = document.querySelectorAll('#reg-name, #name, input[name="name"]');
     nameInputs.forEach(function (el) { el.setAttribute('maxlength', '40'); });

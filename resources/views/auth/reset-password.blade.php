@@ -206,10 +206,7 @@
 
       {{-- Email --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="field-label mb-0" for="email">Email Address</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 40 chars</span>
-        </div>
+        <label class="field-label" for="email">Email Address</label>
         <input
           id="email"
           class="form-control auth-custom-input"
@@ -220,17 +217,11 @@
           placeholder="your@email.com"
           maxlength="40"
         >
-        @error('email')
-          <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
-        @enderror
       </div>
 
       {{-- New Password --}}
       <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="field-label mb-0" for="password">New Password</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">8–12 chars</span>
-        </div>
+        <label class="field-label" for="password">New Password</label>
         <div class="input-pw-wrap">
           <input
             id="password"
@@ -238,7 +229,7 @@
             type="password"
             name="password"
             required autocomplete="new-password"
-            placeholder="8-12 characters"
+            placeholder="Enter your password"
             minlength="8"
             maxlength="12"
             oninput="checkStrength(this.value)"
@@ -253,17 +244,11 @@
           <div class="pw-strength-bar-bg"><div class="pw-strength-bar" id="pwStrengthBar"></div></div>
           <p class="pw-strength-label" id="pwStrengthLabel">Enter a password (8-12 chars)</p>
         </div>
-        @error('password')
-          <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
-        @enderror
       </div>
 
       {{-- Confirm Password --}}
       <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="field-label mb-0" for="password_confirmation">Confirm Password</label>
-          <span class="small text-white-50" style="font-size:0.75rem;">Max 12 chars</span>
-        </div>
+        <label class="field-label" for="password_confirmation">Confirm Password</label>
         <div class="input-pw-wrap">
           <input
             id="password_confirmation"
@@ -271,7 +256,7 @@
             type="password"
             name="password_confirmation"
             required autocomplete="new-password"
-            placeholder="Repeat password (8-12 chars)"
+            placeholder="Repeat password"
             minlength="8"
             maxlength="12"
           >
