@@ -42,7 +42,7 @@ class ReferralsRelationManager extends RelationManager
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Joined At')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
                 TextColumn::make('wallet_balance')
                     ->label('Wallet Balance')

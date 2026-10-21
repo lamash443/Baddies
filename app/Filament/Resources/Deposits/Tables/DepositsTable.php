@@ -47,8 +47,8 @@ class DepositsTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
-                    ->label('Date')
-                    ->dateTime()
+                    ->label('Date (EAT)')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])

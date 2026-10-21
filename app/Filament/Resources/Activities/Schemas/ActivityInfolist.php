@@ -23,7 +23,7 @@ class ActivityInfolist
                         TextEntry::make('causer.email')->label('User Email'),
                         TextEntry::make('subject_type')->label('Model'),
                         TextEntry::make('subject_id')->label('Record ID'),
-                        TextEntry::make('created_at')->dateTime()->label('When'),
+                        TextEntry::make('created_at')->dateTime('d M Y, H:i:s T')->label('When (EAT)'),
                     ]),
                 Section::make('Changed Properties')
                     ->schema([

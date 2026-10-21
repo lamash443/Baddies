@@ -73,7 +73,7 @@ class ReferralEarningsRelationManager extends RelationManager
                     })
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])

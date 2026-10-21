@@ -56,7 +56,7 @@ class UserPhotoResource extends Resource
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->label('Uploaded')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')

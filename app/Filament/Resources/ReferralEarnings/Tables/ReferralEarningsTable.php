@@ -12,6 +12,7 @@ class ReferralEarningsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('referrer.name')
                     ->label('Referrer')
@@ -47,7 +48,7 @@ class ReferralEarningsTable
                     ->sortable(),
                 \Filament\Tables\Columns\TextColumn::make('created_at')
                     ->label('Awarded At')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])

@@ -35,10 +35,10 @@ class SupportTicketInfolist
                                 }),
                             TextEntry::make('created_at')
                                 ->label('Submitted At')
-                                ->dateTime(),
+                                ->dateTime('d M Y, H:i'),
                             TextEntry::make('updated_at')
                                 ->label('Last Updated')
-                                ->dateTime(),
+                                ->dateTime('d M Y, H:i'),
                         ]),
                     ]),
                 

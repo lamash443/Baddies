@@ -72,7 +72,7 @@ class VerificationSubmissionResource extends Resource
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Submitted')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')

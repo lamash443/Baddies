@@ -14,6 +14,7 @@ class SupportTicketsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Associated User')
@@ -41,7 +42,7 @@ class SupportTicketsTable
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Submitted')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->filters([

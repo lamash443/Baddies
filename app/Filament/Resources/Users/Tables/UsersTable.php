@@ -95,7 +95,7 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('subscription_expires_at')
                     ->label('Profile Plan Expires')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->placeholder('Never')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -107,7 +107,7 @@ class UsersTable
                     ->sortable(),
                 TextColumn::make('chat_expires_at')
                     ->label('Chat Plan Expires')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->placeholder('Never')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -149,11 +149,13 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Joined At')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Last Updated')
+                    ->dateTime('d M Y, H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
