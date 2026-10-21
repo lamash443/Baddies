@@ -19,6 +19,37 @@ class AdminChats extends Page
     protected static ?string $title = 'Platform Conversations';
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $adminIds = User::where('is_admin', true)->pluck('id')->toArray();
+
+            $count = Message::select(
+                    DB::raw('CASE WHEN sender_id < receiver_id THEN sender_id ELSE receiver_id END as user_a'),
+                    DB::raw('CASE WHEN sender_id > receiver_id THEN sender_id ELSE receiver_id END as user_b')
+                )
+                ->whereNotIn('sender_id', $adminIds)
+                ->whereNotIn('receiver_id', $adminIds)
+                ->groupBy('user_a', 'user_b')
+                ->get()
+                ->count();
+
+            return $count > 0 ? (string) $count : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): string | array | null
+    {
+        return 'primary';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'User-to-user conversations';
+    }
+
     protected string $view = 'filament.pages.admin-chats';
 
     public ?int $activeUserA = null;

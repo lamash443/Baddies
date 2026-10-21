@@ -31,6 +31,27 @@ class VerificationSubmissionResource extends Resource
 
     protected static ?string $navigationLabel = 'Verifications';
 
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $count = static::getModel()::where('status', 'pending')->count();
+
+            return $count > 0 ? (string) $count : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pending verification submissions';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema

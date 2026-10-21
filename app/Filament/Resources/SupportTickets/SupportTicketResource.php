@@ -28,6 +28,27 @@ class SupportTicketResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'subject';
 
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $count = static::getModel()::where('status', 'pending')->count();
+
+            return $count > 0 ? (string) $count : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pending support tickets';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return SupportTicketForm::configure($schema);
