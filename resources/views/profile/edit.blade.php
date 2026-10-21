@@ -2197,6 +2197,33 @@
                 </div>
 
                 <div class="row g-3 mb-4">
+                  <div class="col-12">
+                    <label class="settings-field-label">Profile Visibility</label>
+                    <div class="settings-input-wrap d-flex align-items-center justify-content-between px-3" style="min-height: 58px; height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08);">
+                      <div class="me-3">
+                        <div class="text-white fw-semibold" style="font-size: 0.92rem;">Hide Profile from Public</div>
+                        <span class="text-white opacity-75" style="font-size: 0.8rem; line-height: 1.4; display: block; margin-top: 2px;">
+                          Hide your profile, photos, and videos from public listings and search even if you have an active subscription.
+                        </span>
+                      </div>
+                      <div class="form-check form-switch m-0 flex-shrink-0">
+                        <input type="hidden" name="is_profile_hidden" value="0">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="profileHiddenToggle"
+                          name="is_profile_hidden"
+                          value="1"
+                          {{ auth()->user()->is_profile_hidden ? 'checked' : '' }}
+                          style="border-color: rgba(255,140,0,0.5); cursor:pointer; width: 2.5rem; height: 1.35rem;"
+                          data-toggle-url="{{ route('profile.toggle-visibility') }}"
+                          data-csrf="{{ csrf_token() }}"
+                        >
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="col-12 col-md-6">
                     <label class="settings-field-label">
                       Favorites are Visible to
@@ -3843,6 +3870,55 @@
         toggle.checked = !toggle.checked;
         if (typeof showDynamicToast === 'function') {
           showDynamicToast('Update Failed', 'Failed to update. Please try again.');
+        }
+      });
+    });
+  })();
+
+  (function () {
+    var toggle = document.getElementById('profileHiddenToggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('change', function () {
+      var isHidden = this.checked ? 1 : 0;
+      var url      = this.dataset.toggleUrl;
+      var csrf     = this.dataset.csrf;
+
+      var hidden = this.previousElementSibling;
+      if (hidden && hidden.type === 'hidden') hidden.value = isHidden ? '0' : '0';
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrf,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ is_profile_hidden: isHidden }),
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          if (data.is_profile_hidden) {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Profile Hidden', 'Your profile is now hidden from public listings.');
+            }
+          } else {
+            if (typeof showDynamicToast === 'function') {
+              showDynamicToast('Profile Visible', 'Your profile is now visible to the public.');
+            }
+          }
+        } else {
+          toggle.checked = !toggle.checked;
+          if (typeof showDynamicToast === 'function') {
+            showDynamicToast('Update Failed', 'Failed to update visibility. Please try again.');
+          }
+        }
+      })
+      .catch(function () {
+        toggle.checked = !toggle.checked;
+        if (typeof showDynamicToast === 'function') {
+          showDynamicToast('Update Failed', 'Failed to update visibility. Please try again.');
         }
       });
     });

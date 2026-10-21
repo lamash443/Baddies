@@ -124,6 +124,25 @@ class ProfileController extends Controller
     }
 
     /**
+     * Toggle the is_profile_hidden flag for the authenticated user (AJAX).
+     */
+    public function toggleProfileVisibility(Request $request)
+    {
+        $request->validate([
+            'is_profile_hidden' => ['required', 'boolean'],
+        ]);
+
+        $user = $request->user();
+        $user->is_profile_hidden = (bool) $request->input('is_profile_hidden');
+        $user->save();
+
+        return response()->json([
+            'success'           => true,
+            'is_profile_hidden' => $user->is_profile_hidden,
+        ]);
+    }
+
+    /**
      * Upload / change the user's profile photo.
      */
     public function uploadPhoto(Request $request)

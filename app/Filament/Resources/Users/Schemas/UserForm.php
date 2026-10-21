@@ -48,6 +48,9 @@ class UserForm
                         Toggle::make('calls_enabled')
                             ->label('Calls Enabled')
                             ->helperText('Allows users to call this profile.'),
+                        Toggle::make('is_profile_hidden')
+                            ->label('Hide Profile from Public')
+                            ->helperText('Hides this profile from public listings and search even if active subscription exists.'),
                         DateTimePicker::make('email_verified_at')
                             ->label('Email Verified At')
                             ->placeholder('Unverified')

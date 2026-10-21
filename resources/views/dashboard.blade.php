@@ -460,15 +460,27 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
           @if($user->hasActiveSubscription())
-          <div class="status-badge" style="color: #4ade80;">
-            Active
-          </div>
-          <h3 class="dash-card-title">Profile Status</h3>
-          <p class="dash-card-text">Your profile is currently active and visible online. Plan: <strong style="color: orange;">{{ ucwords(str_replace('_', ' ', $user->subscription_plan)) }}</strong></p>
-          <a href="{{ route('profile.edit') }}#tab-membership" class="btn-ghost mt-auto">
-            Manage Plan
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
+            @if($user->is_profile_hidden)
+            <div class="status-badge" style="color: #ff8c00; border-color: rgba(255,140,0,0.4); background: rgba(255,140,0,0.1);">
+              Hidden
+            </div>
+            <h3 class="dash-card-title">Profile Status</h3>
+            <p class="dash-card-text">Your profile is hidden from the public by your settings. Plan: <strong style="color: orange;">{{ ucwords(str_replace('_', ' ', $user->subscription_plan)) }}</strong></p>
+            <a href="{{ route('profile.edit') }}#tab-settings" class="btn-ghost mt-auto">
+              Change Visibility
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            @else
+            <div class="status-badge" style="color: #4ade80;">
+              Active
+            </div>
+            <h3 class="dash-card-title">Profile Status</h3>
+            <p class="dash-card-text">Your profile is currently active and visible online. Plan: <strong style="color: orange;">{{ ucwords(str_replace('_', ' ', $user->subscription_plan)) }}</strong></p>
+            <a href="{{ route('profile.edit') }}#tab-membership" class="btn-ghost mt-auto">
+              Manage Plan
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            @endif
           @else
           <div class="status-badge">
             Inactive

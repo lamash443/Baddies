@@ -238,6 +238,15 @@ Route::get('/profile/{id}', function ($id) {
         ->where('is_verified', true)
         ->findOrFail($id);
 
+    // If the profile is hidden from the public, only allow the owner or admin to view it
+    if ($user->is_profile_hidden && auth()->id() !== $user->id && !(auth()->check() && auth()->user()->is_admin)) {
+        return redirect()->route('home')->with([
+            'toast_title' => 'Profile Hidden',
+            'toast_msg'   => 'This profile has been hidden from the public by its owner.',
+            'toast_type'  => 'warning',
+        ]);
+    }
+
     // Increment profile views (not tracking unique per IP for simplicity yet)
     $user->increment('profile_views');
 
@@ -398,6 +407,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/sessions/{id}/terminate', [ProfileController::class, 'terminateSession'])->name('profile.sessions.terminate');
     Route::post('/profile/sessions/terminate-others', [ProfileController::class, 'terminateAllOtherSessions'])->name('profile.sessions.terminate-others');
     Route::post('/profile/toggle-calls', [ProfileController::class, 'toggleCalls'])->name('profile.toggle-calls');
+    Route::post('/profile/toggle-visibility', [ProfileController::class, 'toggleProfileVisibility'])->name('profile.toggle-visibility');
     // User Photos
     Route::post('/profile/photos', [UserPhotoController::class, 'store'])->name('user.photos.store');
     Route::post('/profile/photos/{photo}/set-main', [UserPhotoController::class, 'setMain'])->name('user.photos.set-main');

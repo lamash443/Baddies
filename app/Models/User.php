@@ -71,6 +71,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'photos_visibility',
         'email_notifications',
         'calls_enabled',
+        'is_profile_hidden',
         'last_seen_at',
         'online_toast_enabled',
         'show_online_status_in_chat',
@@ -132,6 +133,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'deletion_requested_at'      => 'datetime',
             'last_seen_at'               => 'datetime',
             'calls_enabled'              => 'boolean',
+            'is_profile_hidden'          => 'boolean',
             'online_toast_enabled'       => 'boolean',
             'show_online_status_in_chat' => 'boolean',
             'force_online'               => 'boolean',
@@ -186,7 +188,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     }
 
     /**
-     * Scope a query to only include users with an active subscription.
+     * Scope a query to only include users with an active subscription and not hidden.
      */
     public function scopeActiveSubscription($query)
     {
@@ -194,7 +196,30 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                      ->where(function ($q) {
                          $q->whereNull('subscription_expires_at')
                            ->orWhere('subscription_expires_at', '>', now());
+                     })
+                     ->where(function ($q) {
+                         $q->where('is_profile_hidden', false)
+                           ->orWhereNull('is_profile_hidden');
                      });
+    }
+
+    /**
+     * Scope a query to only include profiles not hidden from the public.
+     */
+    public function scopeNotHidden($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('is_profile_hidden', false)
+              ->orWhereNull('is_profile_hidden');
+        });
+    }
+
+    /**
+     * Determine if this user's profile is visible to the public.
+     */
+    public function isPubliclyVisible(): bool
+    {
+        return $this->is_verified && $this->hasActiveSubscription() && !$this->is_profile_hidden;
     }
 
     /**

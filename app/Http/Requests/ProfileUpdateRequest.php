@@ -65,6 +65,7 @@ class ProfileUpdateRequest extends FormRequest
             'photos_visibility'    => ['nullable', 'string', 'in:everybody,favourites,nobody'],
             'email_notifications'  => ['nullable', 'string', 'in:messages,none'],
             'calls_enabled'        => ['boolean'],
+            'is_profile_hidden'    => ['boolean'],
         ];
 
     }

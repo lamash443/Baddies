@@ -141,6 +141,9 @@ class UsersTable
                 ToggleColumn::make('calls_enabled')
                     ->label('Calls')
                     ->sortable(),
+                ToggleColumn::make('is_profile_hidden')
+                    ->label('Hidden')
+                    ->sortable(),
                 TextColumn::make('deletion_requested_at')
                     ->label('Pending Deletion')
                     ->badge()
