@@ -177,8 +177,8 @@
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label" for="email">Your Email Address</label>
-                  <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required maxlength="100" value="{{ old('email') }}">
-                  <div class="char-counter" id="email-counter">0 / 100</div>
+                  <input type="email" name="email" id="email" class="form-control" placeholder="e.g. you@gmail.com" required maxlength="50" value="{{ old('email') }}" autocomplete="email" inputmode="email">
+                  <div class="char-counter" id="email-counter">0 / 50</div>
                   @error('email')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                   @enderror
@@ -197,8 +197,8 @@
 
             <div class="mb-4">
               <label class="form-label" for="message">Detailed Message</label>
-              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Please describe your issue or query in detail..." required maxlength="1000">{{ old('message') }}</textarea>
-              <div class="char-counter" id="message-counter">0 / 1000</div>
+              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Please describe your issue or query in detail..." required maxlength="600">{{ old('message') }}</textarea>
+              <div class="char-counter" id="message-counter">0 / 600</div>
               @error('message')
                 <div class="text-danger small mt-1">{{ $message }}</div>
               @enderror
@@ -220,25 +220,72 @@
   <x-auth-modal />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    function initCounter(inputId, counterId, max) {
+    /* ── Sanitizers ── */
+    // Strip emoji and non-printable Unicode from any string
+    function stripEmojis(str) {
+      return str
+        .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+        .replace(/[\u{2600}-\u{27FF}]/gu, '')
+        .replace(/[\u{2300}-\u{23FF}]/gu, '')
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, '')
+        .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')
+        .replace(/\u200D/g, '')
+        .replace(/\uFE0F/g, '');
+    }
+
+    // Name: letters (including accented), spaces only — no digits, no punctuation, no emojis
+    function sanitizeName(str) {
+      return stripEmojis(str)
+        .replace(/[^\p{L}\p{M} ]/gu, '')
+        .replace(/  +/g, ' ');
+    }
+
+    // Email: only a-z A-Z 0-9 @ . - _ allowed
+    function sanitizeEmail(str) {
+      return stripEmojis(str)
+        .replace(/[^a-zA-Z0-9@.\-_+]/g, '')
+        .replace(/@{2,}/g, '@');
+    }
+
+    // Subject/Message: strip emojis and control characters, allow normal punctuation
+    function sanitizeText(str) {
+      return stripEmojis(str)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    }
+
+    function initCounter(inputId, counterId, max, sanitizeFn) {
       var el = document.getElementById(inputId);
       var ct = document.getElementById(counterId);
       if (!el || !ct) return;
-      function update() {
+
+      function sanitizeAndUpdate() {
+        if (sanitizeFn) {
+          var pos = el.selectionStart;
+          var cleaned = sanitizeFn(el.value);
+          if (cleaned !== el.value) {
+            el.value = cleaned;
+            try { el.setSelectionRange(Math.max(0, pos - (el.value.length - cleaned.length)), Math.max(0, pos - (el.value.length - cleaned.length))); } catch(e) {}
+          }
+          // Enforce maxlength after sanitize
+          if (el.value.length > max) el.value = el.value.slice(0, max);
+        }
         var len = el.value.length;
         ct.textContent = len + ' / ' + max;
         ct.classList.remove('warn', 'limit');
         if (len >= max) ct.classList.add('limit');
         else if (len >= max * 0.85) ct.classList.add('warn');
       }
-      el.addEventListener('input', update);
-      update();
+
+      el.addEventListener('input', sanitizeAndUpdate);
+      el.addEventListener('paste', function() { setTimeout(sanitizeAndUpdate, 0); });
+      sanitizeAndUpdate();
     }
+
     document.addEventListener('DOMContentLoaded', function() {
-      initCounter('name',    'name-counter',    50);
-      initCounter('email',   'email-counter',   100);
-      initCounter('subject', 'subject-counter', 80);
-      initCounter('message', 'message-counter', 1000);
+      initCounter('name',    'name-counter',    50,  sanitizeName);
+      initCounter('email',   'email-counter',   50,  sanitizeEmail);
+      initCounter('subject', 'subject-counter', 80,  sanitizeText);
+      initCounter('message', 'message-counter', 600, sanitizeText);
     });
   </script>
 

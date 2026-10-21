@@ -688,24 +688,32 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     }
 
     $rules = [
-        'subject' => 'required|string|max:80',
-        'message' => 'required|string|min:5|max:1000',
+        'subject' => ['required', 'string', 'max:80', 'regex:/^[\p{L}\p{M}\p{N}\p{P}\p{Zs} .,!?\-]{1,80}$/u'],
+        'message' => ['required', 'string', 'min:5', 'max:600'],
     ];
 
     if (!auth()->check()) {
-        $rules['name']  = 'required|string|max:50';
-        $rules['email'] = 'required|email|max:100';
+        $rules['name']  = ['required', 'string', 'max:50', 'regex:/^[\p{L}\p{M} ]+$/u'];
+        $rules['email'] = ['required', 'email', 'max:50'];
     }
 
     $data = $request->validate($rules);
 
+    // Server-side strip of emojis and control characters from text fields
+    $stripFn = fn(string $s) => preg_replace('/[\x{1F000}-\x{1FFFF}\x{2600}-\x{27FF}\x{2300}-\x{23FF}\x{FE00}-\x{FE0F}\x{1F900}-\x{1F9FF}\x{200D}\x{FEFF}]/u', '', $s);
+
+    $name    = auth()->check() ? auth()->user()->name : $stripFn($data['name']);
+    $email   = auth()->check() ? auth()->user()->email : preg_replace('/[^a-zA-Z0-9@.\-_+]/', '', $data['email']);
+    $subject = $stripFn($data['subject']);
+    $message = $stripFn($data['message']);
+
     \App\Models\SupportTicket::create([
         'user_id' => auth()->id(),
-        'name' => auth()->check() ? auth()->user()->name : $data['name'],
-        'email' => auth()->check() ? auth()->user()->email : $data['email'],
-        'subject' => $data['subject'],
-        'message' => $data['message'],
-        'status' => 'pending',
+        'name'    => $name,
+        'email'   => $email,
+        'subject' => $subject,
+        'message' => $message,
+        'status'  => 'pending',
     ]);
 
     \Illuminate\Support\Facades\RateLimiter::hit($key, 1440 * 60); // 24 hours

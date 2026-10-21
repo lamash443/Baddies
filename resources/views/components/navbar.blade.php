@@ -600,12 +600,18 @@
       <!-- Search Input Collapse (mobile) -->
       @if(!isset($hideSearch) || !$hideSearch)
       <div class="collapse w-100 mt-2 pb-2 d-xl-none" id="mobileSearchCollapse">
-        <form action="{{ route('search') }}" method="GET" class="position-relative" role="search">
-          <svg class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: orange; pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" name="q" value="{{ request('q') }}" class="form-control nr-navbar-search-input text-white bg-dark ps-5 py-2" placeholder="Search county, title, or category..." style="border: 2px solid orange; box-shadow: none; border-radius: 8px; width: 100%;" autocomplete="off" aria-label="Site search">
+        <form action="{{ route('search') }}" method="GET" class="d-flex align-items-center gap-2" role="search">
+          <div class="position-relative flex-grow-1">
+            <svg class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: orange; pointer-events:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" name="q" value="{{ request('q') }}" class="form-control nr-navbar-search-input text-white bg-dark ps-5 py-2" placeholder="Search county, title, or category..." style="border: 2px solid orange; box-shadow: none; border-radius: 8px; width: 100%;" autocomplete="off" aria-label="Site search">
+          </div>
+          <button type="submit" style="background: orange; border: none; border-radius: 8px; color: #000; font-weight: 800; font-size: 0.82rem; padding: 0.55rem 1rem; white-space: nowrap; letter-spacing: 0.03em; flex-shrink: 0; cursor: pointer; transition: background 0.2s;" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span style="vertical-align: middle; margin-left: 4px;">Search</span>
+          </button>
         </form>
       </div>
       @endif
