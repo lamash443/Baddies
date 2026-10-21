@@ -552,27 +552,33 @@
         </div>
 
         {{-- Rates --}}
-        @if($incalls || $outcalls)
         <div class="pv-card">
           <div class="pv-section-title">Rates</div>
           <div class="pv-rates">
-            @if($incalls)
             <div class="pv-rate-card">
               <div class="pv-rate-card__type">In-calls</div>
-              <div class="pv-rate-card__price">KES {{ number_format($incalls) }}</div>
+              <div class="pv-rate-card__price">
+                @if($incalls && is_numeric($incalls) && $incalls > 0)
+                  KES {{ number_format($incalls) }}
+                @else
+                  ASK
+                @endif
+              </div>
               <div class="pv-rate-card__per">per session</div>
             </div>
-            @endif
-            @if($outcalls)
             <div class="pv-rate-card">
               <div class="pv-rate-card__type">Out-calls</div>
-              <div class="pv-rate-card__price">KES {{ number_format($outcalls) }}</div>
+              <div class="pv-rate-card__price">
+                @if($outcalls && is_numeric($outcalls) && $outcalls > 0)
+                  KES {{ number_format($outcalls) }}
+                @else
+                  ASK
+                @endif
+              </div>
               <div class="pv-rate-card__per">per session</div>
             </div>
-            @endif
           </div>
         </div>
-        @endif
 
         {{-- Services --}}
         @if(count($services) > 0)
@@ -721,18 +727,14 @@
               <span class="pv-cta-stat__val">{{ $nation }}</span>
             </div>
             @endif
-            @if($incalls)
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">In-call Rate</span>
-              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES {{ number_format($incalls) }}</span>
+              <span class="pv-cta-stat__val" style="color:#ff8c00;">{{ ($incalls && is_numeric($incalls) && $incalls > 0) ? 'KES ' . number_format($incalls) : 'ASK' }}</span>
             </div>
-            @endif
-            @if($outcalls)
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Out-call Rate</span>
-              <span class="pv-cta-stat__val" style="color:#ff8c00;">KES {{ number_format($outcalls) }}</span>
+              <span class="pv-cta-stat__val" style="color:#ff8c00;">{{ ($outcalls && is_numeric($outcalls) && $outcalls > 0) ? 'KES ' . number_format($outcalls) : 'ASK' }}</span>
             </div>
-            @endif
             @if(count($services) > 0)
             <div class="pv-cta-stat">
               <span class="pv-cta-stat__key">Services</span>

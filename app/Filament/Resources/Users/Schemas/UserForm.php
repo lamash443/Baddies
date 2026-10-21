@@ -213,10 +213,12 @@ class UserForm
                             ->columnSpanFull(),
                         TextInput::make('incalls_rate')
                             ->numeric()
-                            ->prefix('Ksh'),
+                            ->prefix('Ksh')
+                            ->placeholder('Defaults to ASK if empty'),
                         TextInput::make('outcalls_rate')
                             ->numeric()
-                            ->prefix('Ksh'),
+                            ->prefix('Ksh')
+                            ->placeholder('Defaults to ASK if empty'),
                         TextInput::make('other_cities')
                             ->columnSpanFull(),
                     ]),

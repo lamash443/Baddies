@@ -206,6 +206,7 @@
                 <label for="incalls_rate" class="form-label">{{ __('Incalls rate') }}</label>
                 <div class="input-group">
                     <input id="incalls_rate" name="incalls_rate" type="number" min="0" max="999999" class="form-control"
+                        placeholder="Leave blank for ASK"
                         value="{{ old('incalls_rate', $user->incalls_rate) }}"
                         onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
@@ -217,6 +218,7 @@
                 <label for="outcalls_rate" class="form-label">{{ __('Outcalls rate') }}</label>
                 <div class="input-group">
                     <input id="outcalls_rate" name="outcalls_rate" type="number" min="0" max="999999" class="form-control"
+                        placeholder="Leave blank for ASK"
                         value="{{ old('outcalls_rate', $user->outcalls_rate) }}"
                         onkeydown="if(['-','+','e','E','.'].includes(event.key)) event.preventDefault();" />
                     <span class="input-group-text" style="color: #ff8c00;">Ksh</span>
