@@ -53,6 +53,64 @@
         </div>
     </div>
 
+    @php
+        $regUser = $visitor->registered_user;
+    @endphp
+
+    {{-- Registered User Card --}}
+    @if($regUser)
+        <div class="rounded-xl border border-primary-500/30 bg-primary-500/10 p-4 dark:border-primary-400/20 dark:bg-primary-500/5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-base shadow-sm">
+                        {{ strtoupper(substr($regUser->name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-base font-bold text-gray-900 dark:text-white">{{ $regUser->name }}</span>
+                            @if($regUser->is_verified)
+                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <x-filament::icon icon="heroicon-m-check-badge" class="h-3 w-3" />
+                                    Verified
+                                </span>
+                            @endif
+                            @if($regUser->is_admin)
+                                <span class="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold text-purple-700 dark:bg-purple-950/40 dark:text-purple-400">
+                                    Admin
+                                </span>
+                            @endif
+                        </div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                            <span class="font-mono">{{ $regUser->email }}</span>
+                            @if($regUser->phone_number)
+                                <span class="mx-1">•</span>
+                                <span>{{ $regUser->phone_number }}</span>
+                            @endif
+                            <span class="mx-1">•</span>
+                            <span>Registered: {{ $regUser->created_at?->format('d M Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+                <a
+                    href="{{ \App\Filament\Resources\Users\UserResource::getUrl('edit', ['record' => $regUser->id]) }}"
+                    target="_blank"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-primary-500 transition-colors"
+                >
+                    View Account
+                    <x-filament::icon icon="heroicon-m-arrow-top-right-on-square" class="h-3.5 w-3.5" />
+                </a>
+            </div>
+        </div>
+    @else
+        <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-3.5 text-xs text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <x-filament::icon icon="heroicon-m-user" class="h-4 w-4 text-gray-400" />
+                <span>Visitor Status: <strong class="text-gray-700 dark:text-gray-300">Guest (Unregistered)</strong></span>
+            </div>
+            <span class="text-[11px] text-gray-400">No registered user matches this IP</span>
+        </div>
+    @endif
+
     {{-- 2 Column Grid: Location and Activity Stats --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {{-- Geolocation Card --}}

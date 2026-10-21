@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Visitor extends Model
 {
     protected $fillable = [
+        'user_id',
         'ip_address',
         'country',
         'country_code',
@@ -21,6 +22,61 @@ class Visitor extends Model
         'total_time_seconds',
         'visit_date',
     ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the registered user matching this visitor session.
+     * Matches via explicit user_id if tracked, or by registration_ip, or active session IP.
+     */
+    public function getRegisteredUserAttribute(): ?User
+    {
+        // 1. Direct relation
+        if (!empty($this->user_id)) {
+            $user = $this->user;
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // 2. Match by IP address
+        if (!empty($this->ip_address)) {
+            $user = User::where('registration_ip', $this->ip_address)->first();
+            if ($user) {
+                return $user;
+            }
+
+            // 3. Fallback: Check active sessions table
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+                    $sessionUserId = \Illuminate\Support\Facades\DB::table('sessions')
+                        ->where('ip_address', $this->ip_address)
+                        ->whereNotNull('user_id')
+                        ->orderByDesc('last_activity')
+                        ->value('user_id');
+
+                    if ($sessionUserId) {
+                        return User::find($sessionUserId);
+                    }
+                }
+            } catch (\Throwable) {
+                // Ignore session lookup failures
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the registered user's name if identified.
+     */
+    public function getRegisteredUserNameAttribute(): ?string
+    {
+        return $this->registered_user?->name;
+    }
     
     protected $casts = [
         'first_visit_at' => 'datetime',

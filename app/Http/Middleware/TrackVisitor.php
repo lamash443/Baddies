@@ -80,6 +80,10 @@ class TrackVisitor
                             $visitor->user_agent = $request->userAgent();
                         }
 
+                        if (auth()->check() && Schema::hasColumn('visitors', 'user_id')) {
+                            $visitor->user_id = auth()->id();
+                        }
+
                         $visitor->save();
                     } else {
                         // Safe fallback for unmigrated database

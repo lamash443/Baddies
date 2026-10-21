@@ -3,7 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VisitorResource\Pages;
+use App\Filament\Resources\Users\UserResource;
 use App\Models\BlockedIp;
+use App\Models\User;
 use App\Models\Visitor;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -83,6 +85,47 @@ class VisitorResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-m-signal')
                     ->tooltip('Click to copy IP address'),
+
+                TextColumn::make('registered_user_name')
+                    ->label('User')
+                    ->badge()
+                    ->state(fn (Visitor $record) => $record->registered_user_name ?? 'Guest')
+                    ->color(fn (string $state) => $state !== 'Guest' ? 'primary' : 'gray')
+                    ->icon(fn (string $state) => $state !== 'Guest' ? 'heroicon-m-user-circle' : 'heroicon-m-user')
+                    ->url(function (Visitor $record): ?string {
+                        $user = $record->registered_user;
+                        return $user ? UserResource::getUrl('edit', ['record' => $user->id]) : null;
+                    })
+                    ->openUrlInNewTab()
+                    ->tooltip(function (Visitor $record): ?string {
+                        $user = $record->registered_user;
+                        return $user ? "Registered account: {$user->name} ({$user->email})" : 'Anonymous guest visitor';
+                    })
+                    ->searchable(query: function (Builder $query, string $search) {
+                        try {
+                            $matchingIps = User::where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->pluck('registration_ip')
+                                ->filter()
+                                ->toArray();
+
+                            $matchingIds = User::where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->pluck('id')
+                                ->toArray();
+
+                            return $query->where(function ($q) use ($matchingIps, $matchingIds) {
+                                if (!empty($matchingIps)) {
+                                    $q->whereIn('ip_address', $matchingIps);
+                                }
+                                if (Schema::hasColumn('visitors', 'user_id') && !empty($matchingIds)) {
+                                    $q->orWhereIn('user_id', $matchingIds);
+                                }
+                            });
+                        } catch (\Throwable) {
+                            return $query;
+                        }
+                    }),
 
                 TextColumn::make('blocked_status')
                     ->label('Blocked')
@@ -188,6 +231,25 @@ class VisitorResource extends Resource
                         try {
                             $blockedIps = BlockedIp::pluck('ip_address')->toArray();
                             return $query->whereIn('ip_address', $blockedIps);
+                        } catch (\Throwable) {
+                            return $query;
+                        }
+                    })
+                    ->toggle(),
+
+                Filter::make('registered')
+                    ->label('Registered Users Only')
+                    ->query(function (Builder $query) {
+                        try {
+                            $regIps = User::whereNotNull('registration_ip')->pluck('registration_ip')->filter()->unique()->toArray();
+                            return $query->where(function ($q) use ($regIps) {
+                                if (!empty($regIps)) {
+                                    $q->whereIn('ip_address', $regIps);
+                                }
+                                if (Schema::hasColumn('visitors', 'user_id')) {
+                                    $q->orWhereNotNull('user_id');
+                                }
+                            });
                         } catch (\Throwable) {
                             return $query;
                         }

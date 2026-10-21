@@ -49,10 +49,15 @@ class VisitorTrackerController extends Controller
                     'country_code' => $geo['country_code'] ?? null,
                     'city' => $geo['city'] ?? null,
                     'region' => $geo['region'] ?? null,
+                    'user_id' => auth()->check() ? auth()->id() : null,
                 ]);
             } else {
                 $visitor->increment('total_time_seconds', $seconds);
-                $visitor->update(['last_visit_at' => $now]);
+                $updates = ['last_visit_at' => $now];
+                if (auth()->check() && empty($visitor->user_id) && \Illuminate\Support\Facades\Schema::hasColumn('visitors', 'user_id')) {
+                    $updates['user_id'] = auth()->id();
+                }
+                $visitor->update($updates);
             }
 
             return response()->json(['status' => 'ok']);
