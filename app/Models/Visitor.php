@@ -125,6 +125,71 @@ class Visitor extends Model
     }
 
     /**
+     * Check if visitor was active within the last 15 minutes.
+     */
+    public function getIsOnlineAttribute(): bool
+    {
+        return $this->last_visit_at && $this->last_visit_at->greaterThanOrEqualTo(now()->subMinutes(15));
+    }
+
+    /**
+     * Status indicator label.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        if ($this->is_online) {
+            return 'Online Now';
+        }
+        if ($this->last_visit_at && $this->last_visit_at->greaterThanOrEqualTo(now()->startOfDay())) {
+            return 'Active Today';
+        }
+        return 'Offline';
+    }
+
+    /**
+     * Status color for badges.
+     */
+    public function getStatusColorAttribute(): string
+    {
+        if ($this->is_online) {
+            return 'success';
+        }
+        if ($this->last_visit_at && $this->last_visit_at->greaterThanOrEqualTo(now()->startOfDay())) {
+            return 'warning';
+        }
+        return 'gray';
+    }
+
+    /**
+     * Operating system parser.
+     */
+    public function getOsNameAttribute(): string
+    {
+        $ua = $this->user_agent ?? '';
+        if (preg_match('/iPhone|iPad|iPod/i', $ua)) return 'iOS';
+        if (preg_match('/Android/i', $ua)) return 'Android';
+        if (preg_match('/Windows NT 10.0/i', $ua)) return 'Windows 10/11';
+        if (preg_match('/Windows NT/i', $ua)) return 'Windows';
+        if (preg_match('/Macintosh|Mac OS X/i', $ua)) return 'macOS';
+        if (preg_match('/Linux/i', $ua)) return 'Linux';
+        return 'Unknown OS';
+    }
+
+    /**
+     * Browser name parser.
+     */
+    public function getBrowserNameAttribute(): string
+    {
+        $ua = $this->user_agent ?? '';
+        if (preg_match('/Edg/i', $ua)) return 'Edge';
+        if (preg_match('/Opera|OPR/i', $ua)) return 'Opera';
+        if (preg_match('/Chrome/i', $ua)) return 'Chrome';
+        if (preg_match('/Firefox/i', $ua)) return 'Firefox';
+        if (preg_match('/Safari/i', $ua)) return 'Safari';
+        return 'Browser';
+    }
+
+    /**
      * Simplified device and browser parser from user_agent.
      */
     public function getDeviceAttribute(): string
@@ -132,15 +197,13 @@ class Visitor extends Model
         $ua = $this->user_agent ?? '';
 
         if (empty($ua)) {
-            return 'Desktop / Unknown';
+            return 'Desktop • Unknown';
         }
 
         $device = 'Desktop';
-        if (preg_match('/iPhone|iPad|iPod/i', $ua)) {
-            $device = 'iOS Device';
-        } elseif (preg_match('/Android/i', $ua)) {
-            $device = 'Android';
-        } elseif (preg_match('/Mobile/i', $ua)) {
+        if (preg_match('/iPad|Tablet/i', $ua)) {
+            $device = 'Tablet';
+        } elseif (preg_match('/iPhone|iPod|Android.*Mobile|Mobile/i', $ua)) {
             $device = 'Mobile';
         } elseif (preg_match('/Macintosh|Mac OS X/i', $ua)) {
             $device = 'Mac';
@@ -150,18 +213,7 @@ class Visitor extends Model
             $device = 'Linux';
         }
 
-        $browser = 'Browser';
-        if (preg_match('/Chrome/i', $ua) && !preg_match('/Edg/i', $ua)) {
-            $browser = 'Chrome';
-        } elseif (preg_match('/Safari/i', $ua) && !preg_match('/Chrome/i', $ua)) {
-            $browser = 'Safari';
-        } elseif (preg_match('/Firefox/i', $ua)) {
-            $browser = 'Firefox';
-        } elseif (preg_match('/Edg/i', $ua)) {
-            $browser = 'Edge';
-        } elseif (preg_match('/Opera|OPR/i', $ua)) {
-            $browser = 'Opera';
-        }
+        $browser = $this->browser_name;
 
         return "{$device} • {$browser}";
     }
