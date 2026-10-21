@@ -206,14 +206,85 @@
     text-shadow: 0 0 8px rgba(255, 140, 0, 0.6);
   }
   
-  .mobile-icon-hover {
-    transition: transform 0.2s ease;
+  /* Icon buttons (Search, Theme) - Never turn or remain white on hover/focus/active/click */
+  .nr-icon-btn,
+  #desktopSearchToggle,
+  #themeToggleBtn,
+  #themeToggleBtnMobile,
+  #mobileSearchToggleBtn,
+  [data-bs-target="#mobileSearchCollapse"] {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
+    user-select: none;
+    -webkit-user-select: none;
   }
-  .mobile-icon-hover svg {
-    transition: stroke 0.3s ease;
+
+  .nr-icon-btn:focus,
+  .nr-icon-btn:active,
+  #desktopSearchToggle:focus,
+  #desktopSearchToggle:active,
+  #themeToggleBtn:focus,
+  #themeToggleBtn:active,
+  #themeToggleBtnMobile:focus,
+  #themeToggleBtnMobile:active,
+  #mobileSearchToggleBtn:focus,
+  #mobileSearchToggleBtn:active,
+  [data-bs-target="#mobileSearchCollapse"]:focus,
+  [data-bs-target="#mobileSearchCollapse"]:active {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
   }
-  .mobile-icon-hover:hover svg {
-    stroke: white !important;
+
+  .nr-icon-btn svg,
+  #desktopSearchToggle svg,
+  #themeToggleBtn svg,
+  #themeToggleBtnMobile svg,
+  #mobileSearchToggleBtn svg,
+  [data-bs-target="#mobileSearchCollapse"] svg {
+    stroke: orange !important;
+    color: orange !important;
+    fill: none !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
+  }
+
+  /* Only on desktop devices with hover support: gentle scale/opacity, stroke stays vibrant orange */
+  @media (hover: hover) and (pointer: fine) {
+    .nr-icon-btn:hover,
+    #desktopSearchToggle:hover,
+    #themeToggleBtn:hover,
+    #themeToggleBtnMobile:hover,
+    #mobileSearchToggleBtn:hover,
+    [data-bs-target="#mobileSearchCollapse"]:hover {
+      transform: scale(1.08);
+      opacity: 0.85;
+    }
+    .nr-icon-btn:hover svg,
+    #desktopSearchToggle:hover svg,
+    #themeToggleBtn:hover svg,
+    #themeToggleBtnMobile:hover svg,
+    #mobileSearchToggleBtn:hover svg,
+    [data-bs-target="#mobileSearchCollapse"]:hover svg {
+      stroke: orange !important;
+      color: orange !important;
+    }
+  }
+
+  /* When pressed/active */
+  .nr-icon-btn:active,
+  #desktopSearchToggle:active,
+  #themeToggleBtn:active,
+  #themeToggleBtnMobile:active,
+  #mobileSearchToggleBtn:active,
+  [data-bs-target="#mobileSearchCollapse"]:active {
+    transform: scale(0.92) !important;
+    opacity: 1 !important;
   }
   
   @media (max-width: 1199.98px) {
@@ -489,7 +560,7 @@
 
           <!-- Mobile Search Toggle Button -->
           @if(!isset($hideSearch) || !$hideSearch)
-          <button class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchCollapse" aria-controls="mobileSearchCollapse" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Search">
+          <button id="mobileSearchToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center nr-icon-btn" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchCollapse" aria-controls="mobileSearchCollapse" aria-expanded="false" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Search" aria-label="Search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -498,7 +569,7 @@
           @endif
           
           <!-- Mobile Theme Toggle Button -->
-          <button id="themeToggleBtnMobile" class="btn p-0 d-flex align-items-center justify-content-center mobile-icon-hover" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme" aria-label="Toggle Theme">
+          <button id="themeToggleBtnMobile" class="btn p-0 d-flex align-items-center justify-content-center nr-icon-btn" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme" aria-label="Toggle Theme">
             <svg id="themeIconSunMobile" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -516,7 +587,7 @@
           </button>
 
           <!-- Hamburger Menu for Mobile -->
-          <button class="navbar-toggler btn p-0 mobile-icon-hover" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid orange; background-color: orange; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 2; padding: 0 !important; box-shadow: none !important;">
+          <button class="navbar-toggler btn p-0" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid orange; background-color: orange; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 2; padding: 0 !important; box-shadow: none !important;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -576,7 +647,7 @@
               @if(!isset($hideSearch) || !$hideSearch)
               <!-- Desktop Search Icon (right side, opens dropdown below) -->
               <div class="nr-search-wrap">
-                <button class="btn p-0 d-flex align-items-center justify-content-center" type="button" id="desktopSearchToggle" aria-label="Search" style="background:transparent; flex-shrink:0; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+                <button class="btn p-0 d-flex align-items-center justify-content-center nr-icon-btn" type="button" id="desktopSearchToggle" aria-label="Search" style="width: 36px; height: 36px; background: transparent; flex-shrink: 0;" title="Search">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -595,7 +666,7 @@
               @endif
 
               <!-- Desktop Theme Toggle -->
-              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center" type="button" style="background-color: transparent; flex-shrink: 0; transition: transform 0.2s ease, opacity 0.2s ease;" onmouseover="this.style.opacity='0.75'; this.style.transform='scale(1.08)';" onmouseout="this.style.opacity='1'; this.style.transform='scale(1)';" title="Toggle Theme" aria-label="Toggle Theme">
+              <button id="themeToggleBtn" class="btn p-0 d-flex align-items-center justify-content-center nr-icon-btn" type="button" style="width: 36px; height: 36px; background-color: transparent; flex-shrink: 0;" title="Toggle Theme" aria-label="Toggle Theme">
                 <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="5"></circle>
                   <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -713,12 +784,10 @@ if (!window._navbarLogicInitialized) {
     syncThemeIcons();
     window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: targetTheme } }));
 
-    // Release lock after painting
-    requestAnimationFrame(function() {
-      requestAnimationFrame(function() {
-        htmlEl.classList.remove('theme-switching');
-      });
-    });
+    // Release lock after painting (120ms lock guarantees instant theme switch without animating transitions)
+    setTimeout(function() {
+      htmlEl.classList.remove('theme-switching');
+    }, 120);
   }
 
   // Synchronize immediately and on lifecycle events
@@ -734,12 +803,13 @@ if (!window._navbarLogicInitialized) {
       const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
       const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       switchThemeInstant(newTheme);
+      themeBtn.blur();
     }
   });
 
-  // Handle Search Dropdown Toggles
+  // Handle Search Dropdown Toggles and Outside Clicks
   document.addEventListener('click', function(e) {
-    // Desktop Search
+    // Desktop Search Toggle
     const desktopBtn = e.target.closest('#desktopSearchToggle');
     const desktopPanel = document.getElementById('desktopSearchPanel');
     if (desktopBtn && desktopPanel) {
@@ -749,22 +819,73 @@ if (!window._navbarLogicInitialized) {
         const input = document.getElementById('desktopSearchInput');
         if (input) setTimeout(() => input.focus(), 50);
       }
+      desktopBtn.blur();
     } else if (desktopPanel && !desktopPanel.contains(e.target)) {
       desktopPanel.classList.remove('is-open');
     }
 
-    // Mobile Search
-    const mobileBtn = e.target.closest('#mobileSearchToggle');
-    const mobilePanel = document.getElementById('mobileSearchPanel');
-    if (mobileBtn && mobilePanel) {
-      e.stopPropagation();
-      const open = mobilePanel.classList.toggle('is-open');
-      if (open) {
-        const input = document.getElementById('mobileSearchInput');
-        if (input) setTimeout(() => input.focus(), 50);
+    // Mobile Search toggle button blur
+    const mobileBtn = e.target.closest('#mobileSearchToggleBtn') || e.target.closest('[data-bs-target="#mobileSearchCollapse"]');
+    if (mobileBtn) {
+      mobileBtn.blur();
+    }
+  });
+
+  // Auto-hide mobile search collapse when clicking/tapping anywhere outside on phone
+  function handleOutsideMobileSearch(e) {
+    var searchCollapse = document.getElementById('mobileSearchCollapse');
+    if (!searchCollapse) return;
+
+    var isOpen = searchCollapse.classList.contains('show') || searchCollapse.classList.contains('collapsing');
+    if (!isOpen) return;
+
+    var toggleBtn = document.getElementById('mobileSearchToggleBtn') || document.querySelector('[data-bs-target="#mobileSearchCollapse"]');
+
+    // If tap was inside the search collapse, don't close
+    if (searchCollapse.contains(e.target)) return;
+
+    // If tap was on the toggle button itself, let button toggle it
+    if (toggleBtn && (toggleBtn === e.target || toggleBtn.contains(e.target))) return;
+
+    // Tap was outside -> hide search collapse immediately!
+    if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+      var bsCollapse = bootstrap.Collapse.getInstance(searchCollapse);
+      if (bsCollapse) {
+        bsCollapse.hide();
+      } else {
+        new bootstrap.Collapse(searchCollapse, { toggle: false }).hide();
       }
-    } else if (mobilePanel && !mobilePanel.contains(e.target)) {
-      mobilePanel.classList.remove('is-open');
+    } else {
+      searchCollapse.classList.remove('show');
+    }
+
+    var input = searchCollapse.querySelector('input');
+    if (input) input.blur();
+  }
+
+  document.addEventListener('pointerdown', handleOutsideMobileSearch, true);
+  document.addEventListener('click', handleOutsideMobileSearch, true);
+
+  // Auto-focus mobile search input when opened & prevent menu conflict
+  document.addEventListener('DOMContentLoaded', function() {
+    var msc = document.getElementById('mobileSearchCollapse');
+    if (msc) {
+      msc.addEventListener('shown.bs.collapse', function () {
+        var input = msc.querySelector('input');
+        if (input) setTimeout(function() { input.focus(); }, 50);
+      });
+    }
+
+    var nav = document.getElementById('publicNavbar');
+    if (msc && nav && typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+      nav.addEventListener('show.bs.collapse', function() {
+        var bsMsc = bootstrap.Collapse.getInstance(msc);
+        if (bsMsc) bsMsc.hide();
+      });
+      msc.addEventListener('show.bs.collapse', function() {
+        var bsNav = bootstrap.Collapse.getInstance(nav);
+        if (bsNav) bsNav.hide();
+      });
     }
   });
 
@@ -772,9 +893,16 @@ if (!window._navbarLogicInitialized) {
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       const dp = document.getElementById('desktopSearchPanel');
-      if(dp) dp.classList.remove('is-open');
-      const mp = document.getElementById('mobileSearchPanel');
-      if(mp) mp.classList.remove('is-open');
+      if (dp) dp.classList.remove('is-open');
+      const msc = document.getElementById('mobileSearchCollapse');
+      if (msc && msc.classList.contains('show')) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+          var bs = bootstrap.Collapse.getInstance(msc);
+          if (bs) bs.hide();
+        } else {
+          msc.classList.remove('show');
+        }
+      }
     }
   });
 }

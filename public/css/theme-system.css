@@ -516,32 +516,103 @@ html.theme-switching *::after {
   color: #0f172a !important;
 }
 
-[data-bs-theme="light"] .loc-tag {
-  background: #ffffff !important;
-  border-color: rgba(255, 140, 0, 0.45) !important;
-  color: #1e293b !important;
+/* ── BROWSE BY LOCATION SYSTEM (INSTANT SWITCH & SNAPPY HOVER) ── */
+:root,
+[data-bs-theme="dark"] {
+  --loc-tag-bg: #000000;
+  --loc-tag-border: #ff8c00;
+  --loc-tag-color: rgba(255, 255, 255, 0.9);
+  --loc-tag-hover-bg: #000000;
+  --loc-tag-hover-border: #ff8c00;
+  --loc-tag-hover-color: #ffffff;
+  --loc-tag-hover-shadow: 0 0 10px rgba(255, 140, 0, 0.6);
+
+  --loc-card-bg: #0d0d0d;
+  --loc-card-border: rgba(255, 255, 255, 0.08);
+  --loc-accordion-body-bg: rgba(10, 8, 0, 0.6);
+  --loc-accordion-item-border: rgba(255, 140, 0, 0.25);
+  --loc-accordion-item-bg: transparent;
 }
 
-[data-bs-theme="light"] .loc-tag:hover {
-  background: #ff8c00 !important;
-  border-color: #ff8c00 !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3) !important;
+[data-bs-theme="light"] {
+  --loc-tag-bg: #ffffff;
+  --loc-tag-border: rgba(255, 140, 0, 0.45);
+  --loc-tag-color: #1e293b;
+  --loc-tag-hover-bg: #ff8c00;
+  --loc-tag-hover-border: #ff8c00;
+  --loc-tag-hover-color: #ffffff;
+  --loc-tag-hover-shadow: 0 3px 10px rgba(255, 140, 0, 0.3);
+
+  --loc-card-bg: #ffffff;
+  --loc-card-border: rgba(0, 0, 0, 0.08);
+  --loc-accordion-body-bg: #fafafa;
+  --loc-accordion-item-border: rgba(255, 140, 0, 0.25);
+  --loc-accordion-item-bg: #ffffff;
 }
 
-[data-bs-theme="light"] .loc-section-card {
-  background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+/* Zero transition during theme switching */
+html.theme-switching .loc-tag,
+html.theme-switching .loc-section-card,
+html.theme-switching #locAccordion,
+html.theme-switching #locAccordion * {
+  transition: none !important;
+  animation: none !important;
 }
 
-[data-bs-theme="light"] #locAccordion .accordion-item {
-  background: #ffffff !important;
-  border-color: rgba(255, 140, 0, 0.25) !important;
+.loc-tag {
+  display: inline-block;
+  padding: .35rem .75rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--loc-tag-color) !important;
+  background: var(--loc-tag-bg) !important;
+  border: 1px solid var(--loc-tag-border) !important;
+  border-radius: .4rem;
+  text-decoration: none;
+  white-space: nowrap;
+  letter-spacing: .02em;
+  /* Snappy fade-out when mouse leaves: only 0.1s (100ms) - fades fast without lingering! */
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background-color 0.1s ease-out, border-color 0.1s ease-out, color 0.1s ease-out;
+  will-change: transform;
 }
 
-[data-bs-theme="light"] #locAccordion .accordion-body {
-  background: #fafafa !important;
+@media (hover: hover) {
+  .loc-tag:hover {
+    background: var(--loc-tag-hover-bg) !important;
+    border-color: var(--loc-tag-hover-border) !important;
+    color: var(--loc-tag-hover-color) !important;
+    box-shadow: var(--loc-tag-hover-shadow) !important;
+    transform: translateY(-1px);
+    /* Snappy hover-in: 0.08s */
+    transition: transform 0.08s ease-in, box-shadow 0.08s ease-in, background-color 0.08s ease-in, border-color 0.08s ease-in, color 0.08s ease-in;
+  }
+}
+
+.loc-tag:active {
+  transform: translateY(0);
+}
+
+.loc-section-card {
+  background: var(--loc-card-bg) !important;
+  border: 1px solid var(--loc-card-border) !important;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: .75rem;
+  transition: none !important;
+}
+
+#locAccordion .accordion-item {
+  background: var(--loc-accordion-item-bg) !important;
+  border: 1px solid var(--loc-accordion-item-border) !important;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: none !important;
+}
+
+#locAccordion .accordion-body {
+  background: var(--loc-accordion-body-bg) !important;
+  padding: 1.25rem;
+  transition: none !important;
 }
 
 /* Modals & Dialogs */
@@ -574,3 +645,52 @@ html.theme-switching *::after {
   border-color: rgba(0, 0, 0, 0.15) !important;
   color: #0f172a !important;
 }
+
+/* ── ICON BUTTONS (SEARCH & THEME) - ALWAYS ORANGE, NO WHITE STROKE ON HOVER/CLICK ── */
+.nr-icon-btn,
+#desktopSearchToggle,
+#themeToggleBtn,
+#themeToggleBtnMobile,
+#mobileSearchToggleBtn,
+[data-bs-target="#mobileSearchCollapse"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.nr-icon-btn svg,
+#desktopSearchToggle svg,
+#themeToggleBtn svg,
+#themeToggleBtnMobile svg,
+#mobileSearchToggleBtn svg,
+[data-bs-target="#mobileSearchCollapse"] svg {
+  stroke: #ff8c00 !important;
+  color: #ff8c00 !important;
+  fill: none !important;
+}
+
+.nr-icon-btn:hover svg,
+.nr-icon-btn:focus svg,
+.nr-icon-btn:active svg,
+#desktopSearchToggle:hover svg,
+#desktopSearchToggle:focus svg,
+#desktopSearchToggle:active svg,
+#themeToggleBtn:hover svg,
+#themeToggleBtn:focus svg,
+#themeToggleBtn:active svg,
+#themeToggleBtnMobile:hover svg,
+#themeToggleBtnMobile:focus svg,
+#themeToggleBtnMobile:active svg,
+#mobileSearchToggleBtn:hover svg,
+#mobileSearchToggleBtn:focus svg,
+#mobileSearchToggleBtn:active svg,
+[data-bs-target="#mobileSearchCollapse"]:hover svg,
+[data-bs-target="#mobileSearchCollapse"]:focus svg,
+[data-bs-target="#mobileSearchCollapse"]:active svg {
+  stroke: #ff8c00 !important;
+  color: #ff8c00 !important;
+}
+

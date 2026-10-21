@@ -285,19 +285,32 @@
 
     
     /* LOCATION SECTION CSS */
+    html.theme-switching .loc-tag,
+    html.theme-switching .loc-section-card,
+    html.theme-switching #locAccordion,
+    html.theme-switching #locAccordion * {
+      transition: none !important;
+      animation: none !important;
+    }
     .loc-tag {
       display: inline-block; padding: .35rem .75rem; font-size: .78rem; font-weight: 600;
-      color: rgba(255, 255, 255, 0.85); background: #000000; border: 1px solid #ff8c00;
-      border-radius: .4rem; text-decoration: none; white-space: nowrap; transition: all 0.3s ease;
+      color: var(--loc-tag-color, rgba(255, 255, 255, 0.9)); background: var(--loc-tag-bg, #000000); border: 1px solid var(--loc-tag-border, #ff8c00);
+      border-radius: .4rem; text-decoration: none; white-space: nowrap;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, background-color 0.1s ease-out, border-color 0.1s ease-out, color 0.1s ease-out;
+      will-change: transform;
       letter-spacing: .02em;
     }
-    .loc-tag:hover {
-      background-color: #000000; border-color: #ff8c00; color: #ffffff;
-      box-shadow: 0 0 12px rgba(255, 140, 0, 0.6); transform: translateY(-1px);
+    @media (hover: hover) {
+      .loc-tag:hover {
+        background-color: var(--loc-tag-hover-bg, #000000); border-color: var(--loc-tag-hover-border, #ff8c00); color: var(--loc-tag-hover-color, #ffffff);
+        box-shadow: var(--loc-tag-hover-shadow, 0 0 10px rgba(255, 140, 0, 0.6)); transform: translateY(-1px);
+        transition: transform 0.08s ease-in, box-shadow 0.08s ease-in, background-color 0.08s ease-in, border-color 0.08s ease-in, color 0.08s ease-in;
+      }
     }
+    .loc-tag:active { transform: translateY(0); }
     .loc-section-card {
-      background: #0d0d0d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px;
-      padding: 1rem 1.25rem; margin-bottom: .75rem;
+      background: var(--loc-card-bg, #0d0d0d); border: 1px solid var(--loc-card-border, rgba(255, 255, 255, 0.08)); border-radius: 6px;
+      padding: 1rem 1.25rem; margin-bottom: .75rem; transition: none !important;
     }
     .loc-section-title {
       font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
@@ -317,8 +330,8 @@
     }
     #locAccordion .accordion-button::after { filter: invert(60%) sepia(80%) saturate(400%) hue-rotate(5deg); }
     #locAccordion .accordion-button:focus { box-shadow: 0 0 0 0.2rem rgba(255,140,0,0.25); }
-    #locAccordion .accordion-item { background: transparent; border: 1px solid rgba(255,140,0,0.25); border-radius: 6px; overflow: hidden; margin-bottom:2rem; }
-    #locAccordion .accordion-body { background: rgba(10,8,0,0.6); padding: 1.25rem; }
+    #locAccordion .accordion-item { background: var(--loc-accordion-item-bg, transparent); border: 1px solid var(--loc-accordion-item-border, rgba(255,140,0,0.25)); border-radius: 6px; overflow: hidden; margin-bottom:2rem; transition: none !important; }
+    #locAccordion .accordion-body { background: var(--loc-accordion-body-bg, rgba(10,8,0,0.6)); padding: 1.25rem; transition: none !important; }
   </style>
 </head>
 <body>
