@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        $middleware->web(append: [
+        $middleware->web(prepend: [
+            \App\Http\Middleware\BlockIpMiddleware::class,
+        ], append: [
             \App\Http\Middleware\TrackVisitor::class,
             \App\Http\Middleware\UpdateLastSeen::class,
             \App\Http\Middleware\AutoLogoutInactive::class,

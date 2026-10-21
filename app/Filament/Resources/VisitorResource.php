@@ -3,12 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VisitorResource\Pages;
+use App\Models\BlockedIp;
 use App\Models\Visitor;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -16,6 +18,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class VisitorResource extends Resource
@@ -80,6 +83,31 @@ class VisitorResource extends Resource
                     ->weight('bold')
                     ->icon('heroicon-m-signal')
                     ->tooltip('Click to copy IP address'),
+
+                TextColumn::make('blocked_status')
+                    ->label('Blocked')
+                    ->badge()
+                    ->state(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'Blocked' : 'Allowed';
+                        } catch (\Throwable) {
+                            return 'Allowed';
+                        }
+                    })
+                    ->color(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'danger' : 'success';
+                        } catch (\Throwable) {
+                            return 'success';
+                        }
+                    })
+                    ->icon(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'heroicon-m-no-symbol' : 'heroicon-m-check-circle';
+                        } catch (\Throwable) {
+                            return 'heroicon-m-check-circle';
+                        }
+                    }),
 
                 TextColumn::make('location')
                     ->label('Location')
@@ -154,6 +182,18 @@ class VisitorResource extends Resource
                     }))
                     ->toggle(),
 
+                Filter::make('blocked')
+                    ->label('Blocked IPs Only')
+                    ->query(function (Builder $query) {
+                        try {
+                            $blockedIps = BlockedIp::pluck('ip_address')->toArray();
+                            return $query->whereIn('ip_address', $blockedIps);
+                        } catch (\Throwable) {
+                            return $query;
+                        }
+                    })
+                    ->toggle(),
+
                 SelectFilter::make('country')
                     ->label('Country')
                     ->searchable()
@@ -170,7 +210,7 @@ class VisitorResource extends Resource
                             ->toArray();
                     }),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('inspect')
                     ->label('Inspect')
                     ->icon('heroicon-m-information-circle')
@@ -180,6 +220,76 @@ class VisitorResource extends Resource
                     ->modalContent(fn (Visitor $record) => view('filament.pages.visitor-details-modal', ['visitor' => $record]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Close'),
+
+                Action::make('block_ip')
+                    ->label(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'Unblock IP' : 'Block IP';
+                        } catch (\Throwable) {
+                            return 'Block IP';
+                        }
+                    })
+                    ->icon(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'heroicon-m-lock-open' : 'heroicon-m-no-symbol';
+                        } catch (\Throwable) {
+                            return 'heroicon-m-no-symbol';
+                        }
+                    })
+                    ->color(function (Visitor $record): string {
+                        try {
+                            return BlockedIp::where('ip_address', $record->ip_address)->exists() ? 'success' : 'danger';
+                        } catch (\Throwable) {
+                            return 'danger';
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists()
+                        ? "Unblock IP: {$record->ip_address}"
+                        : "Block IP: {$record->ip_address}")
+                    ->modalDescription(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists()
+                        ? "This will remove the block and allow this IP to access the website again."
+                        : "This will prevent this IP address from accessing the website. The visitor will see a 403 Access Restricted page.")
+                    ->modalIcon(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists()
+                        ? 'heroicon-o-lock-open'
+                        : 'heroicon-o-no-symbol')
+                    ->form(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists() ? [] : [
+                        \Filament\Schemas\Components\TextInput::make('reason')
+                            ->label('Reason for blocking (optional)')
+                            ->placeholder('e.g. Spam, abuse, suspicious activity...')
+                            ->maxLength(255),
+                    ])
+                    ->action(function (Visitor $record, array $data): void {
+                        try {
+                            $isCurrentlyBlocked = BlockedIp::where('ip_address', $record->ip_address)->exists();
+
+                            if ($isCurrentlyBlocked) {
+                                BlockedIp::unblockIp($record->ip_address);
+                                Notification::make()
+                                    ->title('IP Unblocked')
+                                    ->body("IP address {$record->ip_address} has been unblocked and can now access the website.")
+                                    ->success()
+                                    ->send();
+                            } else {
+                                BlockedIp::blockIp(
+                                    $record->ip_address,
+                                    $data['reason'] ?? null,
+                                    Auth::id()
+                                );
+                                Notification::make()
+                                    ->title('IP Blocked')
+                                    ->body("IP address {$record->ip_address} has been blocked from accessing the website.")
+                                    ->danger()
+                                    ->send();
+                            }
+                        } catch (\Throwable $e) {
+                            Notification::make()
+                                ->title('Error')
+                                ->body('Could not update IP block status: ' . $e->getMessage())
+                                ->warning()
+                                ->send();
+                        }
+                    }),
 
                 Action::make('ip_lookup')
                     ->label('IP Info')
@@ -192,7 +302,7 @@ class VisitorResource extends Resource
                     ->modalHeading('Delete Visitor Record')
                     ->modalDescription('Are you sure you want to delete this visitor record?'),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->modalHeading('Delete Selected Visitor Records')

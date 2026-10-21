@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Schema;
 
 class VisitorOverviewWidget extends BaseWidget
 {
-    protected ?string $pollingInterval = '30s';
+    protected function getPollingInterval(): ?string
+    {
+        return '30s';
+    }
 
     protected function getStats(): array
     {
