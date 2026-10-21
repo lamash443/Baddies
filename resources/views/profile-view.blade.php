@@ -453,10 +453,17 @@
         {{ $age }} years old
       </span>
       @endif
-      @if($city)
+      @php
+        $heroLocParts = [];
+        if (!empty($location)) { $heroLocParts[] = $location; }
+        if (!empty($county) && (!isset($heroLocParts[0]) || strcasecmp($heroLocParts[0], $county) !== 0)) { $heroLocParts[] = $county; }
+        if (empty($heroLocParts) && !empty($city)) { $heroLocParts[] = $city; }
+        $heroLocation = !empty($heroLocParts) ? implode(', ', $heroLocParts) : null;
+      @endphp
+      @if($heroLocation)
       <span class="pv-hero__meta-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        {{ $city }}@if($county), {{ $county }}@endif
+        {{ $heroLocation }}
       </span>
       @endif
       @if($nation)
@@ -775,18 +782,27 @@
               $spPlanType  = 'prime';       $spPlanLabel = 'Prime';
           } elseif (in_array($spRawPlan, ['vip', 'vip_escort'])) {
               $spPlanType  = 'vip';         $spPlanLabel = 'VIP';
-          } else {
-              $spPlanType  = 'regular';     $spPlanLabel = 'Regular';
           }
+          $spLocParts = [];
+          if (!empty($sp->location)) { $spLocParts[] = trim($sp->location); }
+          if (!empty($sp->county) && (!isset($spLocParts[0]) || strcasecmp($spLocParts[0], trim($sp->county)) !== 0)) { $spLocParts[] = trim($sp->county); }
+          if (empty($spLocParts) && !empty($sp->city_town)) { $spLocParts[] = trim($sp->city_town); }
+          $spLocLabel = !empty($spLocParts) ? implode(', ', $spLocParts) : null;
         @endphp
         <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card" style="position:relative;">
           <img class="pv-similar-card__img" src="{{ $spCover }}" alt="{{ $sp->name }}" loading="lazy">
           {{-- Plan badge --}}
           <span class="nr-plan-badge nr-plan-badge--{{ str_replace('_','-',$spPlanType) }}" style="top:.55rem;left:.55rem;">{{ $spPlanLabel }}</span>
+          @if($spLocLabel)
+          <span class="nr-listing-card__loc-pill" style="bottom:.45rem;left:.45rem;font-size:.6rem;padding:.15rem .45rem;" title="{{ $spLocLabel }}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" style="width:.65rem;height:.65rem;fill:#ff8c00;"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Zm0-8.25A2.75 2.75 0 1 0 12 7.25a2.75 2.75 0 0 0 0 5.5Z"/></svg>
+            <span class="nr-listing-card__loc-pill-text">{{ $spLocLabel }}</span>
+          </span>
+          @endif
           <div class="pv-similar-card__info">
             <div class="pv-similar-card__name">{{ $sp->name }}</div>
             <div class="pv-similar-card__meta">
-              {{ $sp->age ? $sp->age.' yrs' : '' }}{{ $sp->age && $sp->city_town ? ' · ' : '' }}{{ $sp->city_town ?? '' }}
+              {{ $sp->age ? $sp->age.' yrs' : '' }}{{ $sp->age && $spLocLabel ? ' · ' : '' }}{{ $spLocLabel ?? '' }}
             </div>
           </div>
         </a>

@@ -99,21 +99,29 @@ class ProfileController extends Controller
         $request->user()->save();
 
         // Auto-save new county to locations table for admin management
-        $county = $request->validated('county');
-        if ($county) {
-            Location::firstOrCreate(
-                ['name' => $county],
-                ['type' => 'county', 'is_active' => true]
-            );
+        $county = trim($request->validated('county') ?? '');
+        if ($county !== '') {
+            $existingCounty = Location::whereRaw('LOWER(name) = ?', [strtolower($county)])->first();
+            if (!$existingCounty) {
+                Location::create([
+                    'name' => $county,
+                    'type' => 'county',
+                    'is_active' => true,
+                ]);
+            }
         }
 
         // Auto-save new location to locations table for admin management
-        $location = $request->validated('location');
-        if ($location) {
-            Location::firstOrCreate(
-                ['name' => $location],
-                ['type' => 'area', 'is_active' => true]
-            );
+        $location = trim($request->validated('location') ?? '');
+        if ($location !== '') {
+            $existingLocation = Location::whereRaw('LOWER(name) = ?', [strtolower($location)])->first();
+            if (!$existingLocation) {
+                Location::create([
+                    'name' => $location,
+                    'type' => 'area',
+                    'is_active' => true,
+                ]);
+            }
         }
 
         $tab = in_array($request->input('_redirect_tab'), ['tab-profile', 'tab-settings'])

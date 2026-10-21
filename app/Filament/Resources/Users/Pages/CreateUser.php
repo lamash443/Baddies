@@ -17,20 +17,28 @@ class CreateUser extends CreateRecord
 
     protected function syncLocationFromRecord(): void
     {
-        $county = $this->record->county;
-        if ($county) {
-            Location::firstOrCreate(
-                ['name' => $county],
-                ['type' => 'county', 'is_active' => true]
-            );
+        $county = trim($this->record->county ?? '');
+        if ($county !== '') {
+            $existingCounty = Location::whereRaw('LOWER(name) = ?', [strtolower($county)])->first();
+            if (!$existingCounty) {
+                Location::create([
+                    'name' => $county,
+                    'type' => 'county',
+                    'is_active' => true,
+                ]);
+            }
         }
 
-        $location = $this->record->location;
-        if ($location) {
-            Location::firstOrCreate(
-                ['name' => $location],
-                ['type' => 'area', 'is_active' => true]
-            );
+        $location = trim($this->record->location ?? '');
+        if ($location !== '') {
+            $existingLocation = Location::whereRaw('LOWER(name) = ?', [strtolower($location)])->first();
+            if (!$existingLocation) {
+                Location::create([
+                    'name' => $location,
+                    'type' => 'area',
+                    'is_active' => true,
+                ]);
+            }
         }
     }
 }

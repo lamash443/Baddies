@@ -8,7 +8,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}">
+    <form id="profile-update-form" method="post" action="{{ route('profile.update') }}">
         @csrf
         @method('patch')
 
@@ -91,7 +91,7 @@
             $isCustomCounty = $currentCounty && !in_array($currentCounty, $allCounties);
         @endphp
         <div class="mb-3">
-            <label for="county_select" class="form-label">{{ __('County') }}</label>
+            <label for="county_select" class="form-label fw-bold">{{ __('County') }} <span class="text-danger">*</span></label>
             <select id="county_select" class="form-select" onchange="handleCountyChange(this)">
                 <option value="">{{ __('Select County') }}</option>
                 @foreach($allCounties as $c)
@@ -101,7 +101,7 @@
             </select>
             <input id="county" name="county" type="text" class="form-control pf-sanitise mt-2"
                 data-pattern="name"
-                maxlength="30"
+                maxlength="50"
                 placeholder="Type your county..."
                 value="{{ $isCustomCounty ? $currentCounty : ($currentCounty && !in_array($currentCounty, $allCounties) ? $currentCounty : '') }}"
                 style="display: {{ $isCustomCounty ? 'block' : 'none' }};" />
@@ -127,7 +127,7 @@
             $isCustomLocation = $currentLocation && !in_array($currentLocation, $allLocations);
         @endphp
         <div class="mb-3">
-            <label for="location_select" class="form-label">{{ __('Location') }}</label>
+            <label for="location_select" class="form-label fw-bold">{{ __('Location') }} <span class="text-danger">*</span></label>
             <select id="location_select" class="form-select" onchange="handleLocationChange(this)">
                 <option value="">{{ __('Select Location / Area') }}</option>
                 @foreach($allLocations as $loc)
@@ -137,7 +137,7 @@
             </select>
             <input id="location" name="location" type="text" class="form-control pf-sanitise mt-2"
                 data-pattern="name"
-                maxlength="30"
+                maxlength="50"
                 placeholder="Type your location..."
                 value="{{ $isCustomLocation ? $currentLocation : '' }}"
                 style="display: {{ $isCustomLocation ? 'block' : 'none' }};" />
@@ -293,12 +293,19 @@
 /* County dropdown handler */
 function handleCountyChange(sel) {
   var customInput = document.getElementById('county');
+  sel.classList.remove('is-invalid');
+  if (customInput) customInput.classList.remove('is-invalid');
+
   if (sel.value === '__other__') {
     customInput.style.display = 'block';
     customInput.value = '';
+    customInput.required = true;
+    sel.required = false;
     customInput.focus();
   } else {
     customInput.style.display = 'none';
+    customInput.required = false;
+    sel.required = true;
     customInput.value = sel.value;
   }
 }
@@ -306,31 +313,108 @@ function handleCountyChange(sel) {
 /* Location dropdown handler */
 function handleLocationChange(sel) {
   var customInput = document.getElementById('location');
+  sel.classList.remove('is-invalid');
+  if (customInput) customInput.classList.remove('is-invalid');
+
   if (sel.value === '__other__') {
     customInput.style.display = 'block';
     customInput.value = '';
+    customInput.required = true;
+    sel.required = false;
     customInput.focus();
   } else {
     customInput.style.display = 'none';
+    customInput.required = false;
+    sel.required = true;
     customInput.value = sel.value;
   }
 }
 
-/* On page load, sync hidden inputs from dropdowns if no custom value is active */
+/* On page load, sync inputs from dropdowns & enforce client-side required validation */
 document.addEventListener('DOMContentLoaded', function() {
   var countySelect = document.getElementById('county_select');
   var countyInput  = document.getElementById('county');
   if (countySelect && countyInput) {
-    if (countyInput.style.display !== 'block' && countySelect.value && countySelect.value !== '__other__') {
+    if (countySelect.value === '__other__' || countyInput.style.display === 'block') {
+      countyInput.required = true;
+      countySelect.required = false;
+    } else if (countySelect.value) {
       countyInput.value = countySelect.value;
+      countyInput.required = false;
+      countySelect.required = true;
+    } else {
+      countySelect.required = true;
+      countyInput.required = false;
     }
   }
+
   var locSelect = document.getElementById('location_select');
   var locInput  = document.getElementById('location');
   if (locSelect && locInput) {
-    if (locInput.style.display !== 'block' && locSelect.value && locSelect.value !== '__other__') {
+    if (locSelect.value === '__other__' || locInput.style.display === 'block') {
+      locInput.required = true;
+      locSelect.required = false;
+    } else if (locSelect.value) {
       locInput.value = locSelect.value;
+      locInput.required = false;
+      locSelect.required = true;
+    } else {
+      locSelect.required = true;
+      locInput.required = false;
     }
+  }
+
+  var form = document.getElementById('profile-update-form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      var cSel = document.getElementById('county_select');
+      var cInp = document.getElementById('county');
+      var lSel = document.getElementById('location_select');
+      var lInp = document.getElementById('location');
+
+      var countyVal = '';
+      if (cSel && cSel.value === '__other__') {
+        countyVal = cInp ? cInp.value.trim() : '';
+      } else if (cSel) {
+        countyVal = cSel.value.trim();
+      }
+
+      var locVal = '';
+      if (lSel && lSel.value === '__other__') {
+        locVal = lInp ? lInp.value.trim() : '';
+      } else if (lSel) {
+        locVal = lSel.value.trim();
+      }
+
+      if (!countyVal) {
+        e.preventDefault();
+        if (cSel.value === '__other__' && cInp) {
+          cInp.classList.add('is-invalid');
+          cInp.focus();
+        } else if (cSel) {
+          cSel.classList.add('is-invalid');
+          cSel.focus();
+        }
+        alert('County is required. Please select your county or type one to complete your profile update.');
+        return false;
+      }
+
+      if (!locVal) {
+        e.preventDefault();
+        if (lSel.value === '__other__' && lInp) {
+          lInp.classList.add('is-invalid');
+          lInp.focus();
+        } else if (lSel) {
+          lSel.classList.add('is-invalid');
+          lSel.focus();
+        }
+        alert('Location is required. Please select your location or type one to complete your profile update.');
+        return false;
+      }
+
+      if (cInp) cInp.value = countyVal;
+      if (lInp) lInp.value = locVal;
+    });
   }
 });
 </script>

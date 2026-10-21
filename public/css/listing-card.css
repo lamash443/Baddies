@@ -392,6 +392,50 @@
       border: none;
     }
 
+    /* ── Location Pill (Visible at a glance over media) ── */
+    .nr-listing-card__loc-pill {
+      position: absolute;
+      bottom: .5rem;
+      left: .5rem;
+      max-width: calc(100% - 1rem);
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .22rem .55rem;
+      border-radius: 999px;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 140, 0, 0.7);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      color: #ffffff !important;
+      font-size: .67rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .nr-listing-card:hover .nr-listing-card__loc-pill {
+      border-color: #ff8c00;
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+    }
+    .nr-listing-card__loc-pill svg {
+      width: .75rem;
+      height: .75rem;
+      flex: 0 0 .75rem;
+      fill: #ff8c00;
+      color: #ff8c00;
+      display: block;
+    }
+    .nr-listing-card__loc-pill-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #ffffff !important;
+    }
+
     .nr-listing-card__status-line--vip {
       background: #ff8c00 !important;
       color: #ffffff !important;

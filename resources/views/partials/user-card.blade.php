@@ -6,9 +6,23 @@
     : "https://ui-avatars.com/api/?name=".urlencode(substr($user->name, 0, 2))."&background=ff8c00&color=000&size=200&bold=true";
   // Formatted name
   $name = $user->name ?? 'Member';
-  // Age & City
+  // Age & Formatted Location
   $age = $user->age ? $user->age . ' Yo' : null;
-  $city = $user->city_town ?? null;
+
+  $locParts = [];
+  if (!empty($user->location)) {
+      $locParts[] = trim($user->location);
+  }
+  if (!empty($user->county) && (!isset($locParts[0]) || strcasecmp($locParts[0], trim($user->county)) !== 0)) {
+      $locParts[] = trim($user->county);
+  }
+  if (empty($locParts) && !empty($user->city_town)) {
+      $locParts[] = trim($user->city_town);
+  }
+  if (empty($locParts) && !empty($user->area)) {
+      $locParts[] = trim($user->area);
+  }
+  $locationLabel = !empty($locParts) ? implode(', ', $locParts) : null;
   // Subscription plan normalization
   $rawPlan = strtolower(trim($user->subscription_plan ?? 'regular'));
   if (in_array($rawPlan, ['prime_vip', 'prime-vip', 'primevip'])) {
@@ -45,6 +59,13 @@
       @else
         <span class="nr-plan-badge nr-plan-badge--regular">Regular</span>
       @endif
+
+      @if($locationLabel)
+        <span class="nr-listing-card__loc-pill" title="{{ $locationLabel }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Zm0-8.25A2.75 2.75 0 1 0 12 7.25a2.75 2.75 0 0 0 0 5.5Z"/></svg>
+          <span class="nr-listing-card__loc-pill-text">{{ $locationLabel }}</span>
+        </span>
+      @endif
     </div>
   </div>
 
@@ -65,12 +86,12 @@
       </div>
       @endif
 
-      @if($city)
-      <div class="nr-listing-card__value">
+      @if($locationLabel)
+      <div class="nr-listing-card__value" title="{{ $locationLabel }}">
         <span class="nr-listing-card__value-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Zm0-8.25A2.75 2.75 0 1 0 12 7.25a2.75 2.75 0 0 0 0 5.5Z"/></svg>
         </span>
-        <span class="nr-listing-card__value-text">{{ $city }}</span>
+        <span class="nr-listing-card__value-text text-truncate" style="max-width: 175px;">{{ $locationLabel }}</span>
       </div>
       @endif
     </div>
