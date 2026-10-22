@@ -270,9 +270,9 @@
 (function () {
   'use strict';
 
-  // ── Testing mode: 3 minutes total timeout (2 min inactivity + 60s warning countdown) ──
-  const TIMEOUT_MS    = 3 * 60 * 1000;   // 3 min total → auto-logout
-  const WARNING_MS    = 2 * 60 * 1000;   // 2 min inactivity → show warning popup
+  // ── 20 minutes total timeout (19 min inactivity + 60s warning countdown) ──
+  const TIMEOUT_MS    = 20 * 60 * 1000;  // 20 min total → auto-logout
+  const WARNING_MS    = 19 * 60 * 1000;  // 19 min inactivity → show warning popup
   const WARNING_SEC   = 60;              // 60-second countdown
   const CIRCUMFERENCE = 2 * Math.PI * 35; // r=35 → ≈ 219.9
 

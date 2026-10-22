@@ -11,9 +11,8 @@ class AutoLogoutInactive
 {
     /**
      * Inactivity timeout in minutes before the user is automatically logged out.
-     * Reduced to 3 minutes for testing.
      */
-    protected int $timeoutMinutes = 3;
+    protected int $timeoutMinutes = 20;
 
     public function handle(Request $request, Closure $next)
     {
