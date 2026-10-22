@@ -57,6 +57,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'incalls_rate',
         'outcalls_rate',
         'other_cities',
+        'additional_information',
         'subscription_plan',
         'subscription_expires_at',
         'chat_plan',

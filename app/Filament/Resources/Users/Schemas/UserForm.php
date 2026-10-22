@@ -221,6 +221,12 @@ class UserForm
                             ->placeholder('Defaults to ASK if empty'),
                         TextInput::make('other_cities')
                             ->columnSpanFull(),
+                        Textarea::make('additional_information')
+                            ->label('Additional Information')
+                            ->helperText('Appealing information displayed on the user profile to attract clients (no title shown on the public profile).')
+                            ->rows(4)
+                            ->maxLength(2500)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Settings')

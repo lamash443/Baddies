@@ -389,6 +389,7 @@
     [data-bs-theme="light"] .pv-auth-gate__icon svg { color: rgba(0,0,0,0.5) !important; }
     [data-bs-theme="light"] .pv-cta-stat__val[style*="color:#ff8c00;"] { color: rgba(255,140,0,0.95) !important; }
     [data-bs-theme="light"] p[style*="color:rgba(255,255,255,.25)"] { color: rgba(0,0,0,0.4) !important; }
+    [data-bs-theme="light"] .pv-additional-info-card { background: #ffffff !important; border-left: 3px solid #ff8c00 !important; }
   </style>
 </head>
 <body>
@@ -419,6 +420,7 @@
   $outcalls  = $user->outcalls_rate;
   $otherSvc  = $user->other_services;
   $otherCit  = $user->other_cities;
+  $addInfo   = $user->additional_information ?? null;
 @endphp
 
 {{-- NAVBAR --}}
@@ -483,6 +485,22 @@
 
       {{-- LEFT: Main content --}}
       <div class="col-lg-8">
+
+        {{-- Added Information (seamless without "Additional Information" title) --}}
+        @if(!empty($addInfo))
+        <div class="pv-card pv-additional-info-card" style="position: relative; border-left: 3px solid #ff8c00; background: linear-gradient(135deg, rgba(255,140,0,0.06), rgba(0,0,0,0.25)); padding: 1.25rem 1.35rem;">
+          <div class="d-flex gap-3 align-items-start">
+            <div style="flex-shrink: 0; width: 34px; height: 34px; border-radius: 8px; background: rgba(255,140,0,0.15); display: flex; align-items: center; justify-content: center; color: #ff8c00;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <div class="flex-grow-1">
+              <p class="pv-about-text mb-0" style="font-size: 0.95rem; line-height: 1.65; white-space: pre-line; word-break: break-word;">{{ $addInfo }}</p>
+            </div>
+          </div>
+        </div>
+        @endif
 
         {{-- About --}}
         @if($otherSvc || $nearby || $otherCit)

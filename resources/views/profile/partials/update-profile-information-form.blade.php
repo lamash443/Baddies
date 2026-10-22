@@ -239,6 +239,32 @@
             @error('other_cities')<div class="text-danger">{{ $message }}</div>@enderror
         </div>
 
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="additional_information" class="form-label mb-0 fw-semibold">{{ __('Any additional information') }}</label>
+                <span class="text-white-50" style="font-size:0.75rem;" id="counter-additional_information"></span>
+            </div>
+
+            <div class="p-3 mb-2 rounded-3" style="background: rgba(255, 140, 0, 0.08); border: 1.5px dashed rgba(255, 140, 0, 0.35); font-size: 0.82rem; line-height: 1.5;">
+                <div style="font-weight: 700; color: #ff8c00; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.45rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Make Your Profile Irresistible To More Clients!
+                </div>
+                <div style="opacity: 0.9;">
+                    Use this space to share appealing and enticing details that make you stand out and attract more clients! Mention your special touches, warm personality, cleanliness, preferred arrangements, or what makes spending time with you completely unforgettable.
+                </div>
+            </div>
+
+            <textarea id="additional_information" name="additional_information" rows="4" maxlength="2500"
+                class="form-control pf-sanitise"
+                data-pattern="text"
+                style="resize: vertical; min-height: 110px; line-height: 1.5;"
+                placeholder="Write appealing details to attract more clients (e.g., your charm, special arrangements, good vibes, hygiene standards, or unique offerings)..."
+            >{{ old('additional_information', $user->additional_information) }}</textarea>
+
+            @error('additional_information')<div class="text-danger mt-1">{{ $message }}</div>@enderror
+        </div>
+
         <div class="d-flex align-items-center gap-3">
             <button type="submit" class="btn-orange">{{ __('Save') }}</button>
             @if (session('status') === 'profile-updated')
@@ -255,7 +281,8 @@
     phone:  /[^0-9+\s\-]/g,
     name:   /[^a-zA-Z\u00C0-\u024F0-9\s'\-]/g,
     places: /[^a-zA-Z\u00C0-\u024F\s,.\-]/g,
-    list:   /[^a-zA-Z\u00C0-\u024F\s,\-]/g
+    list:   /[^a-zA-Z\u00C0-\u024F\s,\-]/g,
+    text:   /[^\x20-\x7E\r\n\u00C0-\u024F]/g
   };
   /* Strip emoji / symbol blocks */
   var EMOJI_RE = /[\uD800-\uDFFF\u2600-\u27BF\u2300-\u23FF\uFE00-\uFE0F]/g;

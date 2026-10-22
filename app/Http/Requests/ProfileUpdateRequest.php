@@ -61,6 +61,7 @@ class ProfileUpdateRequest extends FormRequest
             'outcalls_rate'      => ['nullable', 'integer', 'min:0', 'max:999999'],
             // Letters, spaces, commas, hyphens — max 100
             'other_cities'       => ['nullable', 'string', 'max:100', 'regex:/^[\p{L}\s,\-]*$/u'],
+            'additional_information' => ['nullable', 'string', 'max:2500'],
             'favorites_visibility' => ['nullable', 'string', 'in:everybody,favourites,nobody'],
             'photos_visibility'    => ['nullable', 'string', 'in:everybody,favourites,nobody'],
             'email_notifications'  => ['nullable', 'string', 'in:messages,none'],
@@ -103,6 +104,7 @@ class ProfileUpdateRequest extends FormRequest
             'other_cities.regex'         => 'Other cities may only contain letters, spaces and commas.',
             'incalls_rate.max'           => 'Incalls rate cannot exceed 999,999 Ksh.',
             'outcalls_rate.max'          => 'Outcalls rate cannot exceed 999,999 Ksh.',
+            'additional_information.max' => 'Additional information cannot exceed 2,500 characters.',
         ];
     }
 }
