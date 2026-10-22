@@ -16,7 +16,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
-    
+
     /* HEADER / HERO */
     .hero {
       position: relative;
@@ -25,7 +25,7 @@
       border-bottom: 1px solid rgba(255,140,0,0.1);
       margin-bottom: 3rem;
     }
-    
+
     .classified-container {
       max-width: 900px;
       margin: 0 auto;
@@ -35,7 +35,7 @@
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    
+
     .classified-image {
       width: 100%;
       max-height: 500px;
@@ -44,7 +44,7 @@
       margin-bottom: 2rem;
       border: 1px solid rgba(255,140,0,0.3);
     }
-    
+
     .classified-title {
       font-size: 2.5rem;
       font-weight: 800;
@@ -52,7 +52,7 @@
       margin-bottom: 1rem;
       line-height: 1.2;
     }
-    
+
     .classified-meta {
       display: flex;
       flex-wrap: wrap;
@@ -61,7 +61,7 @@
       padding-bottom: 1.5rem;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    
+
     .meta-item {
       display: flex;
       align-items: center;
@@ -69,7 +69,7 @@
       color: rgba(255,255,255,0.7);
       font-size: 1rem;
     }
-    
+
     .classified-description {
       font-size: 1.1rem;
       line-height: 1.7;
@@ -77,7 +77,7 @@
       margin-bottom: 3rem;
       white-space: pre-wrap;
     }
-    
+
     .contact-box {
       background: linear-gradient(145deg, rgba(255,140,0,0.1) 0%, rgba(255,140,0,0.02) 100%);
       border: 1px solid rgba(255,140,0,0.3);
@@ -85,14 +85,14 @@
       padding: 2rem;
       text-align: center;
     }
-    
+
     .contact-box h3 {
       font-size: 1.5rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 1.5rem;
     }
-    
+
     .btn-contact {
       display: inline-flex;
       align-items: center;
@@ -107,14 +107,64 @@
       text-decoration: none;
       transition: all 0.3s ease;
       border: 2px solid orange;
+      cursor: pointer;
     }
-    
+
     .btn-contact:hover {
       background: transparent;
       color: orange;
       box-shadow: 0 0 15px rgba(255,165,0,0.4);
     }
-    
+
+    /* ── LIGHT THEME OVERRIDES ── */
+    [data-bs-theme="light"] body {
+      background: #f4f6f9;
+      color: #111;
+    }
+    [data-bs-theme="light"] .hero {
+      background: linear-gradient(180deg, rgba(255,140,0,0.06) 0%, #f4f6f9 100%);
+      border-bottom-color: rgba(0,0,0,0.08);
+    }
+    [data-bs-theme="light"] .classified-container {
+      background: #ffffff;
+      border-color: rgba(255,140,0,0.25);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    [data-bs-theme="light"] .classified-title {
+      color: #111;
+    }
+    [data-bs-theme="light"] .classified-meta {
+      border-bottom-color: rgba(0,0,0,0.1);
+    }
+    [data-bs-theme="light"] .meta-item {
+      color: rgba(0,0,0,0.65);
+    }
+    [data-bs-theme="light"] .classified-description {
+      color: rgba(0,0,0,0.75);
+    }
+    [data-bs-theme="light"] .contact-box {
+      background: linear-gradient(145deg, rgba(255,140,0,0.07) 0%, rgba(255,255,255,0.9) 100%);
+      border-color: rgba(255,140,0,0.3);
+    }
+    [data-bs-theme="light"] .contact-box h3 {
+      color: #111;
+    }
+    [data-bs-theme="light"] .contact-box p {
+      color: rgba(0,0,0,0.75);
+    }
+    [data-bs-theme="light"] .contact-box strong {
+      color: #111;
+    }
+    [data-bs-theme="light"] .classified-image {
+      border-color: rgba(255,140,0,0.2);
+    }
+    [data-bs-theme="light"] .btn-contact:hover {
+      background: #fff8f0;
+      color: #cc6f00;
+      border-color: #cc6f00;
+      box-shadow: 0 0 15px rgba(255,140,0,0.2);
+    }
+
   </style>
 </head>
 <body>
