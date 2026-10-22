@@ -16,8 +16,17 @@ class AutoLogoutInactive
 
     public function handle(Request $request, Closure $next)
     {
-        // Never intercept authentication, logout, registration, or background heartbeat routes
-        if ($request->is('login') || $request->is('login/*') || $request->is('logout') || $request->is('register') || $request->is('visitor/heartbeat') || $request->is('visitor/*')) {
+        // Never intercept authentication, logout, registration, heartbeat, or admin panel routes
+        if (
+            $request->is('login') ||
+            $request->is('login/*') ||
+            $request->is('logout') ||
+            $request->is('register') ||
+            $request->is('visitor/heartbeat') ||
+            $request->is('visitor/*') ||
+            $request->is('admin') ||
+            $request->is('admin/*')
+        ) {
             return $next($request);
         }
 
