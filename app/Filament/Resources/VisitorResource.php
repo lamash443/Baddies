@@ -315,11 +315,12 @@ class VisitorResource extends Resource
                     ->modalIcon(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists()
                         ? 'heroicon-o-lock-open'
                         : 'heroicon-o-no-symbol')
-                    ->form(fn (Visitor $record) => BlockedIp::where('ip_address', $record->ip_address)->exists() ? [] : [
+                    ->form([
                         \Filament\Schemas\Components\TextInput::make('reason')
                             ->label('Reason for blocking (optional)')
                             ->placeholder('e.g. Spam, abuse, suspicious activity...')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Leave blank to block without a reason. This field is ignored when unblocking.'),
                     ])
                     ->action(function (Visitor $record, array $data): void {
                         try {
