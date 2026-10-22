@@ -13,6 +13,7 @@
   <meta name="description" content="Adult Classifieds: Personals, Massage, Jobs, and Events in Kenya.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; background:#0d0d0d; color:#fff; min-height:100vh; }
@@ -165,6 +166,45 @@
     [data-bs-theme="light"] .text-secondary { color: rgba(0,0,0,0.55) !important; }
     [data-bs-theme="light"] .btn-create-classified:hover { background-color: #ffffff; }
 
+    /* ── nr-listing-card theme overrides for classifieds page ── */
+    .nr-listing-card .btn-primary,
+    .nr-listing-card .btn-primary:visited {
+      background-color: #ff8c00;
+      border-color: #ff8c00;
+      color: #000;
+      font-weight: 700;
+    }
+    .nr-listing-card .btn-primary:hover,
+    .nr-listing-card .btn-primary:focus {
+      background-color: #e07b00;
+      border-color: #e07b00;
+      color: #000;
+    }
+    [data-bs-theme="dark"] .nr-listing-card__title a,
+    [data-bs-theme="dark"] .nr-listing-card__title span { color: #ff8c00 !important; }
+    [data-bs-theme="dark"] .nr-listing-card__eyebrow { color: rgba(255,140,0,0.85) !important; }
+    [data-bs-theme="dark"] .nr-listing-card__value,
+    [data-bs-theme="dark"] .nr-listing-card__value-text,
+    [data-bs-theme="dark"] .nr-listing-card__value-icon { color: rgba(255,255,255,0.75) !important; }
+    [data-bs-theme="dark"] .nr-listing-card {
+      background: linear-gradient(160deg, rgba(255,140,0,0.07) 0%, #111111 100%);
+      border-color: rgba(255,140,0,0.4);
+    }
+    [data-bs-theme="dark"] .nr-listing-card:hover {
+      border-color: rgba(255,140,0,0.8);
+      box-shadow: 0 0 20px rgba(255,140,0,0.3), 0 0.85rem 1.6rem rgba(0,0,0,0.5);
+    }
+    [data-bs-theme="light"] .nr-listing-card {
+      background: #ffffff;
+      border-color: rgba(255,140,0,0.3);
+    }
+    [data-bs-theme="light"] .nr-listing-card:hover {
+      border-color: rgba(255,140,0,0.7);
+      box-shadow: 0 0 20px rgba(255,140,0,0.15), 0 0.85rem 1.6rem rgba(0,0,0,0.06);
+    }
+    [data-bs-theme="light"] .nr-listing-card__title span { color: #111 !important; }
+    [data-bs-theme="light"] .nr-listing-card__eyebrow { color: rgba(255,140,0,0.9) !important; }
+
   </style>
 </head>
 <body>
@@ -241,16 +281,73 @@
     @else
       <div class="row g-4">
         @foreach($classifieds as $classified)
-          <div class="col-12 col-md-6 col-lg-4">
-            <a href="{{ route('classifieds.show', $classified->id) }}" class="class-card" style="padding:1rem; align-items:flex-start; text-align:left; display:block; text-decoration:none;">
-               @if($classified->image_path)
-               <img src="{{ asset('storage/' . $classified->image_path) }}" alt="{{ $classified->title }}" style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:1rem;">
-               @endif
-               <span class="badge bg-warning text-dark mb-2 text-uppercase">{{ $classified->category }}</span>
-               <h4 class="text-light fw-bold mb-1">{{ $classified->title }}</h4>
-               <p class="small text-secondary mb-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>{{ $classified->city ?? 'N/A' }}</p>
-               <p class="text-secondary" style="font-size:0.9rem; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">{{ $classified->description }}</p>
-               <div class="btn btn-outline-warning w-100 mt-2" style="display:block; text-align:center;">View Details</div>
+          @php
+            $catIcons = [
+              'personals' => '❤️',
+              'massage'   => '💆',
+              'jobs'      => '💼',
+              'events'    => '🎉',
+            ];
+            $catEmoji = $catIcons[$classified->category] ?? '📌';
+          @endphp
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <a href="{{ route('classifieds.show', $classified->id) }}" style="text-decoration:none; display:block; height:100%;">
+              <article class="nr-listing-card" style="cursor:pointer;">
+
+                {{-- Media shell --}}
+                <div class="nr-listing-card__media-shell">
+                  <div class="nr-listing-card__media-wrap">
+                    @if($classified->image_path)
+                      <img class="nr-listing-card__media"
+                           src="{{ asset('storage/' . $classified->image_path) }}"
+                           alt="{{ $classified->title }}"
+                           loading="lazy">
+                    @else
+                      {{-- Fallback placeholder --}}
+                      <div class="nr-listing-card__media d-flex align-items-center justify-content-center"
+                           style="background:rgba(255,140,0,0.08); font-size:3rem;">
+                        {{ $catEmoji }}
+                      </div>
+                    @endif
+
+                    {{-- Category badge (top-left) --}}
+                    <span class="nr-plan-badge nr-plan-badge--vip text-uppercase" style="font-size:0.62rem; letter-spacing:0.06em;">
+                      {{ $classified->category }}
+                    </span>
+
+                    {{-- City pill (bottom-left) --}}
+                    @if($classified->city)
+                      <span class="nr-listing-card__loc-pill" title="{{ $classified->city }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Zm0-8.25A2.75 2.75 0 1 0 12 7.25a2.75 2.75 0 0 0 0 5.5Z"/></svg>
+                        <span class="nr-listing-card__loc-pill-text">{{ $classified->city }}</span>
+                      </span>
+                    @endif
+                  </div>
+                </div>
+
+                {{-- Card body --}}
+                <div class="nr-listing-card__body">
+                  <div class="nr-listing-card__eyebrow">{{ ucfirst($classified->category) }}</div>
+
+                  <h3 class="nr-listing-card__title">
+                    <span>{{ $classified->title }}</span>
+                  </h3>
+
+                  @if($classified->description)
+                    <div class="nr-listing-card__values" style="display:block; margin-bottom:0.5rem;">
+                      <p class="nr-listing-card__value-text mb-0"
+                         style="font-size:0.82rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.45;">
+                        {{ $classified->description }}
+                      </p>
+                    </div>
+                  @endif
+
+                  <div class="mt-auto pt-2">
+                    <span class="btn btn-primary w-100" style="pointer-events:none;">View Details</span>
+                  </div>
+                </div>
+
+              </article>
             </a>
           </div>
         @endforeach
