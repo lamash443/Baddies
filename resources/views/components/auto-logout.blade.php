@@ -6,7 +6,7 @@
     ⚠️ TESTING MODE — change back to 29/30 min for production.
     Only active when the user is authenticated.
 --}}
-@auth
+@if(auth()->check() && !auth()->user()->is_admin)
 @php
   $alLogo = \App\Models\SiteSetting::get('logo');
   $alLogoExists = !empty($alLogo) && \Illuminate\Support\Facades\Storage::disk('public')->exists($alLogo);
@@ -396,4 +396,4 @@
   resetTimers();
 })();
 </script>
-@endauth
+@endif

@@ -65,6 +65,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, \Illuminate\Http\Request $request) {
             if ($e->getStatusCode() === 419) {
+                // Never logout admin users on 419 Page Expired
+                if ($request->is('admin') || $request->is('admin/*') || $request->is('livewire/*') || $request->user()?->is_admin) {
+                    if ($request->expectsJson()) {
+                        return response()->json(['message' => 'Page expired. Please refresh the page.'], 419);
+                    }
+                    return redirect()->back();
+                }
+
                 auth()->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();

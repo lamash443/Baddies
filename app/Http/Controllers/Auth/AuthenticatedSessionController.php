@@ -88,6 +88,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->save();
 
         if ($request->user()->is_admin) {
+            Auth::login($request->user(), remember: true);
             return redirect('/admin');
         }
 

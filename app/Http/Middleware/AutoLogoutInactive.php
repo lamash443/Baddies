@@ -16,7 +16,7 @@ class AutoLogoutInactive
 
     public function handle(Request $request, Closure $next)
     {
-        // Never intercept authentication, logout, registration, heartbeat, or admin panel routes
+        // Never intercept authentication, logout, registration, heartbeat, livewire, or admin panel routes
         if (
             $request->is('login') ||
             $request->is('login/*') ||
@@ -25,17 +25,29 @@ class AutoLogoutInactive
             $request->is('visitor/heartbeat') ||
             $request->is('visitor/*') ||
             $request->is('admin') ||
-            $request->is('admin/*')
+            $request->is('admin/*') ||
+            $request->is('livewire') ||
+            $request->is('livewire/*')
         ) {
             return $next($request);
         }
 
+        // Never auto-logout admin users under any circumstances
+        if ($request->user()?->is_admin || Auth::user()?->is_admin) {
+            return $next($request);
+        }
+
         if (Auth::check()) {
+            $user = Auth::user();
+
+            // Double-check: if user is admin, skip completely
+            if ($user && $user->is_admin) {
+                return $next($request);
+            }
+
             $lastActivity = session('last_activity');
 
             if ($lastActivity && (time() - $lastActivity) >= ($this->timeoutMinutes * 60)) {
-                $user = Auth::user();
-
                 Auth::guard('web')->logout();
 
                 if ($user) {
