@@ -332,6 +332,31 @@
     #locAccordion .accordion-button:focus { box-shadow: 0 0 0 0.2rem rgba(255,140,0,0.25); }
     #locAccordion .accordion-item { background: var(--loc-accordion-item-bg, transparent); border: 1px solid var(--loc-accordion-item-border, rgba(255,140,0,0.25)); border-radius: 6px; overflow: hidden; margin-bottom:2rem; transition: none !important; }
     #locAccordion .accordion-body { background: var(--loc-accordion-body-bg, rgba(10,8,0,0.6)); padding: 1.25rem; transition: none !important; }
+
+    [data-bs-theme="light"] .loc-tag {
+      background-color: #ffffff !important;
+      border: 1.5px solid #ff8c00 !important;
+      color: #111827 !important;
+    }
+    @media (hover: hover) {
+      [data-bs-theme="light"] .loc-tag:hover {
+        background-color: #ff8c00 !important;
+        border-color: #ff8c00 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(255, 140, 0, 0.4) !important;
+      }
+    }
+    [data-bs-theme="light"] .loc-section-card {
+      background-color: #ffffff !important;
+      border-color: rgba(255, 140, 0, 0.25) !important;
+    }
+    [data-bs-theme="light"] #locAccordion .accordion-item {
+      background-color: #ffffff !important;
+      border-color: rgba(255, 140, 0, 0.35) !important;
+    }
+    [data-bs-theme="light"] #locAccordion .accordion-body {
+      background-color: #ffffff !important;
+    }
   </style>
 </head>
 <body>

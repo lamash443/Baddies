@@ -592,6 +592,21 @@ html.theme-switching #locAccordion * {
   transform: translateY(0);
 }
 
+[data-bs-theme="light"] .loc-tag {
+  background-color: #ffffff !important;
+  border: 1.5px solid #ff8c00 !important;
+  color: #111827 !important;
+}
+
+@media (hover: hover) {
+  [data-bs-theme="light"] .loc-tag:hover {
+    background-color: #ff8c00 !important;
+    border-color: #ff8c00 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(255, 140, 0, 0.4) !important;
+  }
+}
+
 .loc-section-card {
   background: var(--loc-card-bg) !important;
   border: 1px solid var(--loc-card-border) !important;

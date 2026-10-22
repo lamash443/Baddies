@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/listing-card.css">
-  <link rel="stylesheet" href="/css/theme-system.css">
+  <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -481,11 +481,11 @@
     [data-bs-theme="light"] .join-banner__title { color: #111; }
     [data-bs-theme="light"] .join-banner__body { color: rgba(0,0,0,0.65); }
 
-    [data-bs-theme="light"] .loc-tag { background: var(--loc-tag-bg); border-color: var(--loc-tag-border); color: var(--loc-tag-color); }
-    [data-bs-theme="light"] .loc-tag:hover { background: var(--loc-tag-hover-bg); border-color: var(--loc-tag-hover-border); color: var(--loc-tag-hover-color); box-shadow: var(--loc-tag-hover-shadow); }
-    [data-bs-theme="light"] .loc-section-card { background: var(--loc-card-bg); border-color: var(--loc-card-border); }
-    [data-bs-theme="light"] #locAccordion .accordion-item { background: var(--loc-accordion-item-bg); border-color: var(--loc-accordion-item-border); }
-    [data-bs-theme="light"] #locAccordion .accordion-body { background: var(--loc-accordion-body-bg); }
+    [data-bs-theme="light"] .loc-tag { background-color: #ffffff !important; border: 1.5px solid #ff8c00 !important; color: #111827 !important; }
+    [data-bs-theme="light"] .loc-tag:hover { background-color: #ff8c00 !important; border-color: #ff8c00 !important; color: #ffffff !important; box-shadow: 0 4px 14px rgba(255, 140, 0, 0.4) !important; }
+    [data-bs-theme="light"] .loc-section-card { background-color: #ffffff !important; border-color: rgba(255, 140, 0, 0.25) !important; }
+    [data-bs-theme="light"] #locAccordion .accordion-item { background-color: #ffffff !important; border-color: rgba(255, 140, 0, 0.35) !important; }
+    [data-bs-theme="light"] #locAccordion .accordion-body { background-color: #ffffff !important; }
     
     [data-bs-theme="light"] .baddies-editorial { background: #ffffff; border-color: rgba(255,140,0,0.25); box-shadow: 0 8px 30px rgba(0,0,0,0.04); }
     [data-bs-theme="light"] .baddies-editorial h2.ed-heading { color: #111; }
@@ -734,6 +734,19 @@
       }
       .loc-tag:active {
         transform: translateY(0);
+      }
+      [data-bs-theme="light"] .loc-tag {
+        background-color: #ffffff !important;
+        border: 1.5px solid #ff8c00 !important;
+        color: #111827 !important;
+      }
+      @media (hover: hover) {
+        [data-bs-theme="light"] .loc-tag:hover {
+          background-color: #ff8c00 !important;
+          border-color: #ff8c00 !important;
+          color: #ffffff !important;
+          box-shadow: 0 4px 14px rgba(255, 140, 0, 0.4) !important;
+        }
       }
       .loc-section-card {
         background: var(--loc-card-bg, #0d0d0d);
