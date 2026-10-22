@@ -536,7 +536,7 @@ html.theme-switching *::after {
 
 [data-bs-theme="light"] {
   --loc-tag-bg: #ffffff;
-  --loc-tag-border: rgba(255, 140, 0, 0.45);
+  --loc-tag-border: #ff8c00;
   --loc-tag-color: #1e293b;
   --loc-tag-hover-bg: #ff8c00;
   --loc-tag-hover-border: #ff8c00;
