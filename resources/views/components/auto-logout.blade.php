@@ -1,8 +1,8 @@
 {{--
     Auto-Logout Component
     Tracks user activity (mouse, keyboard, touch, scroll).
-    After 9 min of inactivity → shows a 60-second warning modal.
-    After 10 min of total inactivity → posts to /logout automatically.
+    After 2 min of inactivity → shows a 60-second warning modal.
+    After 3 min of total inactivity → posts to /logout automatically.
     ⚠️ TESTING MODE — change back to 29/30 min for production.
     Only active when the user is authenticated.
 --}}
@@ -270,9 +270,9 @@
 (function () {
   'use strict';
 
-  // ── 20 minutes total timeout (19 min inactivity + 60s warning countdown) ──
-  const TIMEOUT_MS    = 20 * 60 * 1000;  // 20 min total → auto-logout
-  const WARNING_MS    = 19 * 60 * 1000;  // 19 min inactivity → show warning popup
+  // ── 3 minutes total timeout (2 min inactivity + 60s warning countdown) — ⚠️ TESTING, change back to 20/19 min ──
+  const TIMEOUT_MS    = 3 * 60 * 1000;  // 3 min total → auto-logout
+  const WARNING_MS    = 2 * 60 * 1000;  // 2 min inactivity → show warning popup
   const WARNING_SEC   = 60;              // 60-second countdown
   const CIRCUMFERENCE = 2 * Math.PI * 35; // r=35 → ≈ 219.9
 
