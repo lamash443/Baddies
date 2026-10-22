@@ -146,14 +146,14 @@ class BlockedIpResource extends Resource
                     ->icon('heroicon-m-no-symbol')
                     ->color('danger')
                     ->form([
-                        \Filament\Schemas\Components\TextInput::make('ip_address')
+                        \Filament\Forms\Components\TextInput::make('ip_address')
                             ->label('IP Address')
                             ->required()
                             ->placeholder('e.g. 197.237.100.1')
                             ->maxLength(45)
                             ->rules(['ip']),
 
-                        \Filament\Schemas\Components\TextInput::make('reason')
+                        \Filament\Forms\Components\TextInput::make('reason')
                             ->label('Reason (optional)')
                             ->placeholder('e.g. Spam, abuse, suspicious activity...')
                             ->maxLength(255),
@@ -206,14 +206,14 @@ class BlockedIpResource extends Resource
                     ->icon('heroicon-m-no-symbol')
                     ->color('danger')
                     ->form([
-                        \Filament\Schemas\Components\TextInput::make('ip_address')
+                        \Filament\Forms\Components\TextInput::make('ip_address')
                             ->label('IP Address')
                             ->required()
                             ->placeholder('e.g. 197.237.100.1')
                             ->maxLength(45)
                             ->rules(['ip']),
 
-                        \Filament\Schemas\Components\TextInput::make('reason')
+                        \Filament\Forms\Components\TextInput::make('reason')
                             ->label('Reason (optional)')
                             ->placeholder('e.g. Spam, abuse, suspicious activity...')
                             ->maxLength(255),

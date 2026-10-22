@@ -316,7 +316,7 @@ class VisitorResource extends Resource
                         ? 'heroicon-o-lock-open'
                         : 'heroicon-o-no-symbol')
                     ->form([
-                        \Filament\Schemas\Components\TextInput::make('reason')
+                        \Filament\Forms\Components\TextInput::make('reason')
                             ->label('Reason for blocking (optional)')
                             ->placeholder('e.g. Spam, abuse, suspicious activity...')
                             ->maxLength(255)
