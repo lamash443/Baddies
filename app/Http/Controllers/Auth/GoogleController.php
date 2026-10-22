@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class GoogleController extends Controller
 {
@@ -84,7 +85,7 @@ class GoogleController extends Controller
     /**
      * Handle Google OAuth Callback.
      */
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
         if (!$this->setupGoogleConfig()) {
             return redirect()->route('home')->with('error', 'Google authentication credentials missing.');
@@ -226,9 +227,26 @@ class GoogleController extends Controller
             return redirect('/dashboard')
                 ->with('login_success', 'Welcome back, ' . $user->name . '! Successfully logged in with Google.');
 
+        } catch (InvalidStateException $e) {
+            // The OAuth state token in the session was lost or mismatched.
+            // This commonly happens when the user was auto-logged out (session invalidated)
+            // before clicking Google login. Clear any stale session data and ask them to try again.
+            Log::warning('Google OAuth InvalidStateException (stale session) — redirecting user to retry.');
+
+            // Clear any stale Google auth session data
+            $request->session()->forget('google_auth_mode');
+
+            return redirect('/?auth=login')
+                ->with('toast_type', 'warning')
+                ->with('toast_title', 'Session Expired')
+                ->with('toast_msg', 'Your session expired before Google could complete sign-in. Please try logging in with Google again.');
+
         } catch (\Exception $e) {
             Log::error('Google OAuth Callback Exception: ' . $e->getMessage());
-            return redirect('/?auth=login')->with('error', 'Google authentication failed: ' . $e->getMessage());
+            return redirect('/?auth=login')
+                ->with('toast_type', 'danger')
+                ->with('toast_title', 'Google Login Failed')
+                ->with('toast_msg', 'Google authentication failed. Please try again or use email and password.');
         }
     }
 }

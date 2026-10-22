@@ -12,16 +12,20 @@ class AutoLogoutInactive
     /**
      * Inactivity timeout in minutes before the user is automatically logged out.
      */
-    protected int $timeoutMinutes = 20;
+    protected int $timeoutMinutes = 3; // ⚠️ TESTING: change back to 20 after testing
 
     public function handle(Request $request, Closure $next)
     {
-        // Never intercept authentication, logout, registration, heartbeat, livewire, or admin panel routes
+        // Never intercept authentication, logout, registration, heartbeat, livewire, or admin panel routes.
+        // Also skip Google OAuth routes so the OAuth state token stored in the session is preserved
+        // between the initial redirect and the callback — interrupting it causes InvalidStateException.
         if (
             $request->is('login') ||
             $request->is('login/*') ||
             $request->is('logout') ||
             $request->is('register') ||
+            $request->is('auth/google') ||
+            $request->is('auth/google/*') ||
             $request->is('visitor/heartbeat') ||
             $request->is('visitor/*') ||
             $request->is('admin') ||
