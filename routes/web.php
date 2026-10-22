@@ -494,10 +494,45 @@ Route::middleware('auth')->group(function () {
 
         if ($planType === 'classified') {
             $request->validate([
-                'title' => 'required|string|max:255',
-                'category' => 'required|in:personals,jobs,massage,events',
-                'image' => 'required|image|max:5120',
+                'title'        => ['required', 'string', 'max:30',
+                                   'regex:/^[\p{L}\p{M}\p{N}\p{P}\p{Zs} .,!?\-]{1,30}$/u'],
+                'category'     => 'required|in:personals,jobs,massage,events',
+                'city'         => ['nullable', 'string', 'max:30'],
+                'description'  => ['nullable', 'string', 'max:300'],
+                'phone'        => ['nullable', 'string', 'max:12', 'regex:/^[0-9+]{0,12}$/'],
+                'contact_name' => ['nullable', 'string', 'max:20'],
+                'image'        => 'required|image|mimes:jpeg,png,webp,gif|max:5120',
+                'gallery'      => 'nullable|array|max:2',
+                'gallery.*'    => 'image|mimes:jpeg,png,webp,gif|max:5120',
+            ], [
+                'title.max'         => 'Post title must be 30 characters or less.',
+                'title.regex'       => 'Post title contains invalid characters.',
+                'city.max'          => 'City or neighbourhood must be 30 characters or less.',
+                'description.max'   => 'Description must be 300 characters or less.',
+                'phone.max'         => 'Phone number must be 12 digits or less.',
+                'phone.regex'       => 'Phone number may only contain digits and a leading +.',
+                'contact_name.max'  => 'Contact name must be 20 characters or less.',
+                'gallery.max'       => 'You may upload a maximum of 2 gallery images.',
+                'gallery.*.image'   => 'Each gallery file must be a valid image.',
+                'gallery.*.mimes'   => 'Gallery images must be JPEG, PNG, WebP or GIF.',
+                'gallery.*.max'     => 'Each gallery image must be under 5 MB.',
             ]);
+
+            // Server-side sanitize: strip emojis, control chars, and HTML tags
+            $strip = fn(string $s) => strip_tags(
+                preg_replace('/[\x{1F000}-\x{1FFFF}\x{2600}-\x{27FF}\x{FE00}-\x{FE0F}\x{200D}\x{FEFF}]/u', '', $s)
+            );
+
+            $cleanTitle       = $strip(trim($request->input('title', '')));
+            $cleanCity        = $strip(trim($request->input('city', '')));
+            $cleanDescription = $strip(trim($request->input('description', '')));
+            $cleanPhone       = preg_replace('/[^0-9+]/', '', $request->input('phone', ''));
+            // Ensure + only at start
+            if (strpos($cleanPhone, '+') > 0) {
+                $cleanPhone = preg_replace('/\+/', '', $cleanPhone);
+            }
+            $cleanPhone       = substr($cleanPhone, 0, 12);
+            $cleanContactName = $strip(trim($request->input('contact_name', '')));
 
             $cost = 1000.00;
             $paymentStatus = 'pending';
@@ -512,19 +547,28 @@ Route::middleware('auth')->group(function () {
             }
 
             $imagePath = $request->file('image')->store('classifieds', 'public');
-            
+
+            // Store gallery images (up to 2)
+            $galleryPaths = [];
+            if ($request->hasFile('gallery')) {
+                foreach (array_slice($request->file('gallery'), 0, 2) as $galleryImg) {
+                    $galleryPaths[] = $galleryImg->store('classifieds/gallery', 'public');
+                }
+            }
+
             $classified = \App\Models\Classified::create([
-                'user_id' => auth()->id(),
-                'title' => $request->title,
-                'category' => $request->category,
-                'city' => $request->city,
-                'image_path' => $imagePath,
-                'description' => $request->description,
-                'phone' => $request->phone,
-                'contact_name' => $request->contact_name,
-                'amount' => $cost,
+                'user_id'      => auth()->id(),
+                'title'        => $cleanTitle,
+                'category'     => $request->category,
+                'city'         => $cleanCity ?: null,
+                'image_path'   => $imagePath,
+                'gallery'      => !empty($galleryPaths) ? json_encode($galleryPaths) : null,
+                'description'  => $cleanDescription ?: null,
+                'phone'        => $cleanPhone ?: null,
+                'contact_name' => $cleanContactName ?: null,
+                'amount'       => $cost,
                 'payment_status' => $paymentStatus,
-                'status' => 'approved',
+                'status'       => 'approved',
             ]);
 
             if ($paymentStatus === 'paid') {

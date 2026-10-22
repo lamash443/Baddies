@@ -2043,12 +2043,19 @@
                   <input type="hidden" name="plan_type" value="classified">
                   <input type="hidden" name="plan" value="0">
                   <div class="row g-3">
-                    
+
+                    {{-- Post Title: max 30 chars --}}
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('Post Title') }}</label>
-                      <input type="text" name="title" class="form-control" placeholder="Post Title" required>
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('Post Title') }}
+                        <span class="text-secondary" style="font-size:0.75rem;" id="clf-title-count">0 / 30</span>
+                      </label>
+                      <input type="text" name="title" id="clf-title" class="form-control" placeholder="Post Title"
+                             maxlength="30" required
+                             oninput="clfCount(this,'clf-title-count',30)">
                     </div>
-                    
+
+                    {{-- Category --}}
                     <div class="col-md-6">
                       <label class="form-label">{{ __('Category') }}</label>
                       <select name="category" class="form-select text-secondary" required>
@@ -2060,44 +2067,123 @@
                       </select>
                     </div>
 
+                    {{-- City / Neighbourhood: max 30 chars --}}
                     <div class="col-md-6">
-                      <label class="form-label">{{ __('City or Neighbourhood') }}</label>
-                      <input type="text" name="city" class="form-control" placeholder="City Or Neighbourhood">
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('City or Neighbourhood') }}
+                        <span class="text-secondary" style="font-size:0.75rem;" id="clf-city-count">0 / 30</span>
+                      </label>
+                      <input type="text" name="city" id="clf-city" class="form-control" placeholder="City Or Neighbourhood"
+                             maxlength="30"
+                             oninput="clfCount(this,'clf-city-count',30)">
                     </div>
 
+                    {{-- Featured Image (1 file, images only) --}}
                     <div class="col-md-6">
                       <label class="form-label">{{ __('Featured Image') }}</label>
-                      <input type="file" name="image" class="form-control text-secondary" accept="image/*" required>
+                      <input type="file" name="image" class="form-control text-secondary"
+                             accept="image/jpeg,image/png,image/webp,image/gif" required>
                     </div>
 
+                    {{-- Description: max 300 chars --}}
                     <div class="col-12">
-                      <label class="form-label">{{ __('Description') }}</label>
-                      <textarea name="description" class="form-control" rows="4"></textarea>
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('Description') }}
+                        <span class="text-secondary" style="font-size:0.75rem;" id="clf-desc-count">0 / 300</span>
+                      </label>
+                      <textarea name="description" id="clf-description" class="form-control" rows="4"
+                                maxlength="300"
+                                oninput="clfCount(this,'clf-desc-count',300)"></textarea>
                     </div>
 
+                    {{-- Gallery: max 2 images --}}
                     <div class="col-12">
-                      <label class="form-label">{{ __('Gallery (Add Images)') }}</label>
-                      <input type="file" name="gallery[]" class="form-control text-secondary" multiple>
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('Gallery (Add Images)') }}
+                        <span class="text-secondary" style="font-size:0.75rem;">Max 2 images</span>
+                      </label>
+                      <input type="file" name="gallery[]" id="clf-gallery" class="form-control text-secondary"
+                             accept="image/jpeg,image/png,image/webp,image/gif"
+                             multiple
+                             onchange="clfGalleryLimit(this, 2)">
+                      <div id="clf-gallery-error" class="text-danger mt-1" style="font-size:0.8rem; display:none;">Maximum 2 gallery images allowed.</div>
                     </div>
 
+                    {{-- Phone Number: max 12 digits --}}
                     <div class="col-md-6">
                       <div class="form-check mb-2 mt-3">
                         <input class="form-check-input" type="checkbox" id="showPhone" checked>
                         <label class="form-check-label text-light" for="showPhone">{{ __('Show my Phone Number') }}</label>
                       </div>
-                      <label class="form-label">{{ __('Phone Number') }}</label>
-                      <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('Phone Number') }}
+                        <span class="text-secondary" style="font-size:0.75rem;" id="clf-phone-count">0 / 12</span>
+                      </label>
+                      <input type="tel" name="phone" id="clf-phone" class="form-control" placeholder="e.g. 0712345678"
+                             maxlength="12"
+                             pattern="[0-9+]{0,12}"
+                             inputmode="tel"
+                             oninput="clfPhoneFilter(this)">
                     </div>
 
+                    {{-- Contact Name: max 20 chars --}}
                     <div class="col-md-6">
                       <div class="form-check mb-2 mt-3">
                         <input class="form-check-input" type="checkbox" id="showName" checked>
                         <label class="form-check-label text-light" for="showName">{{ __('Show my Name') }}</label>
                       </div>
-                      <label class="form-label">{{ __('Contact Name') }}</label>
-                      <input type="text" name="contact_name" class="form-control" placeholder="Contact Name">
+                      <label class="form-label d-flex justify-content-between">
+                        {{ __('Contact Name') }}
+                        <span class="text-secondary" style="font-size:0.75rem;" id="clf-name-count">0 / 20</span>
+                      </label>
+                      <input type="text" name="contact_name" id="clf-contact-name" class="form-control" placeholder="Contact Name"
+                             maxlength="20"
+                             oninput="clfCount(this,'clf-name-count',20)">
                     </div>
                   </div>
+
+                  {{-- JS helpers for live counters, gallery limit, and phone sanitization --}}
+                  <script>
+                    function clfCount(el, counterId, max) {
+                      var len = el.value.length;
+                      var counter = document.getElementById(counterId);
+                      if (counter) {
+                        counter.textContent = len + ' / ' + max;
+                        counter.style.color = len >= max ? '#ff4444' : '';
+                      }
+                    }
+                    function clfGalleryLimit(input, max) {
+                      var errEl = document.getElementById('clf-gallery-error');
+                      if (input.files && input.files.length > max) {
+                        errEl.style.display = 'block';
+                        input.value = '';
+                      } else {
+                        errEl.style.display = 'none';
+                      }
+                    }
+                    function clfPhoneFilter(input) {
+                      // Allow only digits and leading +, strip everything else
+                      var raw = input.value;
+                      var filtered = raw.replace(/[^0-9+]/g, '');
+                      // Ensure + only appears at start
+                      if (filtered.indexOf('+') > 0) {
+                        filtered = filtered.replace(/\+/g, '');
+                      }
+                      if (filtered.length > 12) filtered = filtered.slice(0, 12);
+                      input.value = filtered;
+                      var counter = document.getElementById('clf-phone-count');
+                      if (counter) counter.textContent = filtered.length + ' / 12';
+                    }
+                    // Block submit if gallery has > 2 files
+                    document.getElementById('classified-form').addEventListener('submit', function(e) {
+                      var gallery = document.getElementById('clf-gallery');
+                      if (gallery && gallery.files && gallery.files.length > 2) {
+                        e.preventDefault();
+                        document.getElementById('clf-gallery-error').style.display = 'block';
+                        gallery.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    });
+                  </script>
 
                   <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
                   
