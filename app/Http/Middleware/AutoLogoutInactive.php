@@ -11,11 +11,17 @@ class AutoLogoutInactive
 {
     /**
      * Inactivity timeout in minutes before the user is automatically logged out.
+     * Reduced to 3 minutes for testing.
      */
-    protected int $timeoutMinutes = 30;
+    protected int $timeoutMinutes = 3;
 
     public function handle(Request $request, Closure $next)
     {
+        // Never intercept authentication, logout, registration, or background heartbeat routes
+        if ($request->is('login') || $request->is('login/*') || $request->is('logout') || $request->is('register') || $request->is('visitor/heartbeat') || $request->is('visitor/*')) {
+            return $next($request);
+        }
+
         if (Auth::check()) {
             $lastActivity = session('last_activity');
 
@@ -37,11 +43,11 @@ class AutoLogoutInactive
                     return response()->json(['message' => 'Session expired due to inactivity.'], 401);
                 }
 
-                return redirect('/?auth=login')
+                return redirect('/')
                     ->withCookie($cookie)
                     ->with('toast_type', 'warning')
                     ->with('toast_title', 'Session Expired')
-                    ->with('toast_msg', 'You have been logged out due to inactivity. Please log in again.');
+                    ->with('toast_msg', 'You have been logged out due to inactivity.');
             }
 
             // Update session last_activity on every authenticated request

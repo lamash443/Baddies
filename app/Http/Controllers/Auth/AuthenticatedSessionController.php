@@ -31,8 +31,6 @@ class AuthenticatedSessionController extends Controller
         // so that new credentials are fully validated and authenticated
         if (Auth::check()) {
             Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
         }
 
         $email = strtolower(trim((string) $request->input('email')));

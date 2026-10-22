@@ -52,12 +52,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'visitor/heartbeat',
             'visitor/*',
             'api/*',
+            'logout',
         ]);
 
-        // Send unauthenticated users directly to the homepage login modal.
-        // Skipping the /login GET route avoids a double-redirect that can
-        // fragment the session on shared-hosting DB backends (Truehost).
-        $middleware->redirectGuestsTo(fn ($request) => '/?auth=login');
+        // Send unauthenticated users to the landing page without popping up login modal
+        $middleware->redirectGuestsTo(fn ($request) => '/');
 
         // Send already-authenticated users who hit guest-only routes to dashboard.
         $middleware->redirectUsersTo(fn ($request) => '/dashboard');
@@ -74,7 +73,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     return response()->json(['message' => 'Page Expired.'], 419);
                 }
 
-                return redirect('/?auth=login')->with('error', 'Your session has expired. Please log in again.');
+                return redirect('/')->with('toast_type', 'warning')
+                    ->with('toast_title', 'Session Expired')
+                    ->with('toast_msg', 'Your session has expired. Please log in again.');
             }
         });
     })->create();
