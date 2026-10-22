@@ -13,7 +13,8 @@
   <meta name="description" content="Browse verified call boys in Kenya on Baddies Club. Find your perfect companion in Nairobi, Mombasa, Kisumu and more.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}?v={{ file_exists(public_path('css/listing-card.css')) ? filemtime(public_path('css/listing-card.css')) : time() }}">
+  <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 @php
   $callBoysBg = !empty($siteSettings['call_boys_header_background']) 
     ? asset('storage/' . $siteSettings['call_boys_header_background']) 
@@ -236,22 +237,62 @@
       color: #ff8c00 !important;
       box-shadow: 0 0 18px rgba(255,140,0,0.5) !important;
     }
+
     /* Dark-mode text overrides for nr-listing-card */
-    .nr-listing-card__title a { color: #ff8c00 !important; }
-    .nr-listing-card__eyebrow { color: rgba(255,140,0,0.8) !important; }
-    .nr-listing-card__value,
-    .nr-listing-card__value-text,
-    .nr-listing-card__value-icon { color: rgba(255,255,255,0.75) !important; }
-    .nr-listing-card {
+    [data-bs-theme="dark"] .nr-listing-card__title a { color: #ff8c00 !important; }
+    [data-bs-theme="dark"] .nr-listing-card__eyebrow { color: rgba(255,140,0,0.8) !important; }
+    [data-bs-theme="dark"] .nr-listing-card__value,
+    [data-bs-theme="dark"] .nr-listing-card__value-text,
+    [data-bs-theme="dark"] .nr-listing-card__value-icon { color: rgba(255,255,255,0.75) !important; }
+    [data-bs-theme="dark"] .nr-listing-card {
       background: linear-gradient(180deg,#1a0f00,#111) !important;
       border: 1px solid rgba(255,140,0,0.35) !important;
       box-shadow: 0 0 10px rgba(255,140,0,0.18), 0 0.85rem 1.6rem rgba(0,0,0,0.4) !important;
     }
-    .nr-listing-card:hover {
+    [data-bs-theme="dark"] .nr-listing-card:hover {
       border-color: rgba(255,140,0,0.75) !important;
       box-shadow: 0 0 20px rgba(255,140,0,0.5), 0 0.85rem 1.6rem rgba(0,0,0,0.5) !important;
     }
-    .nr-listing-card__ribbon { background: #ff8c00 !important; color: #000 !important; }
+    [data-bs-theme="dark"] .nr-listing-card__ribbon { background: #ff8c00 !important; color: #000 !important; }
+
+    /* Light-mode overrides for nr-listing-card (matches welcome.blade.php) */
+    [data-bs-theme="light"] .nr-listing-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card:hover {
+      border-color: rgba(255, 140, 0, 0.8) !important;
+      box-shadow: 0 12px 32px rgba(255, 140, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card__title a {
+      color: #0f172a !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card__title a:hover {
+      color: #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card__eyebrow {
+      color: #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card__value,
+    [data-bs-theme="light"] .nr-listing-card__value-text {
+      color: #475569 !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card__value-icon {
+      color: #ff8c00 !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card .btn-primary {
+      background-color: #ff8c00 !important;
+      border-color: #ff8c00 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+    [data-bs-theme="light"] .nr-listing-card .btn-primary:hover {
+      background-color: #000000 !important;
+      border-color: #ff8c00 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4) !important;
+    }
     /* LIGHT THEME OVERRIDES */
     [data-bs-theme="light"] body { background:#fdfdfd; color:#111; }
     [data-bs-theme="light"] .cb-page-header { background:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(244,246,249,0.95) 100%), url('{{ $callBoysBg }}') center/cover no-repeat !important; border-bottom-color:rgba(0,0,0,0.1) !important; }

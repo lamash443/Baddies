@@ -330,8 +330,31 @@ html.theme-switching *::after {
   color: #ff8c00 !important;
 }
 
-[data-bs-theme="light"] .nr-listing-card__value {
+[data-bs-theme="light"] .nr-listing-card__eyebrow {
+  color: #ff8c00 !important;
+}
+
+[data-bs-theme="light"] .nr-listing-card__value,
+[data-bs-theme="light"] .nr-listing-card__value-text {
   color: #475569 !important;
+}
+
+[data-bs-theme="light"] .nr-listing-card__value-icon {
+  color: #ff8c00 !important;
+}
+
+[data-bs-theme="light"] .nr-listing-card .btn-primary {
+  background-color: #ff8c00 !important;
+  border-color: #ff8c00 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+[data-bs-theme="light"] .nr-listing-card .btn-primary:hover {
+  background-color: #000000 !important;
+  border-color: #ff8c00 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4) !important;
 }
 
 [data-bs-theme="light"] .nr-listing-card__status-line {
