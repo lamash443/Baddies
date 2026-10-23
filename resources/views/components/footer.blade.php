@@ -187,7 +187,9 @@
   });
 </script>
 
+@guest
 <x-age-verification-modal />
+@endguest
 
 <x-auto-logout />
 
