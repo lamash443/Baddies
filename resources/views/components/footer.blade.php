@@ -187,6 +187,10 @@
   });
 </script>
 
+@auth
+{{-- Pre-set age verification flag for logged-in users so the popup never appears after logout --}}
+<script>try { localStorage.setItem('baddies_club_age_verified', 'true'); } catch(_) {}</script>
+@endauth
 @guest
 <x-age-verification-modal />
 @endguest
