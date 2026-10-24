@@ -143,8 +143,34 @@ Route::get('/search', function (\Illuminate\Http\Request $request) {
                       ->orWhere('subscription_plan', 'LIKE', '%' . $q . '%');
             })
             ->with('photos')
-            ->latest()
-            ->get();
+            ->orderByRaw("CASE 
+                WHEN LOWER(COALESCE(subscription_plan, '')) IN ('vip', 'vip_escort') THEN 1 
+                WHEN LOWER(COALESCE(subscription_plan, '')) IN ('prime_vip', 'prime-vip', 'primevip') THEN 2 
+                WHEN LOWER(COALESCE(subscription_plan, '')) IN ('prime', 'prime_escort') THEN 3 
+                WHEN LOWER(COALESCE(subscription_plan, '')) = 'regular' THEN 4 
+                ELSE 5 
+            END ASC")
+            ->orderByDesc('created_at')
+            ->get()
+            ->sort(function ($a, $b) {
+                $tierPriority = function ($user) {
+                    $raw = strtolower(trim((string)($user->subscription_plan ?? 'regular')));
+                    if (in_array($raw, ['vip', 'vip_escort'])) return 1;
+                    if (in_array($raw, ['prime_vip', 'prime-vip', 'primevip'])) return 2;
+                    if (in_array($raw, ['prime', 'prime_escort'])) return 3;
+                    if ($raw === 'regular') return 4;
+                    return 5;
+                };
+                $pA = $tierPriority($a);
+                $pB = $tierPriority($b);
+                if ($pA !== $pB) {
+                    return $pA <=> $pB;
+                }
+                $tA = $a->created_at ? $a->created_at->timestamp : 0;
+                $tB = $b->created_at ? $b->created_at->timestamp : 0;
+                return $tB <=> $tA;
+            })
+            ->values();
 
         $classifieds = \App\Models\Classified::where('payment_status', 'paid')
             ->where('status', 'approved')

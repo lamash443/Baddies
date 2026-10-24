@@ -52,6 +52,49 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_search_orders_profiles_by_tier_vip_first_then_primevip_then_prime_then_regular(): void
+    {
+        $regularUser = User::factory()->create([
+            'name' => 'SearchOrder Regular User',
+            'is_verified' => true,
+            'subscription_plan' => 'regular',
+            'subscription_expires_at' => now()->addDays(10),
+            'city_town' => 'Nairobi',
+        ]);
+
+        $primeUser = User::factory()->create([
+            'name' => 'SearchOrder Prime User',
+            'is_verified' => true,
+            'subscription_plan' => 'prime',
+            'subscription_expires_at' => now()->addDays(10),
+            'city_town' => 'Nairobi',
+        ]);
+
+        $primeVipUser = User::factory()->create([
+            'name' => 'SearchOrder PrimeVIP User',
+            'is_verified' => true,
+            'subscription_plan' => 'prime_vip',
+            'subscription_expires_at' => now()->addDays(10),
+            'city_town' => 'Nairobi',
+        ]);
+
+        $vipUser = User::factory()->create([
+            'name' => 'SearchOrder VIP User',
+            'is_verified' => true,
+            'subscription_plan' => 'vip',
+            'subscription_expires_at' => now()->addDays(10),
+            'city_town' => 'Nairobi',
+        ]);
+
+        $response = $this->get('/search?q=SearchOrder');
+
+        $response->assertStatus(200);
+        $response->assertViewHas('users', function ($users) use ($vipUser, $primeVipUser, $primeUser, $regularUser) {
+            $ids = $users->pluck('id')->values()->all();
+            return $ids === [$vipUser->id, $primeVipUser->id, $primeUser->id, $regularUser->id];
+        });
+    }
+
     public function test_contact_page_can_be_rendered(): void
     {
         $response = $this->get('/contact');
