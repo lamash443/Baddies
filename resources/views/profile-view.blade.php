@@ -49,45 +49,19 @@
     .pv-online-toast {
       display: inline-flex;
       align-items: center;
-      gap: .5rem;
-      background: rgba(255, 140, 0, 0.15);
-      border: 1px solid rgba(255, 140, 0, 0.5);
+      justify-content: center;
+      background: rgba(255, 140, 0, 0.16);
+      border: 1px solid #ff8c00;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       color: #ff9d1e;
-      padding: .35rem .9rem;
-      border-radius: 9999px;
-      font-size: .75rem;
-      font-weight: 800;
+      border-radius: 4px;
+      padding: .22rem .75rem;
+      font-size: .68rem;
+      font-weight: 900;
       letter-spacing: .08em;
       text-transform: uppercase;
-      box-shadow: 0 0 16px rgba(255, 140, 0, 0.3), inset 0 0 6px rgba(255, 140, 0, 0.12);
-      animation: pvOnlineGlow 3s ease-in-out infinite;
-    }
-    .pv-online-toast__dot {
-      width: 8px;
-      height: 8px;
-      background-color: #ff8c00;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #ff8c00;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .pv-online-toast__dot::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255, 140, 0, 0.75);
-      animation: pvPulseDot 2s ease-out infinite;
-    }
-    @keyframes pvPulseDot {
-      0% { transform: scale(0.9); opacity: 1; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-    @keyframes pvOnlineGlow {
-      0%, 100% { border-color: rgba(255, 140, 0, 0.5); box-shadow: 0 0 14px rgba(255, 140, 0, 0.25); }
-      50% { border-color: rgba(255, 140, 0, 0.85); box-shadow: 0 0 24px rgba(255, 140, 0, 0.45); }
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.25);
     }
     @keyframes pulseGreen { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(1.6);} }
     .pv-hero__name {
@@ -106,9 +80,33 @@
     }
     .pv-hero__meta-item { display: flex; align-items: center; gap: .35rem; }
     .pv-hero__meta-item svg { color: rgba(255,140,0,.8); flex-shrink: 0; }
-    .pv-hero__vip {
+    .pv-hero__vip,
+    .pv-hero__badge--vip {
       display: inline-flex; align-items: center; gap: .35rem;
       background: #ff8c00; color: #000;
+      border-radius: 4px; padding: .22rem .75rem;
+      font-size: .68rem; font-weight: 900; letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pv-hero__badge--prime-vip {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: #6200ea; color: #fff;
+      border-radius: 4px; padding: .22rem .75rem;
+      font-size: .68rem; font-weight: 900; letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pv-hero__badge--prime {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: #e53935; color: #fff;
+      border-radius: 4px; padding: .22rem .75rem;
+      font-size: .68rem; font-weight: 900; letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pv-hero__badge--regular {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #f1f5f9;
       border-radius: 4px; padding: .22rem .75rem;
       font-size: .68rem; font-weight: 900; letter-spacing: .08em;
       text-transform: uppercase;
@@ -425,8 +423,17 @@
     [data-bs-theme="light"] .pv-card div[style*="color:rgba(255,255,255,0.45)"] { color: rgba(0,0,0,0.5) !important; }
     [data-bs-theme="light"] .pv-auth-gate__icon svg { color: rgba(0,0,0,0.5) !important; }
     [data-bs-theme="light"] .pv-cta-stat__val[style*="color:#ff8c00;"] { color: rgba(255,140,0,0.95) !important; }
-    [data-bs-theme="light"] p[style*="color:rgba(255,255,255,.25)"] { color: rgba(0,0,0,0.4) !important; }
     [data-bs-theme="light"] .pv-additional-info-card { background: #ffffff !important; border-left: 3px solid #ff8c00 !important; }
+    [data-bs-theme="light"] .pv-online-toast {
+      background: rgba(255, 140, 0, 0.12) !important;
+      border-color: #ff8c00 !important;
+      color: #d97706 !important;
+    }
+    [data-bs-theme="light"] .pv-hero__badge--regular {
+      background: rgba(0, 0, 0, 0.08) !important;
+      border-color: rgba(0, 0, 0, 0.25) !important;
+      color: #111111 !important;
+    }
   </style>
 </head>
 <body>
@@ -443,6 +450,21 @@
   $services  = $user->services ? (is_array($user->services) ? $user->services : json_decode($user->services, true)) : [];
   $services  = is_array($services) ? $services : [];
   $isVip     = $user->hasActiveSubscription() && in_array($user->subscription_plan, ['vip','prime_vip','prime-vip']);
+  $userHasActiveSub = $user->hasActiveSubscription();
+  $userPlanRaw = strtolower(trim((string)($user->subscription_plan ?? 'regular')));
+  if ($userHasActiveSub && in_array($userPlanRaw, ['prime_vip', 'prime-vip', 'primevip'])) {
+      $profilePlanType  = 'prime_vip';
+      $profilePlanLabel = 'Prime VIP';
+  } elseif ($userHasActiveSub && $userPlanRaw === 'prime') {
+      $profilePlanType  = 'prime';
+      $profilePlanLabel = 'Prime';
+  } elseif ($userHasActiveSub && $userPlanRaw === 'vip') {
+      $profilePlanType  = 'vip';
+      $profilePlanLabel = 'VIP';
+  } else {
+      $profilePlanType  = 'regular';
+      $profilePlanLabel = 'Regular';
+  }
   $photos    = $user->photos ?? collect();
   $age       = $user->age;
   $city      = $user->city_town;
@@ -480,11 +502,19 @@
       </h1>
       
       <div class="d-flex align-items-center gap-2 mb-0 mt-2">
-        @if($isVip) <span class="pv-hero__vip">VIP</span> @endif
+        @if($profilePlanType === 'prime_vip')
+          <span class="pv-hero__badge--prime-vip">{{ $profilePlanLabel }}</span>
+        @elseif($profilePlanType === 'prime')
+          <span class="pv-hero__badge--prime">{{ $profilePlanLabel }}</span>
+        @elseif($profilePlanType === 'vip')
+          <span class="pv-hero__vip">{{ $profilePlanLabel }}</span>
+        @else
+          <span class="pv-hero__badge--regular">{{ $profilePlanLabel }}</span>
+        @endif
+
         @if($user->isOnline())
           <div class="pv-online-toast" role="status" aria-label="{{ $user->name }} is online">
-            <span class="pv-online-toast__dot" aria-hidden="true"></span>
-            <span>Online</span>
+            Online
           </div>
         @endif
       </div>
