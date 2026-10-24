@@ -1,5 +1,33 @@
 <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 <style>
+  /* Root font stability & mobile font-boosting suppression across all pages */
+  html {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+  body {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+  *, *::before, *::after {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+  p, span, a, h1, h2, h3, h4, h5, h6, li, button, input, select, textarea, div {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+    max-height: 1000000em;
+  }
+
   /* Guaranteed Pure CSS Theme Icon Visibility */
   #themeIconMoon,
   #themeIconMoonMobile {

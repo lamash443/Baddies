@@ -3,6 +3,45 @@
  * Supports seamless, instant switching between Dark Mode and White (Light) Theme.
  */
 
+/* ── ROOT STABILITY: PREVENT MOBILE FONT BOOSTING & AUTO-INFLATION ── */
+html {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+body {
+  font-size: 1rem !important;
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+*, *::before, *::after {
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+p, span, a, h1, h2, h3, h4, h5, h6, li, button, input, select, textarea, div {
+  -webkit-text-size-adjust: 100% !important;
+  -moz-text-size-adjust: 100% !important;
+  -ms-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+  max-height: 1000000em;
+}
+
+/* Prevent mobile browser zoom on form input focus (< 16px triggers iOS viewport zoom) */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 /* ── 1. TRANSITION LOCK (INSTANT SWITCHING) ── */
 html.theme-switching,
 html.theme-switching *,

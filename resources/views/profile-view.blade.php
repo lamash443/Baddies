@@ -12,12 +12,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{ $user->name ?? 'Profile' }} – Kenyan Baddies Club</title>
   <meta name="description" content="View the full profile of {{ $user->name }} on Kenyan Baddies Club. {{ $user->age ? $user->age.' years old. ' : '' }}{{ $user->city_town ? 'Based in '.$user->city_town.'. ' : '' }}{{ $user->services ? 'Services: '.implode(', ', array_slice(is_array($user->services) ? $user->services : json_decode($user->services, true) ?? [], 0, 3)).'.' : '' }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}?v={{ file_exists(public_path('css/listing-card.css')) ? filemtime(public_path('css/listing-card.css')) : time() }}">
+  <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: "Outfit", sans-serif; background: #0d0d0d; color: #fff; min-height: 100vh; }
+    html {
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: "Outfit", sans-serif;
+      background: #0d0d0d; color: #fff;
+      min-height: 100vh;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
 
     /* ── HERO ── */
     .pv-hero {

@@ -370,15 +370,10 @@
       btnConfirm.addEventListener('click', function() {
         setVerifiedStorage();
         overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
 
         setTimeout(function() {
           overlay.style.display = 'none';
         }, 320);
-
-        window.dispatchEvent(new Event('resize'));
-        window.dispatchEvent(new Event('scroll'));
       });
 
       btnDecline.addEventListener('click', function() {

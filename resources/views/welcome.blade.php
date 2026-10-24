@@ -22,19 +22,39 @@
   <meta property="og:title" content="Kenyan Baddies Club – VIP Escorts & Call Girls in Kenya">
   <meta property="og:description" content="Browse VIP escorts, call girls and hookups in Nairobi and across Kenya.">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}?v={{ file_exists(public_path('css/listing-card.css')) ? filemtime(public_path('css/listing-card.css')) : time() }}">
   <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
+    html {
+      font-size: 16px !important;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+    }
     html, body {
       margin: 0; padding: 0;
       font-family: "Outfit", sans-serif;
       min-height: 100vh;
       overflow-x: hidden !important;
       max-width: 100vw;
+      font-size: 16px;
+      -webkit-text-size-adjust: 100% !important;
+      -moz-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
     }
     [data-bs-theme="dark"] body { background: #000000; color: #fff; }
     [data-bs-theme="light"] body { background: #f8fafc; color: #0f172a; }

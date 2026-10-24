@@ -12,6 +12,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Escort Girls in Kenya - Baddies Club</title>
   <meta name="description" content="Browse verified escort girls and call girls in Kenya on Baddies Club. Find your perfect companion in Nairobi, Mombasa, Kisumu and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}?v={{ file_exists(public_path('css/listing-card.css')) ? filemtime(public_path('css/listing-card.css')) : time() }}">
