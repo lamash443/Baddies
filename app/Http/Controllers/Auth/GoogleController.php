@@ -49,6 +49,18 @@ class GoogleController extends Controller
     }
 
     /**
+     * Return redirect with age-verified cookie and session to prevent popup recurrence on callback.
+     */
+    protected function redirectAgeVerified(string $to)
+    {
+        session(['baddies_club_age_verified' => true]);
+        $host = request()->getHost();
+        $domain = (str_contains($host, 'kenyanbaddies.com')) ? '.kenyanbaddies.com' : null;
+        $cookie = cookie('baddies_club_age_verified', 'true', 525600, '/', $domain, false, false);
+        return redirect($to)->withCookie($cookie);
+    }
+
+    /**
      * Redirect user to Google OAuth page.
      */
     public function redirectToGoogle(Request $request)
@@ -65,11 +77,11 @@ class GoogleController extends Controller
 
         // Determine mode: 'login' or 'register'
         $mode = $request->query('mode') === 'register' ? 'register' : 'login';
-        session(['google_auth_mode' => $mode]);
+        session(['google_auth_mode' => $mode, 'baddies_club_age_verified' => true]);
 
         if (!$this->setupGoogleConfig()) {
             Log::warning('Google OAuth attempted, but credentials are missing in SiteSetting / .env');
-            return redirect()->route('home')->with('error', 'Google Login is currently being configured. Please log in with email and password.');
+            return $this->redirectAgeVerified('/')->with('error', 'Google Login is currently being configured. Please log in with email and password.');
         }
 
         try {
@@ -78,7 +90,7 @@ class GoogleController extends Controller
                 ->redirect();
         } catch (\Exception $e) {
             Log::error('Google OAuth Redirect Error: ' . $e->getMessage());
-            return redirect()->route('home')->with('error', 'Could not connect to Google authentication. Please try again.');
+            return $this->redirectAgeVerified('/')->with('error', 'Could not connect to Google authentication. Please try again.');
         }
     }
 
@@ -87,8 +99,10 @@ class GoogleController extends Controller
      */
     public function handleGoogleCallback(Request $request)
     {
+        session(['baddies_club_age_verified' => true]);
+
         if (!$this->setupGoogleConfig()) {
-            return redirect()->route('home')->with('error', 'Google authentication credentials missing.');
+            return $this->redirectAgeVerified('/')->with('error', 'Google authentication credentials missing.');
         }
 
         $mode = session()->pull('google_auth_mode', 'login');
@@ -97,7 +111,7 @@ class GoogleController extends Controller
             $googleUser = Socialite::driver('google')->user();
 
             if (!$googleUser || !$googleUser->getEmail()) {
-                return redirect()->route('home')->with('error', 'Could not retrieve user email from Google.');
+                return $this->redirectAgeVerified('/')->with('error', 'Could not retrieve user email from Google.');
             }
 
             $googleEmail = strtolower(trim((string) $googleUser->getEmail()));
@@ -111,7 +125,7 @@ class GoogleController extends Controller
             if ($mode === 'register') {
                 if ($user) {
                     // User email already in the system: reject signup, display toast, do NOT redirect to dashboard
-                    return redirect('/?auth=login')
+                    return $this->redirectAgeVerified('/?auth=login')
                         ->withErrors(['email' => 'This email address is already registered. Please log in instead.'])
                         ->with('toast_type',  'warning')
                         ->with('toast_title', 'Email Already Registered')
@@ -150,21 +164,21 @@ class GoogleController extends Controller
                 ]);
 
                 Auth::login($newUser, false);
-                session(['last_activity' => time()]);
+                session(['last_activity' => time(), 'baddies_club_age_verified' => true]);
                 request()->session()->save();
 
                 activity()
                     ->causedBy($newUser)
                     ->log('Registered account via Google OAuth');
 
-                return redirect('/dashboard')
+                return $this->redirectAgeVerified('/dashboard')
                     ->with('login_success', 'Welcome to Kenyan Baddies Club, ' . $newUser->name . '! Your account has been created via Google.');
             }
 
             // ── SCENARIO 2: User clicked "Log in with Google" (mode === 'login') ──
             if (! $user) {
                 // User can NOT signup by clicking Google auth login
-                return redirect('/?auth=register')
+                return $this->redirectAgeVerified('/?auth=register')
                     ->withErrors(['email' => 'No account exists with this Google email. Please sign up first.'])
                     ->with('toast_type',  'warning')
                     ->with('toast_title', 'Email Not Registered')
@@ -192,7 +206,7 @@ class GoogleController extends Controller
             }
 
             Auth::login($user, false);
-            session(['last_activity' => time()]);
+            session(['last_activity' => time(), 'baddies_club_age_verified' => true]);
             request()->session()->save();
 
             activity()
@@ -200,7 +214,7 @@ class GoogleController extends Controller
                 ->log('Logged in via Google OAuth');
 
             if ($user->is_admin) {
-                return redirect('/admin');
+                return $this->redirectAgeVerified('/admin');
             }
 
             $intended = session()->pull('url.intended');
@@ -219,12 +233,12 @@ class GoogleController extends Controller
                 ];
                 foreach ($allowedMemberPrefixes as $prefix) {
                     if (str_starts_with($normalizedPath, $prefix)) {
-                        return redirect($normalizedPath)->with('login_success', 'Welcome back, ' . $user->name . '! Successfully logged in with Google.');
+                        return $this->redirectAgeVerified($normalizedPath)->with('login_success', 'Welcome back, ' . $user->name . '! Successfully logged in with Google.');
                     }
                 }
             }
 
-            return redirect('/dashboard')
+            return $this->redirectAgeVerified('/dashboard')
                 ->with('login_success', 'Welcome back, ' . $user->name . '! Successfully logged in with Google.');
 
         } catch (InvalidStateException $e) {
@@ -236,14 +250,14 @@ class GoogleController extends Controller
             // Clear any stale Google auth session data
             $request->session()->forget('google_auth_mode');
 
-            return redirect('/?auth=login')
+            return $this->redirectAgeVerified('/?auth=login')
                 ->with('toast_type', 'warning')
                 ->with('toast_title', 'Session Expired')
                 ->with('toast_msg', 'Your session expired before Google could complete sign-in. Please try logging in with Google again.');
 
         } catch (\Exception $e) {
             Log::error('Google OAuth Callback Exception: ' . $e->getMessage());
-            return redirect('/?auth=login')
+            return $this->redirectAgeVerified('/?auth=login')
                 ->with('toast_type', 'danger')
                 ->with('toast_title', 'Google Login Failed')
                 ->with('toast_msg', 'Google authentication failed. Please try again or use email and password.');

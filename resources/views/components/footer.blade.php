@@ -189,10 +189,34 @@
 
 @auth
 {{-- Pre-set age verification flag for logged-in users so the popup never appears after logout --}}
-<script>try { localStorage.setItem('baddies_club_age_verified', 'true'); } catch(_) {}</script>
+<script>
+  try {
+    localStorage.setItem('baddies_club_age_verified', 'true');
+    sessionStorage.setItem('baddies_club_age_verified', 'true');
+    var isLiveDomain = window.location.hostname.indexOf('kenyanbaddies.com') !== -1;
+    document.cookie = "baddies_club_age_verified=true;path=/;max-age=31536000;SameSite=Lax" + (isLiveDomain ? ";domain=.kenyanbaddies.com" : "");
+  } catch(_) {}
+</script>
 @endauth
 @guest
-<x-age-verification-modal />
+@php
+  $isAgeVerified = request()->cookie('baddies_club_age_verified') === 'true'
+      || session('baddies_club_age_verified') === true
+      || request()->has('auth');
+@endphp
+@if($isAgeVerified)
+  {{-- Already verified via server session/cookie or returning from an authentication callback --}}
+  <script>
+    try {
+      localStorage.setItem('baddies_club_age_verified', 'true');
+      sessionStorage.setItem('baddies_club_age_verified', 'true');
+      var isLiveDomain = window.location.hostname.indexOf('kenyanbaddies.com') !== -1;
+      document.cookie = "baddies_club_age_verified=true;path=/;max-age=31536000;SameSite=Lax" + (isLiveDomain ? ";domain=.kenyanbaddies.com" : "");
+    } catch(_) {}
+  </script>
+@else
+  <x-age-verification-modal />
+@endif
 @endguest
 
 <x-auto-logout />

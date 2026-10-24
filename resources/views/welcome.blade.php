@@ -24,7 +24,7 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/listing-card.css">
+  <link rel="stylesheet" href="{{ asset('css/listing-card.css') }}?v={{ file_exists(public_path('css/listing-card.css')) ? filemtime(public_path('css/listing-card.css')) : time() }}">
   <link rel="stylesheet" href="{{ asset('css/theme-system.css') }}?v={{ file_exists(public_path('css/theme-system.css')) ? filemtime(public_path('css/theme-system.css')) : time() }}">
 
   <style>

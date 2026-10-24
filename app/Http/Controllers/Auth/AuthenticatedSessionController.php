@@ -135,9 +135,12 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         $cookie = \Illuminate\Support\Facades\Cookie::forget(Auth::guard('web')->getRecallerName());
+        $domain = (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'kenyanbaddies.com')) ? '.kenyanbaddies.com' : null;
+        $ageCookie = cookie('baddies_club_age_verified', 'true', 525600, '/', $domain, false, false);
 
         return redirect('/')
             ->withCookie($cookie)
+            ->withCookie($ageCookie)
             ->with('toast_type', 'success')
             ->with('toast_title', 'Logged Out')
             ->with('toast_msg', 'You have been successfully logged out.');

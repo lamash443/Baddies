@@ -3,7 +3,7 @@
     position: fixed;
     inset: 0;
     z-index: 999999;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 1rem;
@@ -13,9 +13,12 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    touch-action: none;
+    overscroll-behavior: contain;
   }
 
   .age-modal-overlay.active {
+    display: flex !important;
     opacity: 1;
     visibility: visible;
   }
@@ -292,7 +295,47 @@
 <script>
   (function() {
     const STORAGE_KEY = 'baddies_club_age_verified';
-    
+
+    function setVerifiedStorage() {
+      try { localStorage.setItem(STORAGE_KEY, 'true'); } catch(_) {}
+      try { sessionStorage.setItem(STORAGE_KEY, 'true'); } catch(_) {}
+      var isLive = window.location.hostname.indexOf('kenyanbaddies.com') !== -1;
+      document.cookie = STORAGE_KEY + "=true;path=/;max-age=31536000;SameSite=Lax";
+      if (isLive) {
+        document.cookie = STORAGE_KEY + "=true;path=/;max-age=31536000;domain=.kenyanbaddies.com;SameSite=Lax";
+      }
+      try {
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/age-verify');
+        } else {
+          fetch('/age-verify', { method: 'POST', keepalive: true }).catch(function() {});
+        }
+      } catch(_) {}
+    }
+
+    function checkIsVerified() {
+      try {
+        if (localStorage.getItem(STORAGE_KEY) === 'true') return true;
+      } catch(_) {}
+      try {
+        if (sessionStorage.getItem(STORAGE_KEY) === 'true') return true;
+      } catch(_) {}
+      try {
+        if (document.cookie.indexOf(STORAGE_KEY + '=true') !== -1) {
+          setVerifiedStorage();
+          return true;
+        }
+      } catch(_) {}
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.has('auth') || params.has('code') || params.has('state') || window.location.pathname.indexOf('/auth/') !== -1) {
+          setVerifiedStorage();
+          return true;
+        }
+      } catch(_) {}
+      return false;
+    }
+
     function initAgeVerification() {
       const overlay = document.getElementById('ageVerificationOverlay');
       const btnConfirm = document.getElementById('btnAgeConfirm');
@@ -302,17 +345,40 @@
 
       if (!overlay || !btnConfirm || !btnDecline) return;
 
-      const isVerified = localStorage.getItem(STORAGE_KEY) === 'true';
+      const isVerified = checkIsVerified();
 
       if (!isVerified) {
-        document.body.style.overflow = 'hidden';
+        overlay.style.display = 'flex';
+        void overlay.offsetWidth;
         overlay.classList.add('active');
+
+        overlay.addEventListener('wheel', function(e) {
+          if (!e.target.closest('.age-modal-card')) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+
+        overlay.addEventListener('touchmove', function(e) {
+          if (!e.target.closest('.age-modal-card')) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+      } else {
+        overlay.style.display = 'none';
       }
 
       btnConfirm.addEventListener('click', function() {
-        localStorage.setItem(STORAGE_KEY, 'true');
+        setVerifiedStorage();
         overlay.classList.remove('active');
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+
+        setTimeout(function() {
+          overlay.style.display = 'none';
+        }, 320);
+
+        window.dispatchEvent(new Event('resize'));
+        window.dispatchEvent(new Event('scroll'));
       });
 
       btnDecline.addEventListener('click', function() {

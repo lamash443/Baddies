@@ -8,8 +8,10 @@ define('LARAVEL_START', microtime(true));
 // Absolute path to the Laravel application root on Truehost.
 // The web root (public_html/) is separate from the app root,
 // so relative paths like __DIR__.'/../' resolve to /home/kenyanba/
-// instead of /home/kenyanba/repositories/Baddies/. We fix that here.
-define('LARAVEL_APP_BASE', '/home/kenyanba/repositories/Baddies');
+$appBase = file_exists(__DIR__ . '/../vendor/autoload.php')
+    ? dirname(__DIR__)
+    : '/home/kenyanba/repositories/Baddies';
+define('LARAVEL_APP_BASE', $appBase);
 
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = LARAVEL_APP_BASE . '/storage/framework/maintenance.php')) {

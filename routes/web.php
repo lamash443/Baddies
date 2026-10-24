@@ -1418,3 +1418,10 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 })->name('server.setup');
 
 Route::post('/visitor/heartbeat', [\App\Http\Controllers\VisitorTrackerController::class, 'heartbeat'])->name('visitor.heartbeat');
+
+Route::match(['get', 'post'], '/age-verify', function (\Illuminate\Http\Request $request) {
+    session(['baddies_club_age_verified' => true]);
+    $domain = (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'kenyanbaddies.com')) ? '.kenyanbaddies.com' : null;
+    $cookie = cookie('baddies_club_age_verified', 'true', 525600, '/', $domain, false, false);
+    return response()->json(['success' => true])->withCookie($cookie);
+})->name('age.verify');
