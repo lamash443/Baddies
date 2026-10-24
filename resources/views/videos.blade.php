@@ -236,7 +236,7 @@
           </span>
         </div>
         <div class="mt-auto pt-3">
-          <a href="{{ route('profile.view', $video->user->id) }}" class="btn vd-btn-primary w-100" style="font-size:0.9rem;" onclick="event.stopPropagation()">View Profile</a>
+          <a href="{{ route('profile.view', $video->user->profile_slug) }}" class="btn vd-btn-primary w-100" style="font-size:0.9rem;" onclick="event.stopPropagation()">View Profile</a>
         </div>
       </div>
     </div>

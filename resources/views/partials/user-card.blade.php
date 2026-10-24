@@ -43,9 +43,10 @@
   $cardLabel = $gender === 'female' ? 'Escort Girl' : ($gender === 'male' ? 'Call Boy' : 'Escort');
   // Animation index based on loop variable if available
   $animIndex = isset($loop) ? ($loop->index % 6) + 1 : 1;
+  $profileUrl = url('profile', $user->profile_slug);
 @endphp
 
-<article class="nr-listing-card fi{{ $animIndex }}" style="cursor:pointer;" onclick="window.location.href='{{ url('profile', $user->id) }}'" role="button" tabindex="0" aria-label="View {{ $name }} profile" onkeydown="if(event.key==='Enter')window.location.href='{{ url('profile', $user->id) }}'">
+<article class="nr-listing-card fi{{ $animIndex }}" style="cursor:pointer;" onclick="window.location.href='{{ $profileUrl }}'" role="button" tabindex="0" aria-label="View {{ $name }} profile" onkeydown="if(event.key==='Enter')window.location.href='{{ $profileUrl }}'">
   <div class="nr-listing-card__media-shell">
     <div class="nr-listing-card__media-wrap">
       <img class="nr-listing-card__media" src="{{ $cover }}" alt="{{ $name }}" loading="lazy">
@@ -73,7 +74,7 @@
     <div class="nr-listing-card__eyebrow">{{ $cardLabel }}</div>
 
     <h3 class="nr-listing-card__title">
-      <a href="{{ url('profile', $user->id) }}">{{ $name }}</a>
+      <a href="{{ $profileUrl }}">{{ $name }}</a>
     </h3>
 
     <div class="nr-listing-card__values">
@@ -97,7 +98,7 @@
     </div>
 
     <div class="mt-auto pt-2 d-flex gap-2">
-      <a class="btn btn-primary flex-grow-1" href="{{ url('profile', $user->id) }}" onclick="event.stopPropagation();">View Profile</a>
+      <a class="btn btn-primary flex-grow-1" href="{{ $profileUrl }}" onclick="event.stopPropagation();">View Profile</a>
       @auth
         @if(auth()->user()->hasActiveChatSubscription())
           <a class="btn flex-grow-1 d-flex align-items-center justify-content-center gap-1 btn-chat-card" href="{{ route('chat.show', $user->id) }}" onclick="event.stopPropagation();">

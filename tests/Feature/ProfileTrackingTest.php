@@ -18,7 +18,7 @@ class ProfileTrackingTest extends TestCase
             'profile_views' => 0,
         ]);
 
-        $response = $this->get("/profile/{$user->id}");
+        $response = $this->get("/profile/{$user->profile_slug}");
 
         $response->assertStatus(200);
 
@@ -28,6 +28,19 @@ class ProfileTrackingTest extends TestCase
         ]);
     }
 
+    public function test_viewing_profile_by_numeric_id_redirects_to_slug(): void
+    {
+        $user = User::factory()->create([
+            'is_verified' => true,
+            'profile_views' => 0,
+        ]);
+
+        $response = $this->get("/profile/{$user->id}");
+
+        $response->assertStatus(301);
+        $response->assertRedirect(url('profile/' . $user->profile_slug));
+    }
+
     public function test_viewing_verified_profile_creates_daily_statistics(): void
     {
         $user = User::factory()->create([
@@ -35,7 +48,7 @@ class ProfileTrackingTest extends TestCase
             'profile_views' => 0,
         ]);
 
-        $this->get("/profile/{$user->id}");
+        $this->get("/profile/{$user->profile_slug}");
 
         $this->assertDatabaseHas('profile_statistics', [
             'user_id' => $user->id,
@@ -52,8 +65,8 @@ class ProfileTrackingTest extends TestCase
             'profile_views' => 0,
         ]);
 
-        $this->get("/profile/{$user->id}");
-        $this->get("/profile/{$user->id}");
+        $this->get("/profile/{$user->profile_slug}");
+        $this->get("/profile/{$user->profile_slug}");
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,

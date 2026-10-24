@@ -46,11 +46,48 @@
       position: absolute; bottom: 0; left: 0; right: 0;
       padding: 2.5rem 1.5rem 2rem;
     }
-    .pv-hero__badge {
-      display: inline-flex; align-items: center; gap: .5rem;
-      font-size: .68rem; font-weight: 700; letter-spacing: .08em;
-      text-transform: uppercase; color: rgba(255,140,0,0.95);
-      margin-bottom: .85rem;
+    .pv-online-toast {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(255, 140, 0, 0.15);
+      border: 1px solid rgba(255, 140, 0, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #ff9d1e;
+      padding: .35rem .9rem;
+      border-radius: 9999px;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      box-shadow: 0 0 16px rgba(255, 140, 0, 0.3), inset 0 0 6px rgba(255, 140, 0, 0.12);
+      animation: pvOnlineGlow 3s ease-in-out infinite;
+    }
+    .pv-online-toast__dot {
+      width: 8px;
+      height: 8px;
+      background-color: #ff8c00;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff8c00;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .pv-online-toast__dot::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 140, 0, 0.75);
+      animation: pvPulseDot 2s ease-out infinite;
+    }
+    @keyframes pvPulseDot {
+      0% { transform: scale(0.9); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    @keyframes pvOnlineGlow {
+      0%, 100% { border-color: rgba(255, 140, 0, 0.5); box-shadow: 0 0 14px rgba(255, 140, 0, 0.25); }
+      50% { border-color: rgba(255, 140, 0, 0.85); box-shadow: 0 0 24px rgba(255, 140, 0, 0.45); }
     }
     @keyframes pulseGreen { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(1.6);} }
     .pv-hero__name {
@@ -442,9 +479,14 @@
         <span>{{ $user->name }}</span>
       </h1>
       
-      <div class="pv-hero__badge mb-0 mt-2">
+      <div class="d-flex align-items-center gap-2 mb-0 mt-2">
         @if($isVip) <span class="pv-hero__vip">VIP</span> @endif
-        Available Now
+        @if($user->isOnline())
+          <div class="pv-online-toast" role="status" aria-label="{{ $user->name }} is online">
+            <span class="pv-online-toast__dot" aria-hidden="true"></span>
+            <span>Online</span>
+          </div>
+        @endif
       </div>
     </div>
 
@@ -811,7 +853,7 @@
           if (empty($spLocParts) && !empty($sp->city_town)) { $spLocParts[] = trim((string)$sp->city_town); }
           $spLocLabel = !empty($spLocParts) ? implode(', ', $spLocParts) : null;
         @endphp
-        <a href="{{ url('profile', $sp->id) }}" class="pv-similar-card" style="position:relative;">
+        <a href="{{ url('profile', $sp->profile_slug) }}" class="pv-similar-card" style="position:relative;">
           <img class="pv-similar-card__img" src="{{ $spCover }}" alt="{{ $sp->name }}" loading="lazy">
           {{-- Plan badge --}}
           <span class="nr-plan-badge nr-plan-badge--{{ str_replace('_','-',$spPlanType) }}" style="top:.55rem;left:.55rem;">{{ $spPlanLabel }}</span>

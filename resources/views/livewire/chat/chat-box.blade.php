@@ -372,7 +372,7 @@
                         $cover = $activeUser->profile_photo ? asset('storage/'.$activeUser->profile_photo) : ($hasPhoto ? asset('storage/'.$activeUser->photos->first()->path) : null);
                         $initials = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $activeUser->name), 0, 2));
                     @endphp
-                    <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none d-block flex-shrink-0">
+                    <a href="{{ route('profile.view', $activeUser->profile_slug) }}" class="text-decoration-none d-block flex-shrink-0">
                         @if($hasPhoto)
                             <div class="d-flex align-items-center justify-content-center" style="width:44px; height:44px; border-radius:50%; border: 2px solid {{ $activeUser->isOnline() ? '#ff8c00' : 'rgba(255,140,0,0.3)' }}; padding:2px; box-shadow: {{ $activeUser->isOnline() ? '0 0 8px rgba(255,140,0,0.5)' : 'none' }};">
                                 <img src="{{ $cover }}" alt="{{ $activeUser->name }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
@@ -396,7 +396,7 @@
                         </div>
                         <small style="color: #ff8c00; font-size: 0.7rem; font-weight: 600;">System Announcement</small>
                     @else
-                        <a href="{{ route('profile.view', $activeUser->id) }}" class="text-decoration-none">
+                        <a href="{{ route('profile.view', $activeUser->profile_slug) }}" class="text-decoration-none">
                             <div class="fw-bold" style="color: var(--header-text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $activeUser->name }}</div>
                         </a>
                         @php

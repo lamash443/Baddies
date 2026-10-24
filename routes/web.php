@@ -233,10 +233,55 @@ Route::get('/location/{name}', function ($name) {
 })->name('location.show');
 
 // Public profile view
-Route::get('/profile/{id}', function ($id) {
+Route::get('/profile/{identifier}', function ($identifier) {
+    $reserved = ['statistics', 'photo', 'photos', 'video', 'videos', 'verification', 'sessions', 'toggle-calls', 'toggle-visibility', 'track-call'];
+    if (in_array(strtolower($identifier), $reserved)) {
+        abort(404);
+    }
+
+    // If identifier is numeric (e.g. /profile/61), redirect permanently (301) to the clean name slug URL
+    if (is_numeric($identifier)) {
+        $user = \App\Models\User::with(['photos', 'videos'])
+            ->where('is_verified', true)
+            ->find((int) $identifier);
+
+        if ($user) {
+            return redirect()->to(url('profile/' . $user->profile_slug), 301);
+        }
+
+        abort(404);
+    }
+
+    $decoded = trim(urldecode($identifier));
+    $unslugged = str_replace(['-', '_'], ' ', $decoded);
+
+    // Find by exact name, unslugged name, case-insensitive, or slugified match
     $user = \App\Models\User::with(['photos', 'videos'])
         ->where('is_verified', true)
-        ->findOrFail($id);
+        ->where(function ($q) use ($decoded, $unslugged) {
+            $q->where('name', $decoded)
+              ->orWhere('name', $unslugged)
+              ->orWhereRaw('LOWER(name) = ?', [strtolower($decoded)])
+              ->orWhereRaw('LOWER(name) = ?', [strtolower($unslugged)])
+              ->orWhereRaw("LOWER(REPLACE(name, ' ', '-')) = ?", [strtolower($decoded)])
+              ->orWhereRaw("LOWER(REPLACE(name, ' ', '')) = ?", [str_replace(['-', ' '], '', strtolower($decoded))]);
+        })
+        ->first();
+
+    // Fallback: search profile_slug across verified users
+    if (!$user) {
+        $user = \App\Models\User::with(['photos', 'videos'])
+            ->where('is_verified', true)
+            ->get()
+            ->first(function ($u) use ($decoded) {
+                return strtolower($u->profile_slug) === strtolower($decoded)
+                    || strtolower(\Illuminate\Support\Str::slug($u->name)) === strtolower($decoded);
+            });
+    }
+
+    if (!$user) {
+        abort(404);
+    }
 
     // If the profile is hidden from the public, only allow the owner or admin to view it
     if ($user->is_profile_hidden && auth()->id() !== $user->id && !(auth()->check() && auth()->user()->is_admin)) {
@@ -274,7 +319,6 @@ Route::get('/profile/{id}', function ($id) {
     $viewedPlan = $user->subscription_plan ?? 'regular';
 
     // Pass 1: same gender + same plan (up to 6)
-    // Pass 1: same gender + same plan (up to 6)
     $samePlanProfiles = \App\Models\User::with('photos')
         ->where('is_verified', true)
         ->activeSubscription()
@@ -308,9 +352,8 @@ Route::get('/profile/{id}', function ($id) {
     // Merge: same-plan first, then others
     $similarProfiles = $samePlanProfiles->concat($otherProfiles);
 
-
     return view('profile-view', compact('user', 'similarProfiles'));
-})->where('id', '[0-9]+')->name('profile.view');
+})->where('identifier', '^(?!(statistics|photos?|videos?|verification|sessions|toggle-calls|toggle-visibility|track-call)$)[^/]+')->name('profile.view');
 
 // Track phone clicks
 Route::post('/profile/{id}/track-call', function ($id) {

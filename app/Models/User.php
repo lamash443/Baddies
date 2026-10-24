@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Notifications\ResetPasswordNotification;
@@ -153,8 +154,17 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         if ($this->force_online) return true;
         if (!$this->last_seen_at) return false;
-        $minutes = \App\Models\Setting::getSettings()->online_threshold_minutes ?? 5;
+        $minutes = (int) ($this->online_threshold_minutes ?: (\App\Models\Setting::getSettings()->online_threshold_minutes ?? 5));
         return $this->last_seen_at->gt(now()->subMinutes($minutes));
+    }
+
+    /**
+     * Get the URL slug for the user profile based on name.
+     */
+    public function getProfileSlugAttribute(): string
+    {
+        $slug = Str::slug($this->name);
+        return !empty($slug) ? $slug : (string) $this->id;
     }
 
     /**
