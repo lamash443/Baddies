@@ -32,7 +32,8 @@ class SendBroadcastEmailJob implements ShouldQueue
         $mailer      = SiteSetting::get('mail_mailer', config('mail.default', 'smtp'));
         $host        = SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
         $port        = SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 587));
-        $encryption  = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls'));
+        // Laravel 12 uses 'scheme' (tls / ssl / null) instead of the old 'encryption' key
+        $encryption  = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'tls'));
         $username    = SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
         $password    = SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
         $fromAddress = SiteSetting::get('mail_from_address', config('mail.from.address'));
@@ -42,7 +43,9 @@ class SendBroadcastEmailJob implements ShouldQueue
             'mail.default'                    => $mailer,
             'mail.mailers.smtp.host'          => $host,
             'mail.mailers.smtp.port'          => (int) $port,
-            'mail.mailers.smtp.encryption'    => $encryption ?: null,
+            // Laravel 12: 'scheme' replaces the old 'encryption' key
+            // Values: 'tls' (STARTTLS/port 587), 'ssl' (port 465), null (none)
+            'mail.mailers.smtp.scheme'        => $encryption ?: null,
             'mail.mailers.smtp.username'      => $username,
             'mail.mailers.smtp.password'      => $password,
             'mail.from.address'               => $fromAddress,

@@ -133,7 +133,7 @@ class SiteSettingsPage extends Page implements HasForms
             'mail_mailer'       => SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
             'mail_host'         => SiteSetting::get('mail_host', config('mail.mailers.smtp.host', '')),
             'mail_port'         => SiteSetting::get('mail_port', config('mail.mailers.smtp.port', '587')),
-            'mail_encryption'   => SiteSetting::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls')),
+            'mail_encryption'   => SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'tls')),
             'mail_username'     => SiteSetting::get('mail_username', config('mail.mailers.smtp.username', '')),
             'mail_password'     => SiteSetting::get('mail_password', config('mail.mailers.smtp.password', '')),
             'mail_from_address' => SiteSetting::get('mail_from_address', config('mail.from.address', '')),
@@ -413,21 +413,21 @@ class SiteSettingsPage extends Page implements HasForms
                             ->helperText('Options: smtp, sendmail, log (testing). Use "smtp" for Gmail, Mailgun, Postmark.'),
 
                         TextInput::make('mail_encryption')
-                            ->label('Encryption')
-                            ->placeholder('tls')
-                            ->default('tls')
-                            ->helperText('Options: tls (port 587) · ssl (port 465) · leave blank for none.'),
+                            ->label('Encryption / Scheme')
+                            ->placeholder('ssl')
+                            ->default('ssl')
+                            ->helperText('Truehost: "ssl" for port 465, "tls" for port 587. Leave blank for none.'),
 
                         TextInput::make('mail_host')
                             ->label('SMTP Host')
-                            ->placeholder('smtp.gmail.com')
-                            ->helperText('e.g. smtp.gmail.com, smtp.mailgun.org')
+                            ->placeholder('mail.kenyanbaddies.com')
+                            ->helperText('Truehost: mail.yourdomain.com (e.g. mail.kenyanbaddies.com). Gmail: smtp.gmail.com')
                             ->maxLength(255),
 
                         TextInput::make('mail_port')
                             ->label('SMTP Port')
-                            ->placeholder('587')
-                            ->helperText('Common: 587 (TLS) or 465 (SSL)')
+                            ->placeholder('465')
+                            ->helperText('Truehost: 465 (SSL) or 587 (TLS/STARTTLS). Gmail: 587.')
                             ->maxLength(10),
 
                         TextInput::make('mail_username')
