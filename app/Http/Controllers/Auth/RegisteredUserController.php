@@ -217,14 +217,18 @@ class RegisteredUserController extends Controller
                 ['id' => $user->id, 'hash' => sha1($user->email)]
             );
 
+            $scheme = match(strtolower(trim((string) $encryption))) {
+                'ssl', 'smtps' => 'smtps',
+                'tls', 'starttls', 'smtp' => 'smtp',
+                default => ((int)$port === 465 ? 'smtps' : 'smtp'),
+            };
+
             // Override SMTP config at runtime with admin-panel values
             config([
                 'mail.default'                => $mailer,
                 'mail.mailers.smtp.host'      => $host,
                 'mail.mailers.smtp.port'      => (int) $port,
-                // Laravel 12: 'scheme' replaces the old 'encryption' key
-                // Values: 'tls' (STARTTLS/port 587), 'ssl' (port 465), null (none)
-                'mail.mailers.smtp.scheme'    => $encryption ?: null,
+                'mail.mailers.smtp.scheme'    => $scheme,
                 'mail.mailers.smtp.username'  => $username,
                 'mail.mailers.smtp.password'  => $password,
                 'mail.from.address'           => $fromAddress,

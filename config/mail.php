@@ -39,7 +39,11 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
+            'scheme' => match(strtolower(trim((string) env('MAIL_SCHEME', '')))) {
+                'ssl', 'smtps' => 'smtps',
+                'tls', 'smtp' => 'smtp',
+                default => ((int) env('MAIL_PORT', 465) === 465 ? 'smtps' : 'smtp'),
+            },
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),

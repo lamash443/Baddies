@@ -894,14 +894,14 @@ require __DIR__.'/auth.php';
 // Steps: 1) Full Setup  2) Rebuild Caches  3) Test login
 // =============================================================================
 Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Request $request) {
+    try {
+        if ($request->query('token') !== 'kbc-setup-2026-secure') { abort(404); }
 
-    if ($request->query('token') !== 'kbc-setup-2026-secure') { abort(404); }
-
-    $appDir  = base_path();
-    $artisan = $appDir . '/artisan';
-    $envFile = $appDir . '/.env';
-    $results = [];
-    $action  = $request->query('action', 'status');
+        $appDir  = base_path();
+        $artisan = $appDir . '/artisan';
+        $envFile = $appDir . '/.env';
+        $results = [];
+        $action  = $request->query('action', 'status');
 
     // Run an Artisan command in-process — no exec() needed
     $artisanCall = function (string $command, array $args = []) use (&$results): bool {
@@ -1041,7 +1041,12 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
         try {
             $smtpHost    = trim((string) $request->input('smtp_host', ''));
             $smtpPort    = trim((string) $request->input('smtp_port', '465'));
-            $smtpScheme  = trim((string) $request->input('smtp_scheme', 'ssl'));
+            $rawScheme   = trim((string) $request->input('smtp_scheme', 'smtps'));
+            $smtpScheme  = match(strtolower($rawScheme)) {
+                'ssl', 'smtps' => 'smtps',
+                'tls', 'starttls', 'smtp' => 'smtp',
+                default => ((int)$smtpPort === 465 ? 'smtps' : 'smtp'),
+            };
             $smtpUser    = trim((string) $request->input('smtp_username', ''));
             $smtpPass    = trim((string) $request->input('smtp_password', ''));
             $smtpFrom    = trim((string) $request->input('smtp_from_address', ''));
@@ -1049,7 +1054,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
 
             if ($smtpHost)   \App\Models\SiteSetting::set('mail_host', $smtpHost);
             if ($smtpPort)   \App\Models\SiteSetting::set('mail_port', $smtpPort);
-            \App\Models\SiteSetting::set('mail_encryption', $smtpScheme ?: 'ssl');
+            \App\Models\SiteSetting::set('mail_encryption', $smtpScheme);
             if ($smtpUser)   \App\Models\SiteSetting::set('mail_username', $smtpUser);
             if ($smtpPass)   \App\Models\SiteSetting::set('mail_password', $smtpPass);
             if ($smtpFrom)   \App\Models\SiteSetting::set('mail_from_address', $smtpFrom);
@@ -1061,7 +1066,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
             if ($env !== false) {
                 $envPatches = [
                     '/^MAIL_MAILER=.*/m'       => 'MAIL_MAILER=smtp',
-                    '/^MAIL_SCHEME=.*/m'       => 'MAIL_SCHEME=' . ($smtpScheme ?: 'ssl'),
+                    '/^MAIL_SCHEME=.*/m'       => 'MAIL_SCHEME=' . $smtpScheme,
                     '/^MAIL_HOST=.*/m'         => 'MAIL_HOST=' . ($smtpHost ?: \App\Models\SiteSetting::get('mail_host')),
                     '/^MAIL_PORT=.*/m'         => 'MAIL_PORT=' . ($smtpPort ?: '465'),
                     '/^MAIL_USERNAME=.*/m'     => 'MAIL_USERNAME=' . ($smtpUser ?: \App\Models\SiteSetting::get('mail_username')),
@@ -1084,7 +1089,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
             $results[] = [
                 'label' => 'Save SMTP Settings',
                 'cmd'   => 'SiteSetting::set + patch .env + config:clear',
-                'out'   => "✅ SMTP saved!\nHost: " . ($smtpHost ?: '(preserved)') . "\nPort: $smtpPort\nScheme: $smtpScheme\nUsername: " . ($smtpUser ?: '(preserved)') . "\nFrom: " . ($smtpFrom ?: '(preserved)'),
+                'out'   => "✅ SMTP saved!\nHost: " . ($smtpHost ?: '(preserved)') . "\nPort: $smtpPort\nScheme: $smtpScheme (valid Symfony Mailer scheme)\nUsername: " . ($smtpUser ?: '(preserved)') . "\nFrom: " . ($smtpFrom ?: '(preserved)'),
                 'ok'    => true,
             ];
             $action = 'test-smtp'; // auto-run test
@@ -1098,7 +1103,12 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
         try {
             $smtpHost    = \App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
             $smtpPort    = \App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465));
-            $smtpScheme  = \App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'ssl'));
+            $rawScheme   = \App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'smtps'));
+            $smtpScheme  = match(strtolower(trim((string)$rawScheme))) {
+                'ssl', 'smtps' => 'smtps',
+                'tls', 'starttls', 'smtp' => 'smtp',
+                default => ((int)$smtpPort === 465 ? 'smtps' : 'smtp'),
+            };
             $smtpUser    = \App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
             $smtpPass    = \App\Models\SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
             $smtpFrom    = \App\Models\SiteSetting::get('mail_from_address', config('mail.from.address'));
@@ -1108,7 +1118,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
             $results[] = [
                 'label' => 'Current SMTP Config',
                 'cmd'   => 'SiteSetting + config() fallback',
-                'out'   => "Host     : $smtpHost\nPort     : $smtpPort\nScheme   : " . ($smtpScheme ?: '(none)') . "\nUsername : $smtpUser\nFrom     : $smtpFrom ($smtpName)\nTest To  : $testTo",
+                'out'   => "Host     : $smtpHost\nPort     : $smtpPort\nScheme   : $smtpScheme\nUsername : $smtpUser\nFrom     : $smtpFrom ($smtpName)\nTest To  : $testTo",
                 'ok'    => !empty($smtpHost) && !empty($smtpUser),
             ];
 
@@ -1117,7 +1127,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
                     'mail.default'               => 'smtp',
                     'mail.mailers.smtp.host'     => $smtpHost,
                     'mail.mailers.smtp.port'     => (int) $smtpPort,
-                    'mail.mailers.smtp.scheme'   => $smtpScheme ?: null,
+                    'mail.mailers.smtp.scheme'   => $smtpScheme,
                     'mail.mailers.smtp.username' => $smtpUser,
                     'mail.mailers.smtp.password' => $smtpPass,
                     'mail.from.address'          => $smtpFrom,
@@ -1127,14 +1137,14 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
 
                 try {
                     \Illuminate\Support\Facades\Mail::raw(
-                        "SMTP test from Kenyan Baddies Club server-setup.\n\nHost: $smtpHost:$smtpPort ($smtpScheme)\nTime: " . now()->toDateTimeString(),
+                        "SMTP test from Kenyan Baddies Club server-setup.\n\nHost: $smtpHost:$smtpPort (scheme: $smtpScheme)\nTime: " . now()->toDateTimeString(),
                         function ($msg) use ($testTo, $smtpFrom, $smtpName) {
                             $msg->to($testTo)->from($smtpFrom, $smtpName)->subject('SMTP Test - Kenyan Baddies Club');
                         }
                     );
                     $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "✅ Test email sent to $testTo — check inbox & spam!", 'ok' => true];
                 } catch (\Throwable $me) {
-                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "❌ " . $me->getMessage() . "\n\nFixes:\n1. Check SMTP password is correct (cPanel email account password)\n2. Try port 587 + scheme=tls if 465/ssl fails\n3. Make sure noreply@kenyanbaddies.com exists in cPanel", 'ok' => false];
+                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "❌ " . $me->getMessage() . "\n\nFixes:\n1. Check SMTP password is correct (cPanel email account password)\n2. Try port 587 + scheme=smtp if 465/smtps fails\n3. Make sure $smtpUser exists in cPanel", 'ok' => false];
                 }
             } else {
                 $results[] = ['label' => 'Send Test Email', 'cmd' => '', 'out' => '⚠️ SMTP credentials incomplete — save host, username and password first.', 'ok' => false];
@@ -1367,15 +1377,37 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
     }
 
     // ── REBUILD CACHES (safe — skips route:cache because web.php uses closures) ─
+    // ── REBUILD CACHES (safe for shared hosting / closures — avoids config:cache & route:cache 500s) ─
     if ($action === 'rebuild-cache') {
         $artisanCall('config:clear');
-        $artisanCall('config:cache');
-        $artisanCall('route:clear');       // clear only — don't cache (closures in web.php)
+        $artisanCall('route:clear');
         $artisanCall('view:clear');
+        $artisanCall('cache:clear');
+        $artisanCall('view:cache');
+
+        // Pure PHP deletion of bootstrap/cache files to be 100% sure no stale route or config caches linger
+        try {
+            $deleted = 0;
+            foreach (glob($appDir . '/bootstrap/cache/*.php') ?: [] as $f) {
+                if (basename($f) !== '.gitignore') {
+                    @unlink($f);
+                    $deleted++;
+                }
+            }
+            if ($deleted > 0) {
+                $results[] = [
+                    'label' => 'Bootstrap cache cleanup',
+                    'cmd'   => 'unlink bootstrap/cache/*.php',
+                    'out'   => "✅ Removed $deleted bootstrap cache files",
+                    'ok'    => true,
+                ];
+            }
+        } catch (\Throwable $e) {}
+
         $results[] = [
-            'label' => 'Route cache',
-            'cmd'   => 'route:cache skipped',
-            'out'   => 'ℹ️ Skipped — route:cache is incompatible with closure-based routes (web.php). route:clear was run to remove any stale cache.',
+            'label' => 'Rebuild Caches Summary',
+            'cmd'   => 'config:clear + route:clear + view:cache + cache:clear',
+            'out'   => "✅ All caches safely cleared & views freshly compiled!\n• Config cache: Cleared (dynamic .env & database settings active)\n• Route cache: Cleared (closure routes functional)\n• View cache: Freshly compiled\n• Application cache: Cleared",
             'ok'    => true,
         ];
     }
@@ -1641,9 +1673,37 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 </div>
 <?php endforeach; ?>
 <?php endif; ?>
+<?php
+    $logLines = [];
+    $logPath = $appDir . '/storage/logs/laravel.log';
+    if (file_exists($logPath)) {
+        $rawLines = @file($logPath) ?: [];
+        $logLines = array_slice($rawLines, -35);
+    }
+    if (!empty($logLines)):
+?>
+<details style="margin-top:1.5rem;background:#161616;border:1px solid #333;border-radius:8px;padding:0.75rem 1rem;">
+  <summary style="cursor:pointer;color:#ff8c00;font-weight:600;font-size:0.9rem;">📜 Recent Laravel Logs (last <?=count($logLines)?> lines) — click to expand</summary>
+  <pre style="margin-top:0.75rem;padding:0.75rem;background:#0a0a0a;border:1px solid #222;border-radius:6px;font-size:0.72rem;color:#aaa;white-space:pre-wrap;word-break:break-all;max-height:400px;overflow:auto;"><?=htmlspecialchars(implode('', $logLines))?></pre>
+</details>
+<?php endif; ?>
 </body></html>
 <?php
-    return response(ob_get_clean(), 200)->header('Content-Type', 'text/html');
+        return response(ob_get_clean(), 200)->header('Content-Type', 'text/html');
+
+    } catch (\Throwable $e) {
+        if (ob_get_level() > 0) { ob_end_clean(); }
+        return response(
+            "<div style='background:#111;color:#ff6666;font-family:monospace;padding:2rem;line-height:1.6;border:2px solid #ff4444;border-radius:8px;max-width:900px;margin:2rem auto;'>" .
+            "<h2 style='color:#fff;'>❌ Server Setup Encountered an Error</h2>" .
+            "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>" .
+            "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "</p>" .
+            "<pre style='background:#000;color:#bbb;padding:1rem;border-radius:4px;overflow:auto;margin-top:1rem;font-size:0.8rem;'>" . htmlspecialchars($e->getTraceAsString()) . "</pre>" .
+            "<p style='margin-top:1.5rem;'><a href='/server-setup?token=kbc-setup-2026-secure&action=status' style='color:#ff8c00;text-decoration:underline;'>← Back to Server Setup Home</a></p>" .
+            "</div>",
+            200
+        )->header('Content-Type', 'text/html');
+    }
 
 })->name('server.setup');
 

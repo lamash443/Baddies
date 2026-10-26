@@ -24,12 +24,19 @@ class ViewSupportTicket extends ViewRecord
                         ->rows(5)
                 ])
                 ->action(function (array $data) {
-                    // Apply admin-panel SMTP config at runtime (Laravel 12: uses 'scheme')
+                    $port = (int) \App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465));
+                    $rawScheme = \App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'smtps'));
+                    $scheme = match(strtolower(trim((string) $rawScheme))) {
+                        'ssl', 'smtps' => 'smtps',
+                        'tls', 'starttls', 'smtp' => 'smtp',
+                        default => ($port === 465 ? 'smtps' : 'smtp'),
+                    };
+
                     config([
                         'mail.default'               => \App\Models\SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
                         'mail.mailers.smtp.host'     => \App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host')),
-                        'mail.mailers.smtp.port'     => (int) \App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465)),
-                        'mail.mailers.smtp.scheme'   => \App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'ssl')) ?: null,
+                        'mail.mailers.smtp.port'     => $port,
+                        'mail.mailers.smtp.scheme'   => $scheme,
                         'mail.mailers.smtp.username' => \App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username')),
                         'mail.mailers.smtp.password' => \App\Models\SiteSetting::get('mail_password', config('mail.mailers.smtp.password')),
                         'mail.from.address'          => \App\Models\SiteSetting::get('mail_from_address', config('mail.from.address')),

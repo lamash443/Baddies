@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Console\Commands;
 
@@ -17,7 +17,12 @@ class TestSmtp extends Command
 
         $host        = SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
         $port        = SiteSetting::get('mail_port', config('mail.mailers.smtp.port'));
-        $scheme      = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme'));
+        $rawScheme   = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme'));
+        $scheme      = match(strtolower(trim((string) $rawScheme))) {
+            'ssl', 'smtps' => 'smtps',
+            'tls', 'starttls', 'smtp' => 'smtp',
+            default => ((int)$port === 465 ? 'smtps' : 'smtp'),
+        };
         $username    = SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
         $fromAddress = SiteSetting::get('mail_from_address', config('mail.from.address'));
         $fromName    = SiteSetting::get('mail_from_name', config('mail.from.name'));
@@ -27,7 +32,7 @@ class TestSmtp extends Command
         $this->info('─────────────────────────────────────────');
         $this->line("  Host     : {$host}");
         $this->line("  Port     : {$port}");
-        $this->line("  Scheme   : " . ($scheme ?: '(none)'));
+        $this->line("  Scheme   : {$scheme}");
         $this->line("  Username : {$username}");
         $this->line("  From     : {$fromAddress} ({$fromName})");
         $this->line("  To       : {$to}");
@@ -37,7 +42,7 @@ class TestSmtp extends Command
             'mail.default'               => SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
             'mail.mailers.smtp.host'     => $host,
             'mail.mailers.smtp.port'     => (int) $port,
-            'mail.mailers.smtp.scheme'   => $scheme ?: null,
+            'mail.mailers.smtp.scheme'   => $scheme,
             'mail.mailers.smtp.username' => $username,
             'mail.mailers.smtp.password' => SiteSetting::get('mail_password', config('mail.mailers.smtp.password')),
             'mail.from.address'          => $fromAddress,
