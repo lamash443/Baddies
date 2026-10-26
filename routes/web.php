@@ -1036,6 +1036,114 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
         }
     }
 
+    // ── SAVE SMTP SETTINGS ────────────────────────────────────────────────────
+    if ($action === 'save-smtp') {
+        try {
+            $smtpHost    = trim((string) $request->input('smtp_host', ''));
+            $smtpPort    = trim((string) $request->input('smtp_port', '465'));
+            $smtpScheme  = trim((string) $request->input('smtp_scheme', 'ssl'));
+            $smtpUser    = trim((string) $request->input('smtp_username', ''));
+            $smtpPass    = trim((string) $request->input('smtp_password', ''));
+            $smtpFrom    = trim((string) $request->input('smtp_from_address', ''));
+            $smtpName    = trim((string) $request->input('smtp_from_name', 'Baddies Club'));
+
+            if ($smtpHost)   \App\Models\SiteSetting::set('mail_host', $smtpHost);
+            if ($smtpPort)   \App\Models\SiteSetting::set('mail_port', $smtpPort);
+            \App\Models\SiteSetting::set('mail_encryption', $smtpScheme ?: 'ssl');
+            if ($smtpUser)   \App\Models\SiteSetting::set('mail_username', $smtpUser);
+            if ($smtpPass)   \App\Models\SiteSetting::set('mail_password', $smtpPass);
+            if ($smtpFrom)   \App\Models\SiteSetting::set('mail_from_address', $smtpFrom);
+            if ($smtpName)   \App\Models\SiteSetting::set('mail_from_name', $smtpName);
+            \App\Models\SiteSetting::set('mail_mailer', 'smtp');
+
+            // Also patch .env file
+            $env = file_get_contents($envFile);
+            if ($env !== false) {
+                $envPatches = [
+                    '/^MAIL_MAILER=.*/m'       => 'MAIL_MAILER=smtp',
+                    '/^MAIL_SCHEME=.*/m'       => 'MAIL_SCHEME=' . ($smtpScheme ?: 'ssl'),
+                    '/^MAIL_HOST=.*/m'         => 'MAIL_HOST=' . ($smtpHost ?: \App\Models\SiteSetting::get('mail_host')),
+                    '/^MAIL_PORT=.*/m'         => 'MAIL_PORT=' . ($smtpPort ?: '465'),
+                    '/^MAIL_USERNAME=.*/m'     => 'MAIL_USERNAME=' . ($smtpUser ?: \App\Models\SiteSetting::get('mail_username')),
+                    '/^MAIL_FROM_ADDRESS=.*/m' => 'MAIL_FROM_ADDRESS="' . ($smtpFrom ?: \App\Models\SiteSetting::get('mail_from_address')) . '"',
+                    '/^MAIL_FROM_NAME=.*/m'    => 'MAIL_FROM_NAME="' . ($smtpName ?: 'Baddies Club') . '"',
+                ];
+                if ($smtpPass) $envPatches['/^MAIL_PASSWORD=.*/m'] = 'MAIL_PASSWORD=' . $smtpPass;
+                foreach ($envPatches as $pat => $rep) {
+                    if (preg_match($pat, $env)) {
+                        $env = preg_replace($pat, $rep, $env);
+                    } else {
+                        $env .= "\n" . $rep;
+                    }
+                }
+                file_put_contents($envFile, $env);
+            }
+
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+
+            $results[] = [
+                'label' => 'Save SMTP Settings',
+                'cmd'   => 'SiteSetting::set + patch .env + config:clear',
+                'out'   => "✅ SMTP saved!\nHost: " . ($smtpHost ?: '(preserved)') . "\nPort: $smtpPort\nScheme: $smtpScheme\nUsername: " . ($smtpUser ?: '(preserved)') . "\nFrom: " . ($smtpFrom ?: '(preserved)'),
+                'ok'    => true,
+            ];
+            $action = 'test-smtp'; // auto-run test
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Save SMTP', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
+    }
+
+    // ── TEST SMTP ─────────────────────────────────────────────────────────────
+    if (in_array($action, ['test-smtp', 'save-smtp'])) {
+        try {
+            $smtpHost    = \App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
+            $smtpPort    = \App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465));
+            $smtpScheme  = \App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'ssl'));
+            $smtpUser    = \App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
+            $smtpPass    = \App\Models\SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
+            $smtpFrom    = \App\Models\SiteSetting::get('mail_from_address', config('mail.from.address'));
+            $smtpName    = \App\Models\SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
+            $testTo      = trim((string) $request->query('test_email', $smtpUser));
+
+            $results[] = [
+                'label' => 'Current SMTP Config',
+                'cmd'   => 'SiteSetting + config() fallback',
+                'out'   => "Host     : $smtpHost\nPort     : $smtpPort\nScheme   : " . ($smtpScheme ?: '(none)') . "\nUsername : $smtpUser\nFrom     : $smtpFrom ($smtpName)\nTest To  : $testTo",
+                'ok'    => !empty($smtpHost) && !empty($smtpUser),
+            ];
+
+            if (!empty($smtpHost) && !empty($smtpUser) && !empty($smtpPass)) {
+                config([
+                    'mail.default'               => 'smtp',
+                    'mail.mailers.smtp.host'     => $smtpHost,
+                    'mail.mailers.smtp.port'     => (int) $smtpPort,
+                    'mail.mailers.smtp.scheme'   => $smtpScheme ?: null,
+                    'mail.mailers.smtp.username' => $smtpUser,
+                    'mail.mailers.smtp.password' => $smtpPass,
+                    'mail.from.address'          => $smtpFrom,
+                    'mail.from.name'             => $smtpName,
+                ]);
+                app('mail.manager')->purge('smtp');
+
+                try {
+                    \Illuminate\Support\Facades\Mail::raw(
+                        "SMTP test from Kenyan Baddies Club server-setup.\n\nHost: $smtpHost:$smtpPort ($smtpScheme)\nTime: " . now()->toDateTimeString(),
+                        function ($msg) use ($testTo, $smtpFrom, $smtpName) {
+                            $msg->to($testTo)->from($smtpFrom, $smtpName)->subject('SMTP Test - Kenyan Baddies Club');
+                        }
+                    );
+                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "✅ Test email sent to $testTo — check inbox & spam!", 'ok' => true];
+                } catch (\Throwable $me) {
+                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "❌ " . $me->getMessage() . "\n\nFixes:\n1. Check SMTP password is correct (cPanel email account password)\n2. Try port 587 + scheme=tls if 465/ssl fails\n3. Make sure noreply@kenyanbaddies.com exists in cPanel", 'ok' => false];
+                }
+            } else {
+                $results[] = ['label' => 'Send Test Email', 'cmd' => '', 'out' => '⚠️ SMTP credentials incomplete — save host, username and password first.', 'ok' => false];
+            }
+        } catch (\Throwable $e) {
+            $results[] = ['label' => 'Test SMTP', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
+        }
+    }
+
     // ── TEST PAYHERO ──────────────────────────────────────────────────────────
     if (in_array($action, ['test-payhero', 'save-payhero'])) {
         try {
@@ -1258,14 +1366,18 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
         $artisanCall('migrate', ['--force' => true]);
     }
 
-    // ── REBUILD CACHES (Artisan::call — separate step, safe after full-setup) ─
+    // ── REBUILD CACHES (safe — skips route:cache because web.php uses closures) ─
     if ($action === 'rebuild-cache') {
         $artisanCall('config:clear');
         $artisanCall('config:cache');
-        $artisanCall('route:clear');
-        $artisanCall('route:cache');
+        $artisanCall('route:clear');       // clear only — don't cache (closures in web.php)
         $artisanCall('view:clear');
-        $artisanCall('view:cache');
+        $results[] = [
+            'label' => 'Route cache',
+            'cmd'   => 'route:cache skipped',
+            'out'   => 'ℹ️ Skipped — route:cache is incompatible with closure-based routes (web.php). route:clear was run to remove any stale cache.',
+            'ok'    => true,
+        ];
     }
 
     // ── STATUS ───────────────────────────────────────────────────────────────
@@ -1414,12 +1526,61 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
   <a class="btn p" href="<?=$base?>&action=full-setup">🚀 1. Full Setup</a>
   <a class="btn g" href="<?=$base?>&action=rebuild-cache">⚡ 2. Rebuild Caches</a>
   <a class="btn p" href="<?=$base?>&action=test-payhero">💳 Test PayHero</a>
+  <a class="btn s" href="<?=$base?>&action=test-smtp">📧 Test SMTP</a>
   <a class="btn s" href="<?=$base?>&action=seed-plans">🌱 Seed Plans</a>
   <a class="btn s" href="<?=$base?>&action=fix-storage">🔗 Fix Symlink</a>
   <a class="btn s" href="<?=$base?>&action=fix-env">📝 Fix .env</a>
   <a class="btn s" href="<?=$base?>&action=clear-cache">🗑️ Clear Caches</a>
   <a class="btn s" href="<?=$base?>&action=migrate">🗄️ Migrate</a>
   <a class="btn s" href="<?=$base?>&action=status">🔄 Refresh</a>
+</div>
+<h2>📧 SMTP Mail Settings & Test</h2>
+<div class="card" style="background:#161616;border:1px solid #ff8c00;border-radius:8px;padding:1.25rem;margin-bottom:1.5rem;">
+  <p style="color:#aaa;font-size:0.85rem;margin-bottom:1rem;">
+    Enter your Truehost cPanel SMTP credentials. <strong>Truehost defaults:</strong> Host = <code>mail.kenyanbaddies.com</code>, Port = <code>465</code>, Scheme = <code>ssl</code>. Username &amp; password = your cPanel email account.
+  </p>
+  <form method="POST" action="<?=$base?>&action=save-smtp" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.9rem;align-items:end;">
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">SMTP Host</label>
+      <input type="text" name="smtp_host" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host', '')))?>"
+        placeholder="mail.kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Port</label>
+      <input type="text" name="smtp_port" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', '465')))?>"
+        placeholder="465" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Scheme (ssl / tls)</label>
+      <input type="text" name="smtp_scheme" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'ssl')))?>"
+        placeholder="ssl" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Username (Full Email)</label>
+      <input type="text" name="smtp_username" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username', '')))?>"
+        placeholder="noreply@kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Password</label>
+      <input type="password" name="smtp_password" placeholder="cPanel email account password"
+        style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">From Address</label>
+      <input type="text" name="smtp_from_address" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_address', config('mail.from.address', '')))?>"
+        placeholder="noreply@kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">From Name</label>
+      <input type="text" name="smtp_from_name" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club')))?>"
+        placeholder="Baddies Club" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div style="grid-column:1/-1;display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">
+      <button type="submit" class="btn p" style="border:none;cursor:pointer;">💾 Save &amp; Send Test Email</button>
+      <a class="btn s" href="<?=$base?>&action=test-smtp">🔄 Test Current Settings Only</a>
+      <span style="color:#777;font-size:0.8rem;">Test email is sent to the username above</span>
+    </div>
+  </form>
 </div>
 <h2>💳 PayHero M-Pesa Live Credentials & Instant Test</h2>
 <div class="card" style="background:#161616;border:1px solid #ff8c00;border-radius:8px;padding:1.25rem;margin-bottom:1.5rem;">
