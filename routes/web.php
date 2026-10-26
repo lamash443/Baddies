@@ -937,6 +937,7 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
                 '/^SESSION_DRIVER=.*/m'       => 'SESSION_DRIVER=database',
                 '/^SESSION_DOMAIN=.*/m'       => 'SESSION_DOMAIN=.kenyanbaddies.com',
                 '/^APP_DEBUG=.*/m'            => 'APP_DEBUG=false',
+                '/^QUEUE_CONNECTION=.*/m'     => 'QUEUE_CONNECTION=sync',
                 '/^PAYHERO_CALLBACK_URL=.*/m' => 'PAYHERO_CALLBACK_URL=https://kenyanbaddies.com/webhook/payhero',
             ];
             foreach ($replacements as $p => $r) {
@@ -1113,16 +1114,23 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
             $smtpPass    = \App\Models\SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
             $smtpFrom    = \App\Models\SiteSetting::get('mail_from_address', config('mail.from.address'));
             $smtpName    = \App\Models\SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
-            $testTo      = trim((string) $request->query('test_email', $smtpUser));
+            $customTestTo  = trim((string) $request->input('test_email', $request->query('test_email', '')));
+            $testTo        = !empty($customTestTo) ? $customTestTo : $smtpUser;
+
+            $hasPass       = !empty($smtpPass);
+            $isPlaceholder = $hasPass && str_contains($smtpPass, 'YOUR_CPANEL');
+            $passStatus    = !$hasPass
+                ? '❌ EMPTY (No password saved in database or .env)'
+                : ($isPlaceholder ? '⚠️ STILL DEFAULT PLACEHOLDER ("YOUR_CPANEL_EMAIL_PASSWORD")' : '✅ Configured (' . strlen($smtpPass) . ' chars, ' . substr($smtpPass, 0, 1) . '***)');
 
             $results[] = [
                 'label' => 'Current SMTP Config',
                 'cmd'   => 'SiteSetting + config() fallback',
-                'out'   => "Host     : $smtpHost\nPort     : $smtpPort\nScheme   : $smtpScheme\nUsername : $smtpUser\nFrom     : $smtpFrom ($smtpName)\nTest To  : $testTo",
-                'ok'    => !empty($smtpHost) && !empty($smtpUser),
+                'out'   => "Host     : $smtpHost\nPort     : $smtpPort\nScheme   : $smtpScheme\nUsername : $smtpUser\nPassword : $passStatus\nFrom     : $smtpFrom ($smtpName)\nTest To  : $testTo",
+                'ok'    => !empty($smtpHost) && !empty($smtpUser) && $hasPass && !$isPlaceholder,
             ];
 
-            if (!empty($smtpHost) && !empty($smtpUser) && !empty($smtpPass)) {
+            if ($hasPass && !$isPlaceholder) {
                 config([
                     'mail.default'               => 'smtp',
                     'mail.mailers.smtp.host'     => $smtpHost,
@@ -1137,17 +1145,35 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
 
                 try {
                     \Illuminate\Support\Facades\Mail::raw(
-                        "SMTP test from Kenyan Baddies Club server-setup.\n\nHost: $smtpHost:$smtpPort (scheme: $smtpScheme)\nTime: " . now()->toDateTimeString(),
+                        "SMTP test from Kenyan Baddies Club server-setup.\n\nHost: $smtpHost:$smtpPort (scheme: $smtpScheme)\nUsername: $smtpUser\nTime: " . now()->toDateTimeString(),
                         function ($msg) use ($testTo, $smtpFrom, $smtpName) {
                             $msg->to($testTo)->from($smtpFrom, $smtpName)->subject('SMTP Test - Kenyan Baddies Club');
                         }
                     );
-                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "✅ Test email sent to $testTo — check inbox & spam!", 'ok' => true];
+                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "✅ Test email sent to $testTo — check your inbox & spam folder!", 'ok' => true];
                 } catch (\Throwable $me) {
-                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => "❌ " . $me->getMessage() . "\n\nFixes:\n1. Check SMTP password is correct (cPanel email account password)\n2. Try port 587 + scheme=smtp if 465/smtps fails\n3. Make sure $smtpUser exists in cPanel", 'ok' => false];
+                    $is535 = str_contains($me->getMessage(), '535') || str_contains($me->getMessage(), 'authentication data');
+                    $msg = "❌ " . $me->getMessage();
+                    if ($is535) {
+                        $msg .= "\n\n🔑 HOW TO FIX '535 Incorrect authentication data':"
+                              . "\n1. In cPanel -> 'Email Accounts', verify '$smtpUser' exists. If not, click '+ Create' to create it."
+                              . "\n2. Click 'Manage' next to '$smtpUser', type a NEW password and click 'Update Email Settings'."
+                              . "\n3. Enter that exact new password in the 'Password' field below and click 'Save & Send Test Email'.";
+                    } else {
+                        $msg .= "\n\nFixes:"
+                              . "\n1. Check SMTP password is correct (cPanel email account password)"
+                              . "\n2. Try port 587 + scheme=smtp if 465/smtps fails"
+                              . "\n3. Make sure $smtpUser exists in cPanel";
+                    }
+                    $results[] = ['label' => 'Send Test Email', 'cmd' => "Mail::raw() to $testTo", 'out' => $msg, 'ok' => false];
                 }
             } else {
-                $results[] = ['label' => 'Send Test Email', 'cmd' => '', 'out' => '⚠️ SMTP credentials incomplete — save host, username and password first.', 'ok' => false];
+                $results[] = [
+                    'label' => 'Send Test Email',
+                    'cmd'   => '',
+                    'out'   => "⚠️ Cannot test SMTP: " . ($isPlaceholder ? "Password is still the placeholder 'YOUR_CPANEL_EMAIL_PASSWORD'." : "Password is empty.") . "\nEnter your real cPanel email password in the form below and click 'Save & Send Test Email'.",
+                    'ok'    => false,
+                ];
             }
         } catch (\Throwable $e) {
             $results[] = ['label' => 'Test SMTP', 'cmd' => '', 'out' => '❌ ' . $e->getMessage(), 'ok' => false];
@@ -1568,49 +1594,60 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
 </div>
 <h2>📧 SMTP Mail Settings & Test</h2>
 <div class="card" style="background:#161616;border:1px solid #ff8c00;border-radius:8px;padding:1.25rem;margin-bottom:1.5rem;">
-  <p style="color:#aaa;font-size:0.85rem;margin-bottom:1rem;">
-    Enter your Truehost cPanel SMTP credentials. <strong>Truehost defaults:</strong> Host = <code>mail.kenyanbaddies.com</code>, Port = <code>465</code>, Scheme = <code>ssl</code>. Username &amp; password = your cPanel email account.
+  <p style="color:#aaa;font-size:0.85rem;margin-bottom:0.75rem;">
+    Enter your Truehost cPanel SMTP credentials. <strong>Truehost defaults:</strong> Host = <code>mail.kenyanbaddies.com</code>, Port = <code>465</code>, Scheme = <code>smtps</code>. Username &amp; password = your cPanel email account.
   </p>
+  <div style="background:#221800;border:1px solid #eab308;border-radius:6px;padding:0.75rem 1rem;margin-bottom:1rem;color:#fef08a;font-size:0.82rem;line-height:1.5;">
+    ℹ️ <strong>If you get "535 Incorrect authentication data":</strong> This means the password below doesn't match your cPanel email password.<br>
+    1) Go to Truehost cPanel &rarr; <strong>Email Accounts</strong>.<br>
+    2) Verify <strong>noreply@kenyanbaddies.com</strong> exists (or click <strong>+ Create</strong> to create it).<br>
+    3) Click <strong>Manage</strong>, set a new password, click <strong>Update Email Settings</strong>, then type that exact password below.
+  </div>
   <form method="POST" action="<?=$base?>&action=save-smtp" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.9rem;align-items:end;">
     <div>
       <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">SMTP Host</label>
-      <input type="text" name="smtp_host" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host', '')))?>"
+      <input type="text" name="smtp_host" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_host', config('mail.mailers.smtp.host', 'mail.kenyanbaddies.com')) ?: 'mail.kenyanbaddies.com')?>"
         placeholder="mail.kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
       <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Port</label>
-      <input type="text" name="smtp_port" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', '465')))?>"
+      <input type="text" name="smtp_port" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_port', config('mail.mailers.smtp.port', '465')) ?: '465')?>"
         placeholder="465" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
-      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Scheme (ssl / tls)</label>
-      <input type="text" name="smtp_scheme" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'ssl')))?>"
-        placeholder="ssl" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Scheme (smtps / smtp)</label>
+      <input type="text" name="smtp_scheme" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'smtps')) ?: 'smtps')?>"
+        placeholder="smtps" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
-      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Username (Full Email)</label>
-      <input type="text" name="smtp_username" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username', '')))?>"
+      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Username (Full cPanel Email)</label>
+      <input type="text" name="smtp_username" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_username', config('mail.mailers.smtp.username', 'noreply@kenyanbaddies.com')) ?: 'noreply@kenyanbaddies.com')?>"
         placeholder="noreply@kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
-      <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">Password</label>
-      <input type="password" name="smtp_password" placeholder="cPanel email account password"
-        style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+      <label style="display:block;font-size:0.75rem;color:#ff8c00;margin-bottom:0.25rem;text-transform:uppercase;">Password (cPanel Email Password)</label>
+      <input type="password" name="smtp_password" placeholder="Enter cPanel email account password"
+        style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #ff8c00;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
       <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">From Address</label>
-      <input type="text" name="smtp_from_address" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_address', config('mail.from.address', '')))?>"
+      <input type="text" name="smtp_from_address" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_address', config('mail.from.address', 'noreply@kenyanbaddies.com')) ?: 'noreply@kenyanbaddies.com')?>"
         placeholder="noreply@kenyanbaddies.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div>
       <label style="display:block;font-size:0.75rem;color:#888;margin-bottom:0.25rem;text-transform:uppercase;">From Name</label>
-      <input type="text" name="smtp_from_name" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club')))?>"
-        placeholder="Baddies Club" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+      <input type="text" name="smtp_from_name" value="<?=htmlspecialchars(\App\Models\SiteSetting::get('mail_from_name', config('mail.from.name', 'KenyanBaddies')) ?: 'KenyanBaddies')?>"
+        placeholder="KenyanBaddies" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #333;border-radius:6px;color:#fff;font-size:0.85rem;">
+    </div>
+    <div>
+      <label style="display:block;font-size:0.75rem;color:#38bdf8;margin-bottom:0.25rem;text-transform:uppercase;">Send Test Email To (e.g. Gmail)</label>
+      <input type="email" name="test_email" value="<?=htmlspecialchars($request->input('test_email', $request->query('test_email', '')) ?: '')?>"
+        placeholder="yourname@gmail.com" style="width:100%;padding:0.5rem 0.75rem;background:#0d0d0d;border:1px solid #38bdf8;border-radius:6px;color:#fff;font-size:0.85rem;">
     </div>
     <div style="grid-column:1/-1;display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">
       <button type="submit" class="btn p" style="border:none;cursor:pointer;">💾 Save &amp; Send Test Email</button>
       <a class="btn s" href="<?=$base?>&action=test-smtp">🔄 Test Current Settings Only</a>
-      <span style="color:#777;font-size:0.8rem;">Test email is sent to the username above</span>
+      <span style="color:#888;font-size:0.8rem;">Enter your password &amp; recipient email above, then click Save &amp; Send Test Email</span>
     </div>
   </form>
 </div>
