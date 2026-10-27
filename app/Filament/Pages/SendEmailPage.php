@@ -2,8 +2,11 @@
 
 namespace App\Filament\Pages;
 
-use App\Jobs\SendBroadcastEmailJob;
+use App\Mail\AdminBroadcastMail;
+use App\Models\EmailLog;
+use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\MailHelper;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -15,6 +18,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Mail;
 
 class SendEmailPage extends Page implements HasForms
 {
@@ -172,17 +176,59 @@ class SendEmailPage extends Page implements HasForms
             return;
         }
 
+        // Apply SMTP settings once before the loop
+        MailHelper::applySmtpSettings();
+        $fromName = SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
+
+        $sent   = 0;
+        $failed = 0;
+
         foreach ($users as $user) {
-            SendBroadcastEmailJob::dispatch($user, $subject, $body);
+            try {
+                Mail::to($user->email, $user->name)
+                    ->send(new AdminBroadcastMail(
+                        emailSubject:  $subject,
+                        emailBody:     $body,
+                        recipientName: $user->name ?? '',
+                        senderName:    $fromName,
+                    ));
+
+                EmailLog::create([
+                    'user_id'         => $user->id,
+                    'recipient_email' => $user->email,
+                    'recipient_name'  => $user->name,
+                    'subject'         => $subject,
+                    'type'            => 'broadcast',
+                    'status'          => 'sent',
+                ]);
+
+                $sent++;
+
+            } catch (\Exception $e) {
+                EmailLog::create([
+                    'user_id'         => $user->id,
+                    'recipient_email' => $user->email,
+                    'recipient_name'  => $user->name,
+                    'subject'         => $subject,
+                    'type'            => 'broadcast',
+                    'status'          => 'failed',
+                    'error_message'   => $e->getMessage(),
+                ]);
+
+                $failed++;
+            }
         }
 
-        $count = $users->count();
+        $message = "Sent: {$sent}";
+        if ($failed > 0) {
+            $message .= ", Failed: {$failed}";
+        }
 
         Notification::make()
-            ->title("Email queued for {$count} " . ($count === 1 ? 'user' : 'users') . '.')
-            ->body('Emails are being sent in the background via the queue.')
-            ->success()
-            ->duration(6000)
+            ->title("Broadcast complete — {$message}")
+            ->body($failed > 0 ? 'Some emails failed. Check Email Logs for details.' : 'All emails delivered successfully.')
+            ->color($failed > 0 ? 'warning' : 'success')
+            ->duration(8000)
             ->send();
 
         // Reset form
