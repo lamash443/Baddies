@@ -460,6 +460,49 @@ class SiteSettingsPage extends Page implements HasForms
                 // ── WELCOME EMAIL TEMPLATE ────────────────────────────────────────
                 Section::make('Welcome Email Template')
                     ->description('Customise every part of the automatic welcome email sent to new members on sign-up. Changes take effect immediately for all future registrations.')
+                    ->headerActions([
+                        Action::make('test_welcome_email')
+                            ->label('Send Test Welcome Email')
+                            ->icon('heroicon-o-paper-airplane')
+                            ->color('warning')
+                            ->form([
+                                TextInput::make('test_email')
+                                    ->label('Recipient Email Address')
+                                    ->email()
+                                    ->required()
+                                    ->default(fn () => auth()->user()?->email ?: 'admin@example.com'),
+                            ])
+                            ->action(function (array $data) {
+                                \App\Support\MailHelper::applySmtpSettings();
+                                try {
+                                    $user = new \App\Models\User();
+                                    $user->id = 1;
+                                    $user->name = 'Test Recipient';
+                                    $user->email = $data['test_email'];
+
+                                    $verificationUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                                        'verification.verify',
+                                        now()->addMinutes(60),
+                                        ['id' => $user->id, 'hash' => sha1($user->email)]
+                                    );
+
+                                    $mailable = new \App\Mail\WelcomeEmail($user, $verificationUrl);
+                                    \Illuminate\Support\Facades\Mail::to($user->email, $user->name)->send($mailable);
+
+                                    Notification::make()
+                                        ->title('Welcome email test sent successfully!')
+                                        ->body('Sent to ' . $data['test_email'] . '. Check your inbox & spam folder.')
+                                        ->success()
+                                        ->send();
+                                } catch (\Throwable $e) {
+                                    Notification::make()
+                                        ->title('Welcome email test failed')
+                                        ->body($e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            }),
+                    ])
                     ->schema([
 
                         // — Core fields —

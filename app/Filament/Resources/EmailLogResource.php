@@ -114,7 +114,58 @@ class EmailLogResource extends Resource
                     ->query(fn (Builder $query) => $query->whereDate('created_at', today()))
                     ->toggle(),
             ])
-            ->actions([])
+            ->actions([
+                Tables\Actions\Action::make('resend')
+                    ->label('Resend')
+                    ->icon('heroicon-m-arrow-path')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Resend this email?')
+                    ->modalDescription('This will re-dispatch the email to the recipient using current SMTP settings.')
+                    ->action(function (EmailLog $record) {
+                        \App\Support\MailHelper::applySmtpSettings();
+                        try {
+                            if ($record->type === 'welcome') {
+                                $user = $record->user ?? \App\Models\User::where('email', $record->recipient_email)->first();
+                                if (!$user) {
+                                    $user = new \App\Models\User();
+                                    $user->id = $record->user_id ?: 1;
+                                    $user->name = $record->recipient_name ?: 'Member';
+                                    $user->email = $record->recipient_email;
+                                }
+                                $verificationUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                                    'verification.verify',
+                                    now()->addMinutes(60),
+                                    ['id' => $user->id, 'hash' => sha1($user->email)]
+                                );
+                                \Illuminate\Support\Facades\Mail::to($record->recipient_email, $record->recipient_name)
+                                    ->send(new \App\Mail\WelcomeEmail($user, $verificationUrl));
+                            } else {
+                                $fromAddress = trim((string) \App\Models\SiteSetting::get('mail_from_address')) ?: config('mail.from.address');
+                                $fromName    = trim((string) \App\Models\SiteSetting::get('mail_from_name')) ?: config('mail.from.name', 'Kenyan Baddies Club');
+                                \Illuminate\Support\Facades\Mail::raw(
+                                    "Resent communication from Kenyan Baddies Club:\n\nSubject: " . $record->subject,
+                                    function ($msg) use ($record, $fromAddress, $fromName) {
+                                        $msg->to($record->recipient_email, $record->recipient_name)
+                                            ->from($fromAddress, $fromName)
+                                            ->subject($record->subject);
+                                    }
+                                );
+                            }
+                            $record->update(['status' => 'sent', 'error_message' => null]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Email resent successfully!')
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            $record->update(['status' => 'failed', 'error_message' => $e->getMessage()]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Resend failed: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+            ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

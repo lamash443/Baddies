@@ -198,26 +198,25 @@ class RegisteredUserController extends Controller
         try {
             $log->info('[WelcomeEmail] Starting for user: ' . $user->id . ' / ' . $user->email);
 
+            // 1. Apply admin-panel SMTP settings FIRST — same as working SendEmailPage & ViewSupportTicket
+            MailHelper::applySmtpSettings();
+
+            $log->info('[WelcomeEmail] SMTP — host: ' . config('mail.mailers.smtp.host') . ' port: ' . config('mail.mailers.smtp.port') . ' user: ' . config('mail.mailers.smtp.username') . ' from: ' . config('mail.from.address'));
+
+            // 2. Generate signed verification URL
             $verificationUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes(60),
                 ['id' => $user->id, 'hash' => sha1($user->email)]
             );
 
-            // Build the mailable first — all SiteSetting DB calls happen here
-            // inside the try-catch so any error is properly logged
+            // 3. Build the mailable
             $mailable = new WelcomeEmail($user, $verificationUrl);
 
-            $log->info('[WelcomeEmail] SMTP — host: ' . config('mail.mailers.smtp.host') . ' port: ' . config('mail.mailers.smtp.port') . ' user: ' . config('mail.mailers.smtp.username'));
+            $log->info('[WelcomeEmail] Calling Mail::to()->send() now...');
 
-            // Apply admin-panel SMTP settings (with .env fallback) then send
-            // Use mailer('smtp') explicitly — same pattern as the working TestSmtp command
-            MailHelper::applySmtpSettings();
-
-            $log->info('[WelcomeEmail] Calling Mail::mailer(smtp)->to()->send() now...');
-
-            Mail::mailer('smtp')
-                ->to($user->email, $user->name)
+            // 4. Send via standard Mail::to() — matches SendEmailPage, SupportTicketReply & TestSmtp
+            Mail::to($user->email, $user->name)
                 ->send($mailable);
 
             // ── Log success ──────────────────────────────────────────────────
@@ -233,7 +232,7 @@ class RegisteredUserController extends Controller
             $log->info('[WelcomeEmail] SUCCESS — email sent to ' . $user->email);
 
         } catch (\Throwable $e) {
-            // Catch Throwable (not just Exception) to also catch PHP fatal errors
+            // Catch Throwable to catch both Exceptions and PHP Errors
             $log->error('[WelcomeEmail] FAILED for user ' . $user->id . ': ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
 
             // ── Log failure ──────────────────────────────────────────────────
@@ -241,7 +240,7 @@ class RegisteredUserController extends Controller
                 'user_id'        => $user->id,
                 'recipient_email'=> $user->email,
                 'recipient_name' => $user->name,
-                'subject'        => 'Welcome to Baddies Club',
+                'subject'        => isset($mailable) ? $mailable->emailSubject : 'Welcome to Kenyan Baddies Club',
                 'type'           => 'welcome',
                 'status'         => 'failed',
                 'error_message'  => $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')',
