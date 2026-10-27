@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\AdminBroadcastMail;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\MailHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,36 +29,10 @@ class SendBroadcastEmailJob implements ShouldQueue
 
     public function handle(): void
     {
-        // Apply admin-panel SMTP settings at runtime
-        $mailer      = SiteSetting::get('mail_mailer', config('mail.default', 'smtp'));
-        $host        = SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
-        $port        = SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 587));
-        // Laravel 12 uses 'scheme' (tls / ssl / null) instead of the old 'encryption' key
-        $encryption  = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'tls'));
-        $username    = SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
-        $password    = SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
-        $fromAddress = SiteSetting::get('mail_from_address', config('mail.from.address'));
-        $fromName    = SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
+        // Apply admin-panel SMTP settings (with .env fallback)
+        MailHelper::applySmtpSettings();
 
-        $scheme = match(strtolower(trim((string) $encryption))) {
-            'ssl', 'smtps' => 'smtps',
-            'tls', 'starttls', 'smtp' => 'smtp',
-            default => ((int)$port === 465 ? 'smtps' : 'smtp'),
-        };
-
-        config([
-            'mail.default'                    => $mailer,
-            'mail.mailers.smtp.host'          => $host,
-            'mail.mailers.smtp.port'          => (int) $port,
-            'mail.mailers.smtp.scheme'        => $scheme,
-            'mail.mailers.smtp.username'      => $username,
-            'mail.mailers.smtp.password'      => $password,
-            'mail.from.address'               => $fromAddress,
-            'mail.from.name'                  => $fromName,
-        ]);
-
-        // Purge cached mailer so the new SMTP config is picked up
-        app('mail.manager')->purge('smtp');
+        $fromName = SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
 
         try {
             Mail::to($this->user->email, $this->user->name)

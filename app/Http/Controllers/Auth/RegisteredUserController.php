@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeEmail;
 use App\Models\SiteSetting;
+use App\Support\MailHelper;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -198,18 +199,9 @@ class RegisteredUserController extends Controller
         try {
             $log->info('[WelcomeEmail] Starting for user: ' . $user->id . ' / ' . $user->email);
 
-            $mailer      = SiteSetting::get('mail_mailer', config('mail.default', 'smtp'));
-            $host        = SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
-            $port        = SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 587));
-            // Laravel 12 uses 'scheme' (tls / ssl / null) instead of the old 'encryption' key
-            $encryption  = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme', 'tls'));
-            $username    = SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
-            $password    = SiteSetting::get('mail_password', config('mail.mailers.smtp.password'));
-            $fromAddress = SiteSetting::get('mail_from_address', config('mail.from.address', 'noreply@kenyanbaddies.com'));
-            $fromName    = SiteSetting::get('mail_from_name', config('mail.from.name', 'Baddies Club'));
-            $subject     = SiteSetting::get('welcome_email_subject', 'Welcome to Baddies Club');
+            $subject = SiteSetting::get('welcome_email_subject', 'Welcome to Baddies Club');
 
-            $log->info('[WelcomeEmail] SMTP — host: ' . $host . ' port: ' . $port . ' user: ' . $username);
+            $log->info('[WelcomeEmail] SMTP — host: ' . SiteSetting::get('mail_host', config('mail.mailers.smtp.host')) . ' port: ' . SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465)) . ' user: ' . SiteSetting::get('mail_username', config('mail.mailers.smtp.username')));
 
             $verificationUrl = URL::temporarySignedRoute(
                 'verification.verify',
@@ -217,26 +209,8 @@ class RegisteredUserController extends Controller
                 ['id' => $user->id, 'hash' => sha1($user->email)]
             );
 
-            $scheme = match(strtolower(trim((string) $encryption))) {
-                'ssl', 'smtps' => 'smtps',
-                'tls', 'starttls', 'smtp' => 'smtp',
-                default => ((int)$port === 465 ? 'smtps' : 'smtp'),
-            };
-
-            // Override SMTP config at runtime with admin-panel values
-            config([
-                'mail.default'                => $mailer,
-                'mail.mailers.smtp.host'      => $host,
-                'mail.mailers.smtp.port'      => (int) $port,
-                'mail.mailers.smtp.scheme'    => $scheme,
-                'mail.mailers.smtp.username'  => $username,
-                'mail.mailers.smtp.password'  => $password,
-                'mail.from.address'           => $fromAddress,
-                'mail.from.name'              => $fromName,
-            ]);
-
-            // Purge cached mailer so new SMTP settings are picked up immediately
-            app('mail.manager')->purge('smtp');
+            // Apply admin-panel SMTP settings (with .env fallback)
+            MailHelper::applySmtpSettings();
 
             $log->info('[WelcomeEmail] Calling Mail::to()->sendNow() now...');
 

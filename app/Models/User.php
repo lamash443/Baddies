@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Support\MailHelper;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Support\Str;
@@ -377,5 +378,15 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Override the default email verification notification so it uses
+     * the admin-panel SMTP settings instead of the raw .env values.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        MailHelper::applySmtpSettings();
+        parent::sendEmailVerificationNotification();
     }
 }

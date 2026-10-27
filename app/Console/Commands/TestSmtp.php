@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\MailHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use App\Models\SiteSetting;
@@ -15,41 +16,21 @@ class TestSmtp extends Command
     {
         $to = $this->argument('email');
 
-        $host        = SiteSetting::get('mail_host', config('mail.mailers.smtp.host'));
-        $port        = SiteSetting::get('mail_port', config('mail.mailers.smtp.port'));
-        $rawScheme   = SiteSetting::get('mail_encryption', config('mail.mailers.smtp.scheme'));
-        $scheme      = match(strtolower(trim((string) $rawScheme))) {
-            'ssl', 'smtps' => 'smtps',
-            'tls', 'starttls', 'smtp' => 'smtp',
-            default => ((int)$port === 465 ? 'smtps' : 'smtp'),
-        };
-        $username    = SiteSetting::get('mail_username', config('mail.mailers.smtp.username'));
         $fromAddress = SiteSetting::get('mail_from_address', config('mail.from.address'));
         $fromName    = SiteSetting::get('mail_from_name', config('mail.from.name'));
+
 
         $this->info('─────────────────────────────────────────');
         $this->info('  SMTP Configuration');
         $this->info('─────────────────────────────────────────');
-        $this->line("  Host     : {$host}");
-        $this->line("  Port     : {$port}");
-        $this->line("  Scheme   : {$scheme}");
-        $this->line("  Username : {$username}");
-        $this->line("  From     : {$fromAddress} ({$fromName})");
-        $this->line("  To       : {$to}");
+        $this->line('  Host     : ' . SiteSetting::get('mail_host', config('mail.mailers.smtp.host')));
+        $this->line('  Port     : ' . SiteSetting::get('mail_port', config('mail.mailers.smtp.port')));
+        $this->line('  Username : ' . SiteSetting::get('mail_username', config('mail.mailers.smtp.username')));
+        $this->line('  From     : ' . SiteSetting::get('mail_from_address', config('mail.from.address')) . ' (' . SiteSetting::get('mail_from_name', config('mail.from.name')) . ')');
+        $this->line('  To       : ' . $to);
         $this->info('─────────────────────────────────────────');
 
-        config([
-            'mail.default'               => SiteSetting::get('mail_mailer', config('mail.default', 'smtp')),
-            'mail.mailers.smtp.host'     => $host,
-            'mail.mailers.smtp.port'     => (int) $port,
-            'mail.mailers.smtp.scheme'   => $scheme,
-            'mail.mailers.smtp.username' => $username,
-            'mail.mailers.smtp.password' => SiteSetting::get('mail_password', config('mail.mailers.smtp.password')),
-            'mail.from.address'          => $fromAddress,
-            'mail.from.name'             => $fromName,
-        ]);
-
-        app('mail.manager')->purge('smtp');
+        MailHelper::applySmtpSettings();
 
         $this->info('Sending test email...');
 
