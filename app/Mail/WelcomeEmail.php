@@ -4,19 +4,15 @@ namespace App\Mail;
 
 use App\Models\SiteSetting;
 use App\Models\User;
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 class WelcomeEmail extends Mailable
 {
-    use Queueable, SerializesModels;
-
-    // Pre-fetched settings — resolved in the constructor so any DB error
-    // is caught by the try-catch in RegisteredUserController, not inside
-    // the Blade template where it would silently break rendering.
+    // All data pre-fetched in the constructor so:
+    //  (a) any DB error is caught by the caller's try-catch
+    //  (b) no SiteSetting calls run inside Blade or envelope() outside the catch
     public string $subheading;
     public string $bodyText;
     public string $feat1Title;
@@ -33,11 +29,13 @@ class WelcomeEmail extends Mailable
     public string $step3Desc;
     public string $buttonText;
     public string $securityNote;
+    public string $emailSubject;
 
     public function __construct(
-        public readonly User   $user,
-        public readonly string $verificationUrl,
+        public User   $user,
+        public string $verificationUrl,
     ) {
+        $this->emailSubject = SiteSetting::get('welcome_email_subject', 'Welcome to Baddies Club – Please Verify Your Email');
         $this->subheading   = SiteSetting::get('welcome_email_subheading', "Your account has been created. You're now part of Kenya's most exclusive companion network.");
         $this->bodyText     = SiteSetting::get('welcome_email_body', "We're thrilled to have you join Kenyan Baddies Club — a premium, members-only platform connecting Kenya's most exclusive companions with discerning clients.\n\nTo activate your account and unlock full access, please verify your email address by clicking the button below. Your verification link expires in 60 minutes.");
         $this->feat1Title   = SiteSetting::get('welcome_email_feat1_title', 'VIP Profiles');
@@ -58,12 +56,8 @@ class WelcomeEmail extends Mailable
 
     public function envelope(): Envelope
     {
-        $subject = SiteSetting::get(
-            'welcome_email_subject',
-            'Welcome to Baddies Club – Please Verify Your Email'
-        );
-
-        return new Envelope(subject: $subject);
+        // Use the pre-fetched subject — no DB call here
+        return new Envelope(subject: $this->emailSubject);
     }
 
     public function content(): Content

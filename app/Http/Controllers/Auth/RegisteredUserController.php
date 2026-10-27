@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeEmail;
-use App\Models\SiteSetting;
 use App\Support\MailHelper;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -199,40 +198,43 @@ class RegisteredUserController extends Controller
         try {
             $log->info('[WelcomeEmail] Starting for user: ' . $user->id . ' / ' . $user->email);
 
-            $subject = SiteSetting::get('welcome_email_subject', 'Welcome to Baddies Club');
-
-            $log->info('[WelcomeEmail] SMTP — host: ' . SiteSetting::get('mail_host', config('mail.mailers.smtp.host')) . ' port: ' . SiteSetting::get('mail_port', config('mail.mailers.smtp.port', 465)) . ' user: ' . SiteSetting::get('mail_username', config('mail.mailers.smtp.username')));
-
             $verificationUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes(60),
                 ['id' => $user->id, 'hash' => sha1($user->email)]
             );
 
-            // Apply admin-panel SMTP settings (with .env fallback)
+            // Build the mailable first — all SiteSetting DB calls happen here
+            // inside the try-catch so any error is properly logged
+            $mailable = new WelcomeEmail($user, $verificationUrl);
+
+            $log->info('[WelcomeEmail] SMTP — host: ' . config('mail.mailers.smtp.host') . ' port: ' . config('mail.mailers.smtp.port') . ' user: ' . config('mail.mailers.smtp.username'));
+
+            // Apply admin-panel SMTP settings (with .env fallback) then send
+            // Use mailer('smtp') explicitly — same pattern as the working TestSmtp command
             MailHelper::applySmtpSettings();
 
-            $log->info('[WelcomeEmail] Calling Mail::to()->sendNow() now...');
+            $log->info('[WelcomeEmail] Calling Mail::mailer(smtp)->to()->send() now...');
 
-            // sendNow() sends synchronously (not via queue), ensuring the
-            // runtime config override above is active when the mailer connects.
-            Mail::to($user->email, $user->name)
-                ->sendNow(new WelcomeEmail($user, $verificationUrl));
+            Mail::mailer('smtp')
+                ->to($user->email, $user->name)
+                ->send($mailable);
 
             // ── Log success ──────────────────────────────────────────────────
             \App\Models\EmailLog::create([
                 'user_id'        => $user->id,
                 'recipient_email'=> $user->email,
                 'recipient_name' => $user->name,
-                'subject'        => $subject,
+                'subject'        => $mailable->emailSubject,
                 'type'           => 'welcome',
                 'status'         => 'sent',
             ]);
 
             $log->info('[WelcomeEmail] SUCCESS — email sent to ' . $user->email);
 
-        } catch (\Exception $e) {
-            $log->error('[WelcomeEmail] FAILED for user ' . $user->id . ': ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            // Catch Throwable (not just Exception) to also catch PHP fatal errors
+            $log->error('[WelcomeEmail] FAILED for user ' . $user->id . ': ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
 
             // ── Log failure ──────────────────────────────────────────────────
             \App\Models\EmailLog::create([
@@ -242,7 +244,7 @@ class RegisteredUserController extends Controller
                 'subject'        => 'Welcome to Baddies Club',
                 'type'           => 'welcome',
                 'status'         => 'failed',
-                'error_message'  => $e->getMessage(),
+                'error_message'  => $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')',
             ]);
         }
     }
