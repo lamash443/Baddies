@@ -5,11 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\EmailLogResource\Pages;
 use App\Models\EmailLog;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -115,7 +115,7 @@ class EmailLogResource extends Resource
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\Action::make('resend')
+                Action::make('resend')
                     ->label('Resend')
                     ->icon('heroicon-m-arrow-path')
                     ->color('warning')
