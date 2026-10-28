@@ -1,4 +1,5 @@
 <x-mail::message>
+<x-slot:preheader>Welcome to Kenyan Baddies Club — verify your email to activate your account.</x-slot:preheader>
 # {{ $subheading }}
 
 Hi **{{ $user->name }}**, welcome aboard.

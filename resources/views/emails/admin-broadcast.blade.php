@@ -1,4 +1,5 @@
 <x-mail::message>
+<x-slot:preheader>Important message from the Kenyan Baddies Club team — open to read.</x-slot:preheader>
 @if(!empty($recipientName))
 Hi **{{ $recipientName }}**,
 @else

@@ -21,6 +21,7 @@
 @endphp
 
 <x-mail::message>
+<x-slot:preheader>You have received a reply to your support ticket — tap to read the full response.</x-slot:preheader>
 # Support Ticket Reply
 
 Hi **{{ $ticket->name }}**,

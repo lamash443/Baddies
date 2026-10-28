@@ -25,6 +25,11 @@
 </head>
 <body>
 
+{{-- Preheader: hidden text shown as inbox preview snippet --}}
+@if(!empty($preheader))
+<div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">{{ $preheader }}</div>
+@endif
+
 <table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
 <tr>
 <td align="center">

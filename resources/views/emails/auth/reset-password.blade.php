@@ -192,6 +192,10 @@
   </style>
 </head>
 <body>
+
+  {{-- Preheader: hidden inbox preview text --}}
+  <div style="display:none;font-size:1px;color:#0d0d0f;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">Reset your password — click the link inside to set a new password. Valid for 60 minutes.</div>
+
   <div class="email-wrapper">
     <div class="email-container">
 
