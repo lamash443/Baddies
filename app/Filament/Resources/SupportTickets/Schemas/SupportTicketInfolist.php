@@ -15,7 +15,11 @@ class SupportTicketInfolist
             ->components([
                 Section::make('Ticket Details')
                     ->schema([
-                        Grid::make(3)->schema([
+                        Grid::make(4)->schema([
+                            TextEntry::make('reference')
+                                ->label('Ticket Reference')
+                                ->badge()
+                                ->color('warning'),
                             TextEntry::make('user.name')
                                 ->label('Associated User')
                                 ->placeholder('Guest Ticket'),

@@ -142,10 +142,29 @@
 
         <div class="dash-card">
 
-          <h2 class="dash-card-title justify-content-center">Create Support <span>Ticket</span></h2>
+          <h2 class="dash-card-title justify-content-center">
+            @if(request('ticket_ref'))
+              Reply to Support <span>Ticket</span>
+            @else
+              Create Support <span>Ticket</span>
+            @endif
+          </h2>
+
+          @if(request('ticket_ref'))
+            <div style="background: rgba(255,140,0,0.12); border: 1px solid rgba(255,140,0,0.35); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <div>
+                <div style="font-weight: 800; color: #ff8c00; font-size: 0.95rem;">Replying to Support Ticket</div>
+                <div style="font-size: 0.85rem; color: rgba(255,255,255,0.75);">Reference: <strong style="color: #fff;">#{{ request('ticket_ref') }}</strong></div>
+              </div>
+              <span class="ticket-badge-user">Follow-Up</span>
+            </div>
+          @endif
 
           <form action="{{ route('contact.submit') }}" method="POST">
             @csrf
+            @if(request('ticket_ref'))
+              <input type="hidden" name="ticket_ref" value="{{ request('ticket_ref') }}">
+            @endif
 
             @auth
               <!-- For Logged In Users -->
@@ -169,7 +188,7 @@
               <div class="row g-3 mb-3">
                 <div class="col-12 col-md-6">
                   <label class="form-label" for="name">Your Name</label>
-                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required maxlength="50" value="{{ old('name') }}">
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter your name" required maxlength="50" value="{{ old('name', request('name')) }}">
                   <div class="char-counter" id="name-counter">0 / 50</div>
                   @error('name')
                     <div class="text-danger small mt-1">{{ $message }}</div>
@@ -177,7 +196,7 @@
                 </div>
                 <div class="col-12 col-md-6">
                   <label class="form-label" for="email">Your Email Address</label>
-                  <input type="email" name="email" id="email" class="form-control" placeholder="e.g. you@gmail.com" required maxlength="50" value="{{ old('email') }}" autocomplete="email" inputmode="email">
+                  <input type="email" name="email" id="email" class="form-control" placeholder="e.g. you@gmail.com" required maxlength="50" value="{{ old('email', request('email')) }}" autocomplete="email" inputmode="email">
                   <div class="char-counter" id="email-counter">0 / 50</div>
                   @error('email')
                     <div class="text-danger small mt-1">{{ $message }}</div>
@@ -188,7 +207,7 @@
 
             <div class="mb-3">
               <label class="form-label" for="subject">Subject / Purpose</label>
-              <input type="text" name="subject" id="subject" class="form-control" placeholder="How can we help you?" required maxlength="80" value="{{ old('subject') }}">
+              <input type="text" name="subject" id="subject" class="form-control" placeholder="How can we help you?" required maxlength="80" value="{{ old('subject', request('subject', (request('ticket_ref') ? 'Re: Ticket #' . request('ticket_ref') : ''))) }}">
               <div class="char-counter" id="subject-counter">0 / 80</div>
               @error('subject')
                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -197,7 +216,7 @@
 
             <div class="mb-4">
               <label class="form-label" for="message">Detailed Message</label>
-              <textarea name="message" id="message" rows="5" class="form-control" placeholder="Please describe your issue or query in detail..." required maxlength="600">{{ old('message') }}</textarea>
+              <textarea name="message" id="message" rows="5" class="form-control" placeholder="{{ request('ticket_ref') ? 'Type your reply to this ticket here...' : 'Please describe your issue or query in detail...' }}" required maxlength="600">{{ old('message') }}</textarea>
               <div class="char-counter" id="message-counter">0 / 600</div>
               @error('message')
                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -205,7 +224,11 @@
             </div>
 
             <button type="submit" class="btn btn-orange w-100 fw-bold py-3 mt-2 shadow">
-              Submit Support Request
+              @if(request('ticket_ref'))
+                Send Reply
+              @else
+                Submit Support Request
+              @endif
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="ms-1"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
           </form>

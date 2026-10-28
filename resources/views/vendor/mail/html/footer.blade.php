@@ -5,6 +5,11 @@
       $appHost = 'kenyanbaddies.com';
   }
   $supportEmail = \App\Models\SiteSetting::get('support_email') ?: ('support@' . $appHost);
+
+  $contactUrl = url('/contact');
+  if (str_contains($contactUrl, '127.0.0.1') || str_contains($contactUrl, 'localhost')) {
+      $contactUrl = 'https://kenyanbaddies.com/contact';
+  }
 @endphp
 <tr>
 <td style="padding-bottom: 6px;">
@@ -16,7 +21,7 @@
     <td class="content-cell" align="center" style="padding: 24px 32px 28px;">
       <p style="margin: 0 0 6px; font-size: 12px; color: #71717a;">
         Need help?
-        <a href="mailto:{{ $supportEmail }}" style="color: #ff8c00; text-decoration: none;">{{ $supportEmail }}</a>
+        <a href="{{ $contactUrl }}" style="color: #ff8c00; text-decoration: none; font-weight: 600;">{{ $supportEmail }}</a>
       </p>
       <p style="margin: 8px 0 4px; font-size: 11px; color: #52525b; letter-spacing: 0.5px; text-transform: uppercase;">
         © {{ date('Y') }} {{ $appName }} &middot; All rights reserved

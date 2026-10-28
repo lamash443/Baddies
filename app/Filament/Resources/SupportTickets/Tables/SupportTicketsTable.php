@@ -16,6 +16,12 @@ class SupportTicketsTable
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                TextColumn::make('reference')
+                    ->label('Ref')
+                    ->badge()
+                    ->color('warning')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('user.name')
                     ->label('Associated User')
                     ->searchable()

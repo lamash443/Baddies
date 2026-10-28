@@ -29,9 +29,19 @@ class SupportTicketReply extends Mailable
         $fromAddress = trim((string) SiteSetting::get('mail_from_address')) ?: config('mail.from.address', 'noreply@kenyanbaddies.com');
         $fromName    = trim((string) SiteSetting::get('mail_from_name')) ?: config('mail.from.name', 'Kenyan Baddies Club');
 
+        $refSuffix = ' [#' . $this->ticket->reference . ']';
+        $cleanSubject = $this->ticket->subject;
+        if (!str_starts_with(strtolower($cleanSubject), 're:')) {
+            $cleanSubject = 'Re: ' . $cleanSubject;
+        }
+        if (!str_contains($cleanSubject, $this->ticket->reference)) {
+            $cleanSubject .= $refSuffix;
+        }
+
         return new Envelope(
             from: new Address($fromAddress, $fromName),
-            subject: 'Re: ' . $this->ticket->subject,
+            replyTo: [new Address($fromAddress, $fromName)],
+            subject: $cleanSubject,
         );
     }
 

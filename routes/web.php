@@ -820,18 +820,35 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     $subject = $stripFn($data['subject']);
     $message = $stripFn($data['message']);
 
-    \App\Models\SupportTicket::create([
-        'user_id' => auth()->id(),
-        'name'    => $name,
-        'email'   => $email,
-        'subject' => $subject,
-        'message' => $message,
-        'status'  => 'pending',
+    $ticketRef = trim((string) $request->input('ticket_ref', ''));
+    if (empty($ticketRef) && preg_match('/KB-[A-Z0-9]{6}/i', $subject, $matches)) {
+        $ticketRef = strtoupper($matches[0]);
+    }
+
+    if (!empty($ticketRef)) {
+        // Reopen original ticket if it was resolved
+        \App\Models\SupportTicket::where('reference', $ticketRef)
+            ->where('status', 'resolved')
+            ->update(['status' => 'pending']);
+    }
+
+    $ticket = \App\Models\SupportTicket::create([
+        'user_id'   => auth()->id(),
+        'reference' => !empty($ticketRef) ? $ticketRef : \App\Models\SupportTicket::generateReference(),
+        'name'      => $name,
+        'email'     => $email,
+        'subject'   => $subject,
+        'message'   => $message,
+        'status'    => 'pending',
     ]);
 
     \Illuminate\Support\Facades\RateLimiter::hit($key, 1440 * 60); // 24 hours
 
-    return back()->with('success', 'Your support ticket has been submitted. Our team will review it soon.');
+    $successMsg = !empty($ticketRef)
+        ? "Your reply to support ticket #{$ticket->reference} has been received. Our team will review it shortly."
+        : "Your support ticket #{$ticket->reference} has been submitted. Our team will review it soon.";
+
+    return back()->with('success', $successMsg);
 })->name('contact.submit');
 
 Route::get('/terms', function () {
