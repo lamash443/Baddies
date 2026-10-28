@@ -794,61 +794,82 @@ Route::get('/contact', function () {
 })->name('contact');
 
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
-    $key = 'contact-support:' . $request->ip();
+    try {
+        $key = 'contact-support:' . $request->ip();
 
-    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
-        return back()->with('throttle_error', 'You have reached the 3 message limit for today. Please try again in 24 hours.');
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+            return back()->with('throttle_error', 'You have reached the 3 message limit for today. Please try again in 24 hours.');
+        }
+
+        $rules = [
+            'subject' => ['required', 'string', 'max:80', 'regex:/^[\p{L}\p{M}\p{N}\p{P}\p{Zs} .,!?\-]{1,80}$/u'],
+            'message' => ['required', 'string', 'min:5', 'max:600'],
+        ];
+
+        if (!auth()->check()) {
+            $rules['name']  = ['required', 'string', 'max:50', 'regex:/^[\p{L}\p{M} ]+$/u'];
+            $rules['email'] = ['required', 'email', 'max:50'];
+        }
+
+        $data = $request->validate($rules);
+
+        // Server-side strip of emojis and control characters from text fields
+        $stripFn = fn(string $s) => preg_replace('/[\x{1F000}-\x{1FFFF}\x{2600}-\x{27FF}\x{2300}-\x{23FF}\x{FE00}-\x{FE0F}\x{1F900}-\x{1F9FF}\x{200D}\x{FEFF}]/u', '', $s);
+
+        $name    = auth()->check() ? auth()->user()->name : $stripFn($data['name']);
+        $email   = auth()->check() ? auth()->user()->email : preg_replace('/[^a-zA-Z0-9@.\-_+]/', '', $data['email']);
+        $subject = $stripFn($data['subject']);
+        $message = $stripFn($data['message']);
+
+        $ticketRef = trim((string) $request->input('ticket_ref', ''));
+        if (empty($ticketRef) && preg_match('/KB-[A-Z0-9]{6}/i', $subject, $matches)) {
+            $ticketRef = strtoupper($matches[0]);
+        }
+
+        $hasRefCol = \App\Models\SupportTicket::hasReferenceColumn();
+
+        if (!empty($ticketRef) && $hasRefCol) {
+            try {
+                \App\Models\SupportTicket::where('reference', $ticketRef)
+                    ->where('status', 'resolved')
+                    ->update(['status' => 'pending']);
+            } catch (\Throwable $e) {
+                // Ignore query error if column not ready
+            }
+        }
+
+        $ticketPayload = [
+            'user_id' => auth()->id(),
+            'name'    => $name,
+            'email'   => $email,
+            'subject' => $subject,
+            'message' => $message,
+            'status'  => 'pending',
+        ];
+
+        if ($hasRefCol) {
+            $ticketPayload['reference'] = !empty($ticketRef) ? $ticketRef : \App\Models\SupportTicket::generateReference();
+        }
+
+        $ticket = \App\Models\SupportTicket::create($ticketPayload);
+
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 1440 * 60); // 24 hours
+
+        $finalRef = $ticket->reference ?? $ticketRef;
+        $successMsg = !empty($ticketRef)
+            ? "Your reply to support ticket #{$finalRef} has been received. Our team will review it shortly."
+            : "Your support ticket #{$finalRef} has been submitted. Our team will review it soon.";
+
+        return back()->with('success', $successMsg);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        throw $e;
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error('[ContactSubmit] Error: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
+        return back()
+            ->withInput()
+            ->with('error', 'Something went wrong while submitting your ticket. Please try again.');
     }
-
-    $rules = [
-        'subject' => ['required', 'string', 'max:80', 'regex:/^[\p{L}\p{M}\p{N}\p{P}\p{Zs} .,!?\-]{1,80}$/u'],
-        'message' => ['required', 'string', 'min:5', 'max:600'],
-    ];
-
-    if (!auth()->check()) {
-        $rules['name']  = ['required', 'string', 'max:50', 'regex:/^[\p{L}\p{M} ]+$/u'];
-        $rules['email'] = ['required', 'email', 'max:50'];
-    }
-
-    $data = $request->validate($rules);
-
-    // Server-side strip of emojis and control characters from text fields
-    $stripFn = fn(string $s) => preg_replace('/[\x{1F000}-\x{1FFFF}\x{2600}-\x{27FF}\x{2300}-\x{23FF}\x{FE00}-\x{FE0F}\x{1F900}-\x{1F9FF}\x{200D}\x{FEFF}]/u', '', $s);
-
-    $name    = auth()->check() ? auth()->user()->name : $stripFn($data['name']);
-    $email   = auth()->check() ? auth()->user()->email : preg_replace('/[^a-zA-Z0-9@.\-_+]/', '', $data['email']);
-    $subject = $stripFn($data['subject']);
-    $message = $stripFn($data['message']);
-
-    $ticketRef = trim((string) $request->input('ticket_ref', ''));
-    if (empty($ticketRef) && preg_match('/KB-[A-Z0-9]{6}/i', $subject, $matches)) {
-        $ticketRef = strtoupper($matches[0]);
-    }
-
-    if (!empty($ticketRef)) {
-        // Reopen original ticket if it was resolved
-        \App\Models\SupportTicket::where('reference', $ticketRef)
-            ->where('status', 'resolved')
-            ->update(['status' => 'pending']);
-    }
-
-    $ticket = \App\Models\SupportTicket::create([
-        'user_id'   => auth()->id(),
-        'reference' => !empty($ticketRef) ? $ticketRef : \App\Models\SupportTicket::generateReference(),
-        'name'      => $name,
-        'email'     => $email,
-        'subject'   => $subject,
-        'message'   => $message,
-        'status'    => 'pending',
-    ]);
-
-    \Illuminate\Support\Facades\RateLimiter::hit($key, 1440 * 60); // 24 hours
-
-    $successMsg = !empty($ticketRef)
-        ? "Your reply to support ticket #{$ticket->reference} has been received. Our team will review it shortly."
-        : "Your support ticket #{$ticket->reference} has been submitted. Our team will review it soon.";
-
-    return back()->with('success', $successMsg);
 })->name('contact.submit');
 
 Route::get('/terms', function () {

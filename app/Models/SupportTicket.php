@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -14,7 +15,7 @@ class SupportTicket extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['subject', 'status', 'reference'])
+            ->logOnly(['subject', 'status'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
@@ -29,11 +30,42 @@ class SupportTicket extends Model
         'status',
     ];
 
+    /**
+     * Check if 'reference' column physically exists in support_tickets table,
+     * and auto-creates it on the fly if missing on the production server.
+     */
+    public static function hasReferenceColumn(): bool
+    {
+        static $hasCol = null;
+        if ($hasCol !== null) {
+            return $hasCol;
+        }
+
+        try {
+            if (Schema::hasTable('support_tickets')) {
+                if (!Schema::hasColumn('support_tickets', 'reference')) {
+                    Schema::table('support_tickets', function ($table) {
+                        $table->string('reference', 20)->nullable()->index()->after('id');
+                    });
+                }
+                return $hasCol = true;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[SupportTicket] Reference column check/create notice: ' . $e->getMessage());
+        }
+
+        return $hasCol = false;
+    }
+
     protected static function booted(): void
     {
         static::creating(function (SupportTicket $ticket) {
-            if (empty($ticket->reference)) {
-                $ticket->reference = static::generateReference();
+            if (static::hasReferenceColumn()) {
+                if (empty($ticket->attributes['reference'])) {
+                    $ticket->attributes['reference'] = static::generateReference();
+                }
+            } else {
+                unset($ticket->attributes['reference']);
             }
         });
     }
@@ -56,11 +88,20 @@ class SupportTicket extends Model
             for ($i = 0; $i < 4; $i++) {
                 $code .= $all[random_int(0, strlen($all) - 1)];
             }
-            // Shuffle the 6 characters after KB- so order is unpredictable
+            // Shuffle characters after KB-
             $parts = str_split(substr($code, 3));
             shuffle($parts);
             $finalRef = 'KB-' . implode('', $parts);
-        } while (static::where('reference', $finalRef)->exists());
+
+            $exists = false;
+            if (static::hasReferenceColumn()) {
+                try {
+                    $exists = static::where('reference', $finalRef)->exists();
+                } catch (\Throwable $e) {
+                    $exists = false;
+                }
+            }
+        } while ($exists);
 
         return $finalRef;
     }
@@ -75,7 +116,8 @@ class SupportTicket extends Model
         }
 
         // Deterministic fallback for records created before the reference column
-        $hash = strtoupper(substr(md5('kb-ticket-' . $this->id), 0, 6));
+        $id = $this->id ?? 1;
+        $hash = strtoupper(substr(md5('kb-ticket-' . $id), 0, 6));
         return 'KB-' . $hash;
     }
 
