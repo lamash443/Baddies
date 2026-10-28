@@ -2,7 +2,29 @@
 @php
   $appName    = config('app.name', 'Kenyan Baddies Club');
   $logoPath   = \App\Models\SiteSetting::get('logo');
-  $logoUrl    = $logoPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath) ? url('storage/' . $logoPath) : null;
+  $logoUrl    = null;
+
+  if ($logoPath) {
+      if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+          $logoUrl = $logoPath;
+      } else {
+          $cleanPath = ltrim(preg_replace('#^storage/#', '', $logoPath), '/');
+          if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
+              $logoUrl = url('storage/' . $cleanPath);
+          } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('site/' . $cleanPath)) {
+              $logoUrl = url('storage/site/' . $cleanPath);
+          }
+      }
+  }
+
+  // Force HTTPS live domain if url() generated 127.0.0.1 or localhost
+  if ($logoUrl && (str_contains($logoUrl, '127.0.0.1') || str_contains($logoUrl, 'localhost'))) {
+      $logoUrl = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $logoUrl);
+  }
+
+  $brandUrl = (!empty($url) && !str_contains($url, '127.0.0.1') && !str_contains($url, 'localhost'))
+      ? $url
+      : 'https://kenyanbaddies.com';
 @endphp
 <tr>
 <td class="header" style="padding: 0;">
@@ -13,7 +35,7 @@
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
   <tr>
     <td align="center" style="padding: 28px 32px 22px; background: linear-gradient(180deg, rgba(255,140,0,0.06) 0%, transparent 100%); border-bottom: 1px solid rgba(255,140,0,0.1);">
-      <a href="{{ $url }}" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none;">
+      <a href="{{ $brandUrl }}" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none;">
 
         @if($logoUrl)
           {{-- Use the uploaded site logo --}}

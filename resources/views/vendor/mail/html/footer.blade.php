@@ -1,7 +1,10 @@
 @php
   $appName   = config('app.name', 'Kenyan Baddies Club');
-  $appHost   = parse_url(config('app.url', 'http://127.0.0.1:8000'), PHP_URL_HOST) ?: '127.0.0.1:8000';
-  $supportEmail = 'support@' . $appHost;
+  $appHost   = parse_url(config('app.url', 'https://kenyanbaddies.com'), PHP_URL_HOST) ?: 'kenyanbaddies.com';
+  if ($appHost === '127.0.0.1' || $appHost === 'localhost') {
+      $appHost = 'kenyanbaddies.com';
+  }
+  $supportEmail = \App\Models\SiteSetting::get('support_email') ?: ('support@' . $appHost);
 @endphp
 <tr>
 <td style="padding-bottom: 6px;">

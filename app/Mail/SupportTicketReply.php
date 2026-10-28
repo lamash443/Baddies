@@ -2,10 +2,11 @@
 
 namespace App\Mail;
 
+use App\Models\SiteSetting;
 use App\Models\SupportTicket;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -15,24 +16,21 @@ class SupportTicketReply extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public SupportTicket $ticket;
-    public string $replyMessage;
-
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(SupportTicket $ticket, string $replyMessage)
-    {
-        $this->ticket = $ticket;
-        $this->replyMessage = $replyMessage;
-    }
+    public function __construct(
+        public SupportTicket $ticket,
+        public string $replyMessage,
+    ) {}
 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
+        $fromAddress = trim((string) SiteSetting::get('mail_from_address')) ?: config('mail.from.address', 'noreply@kenyanbaddies.com');
+        $fromName    = trim((string) SiteSetting::get('mail_from_name')) ?: config('mail.from.name', 'Kenyan Baddies Club');
+
         return new Envelope(
+            from: new Address($fromAddress, $fromName),
             subject: 'Re: ' . $this->ticket->subject,
         );
     }
@@ -43,7 +41,7 @@ class SupportTicketReply extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.support-ticket-reply',
+            markdown: 'emails.support-ticket-reply',
         );
     }
 
