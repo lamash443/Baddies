@@ -68,14 +68,7 @@
     .body {
       padding: 36px 40px 32px;
     }
-    .icon-wrap {
-      width: 64px; height: 64px;
-      border-radius: 50%;
-      background: rgba(255,140,0,0.08);
-      border: 1.5px solid rgba(255,140,0,0.25);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 24px;
-    }
+
     .email-title {
       font-size: 22px;
       font-weight: 800;
@@ -207,12 +200,25 @@
 
       <!-- Header / Brand -->
       @php
-        $setting  = \App\Models\Setting::getSettings();
-        $logoPath = $setting->logo ?? null;
-        $logoUrl  = $logoPath ? url('storage/' . $logoPath) : null;
+        $logoPath = \App\Models\SiteSetting::get('logo');
+        $logoUrl  = null;
+        if ($logoPath) {
+            if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+                $logoUrl = $logoPath;
+            } else {
+                $cleanPath = ltrim(preg_replace('#^storage/#', '', $logoPath), '/');
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
+                    $logoUrl = url('storage/' . $cleanPath);
+                }
+            }
+        }
+        if ($logoUrl && (str_contains($logoUrl, '127.0.0.1') || str_contains($logoUrl, 'localhost'))) {
+            $logoUrl = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $logoUrl);
+        }
+        $brandUrl = 'https://kenyanbaddies.com';
       @endphp
       <div class="header">
-        <a href="{{ $appUrl }}" class="brand">
+        <a href="{{ $brandUrl }}" class="brand">
           @if($logoUrl)
             <img src="{{ $logoUrl }}" alt="{{ $appName }}" style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
           @else
@@ -230,21 +236,9 @@
       <!-- Body -->
       <div class="body">
 
-        <!-- Lock icon -->
-        <div style="text-align:center;">
-          <div class="icon-wrap" style="display:inline-flex;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </div>
-        </div>
-
-        <div style="height:20px;"></div>
-
         <p class="email-title">Reset Your Password</p>
         <p class="email-subtitle">
-          Hi{{ $user->name ? ', ' . $user->name : '' }} 👋<br>
+          Hi{{ $user->name ? ', ' . $user->name : '' }},<br>
           We received a request to reset the password for your account.
         </p>
 
@@ -263,7 +257,7 @@
         <!-- Warning box -->
         <div class="info-box">
           <p>
-            <strong>⚠ Didn't request this?</strong><br>
+            <strong>Didn't request this?</strong><br>
             If you did not request a password reset, you can safely ignore this email.
             Your password will <strong>not</strong> change unless you click the link above.
           </p>
@@ -282,7 +276,8 @@
         <p>© {{ date('Y') }} <strong style="color:#52525b;">{{ $appName }}</strong> · All rights reserved.</p>
         <p>
           Need help?
-          <a href="mailto:support@{{ parse_url($appUrl, PHP_URL_HOST) }}">support@{{ parse_url($appUrl, PHP_URL_HOST) }}</a>
+          @php $supportEmail = \App\Models\SiteSetting::get('support_email') ?: 'support@kenyanbaddies.com'; @endphp
+          <a href="https://kenyanbaddies.com/contact" style="color: #52525b;">{{ $supportEmail }}</a>
         </p>
         <p class="footer-brand">This is an automated email — please do not reply directly.</p>
       </div>
