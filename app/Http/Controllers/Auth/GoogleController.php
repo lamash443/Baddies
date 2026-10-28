@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
+use App\Models\EmailLog;
 use App\Models\User;
 use App\Models\SiteSetting;
+use App\Support\MailHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -171,6 +176,9 @@ class GoogleController extends Controller
                     ->causedBy($newUser)
                     ->log('Registered account via Google OAuth');
 
+                // Send welcome email (same as email registration flow)
+                $this->sendWelcomeEmail($newUser);
+
                 return $this->redirectAgeVerified('/dashboard')
                     ->with('login_success', 'Welcome to Kenyan Baddies Club, ' . $newUser->name . '! Your account has been created via Google.');
             }
@@ -261,6 +269,63 @@ class GoogleController extends Controller
                 ->with('toast_type', 'danger')
                 ->with('toast_title', 'Google Login Failed')
                 ->with('toast_msg', 'Google authentication failed. Please try again or use email and password.');
+        }
+    }
+
+    /**
+     * Apply admin-panel SMTP settings and dispatch the welcome email.
+     * Mirrors RegisteredUserController::sendWelcomeEmail().
+     */
+    protected function sendWelcomeEmail(User $user): void
+    {
+        $log = Log::channel('single');
+
+        try {
+            $log->info('[WelcomeEmail/Google] Starting for user: ' . $user->id . ' / ' . $user->email);
+
+            // 1. Apply admin-panel SMTP settings
+            MailHelper::applySmtpSettings();
+
+            $log->info('[WelcomeEmail/Google] SMTP — host: ' . config('mail.mailers.smtp.host') . ' port: ' . config('mail.mailers.smtp.port') . ' user: ' . config('mail.mailers.smtp.username') . ' from: ' . config('mail.from.address'));
+
+            // 2. Generate a signed verification URL.
+            //    Google users have email_verified_at already set, but the welcome email
+            //    template uses this URL for the "Get Started" CTA button.
+            $verificationUrl = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->id, 'hash' => sha1($user->email)]
+            );
+
+            // 3. Build and send the mailable
+            $mailable = new WelcomeEmail($user, $verificationUrl);
+
+            Mail::to($user->email, $user->name)->send($mailable);
+
+            // 4. Log success
+            EmailLog::create([
+                'user_id'         => $user->id,
+                'recipient_email' => $user->email,
+                'recipient_name'  => $user->name,
+                'subject'         => $mailable->emailSubject,
+                'type'            => 'welcome',
+                'status'          => 'sent',
+            ]);
+
+            $log->info('[WelcomeEmail/Google] SUCCESS — email sent to ' . $user->email);
+
+        } catch (\Throwable $e) {
+            $log->error('[WelcomeEmail/Google] FAILED for user ' . $user->id . ': ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
+
+            EmailLog::create([
+                'user_id'         => $user->id,
+                'recipient_email' => $user->email,
+                'recipient_name'  => $user->name,
+                'subject'         => isset($mailable) ? $mailable->emailSubject : 'Welcome to Kenyan Baddies Club',
+                'type'            => 'welcome',
+                'status'          => 'failed',
+                'error_message'   => $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')',
+            ]);
         }
     }
 }
