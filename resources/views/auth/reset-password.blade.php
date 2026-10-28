@@ -50,6 +50,8 @@
       position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
       background: none; border: none; padding: 0; cursor: pointer;
       color: rgba(255,255,255,0.4); transition: color 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px;
     }
     .pw-toggle-btn:hover { color: #ff8c00; }
 
@@ -209,7 +211,7 @@
         <label class="field-label" for="email">Email Address</label>
         <input
           id="email"
-          class="form-control auth-custom-input"
+          class="form-control auth-custom-input {{ $errors->has('email') ? 'border-danger' : '' }}"
           type="email"
           name="email"
           value="{{ old('email', $request->email) }}"
@@ -217,6 +219,9 @@
           placeholder="your@email.com"
           maxlength="40"
         >
+        @error('email')
+          <div class="small mt-1" style="color:#ff6b6b; font-weight:500;">{{ $message }}</div>
+        @enderror
       </div>
 
       {{-- New Password --}}
@@ -235,8 +240,10 @@
             oninput="checkStrength(this.value)"
           >
           <button type="button" class="pw-toggle-btn" onclick="togglePw('password', this)" tabindex="-1" aria-label="Show password">
-            <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="eye-closed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path class="eye-show" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle class="eye-show" cx="12" cy="12" r="3"/>
+              <path class="eye-hide" style="display:none" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/>
+            </svg>
           </button>
         </div>
         <!-- Strength bar -->
@@ -331,6 +338,68 @@
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Resetting...';
   });
 </script>
+
+@if(session('link_expired') || (isset($tokenExpired) && $tokenExpired))
+<style>
+  .expired-overlay {
+    position: fixed; inset: 0; z-index: 1100;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+    animation: fadeBgIn .3s ease both;
+  }
+  @keyframes fadeBgIn { from{opacity:0} to{opacity:1} }
+  .expired-card {
+    background: #111;
+    border: 1px solid rgba(220,53,69,0.4);
+    border-top: 3px solid #dc3545;
+    border-radius: 1.25rem;
+    padding: 2.25rem 2rem;
+    max-width: 420px; width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    animation: cardIn .4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(30px) scale(.94)} to{opacity:1;transform:translateY(0) scale(1)} }
+  .expired-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(220,53,69,0.1);
+    border: 1.5px solid rgba(220,53,69,0.35);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #ff4d4d;
+  }
+  .expired-title { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: .5rem; }
+  .expired-msg   { font-size: .9rem; color: rgba(255,255,255,.55); line-height: 1.65; margin-bottom: 1.75rem; }
+  .btn-new-link {
+    display: inline-block;
+    background: #ff8c00; color: #000 !important;
+    font-weight: 700; font-size: .95rem;
+    padding: .75rem 2rem; border-radius: .75rem;
+    text-decoration: none; letter-spacing: .02em;
+    transition: all .2s;
+  }
+  .btn-new-link:hover { background: #e07b00; transform: translateY(-1px); }
+  .expired-dismiss { display: block; margin-top: 1rem; font-size: .8rem; color: rgba(255,255,255,.3); cursor: pointer; background: none; border: none; }
+  .expired-dismiss:hover { color: rgba(255,255,255,.6); }
+</style>
+<div class="expired-overlay" id="expiredOverlay">
+  <div class="expired-card">
+    <div class="expired-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <p class="expired-title">Link Expired</p>
+    <p class="expired-msg">
+      This password reset link has expired (valid for 60 minutes only).<br>
+      Request a new link to continue.
+    </p>
+    <a href="{{ route('password.request') }}" class="btn-new-link">Request New Link</a>
+    <button class="expired-dismiss" onclick="document.getElementById('expiredOverlay').remove()">Dismiss</button>
+  </div>
+</div>
+@endif
 
 @if($errors->any() && !$errors->has('email') && !$errors->has('password') && !$errors->has('password_confirmation'))
 <style>

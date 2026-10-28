@@ -21,7 +21,22 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request): View
     {
-        return view('auth.reset-password', ['request' => $request]);
+        // Validate the token exists before showing the form — catches expired tokens on GET
+        $token = $request->route('token');
+        $email = $request->query('email', '');
+
+        $tokenExpired = false;
+        if ($token && $email) {
+            $user = \App\Models\User::where('email', $email)->first();
+            if ($user) {
+                $tokenExpired = !\Illuminate\Support\Facades\Password::tokenExists($user, $token);
+            }
+        }
+
+        return view('auth.reset-password', [
+            'request'      => $request,
+            'tokenExpired' => $tokenExpired,
+        ]);
     }
 
     /**
@@ -90,9 +105,19 @@ class NewPasswordController extends Controller
         // If the password was successfully reset, we will redirect the user back to
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        if ($status == Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('status', __($status));
+        }
+
+        // Expired or invalid token — show a dedicated expiry notice
+        if ($status === Password::INVALID_TOKEN) {
+            return back()
+                ->withInput($request->only('email'))
+                ->with('link_expired', true);
+        }
+
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => __($status)]);
     }
 }
