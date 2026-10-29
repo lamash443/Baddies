@@ -1,4 +1,3 @@
-<style>[x-cloak] { display: none !important; }</style>
 <div class="chat-box d-flex flex-column position-relative" style="height: 75vh;"
      @keydown.window.escape="clear()"
      x-data="{ 
