@@ -48,19 +48,8 @@ class SiteSettingsPage extends Page implements HasForms
         }
         $clean = ltrim($clean, '/');
 
-        $disk = Storage::disk('public');
         $cpanelStorage = '/home/kenyanba/public_html/storage/' . $clean;
         $localPublicStorage = storage_path('app/public/' . $clean);
-        $publicStorage = public_path('storage/' . $clean);
-
-        $exists = $disk->exists($clean)
-            || file_exists($cpanelStorage)
-            || file_exists($localPublicStorage)
-            || file_exists($publicStorage);
-
-        if (! $exists) {
-            return null;
-        }
 
         // Auto-heal mirror to cPanel direct storage if present
         if (file_exists($localPublicStorage) && is_dir('/home/kenyanba/public_html/storage') && ! file_exists($cpanelStorage)) {
@@ -219,7 +208,7 @@ class SiteSettingsPage extends Page implements HasForms
                             ->image()
                             ->imageEditor()
                             ->avatar()
-                            ->helperText('A square or circular image shown as the brand avatar circle in email headers when no full logo is set (e.g. your brand icon or profile photo). Replaces the default flame icon / letter "B".'),
+                            ->helperText('Upload your logo or image here to replace the "B" circle at the top of all email templates (welcome, reset password, support tickets). This takes priority as the top circular avatar.'),
                     ]),
 
                 Section::make('Favicon')

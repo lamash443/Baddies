@@ -204,45 +204,51 @@
 
       <!-- Header / Brand -->
       @php
-        $logoPath   = \App\Models\SiteSetting::get('email_logo') ?: \App\Models\SiteSetting::get('logo');
-        $logoUrl    = null;
-        if ($logoPath) {
-            if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
-                $logoUrl = $logoPath;
+        // Resolve public HTTPS URL directly without disk existence checks that fail across cPanel symlinks
+        $resolveAssetUrl = function (?string $path): ?string {
+            if (!$path || trim($path) === '') {
+                return null;
+            }
+            $path = trim($path);
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                $target = $path;
             } else {
-                $cleanPath = ltrim(preg_replace('#^storage/#', '', $logoPath), '/');
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
-                    $logoUrl = url('storage/' . $cleanPath);
+                $clean = ltrim($path, '/');
+                if (str_starts_with($clean, 'storage/')) {
+                    $clean = substr($clean, 8);
                 }
+                $clean = ltrim($clean, '/');
+                $target = 'https://kenyanbaddies.com/storage/' . $clean;
             }
-        }
-        $avatarPath = \App\Models\SiteSetting::get('email_avatar');
-        $avatarUrl  = null;
-        if ($avatarPath) {
-            if (str_starts_with($avatarPath, 'http://') || str_starts_with($avatarPath, 'https://')) {
-                $avatarUrl = $avatarPath;
-            } else {
-                $cleanAvatar = ltrim(preg_replace('#^storage/#', '', $avatarPath), '/');
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanAvatar)) {
-                    $avatarUrl = url('storage/' . $cleanAvatar);
-                }
-            }
-        }
-        foreach (['logoUrl', 'avatarUrl'] as $var) {
-            if ($$var && (str_contains($$var, '127.0.0.1') || str_contains($$var, 'localhost'))) {
-                $$var = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $$var);
-            }
-        }
+
+            // Always force live https://kenyanbaddies.com domain for emails
+            return preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $target);
+        };
+
+        $avatarUrl    = $resolveAssetUrl(\App\Models\SiteSetting::get('email_avatar'));
+        $emailLogoUrl = $resolveAssetUrl(\App\Models\SiteSetting::get('email_logo'));
+        $siteLogoUrl  = $resolveAssetUrl(\App\Models\SiteSetting::get('logo'));
+
         $brandUrl = 'https://kenyanbaddies.com';
       @endphp
       <div class="header">
         <a href="{{ $brandUrl }}" class="brand">
-          @if($logoUrl)
-            <img src="{{ $logoUrl }}" alt="{{ $appName }}" style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
-          @elseif($avatarUrl)
-            <img src="{{ $avatarUrl }}" alt="{{ $appName }}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,140,0,0.4);">
+          @if($avatarUrl)
+            {{-- 1. Dedicated Email Brand Avatar (Circle) + Name --}}
+            <img src="{{ $avatarUrl }}"
+                 alt="{{ $appName }}"
+                 width="46"
+                 height="46"
+                 style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle; border: 2px solid #ff8c00; box-shadow: 0 4px 14px rgba(255,140,0,0.4);">
             <span class="brand-name">{{ $appName }}</span>
+          @elseif($emailLogoUrl)
+            {{-- 2. Dedicated Email Logo (Banner) --}}
+            <img src="{{ $emailLogoUrl }}" alt="{{ $appName }}" style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
+          @elseif($siteLogoUrl)
+            {{-- 3. Fallback: Site Navbar Logo --}}
+            <img src="{{ $siteLogoUrl }}" alt="{{ $appName }}" style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
           @else
+            {{-- 4. Default: Styled Flame/B Icon + Name --}}
             <span class="brand-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c0 1.38-1.12 2.5-2.5 2.5S6 18.38 6 17c0-1.56.77-2.95 2-3.79V6s2.5 1.5 2.5 5"/>
