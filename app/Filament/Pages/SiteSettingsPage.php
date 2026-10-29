@@ -79,6 +79,7 @@ class SiteSettingsPage extends Page implements HasForms
         $this->form->fill([
             // ── Branding ──────────────────────────────────────────────────────
             'logo'            => $this->getValidFileSetting('logo'),
+            'email_logo'      => $this->getValidFileSetting('email_logo'),
             'preloader'       => $this->getValidFileSetting('preloader'),
             'favicon'         => $this->getValidFileSetting('favicon'),
 
@@ -180,7 +181,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ->description('Upload the site logo. Used in the navigation bar and emails.')
                     ->schema([
                         FileUpload::make('logo')
-                            ->label('Site Logo')
+                            ->label('Site Logo (Navbar)')
                             ->disk('public')
                             ->directory('site')
                             ->visibility('public')
@@ -190,7 +191,20 @@ class SiteSettingsPage extends Page implements HasForms
                             ->downloadable()
                             ->image()
                             ->imageEditor()
-                            ->helperText('PNG, JPG, SVG, or WEBP logo. Recommended height: 50-80px.'),
+                            ->helperText('PNG, JPG, SVG, or WEBP logo. Recommended height: 50-80px. Used in the navigation bar.'),
+
+                        FileUpload::make('email_logo')
+                            ->label('Email Logo')
+                            ->disk('public')
+                            ->directory('site')
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor()
+                            ->helperText('Logo shown in the header of all outgoing emails (welcome, reset password, support replies). If not set, falls back to the Site Logo. Recommended: use a version with a transparent background, min 300px wide.'),
                     ]),
 
                 Section::make('Favicon')
@@ -669,11 +683,11 @@ class SiteSettingsPage extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
+        $fileKeys = ['logo', 'email_logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
 
         $allKeys = [
             // Branding
-            'logo', 'preloader', 'favicon',
+            'logo', 'email_logo', 'preloader', 'favicon',
             // Hero & Headers
             'hero_title', 'hero_subtitle', 'hero_background',
             'escort_girls_header_background', 'call_boys_header_background',

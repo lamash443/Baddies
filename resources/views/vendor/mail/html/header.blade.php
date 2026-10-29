@@ -1,7 +1,9 @@
 @props(['url'])
 @php
   $appName    = config('app.name', 'Kenyan Baddies Club');
-  $logoPath   = \App\Models\SiteSetting::get('logo');
+
+  // Prefer dedicated email_logo; fall back to site logo
+  $logoPath   = \App\Models\SiteSetting::get('email_logo') ?: \App\Models\SiteSetting::get('logo');
   $logoUrl    = null;
 
   if ($logoPath) {

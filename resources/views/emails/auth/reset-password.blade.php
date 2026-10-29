@@ -204,7 +204,7 @@
 
       <!-- Header / Brand -->
       @php
-        $logoPath = \App\Models\SiteSetting::get('logo');
+        $logoPath = \App\Models\SiteSetting::get('email_logo') ?: \App\Models\SiteSetting::get('logo');
         $logoUrl  = null;
         if ($logoPath) {
             if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
