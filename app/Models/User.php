@@ -9,13 +9,14 @@ use Illuminate\Notifications\Notifiable;
 
 use App\Support\MailHelper;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Notifications\ResetPasswordNotification;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, LogsActivity;
@@ -299,6 +300,45 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_admin;
+    }
+
+    /**
+     * Return the URL to the admin's avatar for the Filament panel top bar.
+     * Falls back to null (Filament shows initials) when no photo is set.
+     */
+    public function getFilamentAvatarUrl(): ?string
+    {
+        $photo = $this->profile_photo;
+        if (!$photo) {
+            return null;
+        }
+
+        $clean = ltrim($photo, '/');
+        if (str_starts_with($clean, 'storage/')) {
+            $clean = substr($clean, 8);
+        }
+        $clean = ltrim($clean, '/');
+
+        // Try all storage locations
+        $localPath  = storage_path('app/public/' . $clean);
+        $cpanelPath = '/home/kenyanba/public_html/storage/' . $clean;
+
+        $exists = \Illuminate\Support\Facades\Storage::disk('public')->exists($clean)
+            || file_exists($localPath)
+            || file_exists($cpanelPath);
+
+        if (!$exists) {
+            return null;
+        }
+
+        $url = url('storage/' . $clean);
+
+        // Replace localhost with production domain for externally visible URLs
+        if (str_contains($url, '127.0.0.1') || str_contains($url, 'localhost')) {
+            $url = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $url);
+        }
+
+        return $url;
     }
 
     public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany
