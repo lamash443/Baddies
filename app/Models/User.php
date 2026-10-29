@@ -308,37 +308,41 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
      */
     public function getFilamentAvatarUrl(): ?string
     {
-        $photo = $this->profile_photo;
-        if (!$photo) {
+        try {
+            $photo = $this->profile_photo;
+            if (!$photo) {
+                return null;
+            }
+
+            $clean = ltrim($photo, '/');
+            if (str_starts_with($clean, 'storage/')) {
+                $clean = substr($clean, 8);
+            }
+            $clean = ltrim($clean, '/');
+
+            // Try all storage locations
+            $localPath  = storage_path('app/public/' . $clean);
+            $cpanelPath = '/home/kenyanba/public_html/storage/' . $clean;
+
+            $exists = \Illuminate\Support\Facades\Storage::disk('public')->exists($clean)
+                || file_exists($localPath)
+                || file_exists($cpanelPath);
+
+            if (!$exists) {
+                return null;
+            }
+
+            $url = url('storage/' . $clean);
+
+            // Replace localhost with production domain for externally visible URLs
+            if (str_contains($url, '127.0.0.1') || str_contains($url, 'localhost')) {
+                $url = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $url);
+            }
+
+            return $url;
+        } catch (\Throwable $e) {
             return null;
         }
-
-        $clean = ltrim($photo, '/');
-        if (str_starts_with($clean, 'storage/')) {
-            $clean = substr($clean, 8);
-        }
-        $clean = ltrim($clean, '/');
-
-        // Try all storage locations
-        $localPath  = storage_path('app/public/' . $clean);
-        $cpanelPath = '/home/kenyanba/public_html/storage/' . $clean;
-
-        $exists = \Illuminate\Support\Facades\Storage::disk('public')->exists($clean)
-            || file_exists($localPath)
-            || file_exists($cpanelPath);
-
-        if (!$exists) {
-            return null;
-        }
-
-        $url = url('storage/' . $clean);
-
-        // Replace localhost with production domain for externally visible URLs
-        if (str_contains($url, '127.0.0.1') || str_contains($url, 'localhost')) {
-            $url = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $url);
-        }
-
-        return $url;
     }
 
     public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany
