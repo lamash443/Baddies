@@ -502,10 +502,23 @@ Route::middleware('auth')->group(function () {
         if (!auth()->user()->hasActiveChatSubscription()) {
             return redirect()->route('chat.memberships')->with('error', 'You need an active chat subscription to message members.');
         }
-        if (auth()->id() == $user_id) {
+
+        [$resolvedId, $redirectToCode] = \App\Helpers\ChatHelper::resolve($user_id);
+
+        if (!$resolvedId) {
             return redirect()->route('chat.index');
         }
-        return view('chat.index', ['activeUserId' => $user_id]);
+
+        // If accessed via raw database ID (e.g. /chat/62), redirect to the 8-digit random code
+        if ($redirectToCode) {
+            return redirect()->route('chat.show', $redirectToCode);
+        }
+
+        if (auth()->id() == $resolvedId) {
+            return redirect()->route('chat.index');
+        }
+
+        return view('chat.index', ['activeUserId' => $resolvedId]);
     })->name('chat.show');
 
     Route::get('/chat-memberships', function () {

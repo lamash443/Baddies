@@ -169,6 +169,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     }
 
     /**
+     * Get the obfuscated 8-digit chat code for URLs.
+     */
+    public function getChatCodeAttribute(): string
+    {
+        return \App\Helpers\ChatHelper::encodeId($this->id);
+    }
+
+    /**
      * Returns true if the user has an active subscription (plan set and not expired).
      */
     public function hasActiveSubscription(): bool

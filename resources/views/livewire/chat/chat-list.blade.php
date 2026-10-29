@@ -508,10 +508,10 @@
                  @mouseleave="endPress()"
                  @contextmenu.prevent>
 
-                <a href="{{ route('chat.show', $user->id) }}"
+                <a href="{{ route('chat.show', $user->chat_code) }}"
                    class="chat-row text-decoration-none d-block w-100"
                    style="padding: 0.55rem 0.75rem; transition: background 0.08s ease-out, border-left-color 0.08s ease-out;"
-                   @click="handleClick({{ $user->id }}, $event, '{{ route('chat.show', $user->id) }}')">
+                   @click="handleClick({{ $user->id }}, $event, '{{ route('chat.show', $user->chat_code) }}')">
                     <div class="d-flex align-items-start gap-3">
 
                         {{-- Avatar --}}

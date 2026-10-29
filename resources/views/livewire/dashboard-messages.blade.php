@@ -64,7 +64,7 @@
                     $snippet = \Illuminate\Support\Str::limit($latest->body, 55);
                     $timeAgo = $latest->created_at->diffForHumans(null, true);
                 @endphp
-                <a href="{{ route('chat.show', $senderId) }}" wire:navigate
+                <a href="{{ route('chat.show', \App\Helpers\ChatHelper::encodeId($senderId)) }}" wire:navigate
                    class="msg-row d-flex align-items-center gap-3 text-decoration-none"
                    style="border:1px solid rgba(255,140,0,0.15); border-radius:12px; padding:0.85rem 1rem; transition:all 0.2s ease;">
                     <div class="position-relative flex-shrink-0">

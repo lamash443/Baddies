@@ -73,7 +73,7 @@ class ChatBox extends Component
             ->delete();
         $this->dispatch('chat-archive-updated');
         // Redirect to the chat without ?showArchived so the list goes back to active view
-        return redirect()->route('chat.show', $this->activeUserId);
+        return redirect()->route('chat.show', \App\Helpers\ChatHelper::encodeId($this->activeUserId));
     }
 
     public function deleteCurrentChat()
