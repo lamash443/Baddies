@@ -1,31 +1,26 @@
 @props(['url'])
 @php
-  $appName = config('app.name', 'Kenyan Baddies Club');
+  $appName    = config('app.name', 'Kenyan Baddies Club');
+  $logoPath   = \App\Models\SiteSetting::get('logo');
+  $logoUrl    = null;
 
-  // Resolve public HTTPS URL directly without disk existence checks that fail across cPanel symlinks
-  $resolveAssetUrl = function (?string $path): ?string {
-      if (!$path || trim($path) === '') {
-          return null;
-      }
-      $path = trim($path);
-      if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-          $target = $path;
+  if ($logoPath) {
+      if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
+          $logoUrl = $logoPath;
       } else {
-          $clean = ltrim($path, '/');
-          if (str_starts_with($clean, 'storage/')) {
-              $clean = substr($clean, 8);
+          $cleanPath = ltrim(preg_replace('#^storage/#', '', $logoPath), '/');
+          if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
+              $logoUrl = url('storage/' . $cleanPath);
+          } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('site/' . $cleanPath)) {
+              $logoUrl = url('storage/site/' . $cleanPath);
           }
-          $clean = ltrim($clean, '/');
-          $target = 'https://kenyanbaddies.com/storage/' . $clean;
       }
+  }
 
-      // Always force live https://kenyanbaddies.com domain for emails
-      return preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $target);
-  };
-
-  $avatarUrl    = $resolveAssetUrl(\App\Models\SiteSetting::get('email_avatar'));
-  $emailLogoUrl = $resolveAssetUrl(\App\Models\SiteSetting::get('email_logo'));
-  $siteLogoUrl  = $resolveAssetUrl(\App\Models\SiteSetting::get('logo'));
+  // Force HTTPS live domain if url() generated 127.0.0.1 or localhost
+  if ($logoUrl && (str_contains($logoUrl, '127.0.0.1') || str_contains($logoUrl, 'localhost'))) {
+      $logoUrl = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $logoUrl);
+  }
 
   $brandUrl = (!empty($url) && !str_contains($url, '127.0.0.1') && !str_contains($url, 'localhost'))
       ? $url
@@ -42,33 +37,13 @@
     <td align="center" style="padding: 28px 32px 22px; background: linear-gradient(180deg, rgba(255,140,0,0.06) 0%, transparent 100%); border-bottom: 1px solid rgba(255,140,0,0.1);">
       <a href="{{ $brandUrl }}" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none;">
 
-        @if($avatarUrl)
-          {{-- 1. Dedicated Email Brand Avatar (Circle) + Name --}}
-          <img src="{{ $avatarUrl }}"
-               alt="{{ $appName }}"
-               width="46"
-               height="46"
-               style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle; border: 2px solid #ff8c00; box-shadow: 0 4px 14px rgba(255,140,0,0.4);">
-          <span style="
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-            font-size: 22px;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-            vertical-align: middle;
-          ">{{ $appName }}</span>
-        @elseif($emailLogoUrl)
-          {{-- 2. Dedicated Email Logo (Banner) --}}
-          <img src="{{ $emailLogoUrl }}"
-               alt="{{ $appName }}"
-               style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
-        @elseif($siteLogoUrl)
-          {{-- 3. Fallback: Site Navbar Logo --}}
-          <img src="{{ $siteLogoUrl }}"
+        @if($logoUrl)
+          {{-- Use the uploaded site logo --}}
+          <img src="{{ $logoUrl }}"
                alt="{{ $appName }}"
                style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
         @else
-          {{-- 4. Default: Styled Flame/B Icon + Name --}}
+          {{-- Fallback: Flame icon + name --}}
           <span style="
             display: inline-flex; align-items: center; justify-content: center;
             width: 42px; height: 42px; border-radius: 10px;

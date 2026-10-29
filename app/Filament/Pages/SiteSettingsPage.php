@@ -48,8 +48,19 @@ class SiteSettingsPage extends Page implements HasForms
         }
         $clean = ltrim($clean, '/');
 
+        $disk = Storage::disk('public');
         $cpanelStorage = '/home/kenyanba/public_html/storage/' . $clean;
         $localPublicStorage = storage_path('app/public/' . $clean);
+        $publicStorage = public_path('storage/' . $clean);
+
+        $exists = $disk->exists($clean)
+            || file_exists($cpanelStorage)
+            || file_exists($localPublicStorage)
+            || file_exists($publicStorage);
+
+        if (! $exists) {
+            return null;
+        }
 
         // Auto-heal mirror to cPanel direct storage if present
         if (file_exists($localPublicStorage) && is_dir('/home/kenyanba/public_html/storage') && ! file_exists($cpanelStorage)) {
@@ -68,8 +79,6 @@ class SiteSettingsPage extends Page implements HasForms
         $this->form->fill([
             // ── Branding ──────────────────────────────────────────────────────
             'logo'            => $this->getValidFileSetting('logo'),
-            'email_logo'      => $this->getValidFileSetting('email_logo'),
-            'email_avatar'    => $this->getValidFileSetting('email_avatar'),
             'preloader'       => $this->getValidFileSetting('preloader'),
             'favicon'         => $this->getValidFileSetting('favicon'),
 
@@ -171,7 +180,7 @@ class SiteSettingsPage extends Page implements HasForms
                     ->description('Upload the site logo. Used in the navigation bar and emails.')
                     ->schema([
                         FileUpload::make('logo')
-                            ->label('Site Logo (Navbar)')
+                            ->label('Site Logo')
                             ->disk('public')
                             ->directory('site')
                             ->visibility('public')
@@ -181,34 +190,7 @@ class SiteSettingsPage extends Page implements HasForms
                             ->downloadable()
                             ->image()
                             ->imageEditor()
-                            ->helperText('PNG, JPG, SVG, or WEBP logo. Recommended height: 50-80px. Used in the navigation bar.'),
-
-                        FileUpload::make('email_logo')
-                            ->label('Email Logo')
-                            ->disk('public')
-                            ->directory('site')
-                            ->visibility('public')
-                            ->preventFilePathTampering(false, fn () => true)
-                            ->deletable()
-                            ->openable()
-                            ->downloadable()
-                            ->image()
-                            ->imageEditor()
-                            ->helperText('Logo shown in the header of all outgoing emails (welcome, reset password, support replies). If not set, falls back to the Site Logo. Recommended: use a version with a transparent background, min 300px wide.'),
-
-                        FileUpload::make('email_avatar')
-                            ->label('Email Brand Avatar (Circle)')
-                            ->disk('public')
-                            ->directory('site')
-                            ->visibility('public')
-                            ->preventFilePathTampering(false, fn () => true)
-                            ->deletable()
-                            ->openable()
-                            ->downloadable()
-                            ->image()
-                            ->imageEditor()
-                            ->avatar()
-                            ->helperText('Upload your logo or image here to replace the "B" circle at the top of all email templates (welcome, reset password, support tickets). This takes priority as the top circular avatar.'),
+                            ->helperText('PNG, JPG, SVG, or WEBP logo. Recommended height: 50-80px.'),
                     ]),
 
                 Section::make('Favicon')
@@ -687,11 +669,11 @@ class SiteSettingsPage extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $fileKeys = ['logo', 'email_logo', 'email_avatar', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
+        $fileKeys = ['logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
 
         $allKeys = [
             // Branding
-            'logo', 'email_logo', 'email_avatar', 'preloader', 'favicon',
+            'logo', 'preloader', 'favicon',
             // Hero & Headers
             'hero_title', 'hero_subtitle', 'hero_background',
             'escort_girls_header_background', 'call_boys_header_background',
