@@ -71,3 +71,4 @@ class ChatHelper
         return [null, null];
     }
 }
+

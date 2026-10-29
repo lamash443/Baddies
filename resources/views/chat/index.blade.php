@@ -56,6 +56,7 @@
 
     <!-- CRITICAL ANTI-FOUC & ANTI-BLUE-LINK STYLES (Parsed BEFORE Bootstrap CSS) -->
     <style>
+        [x-cloak] { display: none !important; }
         *, *::before, *::after { box-sizing:border-box; }
         html, body { margin:0; padding:0; font-family:"Outfit",sans-serif; min-height:100vh; }
 

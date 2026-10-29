@@ -1,3 +1,4 @@
+<style>[x-cloak] { display: none !important; }</style>
 <div class="chat-box d-flex flex-column position-relative" style="height: 75vh;"
      @keydown.window.escape="clear()"
      x-data="{ 
@@ -238,131 +239,6 @@
                 el.style.backgroundColor = '#efeae2';
             }
         })();
-
-        window.chatImageLoader = function(url, filename) {
-            return {
-                loaded: false,
-                progress: 0,
-                blobUrl: null,
-                blob: null,
-                downloading: false,
-                downloadProgress: 0,
-                downloaded: false,
-                init() {
-                    const testImg = new Image();
-                    testImg.src = url;
-                    if (testImg.complete && testImg.naturalWidth !== 0) {
-                        this.progress = 100;
-                        this.loaded = true;
-                        this.blobUrl = url;
-                        return;
-                    }
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', url, true);
-                    xhr.responseType = 'blob';
-
-                    let timer = setInterval(() => {
-                        if (this.loaded) {
-                            clearInterval(timer);
-                            return;
-                        }
-                        if (this.progress < 90) {
-                            this.progress += Math.floor(Math.random() * 8) + 4;
-                            if (this.progress > 90) this.progress = 90;
-                        }
-                    }, 60);
-
-                    xhr.onprogress = (e) => {
-                        if (e.lengthComputable && e.total > 0) {
-                            this.progress = Math.min(99, Math.round((e.loaded / e.total) * 100));
-                        }
-                    };
-
-                    xhr.onload = () => {
-                        clearInterval(timer);
-                        this.progress = 100;
-                        if (xhr.status === 200 && xhr.response) {
-                            this.blob = xhr.response;
-                            this.blobUrl = URL.createObjectURL(xhr.response);
-                        } else {
-                            this.blobUrl = url;
-                        }
-                        setTimeout(() => {
-                            this.loaded = true;
-                        }, 100);
-                    };
-
-                    xhr.onerror = () => {
-                        clearInterval(timer);
-                        this.progress = 100;
-                        this.blobUrl = url;
-                        this.loaded = true;
-                    };
-
-                    xhr.send();
-                },
-
-                downloadFile() {
-                    if (this.downloading) return;
-                    this.downloading = true;
-                    this.downloadProgress = 0;
-                    this.downloaded = false;
-
-                    if (this.blob) {
-                        let p = 0;
-                        const timer = setInterval(() => {
-                            p += 25;
-                            this.downloadProgress = Math.min(100, p);
-                            if (p >= 100) {
-                                clearInterval(timer);
-                                const a = document.createElement('a');
-                                a.href = URL.createObjectURL(this.blob);
-                                a.download = filename || 'KB-Photo.jpg';
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                this.downloading = false;
-                                this.downloaded = true;
-                                setTimeout(() => { this.downloaded = false; }, 3000);
-                            }
-                        }, 40);
-                    } else {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('GET', url, true);
-                        xhr.responseType = 'blob';
-
-                        xhr.onprogress = (e) => {
-                            if (e.lengthComputable && e.total > 0) {
-                                this.downloadProgress = Math.min(99, Math.round((e.loaded / e.total) * 100));
-                            }
-                        };
-
-                        xhr.onload = () => {
-                            this.downloadProgress = 100;
-                            if (xhr.status === 200 && xhr.response) {
-                                const a = document.createElement('a');
-                                a.href = URL.createObjectURL(xhr.response);
-                                a.download = filename || 'KB-Photo.jpg';
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                            }
-                            this.downloading = false;
-                            this.downloaded = true;
-                            setTimeout(() => { this.downloaded = false; }, 3000);
-                        };
-
-                        xhr.onerror = () => {
-                            this.downloading = false;
-                            window.open(url, '_blank');
-                        };
-
-                        xhr.send();
-                    }
-                }
-            };
-        };
     </script>
 
     <style>
@@ -750,77 +626,71 @@
                             @if($message->image_path)
                                 @php
                                     $photoUrl = asset('storage/' . $message->image_path);
-                                    $fileName = 'KB-Photo-' . $message->id . '.jpg';
                                 @endphp
-                                <div x-data="chatImageLoader('{{ $photoUrl }}', '{{ $fileName }}')"
+                                <div x-data="{
+                                        loaded: false,
+                                        progress: 0,
+                                        timer: null,
+                                        init() {
+                                            const el = this.$refs.img;
+                                            if (el && el.complete && el.naturalWidth > 0) {
+                                                this.loaded = true;
+                                                return;
+                                            }
+                                            this.progress = 15;
+                                            this.timer = setInterval(() => {
+                                                if (this.loaded) {
+                                                    clearInterval(this.timer);
+                                                    return;
+                                                }
+                                                if (this.progress < 92) {
+                                                    this.progress += Math.floor(Math.random() * 12) + 6;
+                                                    if (this.progress > 92) this.progress = 92;
+                                                }
+                                            }, 70);
+                                        },
+                                        onLoad() {
+                                            if (this.timer) clearInterval(this.timer);
+                                            this.progress = 100;
+                                            this.loaded = true;
+                                        }
+                                     }"
                                      class="chat-image-card position-relative mb-1 rounded-3 overflow-hidden text-center"
-                                     style="max-width: 270px; min-width: 200px; min-height: 180px; background: rgba(0,0,0,0.25); cursor: pointer;"
-                                     @click.stop="if(loaded) openLightbox(blobUrl || '{{ $photoUrl }}')"
+                                     style="max-width: 270px; min-width: 180px; min-height: 160px; background: rgba(0,0,0,0.2); cursor: pointer;"
+                                     @click.stop="openLightbox('{{ $photoUrl }}')"
                                      @contextmenu.prevent>
                                     
-                                    {{-- Loader with Percentage while image is downloading --}}
-                                    <div x-show="!loaded"
+                                    {{-- Central Download Progress Ring: ONLY VISIBLE WHILE DOWNLOADING/LOADING --}}
+                                    <div x-cloak x-show="!loaded"
+                                         x-transition:leave="transition ease-out duration-150"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
                                          class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
-                                         style="background: linear-gradient(145deg, rgba(22,14,2,0.92), rgba(10,10,10,0.96)); z-index: 5;">
+                                         style="background: rgba(10,10,10,0.7); backdrop-filter: blur(3px); z-index: 5;">
                                         
-                                        <div class="position-relative d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
-                                            <svg width="56" height="56" viewBox="0 0 36 36">
+                                        <div class="position-relative d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0,0,0,0.6);">
+                                            <svg width="44" height="44" viewBox="0 0 36 36">
                                                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                      fill="none" stroke="rgba(255,140,0,0.18)" stroke-width="3.2" />
+                                                      fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3" />
                                                 <path :stroke-dasharray="`${progress}, 100`"
                                                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                      fill="none" stroke="#ff8c00" stroke-width="3.2" stroke-linecap="round"
-                                                      style="transition: stroke-dasharray 0.15s ease;" />
+                                                      fill="none" stroke="#ff8c00" stroke-width="3" stroke-linecap="round"
+                                                      style="transition: stroke-dasharray 0.1s ease;" />
                                             </svg>
-                                            <div class="position-absolute d-flex align-items-center justify-content-center text-center">
-                                                <span class="text-white fw-bold" style="font-size: 0.72rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="d-flex align-items-center gap-1 mt-2">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                            <span style="font-size: 0.68rem; color: rgba(255,255,255,0.7); font-weight: 500;">Downloading...</span>
+                                            <span class="position-absolute text-white fw-bold" style="font-size: 0.68rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
                                         </div>
                                     </div>
 
-                                    {{-- Downloaded Image --}}
-                                    <img :src="blobUrl || '{{ $photoUrl }}'" 
+                                    {{-- The Image: clean, no overlays or permanent buttons once loaded --}}
+                                    <img x-ref="img"
+                                         src="{{ $photoUrl }}" 
                                          alt="Photo" 
+                                         @load="onLoad()"
+                                         @error="onLoad()"
                                          class="img-fluid rounded w-100 d-block" 
-                                         style="max-width: 270px; max-height: 320px; object-fit: cover; -webkit-user-drag: none; transition: opacity 0.25s ease;"
-                                         :style="loaded ? 'opacity: 1;' : 'opacity: 0;'"
+                                         style="max-width: 270px; max-height: 320px; object-fit: cover; -webkit-user-drag: none; transition: opacity 0.2s ease;"
+                                         :style="loaded ? 'opacity: 1;' : 'opacity: 0.2;'"
                                          loading="lazy">
-
-                                    {{-- Direct Save/Download Button for the receiver --}}
-                                    <div x-cloak x-show="loaded"
-                                         class="position-absolute top-0 end-0 m-2 d-flex align-items-center"
-                                         style="z-index: 6;">
-                                        <button type="button"
-                                                @click.stop="downloadFile()"
-                                                class="btn d-flex align-items-center justify-content-center p-0 shadow"
-                                                style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,140,0,0.4); color: #fff; backdrop-filter: blur(6px); transition: all 0.2s;"
-                                                :title="downloading ? `Saving ${downloadProgress}%` : 'Save to device'">
-                                            <template x-if="!downloading && !downloaded">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                                </svg>
-                                            </template>
-                                            <template x-if="downloading">
-                                                <span style="font-size: 0.55rem; font-weight: bold; color: #ff8c00; font-family: monospace;" x-text="`${downloadProgress}%`"></span>
-                                            </template>
-                                            <template x-if="downloaded">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                            </template>
-                                        </button>
-                                    </div>
                                 </div>
                             @endif
                             @if($message->body)
@@ -894,44 +764,40 @@
                     progress: 0 
                  }"
                  x-on:livewire-upload-start="isUploading = true; progress = 0;"
-                 x-on:livewire-upload-finish="isUploading = false; progress = 100;"
-                 x-on:livewire-upload-error="isUploading = false; alert('Photo upload failed. Please try a smaller photo.');"
+                 x-on:livewire-upload-finish="isUploading = false; progress = 0;"
+                 x-on:livewire-upload-error="isUploading = false; progress = 0; alert('Photo upload failed. Please try a smaller photo.');"
                  x-on:livewire-upload-progress="progress = $event.detail.progress;"
+                 @message-sent.window="isUploading = false; progress = 0;"
                  class="chat-input-wrapper position-relative flex-shrink-0"
                  style="background-color: var(--input-area-bg); background-image: linear-gradient(135deg, rgba(255,140,0,0.12) 0%, rgba(255,140,0,0.04) 100%); border-top: 1px solid rgba(255,140,0,0.2);">
 
-                {{-- Live Upload Percentage Banner --}}
-                <div x-cloak x-show="isUploading"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 -translate-y-2"
-                     x-transition:enter-end="opacity-100 translate-y-0"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="px-3 pt-2 pb-1"
-                     style="background: rgba(13,13,13,0.95); border-bottom: 1px solid rgba(255,140,0,0.25);">
-                    <div class="d-flex align-items-center justify-content-between p-2 rounded-3"
-                         style="background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.25);">
-                        <div class="d-flex align-items-center gap-2" style="min-width: 0;">
-                            <div class="spinner-grow text-warning" role="status" style="width: 14px; height: 14px; animation-duration: 0.9s; flex-shrink: 0;"></div>
-                            <div class="d-flex flex-column" style="min-width: 0;">
-                                <span class="fw-bold text-truncate" style="color: #ff8c00; font-size: 0.82rem; letter-spacing: 0.02em;">
-                                    Uploading Photo...
-                                </span>
-                                <small class="text-white-50 text-truncate" style="font-size: 0.7rem;">Processing image for chat</small>
+                {{-- Live Upload Percentage Banner (ONLY while actively uploading) --}}
+                <template x-if="isUploading">
+                    <div class="px-3 pt-2 pb-1"
+                         style="background: rgba(13,13,13,0.95); border-bottom: 1px solid rgba(255,140,0,0.25);">
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded-3"
+                             style="background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.25);">
+                            <div class="d-flex align-items-center gap-2" style="min-width: 0;">
+                                <div class="spinner-grow text-warning" role="status" style="width: 14px; height: 14px; animation-duration: 0.9s; flex-shrink: 0;"></div>
+                                <div class="d-flex flex-column" style="min-width: 0;">
+                                    <span class="fw-bold text-truncate" style="color: #ff8c00; font-size: 0.82rem; letter-spacing: 0.02em;">
+                                        Uploading Photo...
+                                    </span>
+                                    <small class="text-white-50 text-truncate" style="font-size: 0.7rem;">Processing image for chat</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 ms-2 flex-shrink-0">
+                                <span class="fw-bold text-white px-2 py-0.5 rounded-pill" style="font-size: 0.75rem; background: rgba(255,140,0,0.25); border: 1px solid rgba(255,140,0,0.4); font-family: monospace;" x-text="`${progress}%`">0%</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2 ms-2 flex-shrink-0">
-                            <span class="fw-bold text-white px-2 py-0.5 rounded-pill" style="font-size: 0.75rem; background: rgba(255,140,0,0.25); border: 1px solid rgba(255,140,0,0.4); font-family: monospace;" x-text="`${progress}%`">0%</span>
+                        <div class="progress mt-1" style="height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                 role="progressbar"
+                                 :style="`width: ${progress}%; background: linear-gradient(90deg, #ff8c00, #ffb347);`"
+                                 :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
-                    <div class="progress mt-1" style="height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated"
-                             role="progressbar"
-                             :style="`width: ${progress}%; background: linear-gradient(90deg, #ff8c00, #ffb347);`"
-                             :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                </div>
+                </template>
 
                 <!-- Main Input Form -->
                 <div class="px-3 py-2">
@@ -951,17 +817,19 @@
                                 @endif
 
                                 <!-- Circular Percentage Meter while uploading on button -->
-                                <div x-cloak x-show="isUploading" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                                     style="background: rgba(0,0,0,0.85); border-radius: 50%; z-index: 20;">
-                                    <svg width="34" height="34" viewBox="0 0 36 36">
-                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                              fill="none" stroke="rgba(255,140,0,0.2)" stroke-width="3.5" />
-                                        <path :stroke-dasharray="`${progress}, 100`"
-                                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                              fill="none" stroke="#ff8c00" stroke-width="3.5" stroke-linecap="round" />
-                                    </svg>
-                                    <span class="position-absolute text-white fw-bold" style="font-size: 0.58rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
-                                </div>
+                                <template x-if="isUploading">
+                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                                         style="background: rgba(0,0,0,0.85); border-radius: 50%; z-index: 20;">
+                                        <svg width="34" height="34" viewBox="0 0 36 36">
+                                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                  fill="none" stroke="rgba(255,140,0,0.2)" stroke-width="3.5" />
+                                            <path :stroke-dasharray="`${progress}, 100`"
+                                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                  fill="none" stroke="#ff8c00" stroke-width="3.5" stroke-linecap="round" />
+                                        </svg>
+                                        <span class="position-absolute text-white fw-bold" style="font-size: 0.58rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
+                                    </div>
+                                </template>
 
                                 <input type="file" wire:model="photo" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="d-none"
                                        :disabled="isUploading">
@@ -984,8 +852,13 @@
                             style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff8c00, #ff6b00); border: none; box-shadow: 0 2px 10px rgba(255,140,0,0.4); padding: 0;"
                             :disabled="isUploading"
                             wire:loading.attr="disabled"
-                            wire:target="photo">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            wire:target="sendMessage, photo">
+                            <div wire:loading.remove wire:target="sendMessage">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </div>
+                            <div wire:loading wire:target="sendMessage">
+                                <div class="spinner-border spinner-border-sm text-dark" role="status" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                            </div>
                             
                             @if($photo)
                                 <span class="position-absolute d-flex align-items-center justify-content-center fw-bold shadow" style="width: 18px; height: 18px; font-size: 0.7rem; background: #dc3545; color: white; border-radius: 50%; top: -3px; right: -3px; z-index: 10;">
