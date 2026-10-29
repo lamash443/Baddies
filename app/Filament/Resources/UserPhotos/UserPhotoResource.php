@@ -16,13 +16,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Storage;
 
 class UserPhotoResource extends Resource
 {
@@ -66,7 +64,7 @@ class UserPhotoResource extends Resource
                         'prime'     => 'Prime',
                         'vip'       => 'VIP',
                         'prime_vip' => 'Prime VIP',
-                        default     => ucfirst((string) $state),
+                        default     => $state ? ucfirst((string) $state) : 'No Plan',
                     })
                     ->color(fn ($state) => match ($state) {
                         'regular'   => 'gray',
@@ -105,10 +103,10 @@ class UserPhotoResource extends Resource
                 SelectFilter::make('subscription_plan')
                     ->label('Subscription Plan')
                     ->options([
-                        'regular'   => 'Regular',
-                        'prime'     => 'Prime',
-                        'vip'       => 'VIP',
                         'prime_vip' => 'Prime VIP',
+                        'vip'       => 'VIP',
+                        'prime'     => 'Prime',
+                        'regular'   => 'Regular',
                     ])
                     ->query(function ($query, array $data) {
                         if (!empty($data['value'])) {
@@ -129,27 +127,56 @@ class UserPhotoResource extends Resource
                     ->form([
                         Select::make('user_id')
                             ->label('Select User')
-                            ->options(
-                                User::whereNotNull('subscription_plan')
-                                    ->orderByRaw("FIELD(subscription_plan,'prime_vip','vip','prime','regular')")
-                                    ->get()
-                                    ->mapWithKeys(fn ($u) => [
-                                        $u->id => sprintf(
-                                            '%s — %s',
-                                            $u->name,
-                                            match ($u->subscription_plan) {
-                                                'regular'   => 'Regular',
-                                                'prime'     => 'Prime',
-                                                'vip'       => 'VIP',
-                                                'prime_vip' => 'Prime VIP',
-                                                default     => ucfirst((string) $u->subscription_plan),
-                                            }
-                                        ),
-                                    ])
-                            )
                             ->searchable()
+                            ->getSearchResultsUsing(function (string $search) {
+                                return User::query()
+                                    ->where(function ($query) use ($search) {
+                                        $query->where('name', 'like', "%{$search}%")
+                                            ->orWhere('email', 'like', "%{$search}%");
+                                    })
+                                    ->limit(50)
+                                    ->get()
+                                    ->mapWithKeys(function ($u) {
+                                        $plan = match ($u->subscription_plan) {
+                                            'prime_vip' => 'Prime VIP',
+                                            'vip'       => 'VIP',
+                                            'prime'     => 'Prime',
+                                            'regular'   => 'Regular',
+                                            default     => $u->subscription_plan ? ucfirst($u->subscription_plan) : 'No Plan',
+                                        };
+                                        return [$u->id => "{$u->name} ({$u->email}) — [{$plan}]"];
+                                    });
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $u = User::find($value);
+                                if (!$u) return $value;
+                                $plan = match ($u->subscription_plan) {
+                                    'prime_vip' => 'Prime VIP',
+                                    'vip'       => 'VIP',
+                                    'prime'     => 'Prime',
+                                    'regular'   => 'Regular',
+                                    default     => $u->subscription_plan ? ucfirst($u->subscription_plan) : 'No Plan',
+                                };
+                                return "{$u->name} ({$u->email}) — [{$plan}]";
+                            })
+                            ->options(function () {
+                                return User::query()
+                                    ->orderBy('name')
+                                    ->limit(100)
+                                    ->get()
+                                    ->mapWithKeys(function ($u) {
+                                        $plan = match ($u->subscription_plan) {
+                                            'prime_vip' => 'Prime VIP',
+                                            'vip'       => 'VIP',
+                                            'prime'     => 'Prime',
+                                            'regular'   => 'Regular',
+                                            default     => $u->subscription_plan ? ucfirst($u->subscription_plan) : 'No Plan',
+                                        };
+                                        return [$u->id => "{$u->name} ({$u->email}) — [{$plan}]"];
+                                    });
+                            })
                             ->required()
-                            ->placeholder('Search by name…'),
+                            ->placeholder('Search by name or email…'),
 
                         FileUpload::make('photos')
                             ->label('Photos')
@@ -177,7 +204,6 @@ class UserPhotoResource extends Resource
                         foreach ($photos as $path) {
                             $makeMain = $setMain && $isFirst;
 
-                            // If setting as main, clear existing main flag
                             if ($makeMain) {
                                 UserPhoto::where('user_id', $userId)
                                     ->where('is_main', true)
@@ -222,11 +248,12 @@ class UserPhotoResource extends Resource
                     ->modalCancelActionLabel('Close'),
 
                 Action::make('toggle_main')
-                    ->icon(fn ($record) => $record->is_main ? 'heroicon-o-star' : 'heroicon-o-star')
+                    ->icon('heroicon-o-star')
                     ->label(fn ($record) => $record->is_main ? 'Unset Main' : 'Set as Main')
                     ->color(fn ($record) => $record->is_main ? 'gray' : 'warning')
-                    ->requiresConfirmation(fn ($record) => $record->is_main)
-                    ->confirmationMessage('This will remove the main flag from this photo.')
+                    ->requiresConfirmation()
+                    ->modalHeading('Toggle Main Photo')
+                    ->modalDescription('Are you sure you want to change the main cover photo status for this user?')
                     ->action(function ($record): void {
                         if (!$record->is_main) {
                             UserPhoto::where('user_id', $record->user_id)
