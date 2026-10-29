@@ -204,8 +204,8 @@
 
       <!-- Header / Brand -->
       @php
-        $logoPath = \App\Models\SiteSetting::get('email_logo') ?: \App\Models\SiteSetting::get('logo');
-        $logoUrl  = null;
+        $logoPath   = \App\Models\SiteSetting::get('email_logo') ?: \App\Models\SiteSetting::get('logo');
+        $logoUrl    = null;
         if ($logoPath) {
             if (str_starts_with($logoPath, 'http://') || str_starts_with($logoPath, 'https://')) {
                 $logoUrl = $logoPath;
@@ -216,8 +216,22 @@
                 }
             }
         }
-        if ($logoUrl && (str_contains($logoUrl, '127.0.0.1') || str_contains($logoUrl, 'localhost'))) {
-            $logoUrl = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $logoUrl);
+        $avatarPath = \App\Models\SiteSetting::get('email_avatar');
+        $avatarUrl  = null;
+        if ($avatarPath) {
+            if (str_starts_with($avatarPath, 'http://') || str_starts_with($avatarPath, 'https://')) {
+                $avatarUrl = $avatarPath;
+            } else {
+                $cleanAvatar = ltrim(preg_replace('#^storage/#', '', $avatarPath), '/');
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanAvatar)) {
+                    $avatarUrl = url('storage/' . $cleanAvatar);
+                }
+            }
+        }
+        foreach (['logoUrl', 'avatarUrl'] as $var) {
+            if ($$var && (str_contains($$var, '127.0.0.1') || str_contains($$var, 'localhost'))) {
+                $$var = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $$var);
+            }
         }
         $brandUrl = 'https://kenyanbaddies.com';
       @endphp
@@ -225,6 +239,9 @@
         <a href="{{ $brandUrl }}" class="brand">
           @if($logoUrl)
             <img src="{{ $logoUrl }}" alt="{{ $appName }}" style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
+          @elseif($avatarUrl)
+            <img src="{{ $avatarUrl }}" alt="{{ $appName }}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,140,0,0.4);">
+            <span class="brand-name">{{ $appName }}</span>
           @else
             <span class="brand-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

@@ -80,6 +80,7 @@ class SiteSettingsPage extends Page implements HasForms
             // ── Branding ──────────────────────────────────────────────────────
             'logo'            => $this->getValidFileSetting('logo'),
             'email_logo'      => $this->getValidFileSetting('email_logo'),
+            'email_avatar'    => $this->getValidFileSetting('email_avatar'),
             'preloader'       => $this->getValidFileSetting('preloader'),
             'favicon'         => $this->getValidFileSetting('favicon'),
 
@@ -205,6 +206,20 @@ class SiteSettingsPage extends Page implements HasForms
                             ->image()
                             ->imageEditor()
                             ->helperText('Logo shown in the header of all outgoing emails (welcome, reset password, support replies). If not set, falls back to the Site Logo. Recommended: use a version with a transparent background, min 300px wide.'),
+
+                        FileUpload::make('email_avatar')
+                            ->label('Email Brand Avatar (Circle)')
+                            ->disk('public')
+                            ->directory('site')
+                            ->visibility('public')
+                            ->preventFilePathTampering(false, fn () => true)
+                            ->deletable()
+                            ->openable()
+                            ->downloadable()
+                            ->image()
+                            ->imageEditor()
+                            ->avatar()
+                            ->helperText('A square or circular image shown as the brand avatar circle in email headers when no full logo is set (e.g. your brand icon or profile photo). Replaces the default flame icon / letter "B".'),
                     ]),
 
                 Section::make('Favicon')
@@ -683,11 +698,11 @@ class SiteSettingsPage extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $fileKeys = ['logo', 'email_logo', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
+        $fileKeys = ['logo', 'email_logo', 'email_avatar', 'preloader', 'favicon', 'hero_background', 'escort_girls_header_background', 'call_boys_header_background', 'chat_announcement_logo'];
 
         $allKeys = [
             // Branding
-            'logo', 'email_logo', 'preloader', 'favicon',
+            'logo', 'email_logo', 'email_avatar', 'preloader', 'favicon',
             // Hero & Headers
             'hero_title', 'hero_subtitle', 'hero_background',
             'escort_girls_header_background', 'call_boys_header_background',

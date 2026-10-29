@@ -19,9 +19,27 @@
       }
   }
 
+  // Email avatar (circle) — shown when no full logo is available
+  $avatarPath = \App\Models\SiteSetting::get('email_avatar');
+  $avatarUrl  = null;
+  if ($avatarPath) {
+      if (str_starts_with($avatarPath, 'http://') || str_starts_with($avatarPath, 'https://')) {
+          $avatarUrl = $avatarPath;
+      } else {
+          $cleanAvatar = ltrim(preg_replace('#^storage/#', '', $avatarPath), '/');
+          if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanAvatar)) {
+              $avatarUrl = url('storage/' . $cleanAvatar);
+          } elseif (\Illuminate\Support\Facades\Storage::disk('public')->exists('site/' . $cleanAvatar)) {
+              $avatarUrl = url('storage/site/' . $cleanAvatar);
+          }
+      }
+  }
+
   // Force HTTPS live domain if url() generated 127.0.0.1 or localhost
-  if ($logoUrl && (str_contains($logoUrl, '127.0.0.1') || str_contains($logoUrl, 'localhost'))) {
-      $logoUrl = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $logoUrl);
+  foreach (['logoUrl', 'avatarUrl'] as $var) {
+      if ($$var && (str_contains($$var, '127.0.0.1') || str_contains($$var, 'localhost'))) {
+          $$var = preg_replace('#^https?://(127\.0\.0\.1|localhost)(:\d+)?#', 'https://kenyanbaddies.com', $$var);
+      }
   }
 
   $brandUrl = (!empty($url) && !str_contains($url, '127.0.0.1') && !str_contains($url, 'localhost'))
@@ -40,10 +58,22 @@
       <a href="{{ $brandUrl }}" style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none;">
 
         @if($logoUrl)
-          {{-- Use the uploaded site logo --}}
+          {{-- Full logo image --}}
           <img src="{{ $logoUrl }}"
                alt="{{ $appName }}"
                style="max-height: 48px; max-width: 160px; width: auto; object-fit: contain; display: block;">
+        @elseif($avatarUrl)
+          {{-- Uploaded brand avatar circle --}}
+          <img src="{{ $avatarUrl }}"
+               alt="{{ $appName }}"
+               style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid rgba(255,140,0,0.4);">
+          <span style="
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+          ">{{ $appName }}</span>
         @else
           {{-- Fallback: Flame icon + name --}}
           <span style="
