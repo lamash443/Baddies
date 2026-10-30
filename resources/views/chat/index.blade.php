@@ -195,6 +195,22 @@
       });
       syncChatToViewport();
     }
+
+    // ── Automatic scroll to latest message ──
+    function autoScrollChat() {
+      var el = document.getElementById('chat-messages');
+      if (el) el.scrollTop = el.scrollHeight;
+    }
+    window.addEventListener('load', function() {
+      autoScrollChat();
+      setTimeout(autoScrollChat, 150);
+      setTimeout(autoScrollChat, 500);
+    });
+    document.addEventListener('livewire:navigated', function() {
+      autoScrollChat();
+      setTimeout(autoScrollChat, 150);
+      setTimeout(autoScrollChat, 500);
+    });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

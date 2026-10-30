@@ -513,7 +513,21 @@
         </div>
 
         <!-- Messages Body -->
-        <div class="flex-grow-1 p-3 position-relative" id="chat-messages" wire:poll.3s style="background-color: var(--chat-bg); overflow-x: hidden; overflow-y: auto;">
+        <div class="flex-grow-1 p-3 position-relative" 
+             id="chat-messages" 
+             x-init="$nextTick(() => { $el.scrollTop = $el.scrollHeight });
+                     setTimeout(() => { $el.scrollTop = $el.scrollHeight }, 100);
+                     setTimeout(() => { $el.scrollTop = $el.scrollHeight }, 350);
+                     setTimeout(() => { $el.scrollTop = $el.scrollHeight }, 800);
+                     const obs = new MutationObserver(() => {
+                         const dist = $el.scrollHeight - $el.scrollTop - $el.clientHeight;
+                         if (dist < 280) {
+                             $el.scrollTop = $el.scrollHeight;
+                         }
+                     });
+                     obs.observe($el, { childList: true, subtree: true });"
+             wire:poll.3s 
+             style="background-color: var(--chat-bg); overflow-x: hidden; overflow-y: auto;">
             <!-- WhatsApp Doodle Background Pattern -->
             <div class="chat-bg-pattern"></div>
             
@@ -684,7 +698,7 @@
                                     <img x-ref="img"
                                          src="{{ $photoUrl }}" 
                                          alt="Photo" 
-                                         x-on:load="onLoad()"
+                                         x-on:load="onLoad(); const c = document.getElementById('chat-messages'); if (c && (c.scrollHeight - c.scrollTop - c.clientHeight < 350)) c.scrollTop = c.scrollHeight;"
                                          x-on:error="onLoad()"
                                          class="img-fluid rounded w-100 d-block" 
                                          style="max-width: 270px; max-height: 320px; object-fit: cover; -webkit-user-drag: none; transition: opacity 0.2s ease;"
@@ -777,7 +791,11 @@
                         <div class="d-flex align-items-center justify-content-between p-2 rounded-3"
                              style="background: rgba(255,140,0,0.08); border: 1px solid rgba(255,140,0,0.25);">
                             <div class="d-flex align-items-center gap-2" style="min-width: 0;">
-                                <div class="spinner-grow text-warning" role="status" style="width: 14px; height: 14px; animation-duration: 0.9s; flex-shrink: 0;"></div>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
                                 <div class="d-flex flex-column" style="min-width: 0;">
                                     <span class="fw-bold text-truncate" style="color: #ff8c00; font-size: 0.82rem; letter-spacing: 0.02em;">
                                         Uploading Photo...
@@ -858,12 +876,6 @@
                             <div wire:loading wire:target="sendMessage">
                                 <div class="spinner-border spinner-border-sm text-dark" role="status" style="width: 16px; height: 16px; border-width: 2px;"></div>
                             </div>
-                            
-                            @if($photo)
-                                <span class="position-absolute d-flex align-items-center justify-content-center fw-bold shadow" style="width: 18px; height: 18px; font-size: 0.7rem; background: #dc3545; color: white; border-radius: 50%; top: -3px; right: -3px; z-index: 10;">
-                                    1
-                                </span>
-                            @endif
                         </button>
                     </form>
                 </div>
@@ -893,13 +905,43 @@
                 sound:    @json($tSound),
             };
 
-            function scrollToBottom() { const el = document.getElementById('chat-messages'); if (el) el.scrollTop = el.scrollHeight; }
+            function scrollToBottom(force = false) {
+                const el = document.getElementById('chat-messages');
+                if (!el) return;
+                const isNearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 250;
+                if (force || isNearBottom) {
+                    el.scrollTop = el.scrollHeight;
+                }
+            }
+            window.scrollToChatBottom = scrollToBottom;
+
             document.addEventListener('livewire:initialized', () => {
-                scrollToBottom();
-                Livewire.on('messageSent', () => setTimeout(scrollToBottom, 50));
+                scrollToBottom(true);
+                setTimeout(() => scrollToBottom(true), 150);
+                setTimeout(() => scrollToBottom(true), 450);
+                setTimeout(() => scrollToBottom(true), 900);
+                if (window.Livewire) {
+                    Livewire.on('messageSent', () => {
+                        setTimeout(() => scrollToBottom(true), 50);
+                        setTimeout(() => scrollToBottom(true), 200);
+                    });
+                }
             });
-            document.addEventListener('DOMContentLoaded', scrollToBottom);
-            document.addEventListener('livewire:navigated', scrollToBottom);
+            window.addEventListener('messageSent', () => {
+                setTimeout(() => scrollToBottom(true), 50);
+                setTimeout(() => scrollToBottom(true), 200);
+            });
+            document.addEventListener('DOMContentLoaded', () => {
+                scrollToBottom(true);
+                setTimeout(() => scrollToBottom(true), 200);
+            });
+            document.addEventListener('livewire:navigated', () => {
+                scrollToBottom(true);
+                setTimeout(() => scrollToBottom(true), 200);
+            });
+            document.addEventListener('livewire:update', () => {
+                scrollToBottom(false);
+            });
         </script>
 
     <!-- Delete Message Modal -->
