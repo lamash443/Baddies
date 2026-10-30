@@ -833,18 +833,18 @@
                                     </svg>
                                 @endif
 
-                                <!-- Circular Percentage Meter while uploading on button -->
+                                <!-- Circular Loading Ring while uploading (image clearly visible at center, no text inside) -->
                                 <template x-if="isUploading">
-                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                                         style="background: rgba(0,0,0,0.85); border-radius: 50%; z-index: 20;">
-                                        <svg width="34" height="34" viewBox="0 0 36 36">
+                                    <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center pointer-events-none"
+                                         style="background: rgba(0,0,0,0.3); border-radius: 50%; z-index: 20;">
+                                        <svg width="40" height="40" viewBox="0 0 36 36">
                                             <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                  fill="none" stroke="rgba(255,140,0,0.2)" stroke-width="3.5" />
+                                                  fill="none" stroke="rgba(255,140,0,0.25)" stroke-width="3" />
                                             <path :stroke-dasharray="`${progress}, 100`"
                                                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                  fill="none" stroke="#ff8c00" stroke-width="3.5" stroke-linecap="round" />
+                                                  fill="none" stroke="#ff8c00" stroke-width="3" stroke-linecap="round"
+                                                  style="transition: stroke-dasharray 0.1s ease;" />
                                         </svg>
-                                        <span class="position-absolute text-white fw-bold" style="font-size: 0.58rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
                                     </div>
                                 </template>
 
