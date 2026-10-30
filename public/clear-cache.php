@@ -5,7 +5,18 @@ if (($_GET['token'] ?? '') !== 'kbc-clear-2026') { http_response_code(404); die(
 
 header('Content-Type: text/plain; charset=utf-8');
 
+$candidateBases = [
+    '/home/kenyanba/repositories/Baddies',
+    '/home/kenyanba/laravel-app',
+    dirname(__DIR__),
+];
 $base = dirname(__DIR__);
+foreach ($candidateBases as $b) {
+    if (file_exists($b . '/artisan') || file_exists($b . '/vendor/autoload.php')) {
+        $base = $b;
+        break;
+    }
+}
 echo "Base path: $base\n";
 echo "PHP version: " . PHP_VERSION . "\n\n";
 
@@ -18,10 +29,13 @@ function rDelete(string $path, string $base, array &$d, array &$e): void {
         if (basename($path) === '.gitignore') return;
         if (@unlink($path)) $d[] = ltrim(str_replace($base, '', $path), '/\\');
         else $e[] = ltrim(str_replace($base, '', $path), '/\\');
-    } elseif (is_dir($path)) {
-        foreach (scandir($path) as $item) {
-            if ($item === '.' || $item === '..') continue;
-            rDelete($path . DIRECTORY_SEPARATOR . $item, $base, $d, $e);
+    } elseif (is_dir($path) && is_readable($path)) {
+        $items = @scandir($path);
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if ($item === '.' || $item === '..') continue;
+                rDelete($path . DIRECTORY_SEPARATOR . $item, $base, $d, $e);
+            }
         }
     }
 }

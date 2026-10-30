@@ -8,3 +8,4 @@ class EditProfile extends BaseEditProfile
 {
     //
 }
+

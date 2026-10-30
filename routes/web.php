@@ -1803,3 +1803,19 @@ Route::match(['get', 'post'], '/age-verify', function (\Illuminate\Http\Request 
     $cookie = cookie('baddies_club_age_verified', 'true', 525600, '/', $domain, false, false);
     return response()->json(['success' => true])->withCookie($cookie);
 })->name('age.verify');
+
+// Emergency Cache Clear Route - Accessible via web without needing file copy to public_html
+Route::get('/clear-cache.php', function () {
+    if (request('token') !== 'kbc-clear-2026') {
+        abort(404);
+    }
+    try {
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        return response("=== Cache Clear Successful ===\nCompiled views cleared: OK\nApplication cache cleared: OK\nConfiguration cache cleared: OK\nRoute cache cleared: OK\n\nAll caches cleared! Reload kenyanbaddies.com now.\n", 200, ['Content-Type' => 'text/plain']);
+    } catch (\Throwable $e) {
+        return response("Error clearing cache: " . $e->getMessage() . "\n", 500, ['Content-Type' => 'text/plain']);
+    }
+});

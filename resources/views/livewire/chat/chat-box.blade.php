@@ -134,7 +134,7 @@
                 if (bubble) {
                     const textEl = bubble.querySelector('.msg-body-text');
                     const senderId = bubble.getAttribute('data-sender-id');
-                    const isMe = senderId == {{ auth()->id() }};
+                    const isMe = senderId == {{ auth()->id() ?? 'null' }};
                     
                     this.replyData = {
                         id: id,
@@ -159,7 +159,7 @@
         },
         openDeleteModal() {
             if (this.selectedIds.length === 0) return;
-            const currentUserId = {{ auth()->id() }};
+            const currentUserId = {{ auth()->id() ?? 'null' }};
             const selectedBubbles = document.querySelectorAll('.msg-bubble');
             let allMine = true;
             this.selectedIds.forEach(id => {
@@ -684,8 +684,8 @@
                                     <img x-ref="img"
                                          src="{{ $photoUrl }}" 
                                          alt="Photo" 
-                                         @load="onLoad()"
-                                         @error="onLoad()"
+                                         x-on:load="onLoad()"
+                                         x-on:error="onLoad()"
                                          class="img-fluid rounded w-100 d-block" 
                                          style="max-width: 270px; max-height: 320px; object-fit: cover; -webkit-user-drag: none; transition: opacity 0.2s ease;"
                                          :style="loaded ? 'opacity: 1;' : 'opacity: 0.2;'"
@@ -706,7 +706,7 @@
                                           <polyline points="16 7 12 11"></polyline>
                                           <polyline points="6 15 2 11"></polyline>
                                         </svg>
-                                    @elseif($activeUser->isOnline())
+                                    @elseif($activeUser && $activeUser->isOnline())
                                         {{-- Double Gray Tick --}}
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50">
                                           <polyline points="22 7 12 17 8 13"></polyline>

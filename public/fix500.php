@@ -17,3 +17,4 @@ if (file_exists($log)) {
 } else {
     echo "Log not found: $log\n";
 }
+
