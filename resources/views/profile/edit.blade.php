@@ -1941,7 +1941,7 @@
                     </ul>
 
                     @if($checkoutRoute)
-                      <a href="{{ route($checkoutRoute) }}" class="btn {{ $isPrimeVip ? 'btn-orange' : 'btn-outline-warning' }} w-100 fw-bold mt-auto" style="border-radius:8px;">{{ __('Sign Up Now') }}</a>
+                      <a href="{{ route($checkoutRoute) }}" class="btn {{ $isPrimeVip ? 'btn-orange' : 'btn-outline-warning' }} w-100 fw-bold mt-auto" style="border-radius:8px;">{{ __('Subscribe') }}</a>
                     @endif
                   </div>
                 </div>

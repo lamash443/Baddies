@@ -1051,31 +1051,22 @@
             <button type="button" 
                     @click.stop="downloadLightboxImage()"
                     class="btn text-white d-flex align-items-center justify-content-center p-0" 
-                    style="min-width:40px; height:40px; padding: 0 14px; background: rgba(0,0,0,0.65); border-radius: 20px; border: 1px solid rgba(255,140,0,0.4); backdrop-filter: blur(6px); transition: all 0.2s;" 
+                    style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; border: none; backdrop-filter: blur(4px); transition: all 0.2s;" 
                     :title="lightboxDownloading ? `Downloading ${lightboxProgress}%` : 'Download Photo'">
                 <template x-if="!lightboxDownloading && !lightboxDownloaded">
-                    <div class="d-flex align-items-center gap-1">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Download</span>
-                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
                 </template>
                 <template x-if="lightboxDownloading">
-                    <div class="d-flex align-items-center gap-1.5">
-                        <div class="spinner-border text-warning" role="status" style="width: 14px; height: 14px; border-width: 2px;"></div>
-                        <span class="text-white fw-bold" style="font-size: 0.78rem; font-family: monospace;" x-text="`${lightboxProgress}%`"></span>
-                    </div>
+                    <div class="spinner-border text-warning" role="status" style="width: 18px; height: 18px; border-width: 2px;"></div>
                 </template>
                 <template x-if="lightboxDownloaded">
-                    <div class="d-flex align-items-center gap-1 text-success">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span style="font-size: 0.8rem; font-weight: 600;">Saved</span>
-                    </div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
                 </template>
             </button>
 
