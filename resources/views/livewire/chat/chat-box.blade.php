@@ -627,30 +627,31 @@
                                     $photoUrl = asset('storage/' . $message->image_path);
                                 @endphp
                                 <div x-data="{
-                                        loaded: false,
+                                        loaded: {{ $isSender ? 'true' : 'false' }},
                                         progress: 0,
                                         timer: null,
                                         init() {
-                                            const el = this.$refs.img;
-                                            if (el && el.complete && el.naturalWidth > 0) {
-                                                this.loaded = true;
-                                                return;
-                                            }
-                                            this.progress = 15;
-                                            this.timer = setInterval(() => {
-                                                if (this.loaded) {
-                                                    clearInterval(this.timer);
+                                            @if(!$isSender)
+                                                const el = this.$refs.img;
+                                                if (el && el.complete && el.naturalWidth > 0) {
+                                                    this.loaded = true;
                                                     return;
                                                 }
-                                                if (this.progress < 92) {
-                                                    this.progress += Math.floor(Math.random() * 12) + 6;
-                                                    if (this.progress > 92) this.progress = 92;
-                                                }
-                                            }, 70);
+                                                this.progress = 15;
+                                                this.timer = setInterval(() => {
+                                                    if (this.loaded) {
+                                                        clearInterval(this.timer);
+                                                        return;
+                                                    }
+                                                    if (this.progress < 90) {
+                                                        this.progress += Math.floor(Math.random() * 12) + 6;
+                                                        if (this.progress > 90) this.progress = 90;
+                                                    }
+                                                }, 70);
+                                            @endif
                                         },
                                         onLoad() {
                                             if (this.timer) clearInterval(this.timer);
-                                            this.progress = 100;
                                             this.loaded = true;
                                         }
                                      }"
@@ -659,26 +660,25 @@
                                      @click.stop="openLightbox('{{ $photoUrl }}')"
                                      @contextmenu.prevent>
                                     
-                                    {{-- Central Download Progress Ring: ONLY VISIBLE WHILE DOWNLOADING/LOADING --}}
-                                    <div x-cloak x-show="!loaded"
-                                         x-transition:leave="transition ease-out duration-150"
-                                         x-transition:leave-start="opacity-100"
-                                         x-transition:leave-end="opacity-0"
-                                         class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
-                                         style="background: rgba(10,10,10,0.7); backdrop-filter: blur(3px); z-index: 5;">
-                                        
-                                        <div class="position-relative d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0,0,0,0.6);">
-                                            <svg width="44" height="44" viewBox="0 0 36 36">
-                                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                      fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3" />
-                                                <path :stroke-dasharray="`${progress}, 100`"
-                                                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                      fill="none" stroke="#ff8c00" stroke-width="3" stroke-linecap="round"
-                                                      style="transition: stroke-dasharray 0.1s ease;" />
-                                            </svg>
-                                            <span class="position-absolute text-white fw-bold" style="font-size: 0.68rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
-                                        </div>
-                                    </div>
+                                    {{-- Central Download Progress Ring: ONLY ON RECEIVED IMAGES WHILE LOADING --}}
+                                    @if(!$isSender)
+                                        <template x-if="!loaded">
+                                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
+                                                 style="background: rgba(10,10,10,0.7); backdrop-filter: blur(3px); z-index: 5;">
+                                                <div class="position-relative d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; border-radius: 50%; background: rgba(0,0,0,0.6);">
+                                                    <svg width="44" height="44" viewBox="0 0 36 36">
+                                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                              fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3" />
+                                                        <path :stroke-dasharray="`${progress}, 100`"
+                                                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                              fill="none" stroke="#ff8c00" stroke-width="3" stroke-linecap="round"
+                                                              style="transition: stroke-dasharray 0.1s ease;" />
+                                                    </svg>
+                                                    <span class="position-absolute text-white fw-bold" style="font-size: 0.68rem; font-family: monospace;" x-text="`${progress}%`">0%</span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    @endif
 
                                     {{-- The Image: clean, no overlays or permanent buttons once loaded --}}
                                     <img x-ref="img"

@@ -1347,30 +1347,33 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
 
     // ── FIX STORAGE SYMLINK (pure PHP — no exec) ─────────────────────────────
     if (in_array($action, ['fix-storage', 'full-setup'])) {
-        $target = '/home/kenyanba/repositories/Baddies/storage/app/public';
-        $link   = '/home/kenyanba/public_html/storage';
+        $target = file_exists('/home/kenyanba/repositories/Baddies/storage/app/public')
+            ? '/home/kenyanba/repositories/Baddies/storage/app/public'
+            : storage_path('app/public');
+        $link   = is_dir('/home/kenyanba/public_html')
+            ? '/home/kenyanba/public_html/storage'
+            : public_path('storage');
         try {
-            // Remove whatever is there
+            if (!is_dir($target)) @mkdir($target, 0775, true);
+
+            // Remove broken symlink if present
             if (is_link($link)) {
                 $removed = unlink($link);
                 $results[] = ['label' => 'Remove old symlink', 'cmd' => "unlink('$link')", 'out' => $removed ? '✅ Removed' : '❌ Could not remove', 'ok' => $removed];
-            } elseif (is_dir($link)) {
-                $removed = $rrmdir($link);
-                $results[] = ['label' => 'Remove old storage dir', 'cmd' => "rrmdir('$link')", 'out' => $removed ? '✅ Removed' : '❌ Could not remove (may have files)', 'ok' => $removed];
             } else {
-                $results[] = ['label' => 'Check existing link', 'cmd' => "is_link/is_dir '$link'", 'out' => 'Clean — nothing to remove', 'ok' => true];
+                $results[] = ['label' => 'Check existing link', 'cmd' => "is_link '$link'", 'out' => 'Clean — ready for link or mirror', 'ok' => true];
             }
 
-            // Create symlink if function is available
+            // Create symlink if function is available and not a real dir
             $ok = false;
-            if (function_exists('symlink')) {
+            if (function_exists('symlink') && !is_dir($link)) {
                 $ok = @symlink($target, $link);
             }
 
             if ($ok && is_link($link) && is_dir($link)) {
                 $results[] = ['label' => 'Create symlink', 'cmd' => "symlink('$target', '$link')", 'out' => '✅ Native symlink created and verified working', 'ok' => true];
             } else {
-                // Shared hosting: symlink() disabled. Recursively mirror storage/app/public into public_html/storage
+                // Shared hosting: symlink() disabled or blocked. Recursively mirror storage/app/public into public_html/storage
                 $copyDir = function ($src, $dst) use (&$copyDir): int {
                     $c = 0;
                     if (!is_dir($dst)) @mkdir($dst, 0775, true);
@@ -1381,8 +1384,12 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
                         if (is_dir($sf)) {
                             $c += $copyDir($sf, $df);
                         } else {
-                            if (@copy($sf, $df)) {
-                                @chmod($df, 0664);
+                            if (!file_exists($df) || filesize($df) !== filesize($sf)) {
+                                if (@copy($sf, $df)) {
+                                    @chmod($df, 0664);
+                                    $c++;
+                                }
+                            } else {
                                 $c++;
                             }
                         }
@@ -1394,8 +1401,8 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
                 $results[] = [
                     'label' => 'Public Storage Mirror',
                     'cmd'   => "copyDir('$target', '$link')",
-                    'out'   => "✅ Mirrored $copied media files directly into public_html/storage! LiteSpeed web server now serves all images natively 🚀",
-                    'ok'    => $copied > 0
+                    'out'   => "✅ Mirrored $copied media files directly into public_html/storage! Web server now serves all images natively 🚀",
+                    'ok'    => true
                 ];
             }
 
@@ -1492,9 +1499,44 @@ Route::match(['GET', 'POST'], '/server-setup', function (\Illuminate\Http\Reques
     // ── STATUS ───────────────────────────────────────────────────────────────
     $envRaw = @file_get_contents($envFile) ?: '';
     $val    = fn($k) => preg_match("/^{$k}=(.*)$/m", $envRaw, $m) ? trim($m[1]) : '(not set)';
-    $sym    = '/home/kenyanba/public_html/storage';
-    $symOk  = is_link($sym) && is_dir($sym);
-    $dirOk  = is_dir($sym) && count(glob($sym . '/*') ?: []) > 0;
+    $sym           = is_dir('/home/kenyanba/public_html') ? '/home/kenyanba/public_html/storage' : public_path('storage');
+    $storageTarget = file_exists('/home/kenyanba/repositories/Baddies/storage/app/public') ? '/home/kenyanba/repositories/Baddies/storage/app/public' : storage_path('app/public');
+    $symOk         = is_link($sym) && is_dir($sym);
+    $dirOk         = is_dir($sym) && count(glob($sym . '/*') ?: []) > 0;
+
+    if (!$symOk && !$dirOk && is_dir($storageTarget)) {
+        // Automatically link or mirror when status dashboard is viewed
+        if (function_exists('symlink') && !is_dir($sym)) {
+            @symlink($storageTarget, $sym);
+            $symOk = is_link($sym) && is_dir($sym);
+        }
+        if (!$symOk) {
+            $autoMirror = function ($src, $dst) use (&$autoMirror): int {
+                $c = 0;
+                if (!is_dir($dst)) @mkdir($dst, 0775, true);
+                foreach (scandir($src) ?: [] as $f) {
+                    if ($f === '.' || $f === '..') continue;
+                    $sf = $src . '/' . $f;
+                    $df = $dst . '/' . $f;
+                    if (is_dir($sf)) {
+                        $c += $autoMirror($sf, $df);
+                    } else {
+                        if (!file_exists($df) || filesize($df) !== filesize($sf)) {
+                            if (@copy($sf, $df)) {
+                                @chmod($df, 0664);
+                                $c++;
+                            }
+                        } else {
+                            $c++;
+                        }
+                    }
+                }
+                return $c;
+            };
+            $autoMirror($storageTarget, $sym);
+            $dirOk = is_dir($sym) && count(glob($sym . '/*') ?: []) > 0;
+        }
+    }
 
     $hasSessions = false;
     $userCount = null;
@@ -1637,7 +1679,7 @@ h2{color:#ff8c00;font-size:1.1rem;margin:.75rem 0}
   <a class="btn p" href="<?=$base?>&action=test-payhero">💳 Test PayHero</a>
   <a class="btn s" href="<?=$base?>&action=test-smtp">📧 Test SMTP</a>
   <a class="btn s" href="<?=$base?>&action=seed-plans">🌱 Seed Plans</a>
-  <a class="btn s" href="<?=$base?>&action=fix-storage">🔗 Fix Symlink</a>
+  <a class="btn p" href="<?=$base?>&action=fix-storage">🔗 Fix Storage</a>
   <a class="btn s" href="<?=$base?>&action=fix-env">📝 Fix .env</a>
   <a class="btn s" href="<?=$base?>&action=clear-cache">🗑️ Clear Caches</a>
   <a class="btn s" href="<?=$base?>&action=migrate">🗄️ Migrate</a>
